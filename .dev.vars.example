@@ -1,0 +1,14 @@
+# Local-only example. Copy to .dev.vars; never commit real values.
+OTP_PEPPER=replace-with-at-least-32-random-bytes
+RATE_LIMIT_PEPPER=replace-with-a-different-32-byte-value
+RESEND_API_KEY=re_local_only
+EMAIL_FROM=ChatGun <login@example.com>
+TURNSTILE_SITE_KEY=replace-me
+TURNSTILE_SECRET_KEY=replace-me
+GOOGLE_CLIENT_ID=replace-me
+GOOGLE_CLIENT_SECRET=replace-me
+FACEBOOK_CLIENT_ID=replace-me
+FACEBOOK_CLIENT_SECRET=replace-me
+FACEBOOK_GRAPH_VERSION=replace-with-current-vN.0
+LINE_CLIENT_ID=replace-me
+LINE_CLIENT_SECRET=replace-me

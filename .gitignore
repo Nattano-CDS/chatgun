@@ -1,0 +1,9 @@
+node_modules/
+coverage/
+playwright-report/
+test-results/
+.wrangler/
+.dev.vars
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

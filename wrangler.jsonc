@@ -1,0 +1,39 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "chatgun",
+  "pages_build_output_dir": ".",
+  "compatibility_date": "2026-10-15",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "chatgun-auth",
+      "database_id": "9738a051-d914-42d0-8e7b-8098ef2b959d",
+      "preview_database_id": "DB",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "env": {
+    "production": {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "chatgun-auth",
+          "database_id": "9738a051-d914-42d0-8e7b-8098ef2b959d",
+          "preview_database_id": "DB",
+          "migrations_dir": "migrations"
+        }
+      ]
+    },
+    "preview": {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "chatgun-auth-staging",
+          "database_id": "5bbfd55d-eb22-4324-8a7d-57bef14110ea",
+          "preview_database_id": "DB",
+          "migrations_dir": "migrations"
+        }
+      ]
+    }
+  }
+}

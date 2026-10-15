@@ -1,18 +1,342 @@
-const encoder=new TextEncoder();
-const b64=x=>btoa(String.fromCharCode(...new Uint8Array(x))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-const rand=()=>b64(crypto.getRandomValues(new Uint8Array(32)));
-const sha=async x=>b64(await crypto.subtle.digest("SHA-256",encoder.encode(x)));
-const sign=async(k,x)=>{const key=await crypto.subtle.importKey("raw",encoder.encode(k),"HMAC",false,["sign"]);return b64(await crypto.subtle.sign("HMAC",key,encoder.encode(x)))};
-const now=()=>Math.floor(Date.now()/1000);
-const reply=(v,status=200,headers={})=>new Response(JSON.stringify(v),{status,headers:{"content-type":"application/json","cache-control":"no-store",...headers}});
-const error=(m,s=400)=>reply({message:m},s);
-const cookie=(k,v,age)=>k+"="+encodeURIComponent(v)+"; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age="+age;
-const getCookie=(r,k)=>r.headers.get("cookie")?.split(";").map(x=>x.trim()).find(x=>x.startsWith(k+"="))?.slice(k.length+1)||"";
-async function body(r){if(Number(r.headers.get("content-length")||0)>2048)throw Error("large");return r.json()}
-async function issueSession(env,id){const token=rand();await env.DB.prepare("INSERT INTO sessions VALUES(?,?,?)").bind(await sha(token),id,now()+2592000).run();return cookie("cg_session",token,2592000)}
-async function otpStart(r,e){const {channel,destination}=await body(r);if(channel!=="email")return error("ยังไม่เปิด SMS OTP");if(typeof destination!=="string"||destination.length>254||! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(destination))return error("อีเมลไม่ถูกต้อง");if(!e.RESEND_API_KEY||!e.EMAIL_FROM||!e.OTP_PEPPER)return error("ระบบส่งอีเมลยังไม่พร้อม",503);const email=destination.trim().toLowerCase(),ip=await sign(e.OTP_PEPPER,r.headers.get("CF-Connecting-IP")||"unknown");const count=await e.DB.prepare("SELECT COUNT(*) AS n FROM otp_challenges WHERE (email=? OR ip_hash=?) AND created_at>?").bind(email,ip,now()-3600).first();if(count.n>=5)return error("ขอรหัสบ่อยเกินไป",429);const id=crypto.randomUUID(),otp=String(crypto.getRandomValues(new Uint32Array(1))[0]%1000000).padStart(6,"0");await e.DB.prepare("INSERT INTO otp_challenges(id,email,code_hash,ip_hash,expires_at,created_at) VALUES(?,?,?,?,?,?)").bind(id,email,await sign(e.OTP_PEPPER,id+":"+otp),ip,now()+300,now()).run();const sent=await fetch("https://api.resend.com/emails",{method:"POST",headers:{"authorization":"Bearer "+e.RESEND_API_KEY,"content-type":"application/json"},body:JSON.stringify({from:e.EMAIL_FROM,to:[email],subject:"ChatGun OTP",text:"รหัสยืนยัน ChatGun: "+otp+" หมดอายุใน 5 นาที"})});if(!sent.ok){await e.DB.prepare("DELETE FROM otp_challenges WHERE id=?").bind(id).run();return error("ส่งอีเมลไม่สำเร็จ",502)}return reply({challengeId:id})}
-async function otpVerify(r,e){const {challengeId,code}=await body(r);if(typeof challengeId!=="string"||!/^\d{6}$/.test(code||""))return error("OTP ไม่ถูกต้อง");const row=await e.DB.prepare("SELECT * FROM otp_challenges WHERE id=?").bind(challengeId).first();if(!row||row.used_at||row.expires_at<now()||row.attempts>=5)return error("OTP หมดอายุหรือถูกใช้แล้ว");if(await sign(e.OTP_PEPPER,challengeId+":"+code)!==row.code_hash){await e.DB.prepare("UPDATE otp_challenges SET attempts=attempts+1 WHERE id=?").bind(challengeId).run();return error("OTP ไม่ถูกต้อง")}const claim=await e.DB.prepare("UPDATE otp_challenges SET used_at=? WHERE id=? AND used_at IS NULL AND expires_at>? AND attempts<5").bind(now(),challengeId,now()).run();if(claim.meta.changes!==1)return error("OTP ถูกใช้แล้ว");await e.DB.prepare("INSERT OR IGNORE INTO users(id,email,created_at) VALUES(?,?,?)").bind(crypto.randomUUID(),row.email,now()).run();const user=await e.DB.prepare("SELECT id FROM users WHERE email=?").bind(row.email).first();return reply({authenticated:true,redirectUrl:"/account.html"},200,{"set-cookie":await issueSession(e,user.id)})}
-const providers={google:["https://accounts.google.com/o/oauth2/v2/auth","https://oauth2.googleapis.com/token","https://openidconnect.googleapis.com/v1/userinfo","openid email profile"],facebook:["https://www.facebook.com/v21.0/dialog/oauth","https://graph.facebook.com/v21.0/oauth/access_token","https://graph.facebook.com/me?fields=id,name,email","email,public_profile"],line:["https://access.line.me/oauth2/v2.1/authorize","https://api.line.me/oauth2/v2.1/token","https://api.line.me/v2/profile","profile openid email"]};
-async function oauthStart(r,e,p){const cfg=providers[p],client=e[p.toUpperCase()+"_CLIENT_ID"];if(!client)return error("ยังไม่ได้ตั้งค่า "+p,503);const state=rand(),verifier=rand(),nonce=rand();await e.DB.prepare("INSERT INTO oauth_flows VALUES(?,?,?,?,?)").bind(await sha(state),p,verifier,nonce,now()+600).run();const u=new URL(cfg[0]);u.searchParams.set("client_id",client);u.searchParams.set("redirect_uri",new URL(r.url).origin+"/api/auth/oauth/"+p+"/callback");u.searchParams.set("response_type","code");u.searchParams.set("scope",cfg[3]);u.searchParams.set("state",state);if(p!=="facebook"){u.searchParams.set("code_challenge",await sha(verifier));u.searchParams.set("code_challenge_method","S256")}if(p!=="facebook")u.searchParams.set("nonce",nonce);return new Response(null,{status:302,headers:{location:u.toString(),"set-cookie":cookie("cg_oauth_state",state,600)}})}
-async function oauthCallback(r,e,p){const u=new URL(r.url),state=u.searchParams.get("state"),code=u.searchParams.get("code");if(!state||!code||state!==decodeURIComponent(getCookie(r,"cg_oauth_state")))return error("OAuth state invalid",403);const key=await sha(state),flow=await e.DB.prepare("SELECT * FROM oauth_flows WHERE state_hash=? AND provider=?").bind(key,p).first();if(!flow||flow.expires_at<now())return error("OAuth expired",403);const claim=await e.DB.prepare("DELETE FROM oauth_flows WHERE state_hash=? AND provider=?").bind(key,p).run();if(claim.meta.changes!==1)return error("OAuth used",403);const cfg=providers[p],client=e[p.toUpperCase()+"_CLIENT_ID"],secret=e[p.toUpperCase()+"_CLIENT_SECRET"];if(!client||!secret)return error("OAuth not configured",503);const form=new URLSearchParams({grant_type:"authorization_code",code,client_id:client,client_secret:secret,redirect_uri:u.origin+"/api/auth/oauth/"+p+"/callback"});if(p!=="facebook")form.set("code_verifier",flow.verifier);const t=await fetch(cfg[1],{method:"POST",headers:{"content-type":"application/x-www-form-urlencoded","accept":"application/json"},body:form});if(!t.ok)return error("OAuth exchange failed",502);const token=await t.json();if(!token.access_token)return error("Missing token",502);const profile=await fetch(cfg[2],{headers:{authorization:"Bearer "+token.access_token}});if(!profile.ok)return error("Profile unavailable",502);const info=await profile.json(),subject=p==="google"?info.sub:p==="line"?info.userId:info.id;if(!subject)return error("Invalid identity",502);if(p==="google"&&info.email_verified!==true)return error("Unverified Google account",403);let identity=await e.DB.prepare("SELECT user_id FROM identities WHERE provider=? AND subject=?").bind(p,subject).first();let id=identity?.user_id;if(!id){id=crypto.randomUUID();await e.DB.prepare("INSERT INTO users(id,display_name,created_at) VALUES(?,?,?)").bind(id,info.name||info.displayName||null,now()).run();await e.DB.prepare("INSERT INTO identities VALUES(?,?,?)").bind(p,subject,id).run()}return new Response(null,{status:302,headers:{location:"/account.html","set-cookie":await issueSession(e,id)}})}
-export async function onRequest({request:r,env:e}){try{const p=new URL(r.url).pathname;if(r.method==="POST"&&p==="/api/auth/otp/start")return otpStart(r,e);if(r.method==="POST"&&p==="/api/auth/otp/verify")return otpVerify(r,e);const m=p.match(/^\/api\/auth\/oauth\/(google|facebook|line)\/(start|callback)$/);if(m&&r.method==="GET")return m[2]==="start"?oauthStart(r,e,m[1]):oauthCallback(r,e,m[1]);if(p==="/api/auth/me"&&r.method==="GET"){const token=decodeURIComponent(getCookie(r,"cg_session"));if(!token)return error("Unauthorized",401);const user=await e.DB.prepare("SELECT u.id,u.email,u.display_name FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?").bind(await sha(token),now()).first();return user?reply({user}):error("Unauthorized",401)}if(p==="/api/auth/logout"&&r.method==="POST"){const token=decodeURIComponent(getCookie(r,"cg_session"));if(token)await e.DB.prepare("DELETE FROM sessions WHERE token_hash=?").bind(await sha(token)).run();return reply({ok:true},200,{"set-cookie":cookie("cg_session","",0)})}return error("Not found",404)}catch(err){console.error("Auth error",err?.name);return error("ระบบขัดข้อง",500)}}
+import { constantTimeEqual, hmac, randomOtp, randomToken, safeUuid, sha256 } from "../../_lib/crypto.js";
+import {
+  CSRF_COOKIE,
+  OAUTH_COOKIE,
+  SESSION_COOKIE,
+  RequestError,
+  appendCookies,
+  cookie,
+  failure,
+  json,
+  parseCookies,
+  readJson,
+  redirect,
+  requireSameOrigin,
+} from "../../_lib/http.js";
+import {
+  createVerifiedEmailUser,
+  findOrCreateIdentity,
+  getSession,
+  issueSession,
+  rateLimit,
+  requireCsrf,
+  unixTime,
+} from "../../_lib/db.js";
+import { exchangeCode, providerConfiguration, verifyProviderIdentity } from "../../_lib/oauth.js";
+
+const PROVIDERS = new Set(["google", "facebook", "line"]);
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
+const OAUTH_TTL_SECONDS = 600;
+const OTP_TTL_SECONDS = 300;
+const OTP_COOLDOWN_SECONDS = 60;
+const GENERIC_ERROR = "ไม่สามารถเข้าสู่ระบบได้ กรุณาลองใหม่อีกครั้ง";
+
+function clientIp(request) {
+  return request.headers.get("cf-connecting-ip") || "unknown";
+}
+
+function requestHost(request) {
+  return new URL(request.url).hostname;
+}
+
+function authErrorRedirect(request, code) {
+  const target = new URL("/signup.html", request.url);
+  target.searchParams.set("auth_error", code);
+  return redirect(target.pathname + target.search, [cookie(OAUTH_COOKIE, "", 0)]);
+}
+
+function assertEnvironment(env, names) {
+  if (!env.DB) throw new Error("missing_db_binding");
+  for (const name of names) if (!env[name]) throw new Error(`missing_${name.toLowerCase()}`);
+}
+
+async function verifyTurnstile(request, env, token, expectedAction) {
+  assertEnvironment(env, ["TURNSTILE_SECRET_KEY"]);
+  if (typeof token !== "string" || token.length < 10 || token.length > 2048) return false;
+  const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      secret: env.TURNSTILE_SECRET_KEY,
+      response: token,
+      remoteip: clientIp(request),
+      idempotency_key: safeUuid(),
+    }),
+  });
+  const outcome = await response.json().catch(() => ({}));
+  return response.ok && outcome.success === true
+    && (!outcome.hostname || outcome.hostname === requestHost(request))
+    && (!outcome.action || outcome.action === expectedAction);
+}
+
+async function startOtp(request, env) {
+  requireSameOrigin(request);
+  assertEnvironment(env, ["OTP_PEPPER", "RATE_LIMIT_PEPPER", "RESEND_API_KEY", "EMAIL_FROM"]);
+  const body = await readJson(request);
+  if (body.channel !== "email") return failure("ยังไม่เปิดให้ยืนยันด้วย SMS", 400, "sms_disabled");
+  if (typeof body.destination !== "string") return failure("กรุณากรอกอีเมลให้ถูกต้อง", 400, "invalid_email");
+  const email = body.destination.trim().toLowerCase();
+  if (email.length > 254 || !EMAIL_PATTERN.test(email)) {
+    return failure("กรุณากรอกอีเมลให้ถูกต้อง", 400, "invalid_email");
+  }
+  if (!await verifyTurnstile(request, env, body.turnstileToken, "auth_start")) {
+    return failure("กรุณายืนยันว่าคุณไม่ใช่โปรแกรมอัตโนมัติ", 403, "turnstile_failed");
+  }
+
+  const timestamp = unixTime();
+  const emailAllowed = await rateLimit(env.DB, "otp_email_hour", email, 5, 3600, env.RATE_LIMIT_PEPPER, timestamp);
+  const ipAllowed = await rateLimit(env.DB, "otp_ip_hour", clientIp(request), 20, 3600, env.RATE_LIMIT_PEPPER, timestamp);
+  if (!emailAllowed || !ipAllowed) {
+    return failure("ขอรหัสบ่อยเกินไป กรุณาลองใหม่ภายหลัง", 429, "rate_limited");
+  }
+  const latest = await env.DB.prepare(
+    "SELECT created_at FROM otp_challenges WHERE email = ? ORDER BY created_at DESC LIMIT 1",
+  ).bind(email).first();
+  if (latest && Number(latest.created_at) > timestamp - OTP_COOLDOWN_SECONDS) {
+    return failure("กรุณารอ 60 วินาทีก่อนขอรหัสใหม่", 429, "cooldown");
+  }
+
+  const challengeId = safeUuid();
+  const otp = randomOtp();
+  const ipHash = await hmac(env.RATE_LIMIT_PEPPER, clientIp(request));
+  const codeHash = await hmac(env.OTP_PEPPER, `${challengeId}:${otp}`);
+  await env.DB.prepare(`
+    INSERT INTO otp_challenges(id, email, code_hash, ip_hash, expires_at, created_at, attempts)
+    VALUES (?, ?, ?, ?, ?, ?, 0)
+  `).bind(challengeId, email, codeHash, ipHash, timestamp + OTP_TTL_SECONDS, timestamp).run();
+
+  const sent = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${env.RESEND_API_KEY}`,
+      "content-type": "application/json",
+      "idempotency-key": `chatgun-otp-${challengeId}`,
+    },
+    body: JSON.stringify({
+      from: env.EMAIL_FROM,
+      to: [email],
+      subject: "รหัสยืนยัน ChatGun",
+      text: `รหัสยืนยัน ChatGun ของคุณคือ ${otp}\nรหัสนี้จะหมดอายุใน 5 นาที หากคุณไม่ได้ขอรหัสนี้ โปรดเพิกเฉยต่ออีเมลฉบับนี้`,
+    }),
+  });
+  if (!sent.ok) {
+    await env.DB.prepare("UPDATE otp_challenges SET used_at = ? WHERE id = ?").bind(timestamp, challengeId).run();
+    return failure("ยังไม่สามารถส่งอีเมลได้ กรุณาลองใหม่ภายหลัง", 502, "email_delivery_failed");
+  }
+  return json({ challengeId, expiresIn: OTP_TTL_SECONDS, resendAfter: OTP_COOLDOWN_SECONDS });
+}
+
+async function verifyOtp(request, env) {
+  requireSameOrigin(request);
+  assertEnvironment(env, ["OTP_PEPPER", "RATE_LIMIT_PEPPER"]);
+  const body = await readJson(request);
+  if (typeof body.challengeId !== "string" || body.challengeId.length > 64 || !/^\d{6}$/u.test(body.code || "")) {
+    return failure("รหัส OTP ไม่ถูกต้อง", 400, "invalid_otp");
+  }
+  const timestamp = unixTime();
+  const allowed = await rateLimit(
+    env.DB,
+    "otp_verify_ip_10m",
+    clientIp(request),
+    30,
+    600,
+    env.RATE_LIMIT_PEPPER,
+    timestamp,
+  );
+  if (!allowed) return failure("ลองรหัสบ่อยเกินไป กรุณารอสักครู่", 429, "rate_limited");
+
+  const row = await env.DB.prepare(`
+    SELECT id, email, code_hash, expires_at, attempts, used_at
+    FROM otp_challenges WHERE id = ?
+  `).bind(body.challengeId).first();
+  if (!row || row.used_at || Number(row.expires_at) <= timestamp || Number(row.attempts) >= 5) {
+    return failure("รหัส OTP หมดอายุหรือถูกใช้แล้ว", 400, "otp_unavailable");
+  }
+  const suppliedHash = await hmac(env.OTP_PEPPER, `${body.challengeId}:${body.code}`);
+  if (!constantTimeEqual(suppliedHash, row.code_hash)) {
+    await env.DB.prepare(`
+      UPDATE otp_challenges SET attempts = attempts + 1
+      WHERE id = ? AND used_at IS NULL AND expires_at > ? AND attempts < 5
+    `).bind(body.challengeId, timestamp).run();
+    return failure("รหัส OTP ไม่ถูกต้อง", 400, "invalid_otp");
+  }
+  const claimed = await env.DB.prepare(`
+    UPDATE otp_challenges SET used_at = ?
+    WHERE id = ? AND code_hash = ? AND used_at IS NULL AND expires_at > ? AND attempts < 5
+  `).bind(timestamp, body.challengeId, suppliedHash, timestamp).run();
+  if (Number(claimed.meta?.changes || 0) !== 1) {
+    return failure("รหัส OTP หมดอายุหรือถูกใช้แล้ว", 400, "otp_unavailable");
+  }
+  let userId;
+  try {
+    userId = await createVerifiedEmailUser(env.DB, row.email, timestamp);
+  } catch (error) {
+    if (error?.message === "account_disabled") return failure("บัญชีนี้ไม่พร้อมใช้งาน", 403, "account_disabled");
+    throw error;
+  }
+  const session = await issueSession(env.DB, userId, timestamp);
+  return appendCookies(json({ authenticated: true, redirectUrl: "/account.html" }), session.cookies);
+}
+
+async function startOauth(request, env, provider) {
+  requireSameOrigin(request);
+  assertEnvironment(env, ["RATE_LIMIT_PEPPER"]);
+  const body = await readJson(request);
+  if (!await verifyTurnstile(request, env, body.turnstileToken, "auth_start")) {
+    return failure("กรุณายืนยันว่าคุณไม่ใช่โปรแกรมอัตโนมัติ", 403, "turnstile_failed");
+  }
+  const allowed = await rateLimit(
+    env.DB,
+    "oauth_ip_10m",
+    clientIp(request),
+    20,
+    600,
+    env.RATE_LIMIT_PEPPER,
+  );
+  if (!allowed) return failure("เข้าสู่ระบบบ่อยเกินไป กรุณารอสักครู่", 429, "rate_limited");
+
+  let linkUserId = null;
+  if (body.link === true) {
+    const session = await getSession(request, env.DB);
+    if (!session) return failure("กรุณาเข้าสู่ระบบก่อนเชื่อมบัญชี", 401, "unauthorized");
+    if (!await requireCsrf(request, session)) return failure("คำขอหมดอายุ กรุณาลองใหม่", 403, "invalid_csrf");
+    linkUserId = session.user_id;
+  }
+
+  const configuration = providerConfiguration(provider, env);
+  const state = randomToken();
+  const verifier = randomToken(48);
+  const nonce = randomToken();
+  const timestamp = unixTime();
+  await env.DB.prepare(`
+    INSERT INTO oauth_flows(state_hash, provider, pkce_verifier, nonce, ip_hash, link_user_id, created_at, expires_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).bind(
+    await sha256(state),
+    provider,
+    verifier,
+    nonce,
+    await hmac(env.RATE_LIMIT_PEPPER, clientIp(request)),
+    linkUserId,
+    timestamp,
+    timestamp + OAUTH_TTL_SECONDS,
+  ).run();
+
+  const callbackUrl = `${new URL(request.url).origin}/api/auth/oauth/${provider}/callback`;
+  const authorization = new URL(configuration.authorizationUrl);
+  authorization.searchParams.set("client_id", configuration.clientId);
+  authorization.searchParams.set("redirect_uri", callbackUrl);
+  authorization.searchParams.set("response_type", "code");
+  authorization.searchParams.set("scope", configuration.scope);
+  authorization.searchParams.set("state", state);
+  if (provider !== "facebook") authorization.searchParams.set("nonce", nonce);
+  if (configuration.pkce) {
+    authorization.searchParams.set("code_challenge", await sha256(verifier));
+    authorization.searchParams.set("code_challenge_method", "S256");
+  }
+  return appendCookies(
+    json({ authorizationUrl: authorization.toString() }),
+    [cookie(OAUTH_COOKIE, state, OAUTH_TTL_SECONDS, { httpOnly: true, sameSite: "Lax" })],
+  );
+}
+
+async function oauthCallback(request, env, provider) {
+  const url = new URL(request.url);
+  if (url.searchParams.has("error")) return authErrorRedirect(request, "provider_denied");
+  const state = url.searchParams.get("state") || "";
+  const code = url.searchParams.get("code") || "";
+  const cookieState = parseCookies(request)[OAUTH_COOKIE] || "";
+  if (!state || !code || !constantTimeEqual(state, cookieState) || state.length > 128 || code.length > 2048) {
+    return authErrorRedirect(request, "invalid_state");
+  }
+  const stateHash = await sha256(state);
+  const flow = await env.DB.prepare(`
+    SELECT provider, pkce_verifier, nonce, link_user_id, expires_at
+    FROM oauth_flows WHERE state_hash = ? AND provider = ?
+  `).bind(stateHash, provider).first();
+  const timestamp = unixTime();
+  if (!flow || Number(flow.expires_at) <= timestamp) return authErrorRedirect(request, "oauth_expired");
+  const claimed = await env.DB.prepare(
+    "DELETE FROM oauth_flows WHERE state_hash = ? AND provider = ? AND expires_at > ?",
+  ).bind(stateHash, provider, timestamp).run();
+  if (Number(claimed.meta?.changes || 0) !== 1) return authErrorRedirect(request, "oauth_used");
+
+  try {
+    const configuration = providerConfiguration(provider, env);
+    const callbackUrl = `${url.origin}/api/auth/oauth/${provider}/callback`;
+    const token = await exchangeCode(provider, configuration, code, callbackUrl, flow.pkce_verifier);
+    const profile = await verifyProviderIdentity(provider, configuration, token, flow.nonce, timestamp);
+    if (!profile.subject || profile.subject.length > 255) throw new Error("invalid_subject");
+    const userId = await findOrCreateIdentity(env.DB, profile, flow.link_user_id, timestamp);
+    const session = await issueSession(env.DB, userId, timestamp);
+    return redirect("/account.html", [cookie(OAUTH_COOKIE, "", 0), ...session.cookies]);
+  } catch (error) {
+    console.error(JSON.stringify({ event: "oauth_callback_failed", provider, reason: error?.message || "unknown" }));
+    return authErrorRedirect(request, error?.message === "identity_already_linked" ? "identity_linked" : "oauth_failed");
+  }
+}
+
+async function currentUser(request, env) {
+  const session = await getSession(request, env.DB);
+  if (!session) return failure("กรุณาเข้าสู่ระบบ", 401, "unauthorized");
+  return json({
+    user: {
+      id: session.user_id,
+      email: session.email,
+      displayName: session.display_name,
+      avatarUrl: session.avatar_url,
+    },
+  });
+}
+
+async function logout(request, env) {
+  requireSameOrigin(request);
+  const session = await getSession(request, env.DB);
+  if (!session) {
+    return appendCookies(json({ ok: true }), [
+      cookie(SESSION_COOKIE, "", 0),
+      cookie(CSRF_COOKIE, "", 0, { httpOnly: false }),
+    ]);
+  }
+  if (!await requireCsrf(request, session)) return failure("คำขอหมดอายุ กรุณาลองใหม่", 403, "invalid_csrf");
+  await env.DB.prepare("UPDATE sessions SET revoked_at = ? WHERE token_hash = ?").bind(unixTime(), session.token_hash).run();
+  return appendCookies(json({ ok: true }), [
+    cookie(SESSION_COOKIE, "", 0),
+    cookie(CSRF_COOKIE, "", 0, { httpOnly: false }),
+  ]);
+}
+
+export async function onRequest({ request, env }) {
+  const requestId = safeUuid();
+  try {
+    const path = new URL(request.url).pathname;
+    if (request.method === "GET" && path === "/api/auth/config") {
+      return json({ turnstileSiteKey: env.TURNSTILE_SITE_KEY || null, smsEnabled: false });
+    }
+    if (request.method === "POST" && path === "/api/auth/otp/start") return await startOtp(request, env);
+    if (request.method === "POST" && path === "/api/auth/otp/verify") return await verifyOtp(request, env);
+    const oauthMatch = path.match(/^\/api\/auth\/oauth\/(google|facebook|line)\/(start|callback)$/u);
+    if (oauthMatch) {
+      const [, provider, action] = oauthMatch;
+      if (!PROVIDERS.has(provider)) return failure("ไม่พบผู้ให้บริการ", 404, "not_found");
+      if (action === "start" && request.method === "POST") return await startOauth(request, env, provider);
+      if (action === "callback" && request.method === "GET") return await oauthCallback(request, env, provider);
+      return failure("ไม่อนุญาตวิธีเรียกนี้", 405, "method_not_allowed");
+    }
+    if (request.method === "GET" && path === "/api/auth/me") return await currentUser(request, env);
+    if (request.method === "POST" && path === "/api/auth/logout") return await logout(request, env);
+    return failure("ไม่พบหน้าที่เรียก", 404, "not_found");
+  } catch (error) {
+    if (error instanceof RequestError) {
+      const messages = {
+        invalid_origin: "คำขอไม่ถูกต้อง",
+        invalid_content_type: "รูปแบบข้อมูลไม่ถูกต้อง",
+        invalid_json: "รูปแบบข้อมูลไม่ถูกต้อง",
+        body_too_large: "ข้อมูลมีขนาดใหญ่เกินไป",
+      };
+      return failure(messages[error.code] || "คำขอไม่ถูกต้อง", error.status, error.code, requestId);
+    }
+    console.error(JSON.stringify({ event: "auth_request_failed", requestId, reason: error?.message || "unknown" }));
+    return failure(GENERIC_ERROR, 500, "internal_error", requestId);
+  }
+}
