@@ -1,5 +1,8 @@
 # ChatGun Phase 1 production authentication checklist
 
+> Provider publishing preparation and the current per-provider GO/NO-GO decision are
+> recorded in [provider-publishing-readiness.md](./provider-publishing-readiness.md).
+
 Status captured on 2026-10-16 for Cloudflare account
 `23017b53386fb67fc62a52cdd017454c`. This checklist authorizes no Production deployment.
 

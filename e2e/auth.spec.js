@@ -15,6 +15,7 @@ test("signup renders branded auth controls with Preview Turnstile", async ({ pag
   await expect(page.getByRole("button", { name: "ดำเนินการต่อด้วย LINE" })).toBeVisible();
   await expect(page.getByText(/รับชื่อ รูปโปรไฟล์ และอีเมลจากผู้ให้บริการ/u)).toBeVisible();
   await expect(page.getByRole("link", { name: "นโยบายความเป็นส่วนตัว" })).toHaveAttribute("href", "./privacy.html");
+  await expect(page.getByRole("link", { name: "ข้อกำหนดการใช้บริการ" })).toHaveAttribute("href", "./terms.html");
   await expect(page.getByText(/OTP/u)).toHaveCount(0);
   await expect(page.locator('input[type="email"], input[inputmode="tel"]')).toHaveCount(0);
   await expect(page.locator('#turnstile input[name="cf-turnstile-response"]')).toBeAttached();
@@ -31,6 +32,17 @@ test("privacy notice explains social identity data use", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "ข้อมูลที่เราเก็บ" })).toBeVisible();
   await expect(page.getByText(/Google, Facebook หรือ LINE/u)).toBeVisible();
   await expect(page.getByRole("heading", { name: "การลบข้อมูล" })).toBeVisible();
+  await expect(page.getByText("Email OTP ถูกปิดใช้งาน")).toBeVisible();
+});
+
+test("legal review pages disclose unresolved owner decisions", async ({ page }) => {
+  await page.goto("/terms.html");
+  await expect(page).toHaveTitle("ข้อกำหนดการใช้บริการ | ChatGun");
+  await expect(page.getByText("ฉบับร่างสำหรับเจ้าของบริการตรวจสอบ:")).toBeVisible();
+
+  await page.goto("/data-deletion.html");
+  await expect(page).toHaveTitle("การขอลบบัญชีและข้อมูล | ChatGun");
+  await expect(page.getByRole("heading", { name: "วิธีส่งคำขอในช่วงทดสอบ" })).toBeVisible();
 });
 
 test("account page redirects unauthenticated users to signup", async ({ page }) => {
