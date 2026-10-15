@@ -19,20 +19,23 @@ Status captured on 2026-10-16 for Cloudflare account
 
 ## Blocking before Production
 
-- [ ] Configure the live Pages **Production** binding `DB` to `chatgun-auth`
+- [ ] Save the staged live Pages **Production** binding `DB` to `chatgun-auth`
   (`9738a051-d914-42d0-8e7b-8098ef2b959d`). A read-only Pages configuration download
-  currently shows the staging binding at the top level and an empty `env.production`.
-- [ ] Attach `chatgun.social` to Pages project `chatgun`, create/verify DNS, and confirm a
-  valid certificate. It currently does not resolve and is not listed as a Pages domain.
-- [ ] Decide whether `chatgun.pages.dev` will redirect to the canonical custom domain. If it
-  remains an authentication origin, register both production origins with every provider.
+  previously showed the staging binding at the top level and an empty `env.production`.
+- [x] Attach `chatgun.social` to Pages project `chatgun` and create the apex CNAME to
+  `chatgun.pages.dev`. Cloudflare accepted the domain on 2026-10-16; certificate issuance
+  and domain activation must reach `Active` before release.
+- [x] Implement an exact-host permanent redirect from `chatgun.pages.dev` to the canonical
+  `https://chatgun.social` origin. Preview and immutable deployment hostnames are excluded.
 - [ ] Create dedicated Production credentials without copying Preview or PiggyPrice values:
   `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `FACEBOOK_CLIENT_ID`,
   `FACEBOOK_CLIENT_SECRET`, `FACEBOOK_GRAPH_VERSION`, `LINE_CLIENT_ID`, and
   `LINE_CLIENT_SECRET`.
 - [ ] Create a Production Turnstile widget allowlisted for the chosen production hostname(s)
   and set `TURNSTILE_SITE_KEY` plus `TURNSTILE_SECRET_KEY`.
-- [ ] Generate a new Production-only `RATE_LIMIT_PEPPER`.
+- [x] Generate independent Production-only `RATE_LIMIT_PEPPER` and `OTP_PEPPER` secrets.
+  OTP remains disabled; retaining its independent pepper avoids sharing Preview material if
+  Email OTP is enabled in a future release.
 - [ ] Keep `EMAIL_OTP_ENABLED=false`, `MOBILE_OTP_ENABLED=false`, and
   `LINE_EMAIL_ENABLED=false`. Phase 1 does not require Resend or OTP secrets.
 - [ ] Register exact provider callbacks for `https://chatgun.social` and publish/approve each
@@ -58,6 +61,7 @@ Non-secret variables:
 
 Encrypted secrets:
 
+- `OTP_PEPPER` (stored but unused while OTP is disabled)
 - `RATE_LIMIT_PEPPER`
 - `GOOGLE_CLIENT_SECRET`
 - `FACEBOOK_CLIENT_SECRET`
