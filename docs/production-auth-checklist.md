@@ -19,27 +19,30 @@ Status captured on 2026-10-16 for Cloudflare account
 
 ## Blocking before Production
 
-- [ ] Save the staged live Pages **Production** binding `DB` to `chatgun-auth`
-  (`9738a051-d914-42d0-8e7b-8098ef2b959d`). A read-only Pages configuration download
-  previously showed the staging binding at the top level and an empty `env.production`.
-- [x] Attach `chatgun.social` to Pages project `chatgun` and create the apex CNAME to
-  `chatgun.pages.dev`. Cloudflare accepted the domain on 2026-10-16; certificate issuance
-  and domain activation must reach `Active` before release.
+- [x] Save the live Pages **Production** binding `DB` to `chatgun-auth`
+  (`9738a051-d914-42d0-8e7b-8098ef2b959d`). The dashboard confirms the binding, while
+  Preview remains mapped to `chatgun-auth-staging`.
+- [x] Attach `chatgun.social` to Pages project `chatgun`, create the apex CNAME to
+  `chatgun.pages.dev`, and verify Cloudflare HTTPS. Public DNS and a successful TLS/HTTP
+  response were confirmed on 2026-10-16.
 - [x] Implement an exact-host permanent redirect from `chatgun.pages.dev` to the canonical
   `https://chatgun.social` origin. Preview and immutable deployment hostnames are excluded.
-- [ ] Create dedicated Production credentials without copying Preview or PiggyPrice values:
+- [ ] Complete dedicated Production credentials without copying Preview or PiggyPrice values:
   `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `FACEBOOK_CLIENT_ID`,
   `FACEBOOK_CLIENT_SECRET`, `FACEBOOK_GRAPH_VERSION`, `LINE_CLIENT_ID`, and
-  `LINE_CLIENT_SECRET`.
-- [ ] Create a Production Turnstile widget allowlisted for the chosen production hostname(s)
-  and set `TURNSTILE_SITE_KEY` plus `TURNSTILE_SECRET_KEY`.
+  `LINE_CLIENT_SECRET`. Google and LINE are stored as encrypted Production secrets. Meta
+  app creation is paused at the developer-account password reauthentication prompt.
+- [x] Create a dedicated managed Production Turnstile widget allowlisted only for
+  `chatgun.social` and store `TURNSTILE_SITE_KEY` plus `TURNSTILE_SECRET_KEY` as encrypted
+  Production secrets. The Preview widget remains unchanged.
 - [x] Generate independent Production-only `RATE_LIMIT_PEPPER` and `OTP_PEPPER` secrets.
   OTP remains disabled; retaining its independent pepper avoids sharing Preview material if
   Email OTP is enabled in a future release.
-- [ ] Keep `EMAIL_OTP_ENABLED=false`, `MOBILE_OTP_ENABLED=false`, and
-  `LINE_EMAIL_ENABLED=false`. Phase 1 does not require Resend or OTP secrets.
+- [x] Store `EMAIL_OTP_ENABLED=false`, `MOBILE_OTP_ENABLED=false`, and
+  `LINE_EMAIL_ENABLED=false` in Production. Phase 1 does not require Resend.
 - [ ] Register exact provider callbacks for `https://chatgun.social` and publish/approve each
-  provider application as required by its console.
+  provider application as required by its console. Google and LINE callbacks are registered;
+  Meta remains blocked on password reauthentication before its Production app exists.
 - [ ] Configure Google production branding/homepage/privacy links on the verified domain;
   switch the Meta app to Live only after its privacy/data-deletion settings pass review; and
   publish the LINE Login channel for the intended audience.
