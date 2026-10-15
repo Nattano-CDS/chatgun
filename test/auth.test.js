@@ -24,6 +24,7 @@ function installDeliveryMock() {
 }
 
 async function startOtp(env, email = "member@example.com") {
+  env.EMAIL_OTP_ENABLED = "true";
   return onRequest({
     env,
     request: jsonRequest("/api/auth/otp/start", {
@@ -49,6 +50,34 @@ test("invalid cross-origin POST is returned as JSON instead of escaping the hand
   const response = await onRequest({ env, request });
   assert.equal(response.status, 403);
   assert.equal((await response.json()).code, "invalid_origin");
+  database.close();
+});
+
+test("OTP endpoints are disabled by feature flag without removing the schema", async () => {
+  const database = new TestD1();
+  const env = environment(database);
+  const start = await onRequest({
+    env,
+    request: jsonRequest("/api/auth/otp/start", {
+      channel: "email", destination: "member@example.com", turnstileToken: "valid-turnstile-token",
+    }),
+  });
+  assert.equal(start.status, 404);
+  assert.equal((await start.json()).code, "otp_disabled");
+
+  const mobileStart = await onRequest({
+    env,
+    request: jsonRequest("/api/auth/otp/start", {
+      channel: "mobile", destination: "+66800000000", turnstileToken: "valid-turnstile-token",
+    }),
+  });
+  assert.equal(mobileStart.status, 404);
+  assert.equal((await mobileStart.json()).code, "otp_disabled");
+
+  const verify = await verifyOtp(env, "unused-challenge", "123456");
+  assert.equal(verify.status, 404);
+  assert.equal((await verify.json()).code, "otp_disabled");
+  assert.equal(database.database.prepare("SELECT COUNT(*) count FROM otp_challenges").get().count, 0);
   database.close();
 });
 

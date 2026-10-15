@@ -55,6 +55,8 @@ export function environment(database) {
     EMAIL_FROM: "ChatGun <login@example.test>",
     TURNSTILE_SECRET_KEY: "turnstile-secret",
     TURNSTILE_SITE_KEY: "turnstile-site",
+    EMAIL_OTP_ENABLED: "false",
+    MOBILE_OTP_ENABLED: "false",
     GOOGLE_CLIENT_ID: "google-client",
     GOOGLE_CLIENT_SECRET: "google-secret",
     LINE_CLIENT_ID: "line-client",

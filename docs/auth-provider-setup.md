@@ -110,6 +110,8 @@ PiggyPrice Cloudflare account.
 
 Non-secret variables:
 
+- `EMAIL_OTP_ENABLED=false`
+- `MOBILE_OTP_ENABLED=false`
 - `EMAIL_FROM`
 - `GOOGLE_CLIENT_ID`
 - `FACEBOOK_CLIENT_ID`

@@ -31,6 +31,14 @@ const OTP_TTL_SECONDS = 300;
 const OTP_COOLDOWN_SECONDS = 60;
 const GENERIC_ERROR = "ไม่สามารถเข้าสู่ระบบได้ กรุณาลองใหม่อีกครั้ง";
 
+function featureEnabled(value) {
+  return String(value || "").trim().toLowerCase() === "true";
+}
+
+function otpDisabled() {
+  return failure("ขณะนี้เปิดให้เข้าสู่ระบบด้วย Google, Facebook หรือ LINE เท่านั้น", 404, "otp_disabled");
+}
+
 function clientIp(request) {
   return request.headers.get("cf-connecting-ip") || "unknown";
 }
@@ -71,9 +79,9 @@ async function verifyTurnstile(request, env, token, expectedAction) {
 
 async function startOtp(request, env) {
   requireSameOrigin(request);
-  assertEnvironment(env, ["OTP_PEPPER", "RATE_LIMIT_PEPPER", "RESEND_API_KEY", "EMAIL_FROM"]);
   const body = await readJson(request);
-  if (body.channel !== "email") return failure("ยังไม่เปิดให้ยืนยันด้วย SMS", 400, "sms_disabled");
+  if (body.channel !== "email" || !featureEnabled(env.EMAIL_OTP_ENABLED)) return otpDisabled();
+  assertEnvironment(env, ["OTP_PEPPER", "RATE_LIMIT_PEPPER", "RESEND_API_KEY", "EMAIL_FROM"]);
   if (typeof body.destination !== "string") return failure("กรุณากรอกอีเมลให้ถูกต้อง", 400, "invalid_email");
   const email = body.destination.trim().toLowerCase();
   if (email.length > 254 || !EMAIL_PATTERN.test(email)) {
@@ -128,6 +136,7 @@ async function startOtp(request, env) {
 
 async function verifyOtp(request, env) {
   requireSameOrigin(request);
+  if (!featureEnabled(env.EMAIL_OTP_ENABLED)) return otpDisabled();
   assertEnvironment(env, ["OTP_PEPPER", "RATE_LIMIT_PEPPER"]);
   const body = await readJson(request);
   if (typeof body.challengeId !== "string" || body.challengeId.length > 64 || !/^\d{6}$/u.test(body.code || "")) {
@@ -311,7 +320,15 @@ export async function onRequest({ request, env }) {
   try {
     const path = new URL(request.url).pathname;
     if (request.method === "GET" && path === "/api/auth/config") {
-      return json({ turnstileSiteKey: env.TURNSTILE_SITE_KEY || null, smsEnabled: false });
+      const emailOtpEnabled = featureEnabled(env.EMAIL_OTP_ENABLED);
+      const mobileOtpEnabled = featureEnabled(env.MOBILE_OTP_ENABLED);
+      return json({
+        turnstileSiteKey: env.TURNSTILE_SITE_KEY || null,
+        oauthProviders: [...PROVIDERS],
+        emailOtpEnabled,
+        mobileOtpEnabled,
+        smsEnabled: mobileOtpEnabled,
+      });
     }
     if (request.method === "POST" && path === "/api/auth/otp/start") return await startOtp(request, env);
     if (request.method === "POST" && path === "/api/auth/otp/verify") return await verifyOtp(request, env);

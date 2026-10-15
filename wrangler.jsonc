@@ -3,6 +3,10 @@
   "name": "chatgun",
   "pages_build_output_dir": ".",
   "compatibility_date": "2026-10-15",
+  "vars": {
+    "EMAIL_OTP_ENABLED": "false",
+    "MOBILE_OTP_ENABLED": "false"
+  },
   "d1_databases": [
     {
       "binding": "DB",
@@ -14,6 +18,10 @@
   ],
   "env": {
     "production": {
+      "vars": {
+        "EMAIL_OTP_ENABLED": "false",
+        "MOBILE_OTP_ENABLED": "false"
+      },
       "d1_databases": [
         {
           "binding": "DB",
@@ -25,6 +33,10 @@
       ]
     },
     "preview": {
+      "vars": {
+        "EMAIL_OTP_ENABLED": "false",
+        "MOBILE_OTP_ENABLED": "false"
+      },
       "d1_databases": [
         {
           "binding": "DB",

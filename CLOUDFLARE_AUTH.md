@@ -1,12 +1,12 @@
 # ChatGun Cloudflare authentication
 
-The backend uses Cloudflare Pages Functions, a D1 binding named `DB`, Resend email delivery, and Cloudflare Turnstile. SMS authentication is intentionally disabled.
+The backend uses Cloudflare Pages Functions, a D1 binding named `DB`, and Cloudflare Turnstile. Phase 1 enables only Google, Facebook, and LINE. Email and mobile OTP remain implemented for future use but are disabled at the API boundary by feature flags.
 
 ## Deployment gate
 
 Do not run any remote command until `wrangler whoami` shows the dedicated ChatGun account. If the account contains PiggyPrice projects or databases, stop. Never create ChatGun resources in, bind ChatGun to, or deploy ChatGun from the PiggyPrice account.
 
-The current implementation has not been deployed. Production activation also requires real credentials and end-to-end provider tests.
+The authentication branch is deployed only to Preview. Production activation requires explicit approval and a separate production-readiness review.
 
 ## 1. Verify the ChatGun account and existing resources
 
@@ -62,6 +62,8 @@ Set these as encrypted Pages secrets for project `chatgun`:
 
 Set these non-secret environment variables:
 
+- `EMAIL_OTP_ENABLED=false` — Phase 1 server-side gate; do not enable without a reviewed rollout
+- `MOBILE_OTP_ENABLED=false` — Phase 1 server-side gate; no mobile OTP implementation is active
 - `EMAIL_FROM` — sender on a Resend-verified domain
 - `GOOGLE_CLIENT_ID`
 - `FACEBOOK_CLIENT_ID`
@@ -95,7 +97,7 @@ Facebook does not return an `email_verified` assertion in this flow, so its emai
 
 Verify the `EMAIL_FROM` domain in Resend. Configure the Turnstile widget for `chatgun.pages.dev` and any explicit preview host used for testing. Both OTP and OAuth initiation fail closed when Turnstile secrets are missing or verification fails.
 
-Email OTPs are six digits, stored only as keyed hashes, valid for five minutes, limited to five verification attempts, single-use, subject to a 60-second resend cooldown, and rate-limited by normalized email and hashed client IP.
+When explicitly enabled in a future phase, email OTPs are six digits, stored only as keyed hashes, valid for five minutes, limited to five verification attempts, single-use, subject to a 60-second resend cooldown, and rate-limited by normalized email and hashed client IP. With `EMAIL_OTP_ENABLED=false`, both OTP API endpoints return `otp_disabled` before delivery or challenge access.
 
 ## 7. Pre-production checks
 
@@ -106,4 +108,4 @@ npm test
 npm run test:coverage
 ```
 
-On a preview deployment, test success, denial, expiry, callback replay, provider revocation/failure, logout CSRF, mobile layout, and throttling for all three providers plus email OTP. Do not merge or promote production until those real-provider tests pass.
+On a preview deployment, test success, denial, expiry, callback replay, provider revocation/failure, logout CSRF, mobile layout, and throttling for all three providers. Confirm the signup UI has no OTP controls and both OTP feature flags remain false. Do not merge or promote production until those checks pass.

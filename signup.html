@@ -14,13 +14,9 @@
   <main>
     <aside><span class="eyebrow">WELCOME TO CHATGUN ✦</span><h1>มาเป็นส่วนหนึ่ง<br><span class="gradient">ของเรื่องราวดี ๆ</span></h1><p>แชทกัน แชร์กัน เจอกัน — พบเพื่อนใหม่และคอมมูนิตี้ที่ใช่</p></aside>
     <section class="card">
-      <h2>สร้างบัญชีใหม่</h2><p>เลือกวิธีสมัครสมาชิกที่สะดวกสำหรับคุณ</p>
-      <div class="providers"><button type="button" data-provider="line" class="line">LINE</button><button type="button" data-provider="facebook" class="facebook">Facebook</button><button type="button" data-provider="google" class="google">Google</button></div>
+      <h2>เข้าสู่ระบบหรือสร้างบัญชี</h2><p>เลือกบัญชีโซเชียลที่คุณต้องการใช้กับ ChatGun</p>
+      <div class="providers"><button type="button" data-provider="line" class="line">ดำเนินการต่อด้วย LINE</button><button type="button" data-provider="facebook" class="facebook">ดำเนินการต่อด้วย Facebook</button><button type="button" data-provider="google" class="google">ดำเนินการต่อด้วย Google</button></div>
       <p class="social-consent">เมื่อดำเนินการต่อด้วยบัญชีโซเชียล คุณยินยอมให้ ChatGun รับชื่อ รูปโปรไฟล์ และอีเมลจากผู้ให้บริการ เพื่อสร้างบัญชี ยืนยันตัวตน และรักษาความปลอดภัยในการเข้าสู่ระบบ</p>
-      <div class="separator">หรือสมัครด้วย OTP</div>
-      <div class="tabs"><button id="phone-tab" disabled type="button" aria-disabled="true">เบอร์มือถือ (เร็ว ๆ นี้)</button><button id="email-tab" class="active" type="button">อีเมล</button></div>
-      <form id="start"><label for="contact" id="contact-label">อีเมล</label><input id="contact" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required><button class="primary" type="submit"><span>ส่งรหัส OTP →</span></button></form>
-      <form id="verify" hidden><p>ส่งรหัสไปที่ <strong id="destination"></strong></p><label for="code">รหัส OTP 6 หลัก</label><input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required placeholder="000000"><button class="primary" type="submit"><span>ยืนยันและสมัครสมาชิก →</span></button><button id="resend" type="button" class="link">ส่งรหัสใหม่</button><button id="change" type="button" class="link">เปลี่ยนอีเมล</button></form>
       <div id="turnstile" class="turnstile" aria-label="การตรวจสอบความปลอดภัย"></div>
       <p id="message" role="status" aria-live="polite"></p>
       <small>การสมัครสมาชิกถือว่ายอมรับข้อกำหนดและ<a href="./privacy.html">นโยบายความเป็นส่วนตัว</a>ของ ChatGun</small>
