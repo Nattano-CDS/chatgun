@@ -146,7 +146,10 @@ Outstanding work:
 ## Test evidence
 
 - `npm test`: 19/19 passed after the legal-content changes.
-- Full Playwright must be rerun after this branch is pushed and its Cloudflare Preview
-  alias serves the new commit. The initial run against the old Preview correctly failed
-  because the newly added legal pages were not deployed there yet.
-
+- `npm run test:e2e`: 10/10 passed on desktop and mobile Chromium against the updated
+  Cloudflare Preview branch alias. The suite covers the social-only signup UI, Turnstile
+  presence, legal pages, disabled OTP configuration, same-origin enforcement, and the
+  unauthenticated account redirect.
+- The initial Playwright run against the old Preview correctly failed because the newly
+  added legal pages had not yet been deployed. The complete rerun passed after the
+  automatic Preview build for commit `e2d08a1` completed.
