@@ -143,6 +143,46 @@ test("Google authorization uses state, nonce, and S256 PKCE", async () => {
   database.close();
 });
 
+test("account linking requires the authenticated session and matching CSRF token", async () => {
+  const database = new TestD1();
+  const env = environment(database);
+  installDeliveryMock();
+  const timestamp = Math.floor(Date.now() / 1000);
+  database.database.prepare(`
+    INSERT INTO users(id, email, email_verified_at, status, created_at, updated_at)
+    VALUES ('link-user', 'link@example.com', ?, 'active', ?, ?)
+  `).run(timestamp, timestamp, timestamp);
+  const { issueSession } = await import("../functions/_lib/db.js");
+  const session = await issueSession(database, "link-user", timestamp);
+
+  const linked = await onRequest({
+    env,
+    request: jsonRequest("/api/auth/oauth/line/start", {
+      link: true,
+      turnstileToken: "valid-turnstile-token",
+    }, {
+      cookie: `__Host-cg_session=${encodeURIComponent(session.token)}; __Host-cg_csrf=${encodeURIComponent(session.csrf)}`,
+      "x-csrf-token": session.csrf,
+    }),
+  });
+  assert.equal(linked.status, 200);
+  assert.equal(database.database.prepare("SELECT link_user_id FROM oauth_flows").get().link_user_id, "link-user");
+
+  const rejected = await onRequest({
+    env,
+    request: jsonRequest("/api/auth/oauth/google/start", {
+      link: true,
+      turnstileToken: "valid-turnstile-token",
+    }, {
+      cookie: `__Host-cg_session=${encodeURIComponent(session.token)}; __Host-cg_csrf=${encodeURIComponent(session.csrf)}`,
+      "x-csrf-token": "wrong-token",
+    }),
+  });
+  assert.equal(rejected.status, 403);
+  assert.equal((await rejected.json()).code, "invalid_csrf");
+  database.close();
+});
+
 test("LINE callback validates ID token claims, creates identity, and rejects replay", async () => {
   const database = new TestD1();
   const env = environment(database);
