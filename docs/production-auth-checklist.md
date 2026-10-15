@@ -6,7 +6,7 @@ Status captured on 2026-10-16 for Cloudflare account
 ## Verified
 
 - [x] `wrangler whoami` resolves to the dedicated ChatGun Cloudflare account.
-- [x] Production D1 binding `DB` targets `chatgun-auth`
+- [x] The repository's Production D1 configuration targets `chatgun-auth`
   (`9738a051-d914-42d0-8e7b-8098ef2b959d`).
 - [x] Preview D1 targets the distinct `chatgun-auth-staging`
   (`5bbfd55d-eb22-4324-8a7d-57bef14110ea`).
@@ -19,6 +19,9 @@ Status captured on 2026-10-16 for Cloudflare account
 
 ## Blocking before Production
 
+- [ ] Configure the live Pages **Production** binding `DB` to `chatgun-auth`
+  (`9738a051-d914-42d0-8e7b-8098ef2b959d`). A read-only Pages configuration download
+  currently shows the staging binding at the top level and an empty `env.production`.
 - [ ] Attach `chatgun.social` to Pages project `chatgun`, create/verify DNS, and confirm a
   valid certificate. It currently does not resolve and is not listed as a Pages domain.
 - [ ] Decide whether `chatgun.pages.dev` will redirect to the canonical custom domain. If it
