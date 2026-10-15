@@ -12,3 +12,4 @@ FACEBOOK_CLIENT_SECRET=replace-me
 FACEBOOK_GRAPH_VERSION=replace-with-current-vN.0
 LINE_CLIENT_ID=replace-me
 LINE_CLIENT_SECRET=replace-me
+LINE_EMAIL_ENABLED=false

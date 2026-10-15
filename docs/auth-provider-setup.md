@@ -20,14 +20,14 @@ This runbook is for the ChatGun Cloudflare account only.
   platform registered; Preview app ID and secret configured; Graph API `v26.0` selected.
   Real Preview E2E passed for authorization, server-side token debugging, profile lookup,
   initial account creation, secure session creation, and logout/session invalidation.
-  Account linking is not claimed: the authorized Facebook identity and LINE identity were
-  exercised as separate sessions and belong to two distinct staging users. Testing a real
-  link requires another authorized provider identity that is not already attached.
+  Full callback-path integration tests cover successful explicit account linking and
+  rejection when an identity belongs to another user. A live positive linking run still
+  requires an authorized provider identity that is not already attached to a staging user.
 - LINE: separate `ChatGun` provider and LINE Login channel created in Developing status;
   Preview callback registered; Preview channel ID and secret configured. Real profile-only
   Preview login, account creation, secure session creation, and logout passed. Email
-  permission remains blocked on the user-authorized screenshot upload and LINE review
-  approval, so verified-email behavior is not claimed.
+  permission remains unapplied, so `LINE_EMAIL_ENABLED=false` limits the requested scopes
+  to `openid profile`; verified-email behavior is not claimed or required for Phase 1.
 - Resend: the only visible team, `nat.tanouxui`, is empty and cannot be identified as the
   PiggyPrice integration owner. No API key or domain was created.
 - Turnstile: the existing dedicated ChatGun Preview widget and its Preview secrets were
@@ -47,6 +47,20 @@ Register these exact HTTPS callback URLs:
 
 Do not register an immutable deployment hostname such as `<deployment>.chatgun.pages.dev`.
 The branch alias above remains stable across Preview deployments.
+
+## Production callback URLs
+
+After `chatgun.social` is attached to the Pages project and resolves over HTTPS, register
+these exact callback URLs in dedicated Production applications/clients:
+
+- Google: `https://chatgun.social/api/auth/oauth/google/callback`
+- Facebook: `https://chatgun.social/api/auth/oauth/facebook/callback`
+- LINE: `https://chatgun.social/api/auth/oauth/line/callback`
+
+The application derives its callback origin from the browser request. Either enforce
+`chatgun.social` as the canonical authentication origin before launch or also register the
+equivalent `https://chatgun.pages.dev/api/auth/oauth/{provider}/callback` URLs. Do not
+register wildcard or immutable deployment URLs.
 
 ## Google
 
@@ -112,6 +126,7 @@ Non-secret variables:
 
 - `EMAIL_OTP_ENABLED=false`
 - `MOBILE_OTP_ENABLED=false`
+- `LINE_EMAIL_ENABLED=false`
 - `EMAIL_FROM`
 - `GOOGLE_CLIENT_ID`
 - `FACEBOOK_CLIENT_ID`

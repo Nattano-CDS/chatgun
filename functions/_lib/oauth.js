@@ -78,7 +78,9 @@ export function providerConfiguration(provider, env) {
     clientId, clientSecret,
     authorizationUrl: "https://access.line.me/oauth2/v2.1/authorize",
     tokenUrl: "https://api.line.me/oauth2/v2.1/token",
-    scope: "openid email profile",
+    scope: String(env.LINE_EMAIL_ENABLED || "").trim().toLowerCase() === "true"
+      ? "openid email profile"
+      : "openid profile",
     pkce: true,
   };
   const version = graphVersion(env);

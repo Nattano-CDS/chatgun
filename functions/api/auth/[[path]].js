@@ -73,8 +73,8 @@ async function verifyTurnstile(request, env, token, expectedAction) {
   });
   const outcome = await response.json().catch(() => ({}));
   return response.ok && outcome.success === true
-    && (!outcome.hostname || outcome.hostname === requestHost(request))
-    && (!outcome.action || outcome.action === expectedAction);
+    && outcome.hostname === requestHost(request)
+    && outcome.action === expectedAction;
 }
 
 async function startOtp(request, env) {
@@ -251,11 +251,12 @@ async function startOauth(request, env, provider) {
 
 async function oauthCallback(request, env, provider) {
   const url = new URL(request.url);
-  if (url.searchParams.has("error")) return authErrorRedirect(request, "provider_denied");
+  const providerDenied = url.searchParams.has("error");
   const state = url.searchParams.get("state") || "";
   const code = url.searchParams.get("code") || "";
   const cookieState = parseCookies(request)[OAUTH_COOKIE] || "";
-  if (!state || !code || !constantTimeEqual(state, cookieState) || state.length > 128 || code.length > 2048) {
+  if (!state || (!providerDenied && !code) || !constantTimeEqual(state, cookieState)
+    || state.length > 128 || code.length > 2048) {
     return authErrorRedirect(request, "invalid_state");
   }
   const stateHash = await sha256(state);
@@ -269,6 +270,7 @@ async function oauthCallback(request, env, provider) {
     "DELETE FROM oauth_flows WHERE state_hash = ? AND provider = ? AND expires_at > ?",
   ).bind(stateHash, provider, timestamp).run();
   if (Number(claimed.meta?.changes || 0) !== 1) return authErrorRedirect(request, "oauth_used");
+  if (providerDenied) return authErrorRedirect(request, "provider_denied");
 
   try {
     const configuration = providerConfiguration(provider, env);

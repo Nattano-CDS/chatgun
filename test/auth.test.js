@@ -23,6 +23,26 @@ function installDeliveryMock() {
   return () => deliveredCode;
 }
 
+function installLineCallbackMock(env, nonce, subject) {
+  globalThis.fetch = async (input) => {
+    const url = String(input);
+    if (url === "https://api.line.me/oauth2/v2.1/token") {
+      return Response.json({ access_token: "line-access", id_token: "line-id-token" });
+    }
+    if (url === "https://api.line.me/oauth2/v2.1/verify") {
+      return Response.json({
+        iss: "https://access.line.me",
+        aud: env.LINE_CLIENT_ID,
+        nonce,
+        exp: Math.floor(Date.now() / 1000) + 300,
+        sub: subject,
+        name: "Line Member",
+      });
+    }
+    throw new Error(`Unexpected fetch: ${url}`);
+  };
+}
+
 async function startOtp(env, email = "member@example.com") {
   env.EMAIL_OTP_ENABLED = "true";
   return onRequest({
@@ -172,6 +192,55 @@ test("Google authorization uses state, nonce, and S256 PKCE", async () => {
   database.close();
 });
 
+test("Turnstile verification requires the expected hostname and action", async () => {
+  const database = new TestD1();
+  const env = environment(database);
+  globalThis.fetch = async (input) => {
+    if (String(input).includes("turnstile/v0/siteverify")) return Response.json({ success: true });
+    throw new Error(`Unexpected fetch: ${String(input)}`);
+  };
+  const response = await onRequest({
+    env,
+    request: jsonRequest("/api/auth/oauth/google/start", { turnstileToken: "valid-turnstile-token" }),
+  });
+  assert.equal(response.status, 403);
+  assert.equal((await response.json()).code, "turnstile_failed");
+  assert.equal(database.database.prepare("SELECT COUNT(*) count FROM oauth_flows").get().count, 0);
+  database.close();
+});
+
+test("provider denial validates state and consumes the OAuth flow", async () => {
+  const database = new TestD1();
+  const env = environment(database);
+  installDeliveryMock();
+  const start = await onRequest({
+    env,
+    request: jsonRequest("/api/auth/oauth/google/start", { turnstileToken: "valid-turnstile-token" }),
+  });
+  const state = new URL((await start.json()).authorizationUrl).searchParams.get("state");
+  const cookie = cookieValue(start, "__Host-cg_oauth");
+  const deniedUrl = `https://chatgun.pages.dev/api/auth/oauth/google/callback?error=access_denied&state=${encodeURIComponent(state)}`;
+  const denied = await onRequest({
+    env,
+    request: new Request(deniedUrl, { headers: { cookie: `__Host-cg_oauth=${encodeURIComponent(cookie)}` } }),
+  });
+  assert.equal(denied.status, 303);
+  assert.match(denied.headers.get("location"), /auth_error=provider_denied/u);
+  assert.equal(database.database.prepare("SELECT COUNT(*) count FROM oauth_flows").get().count, 0);
+
+  const replay = await onRequest({
+    env,
+    request: new Request(deniedUrl, { headers: { cookie: `__Host-cg_oauth=${encodeURIComponent(cookie)}` } }),
+  });
+  assert.match(replay.headers.get("location"), /auth_error=oauth_expired/u);
+  const unsolicited = await onRequest({
+    env,
+    request: new Request("https://chatgun.pages.dev/api/auth/oauth/google/callback?error=access_denied"),
+  });
+  assert.match(unsolicited.headers.get("location"), /auth_error=invalid_state/u);
+  database.close();
+});
+
 test("account linking requires the authenticated session and matching CSRF token", async () => {
   const database = new TestD1();
   const env = environment(database);
@@ -209,6 +278,98 @@ test("account linking requires the authenticated session and matching CSRF token
   });
   assert.equal(rejected.status, 403);
   assert.equal((await rejected.json()).code, "invalid_csrf");
+  database.close();
+});
+
+test("account linking callback attaches a new provider identity to the authenticated user", async () => {
+  const database = new TestD1();
+  const env = environment(database);
+  installDeliveryMock();
+  const timestamp = Math.floor(Date.now() / 1000);
+  database.database.prepare(`
+    INSERT INTO users(id, email, email_verified_at, status, created_at, updated_at)
+    VALUES ('link-target', 'target@example.com', ?, 'active', ?, ?)
+  `).run(timestamp, timestamp, timestamp);
+  const { issueSession } = await import("../functions/_lib/db.js");
+  const session = await issueSession(database, "link-target", timestamp);
+  const start = await onRequest({
+    env,
+    request: jsonRequest("/api/auth/oauth/line/start", {
+      link: true,
+      turnstileToken: "valid-turnstile-token",
+    }, {
+      cookie: `__Host-cg_session=${encodeURIComponent(session.token)}; __Host-cg_csrf=${encodeURIComponent(session.csrf)}`,
+      "x-csrf-token": session.csrf,
+    }),
+  });
+  const authorization = new URL((await start.json()).authorizationUrl);
+  assert.equal(authorization.searchParams.get("scope"), "openid profile");
+  const state = authorization.searchParams.get("state");
+  installLineCallbackMock(env, authorization.searchParams.get("nonce"), "line-link-new");
+
+  const callback = await onRequest({
+    env,
+    request: new Request(
+      `https://chatgun.pages.dev/api/auth/oauth/line/callback?state=${encodeURIComponent(state)}&code=line-link-code`,
+      { headers: { cookie: `__Host-cg_oauth=${encodeURIComponent(cookieValue(start, "__Host-cg_oauth"))}` } },
+    ),
+  });
+  assert.equal(callback.status, 303);
+  assert.equal(callback.headers.get("location"), "/account.html");
+  assert.equal(
+    database.database.prepare("SELECT user_id FROM identities WHERE provider = 'line' AND subject = 'line-link-new'").get().user_id,
+    "link-target",
+  );
+  assert.equal(database.database.prepare("SELECT COUNT(*) count FROM users").get().count, 1);
+  assert.match(callback.headers.getSetCookie().join("\n"), /__Host-cg_session=.*HttpOnly.*SameSite=Lax/u);
+  database.close();
+});
+
+test("account linking callback rejects an identity owned by another user", async () => {
+  const database = new TestD1();
+  const env = environment(database);
+  installDeliveryMock();
+  const timestamp = Math.floor(Date.now() / 1000);
+  database.database.prepare(`
+    INSERT INTO users(id, email, email_verified_at, status, created_at, updated_at)
+    VALUES ('identity-owner', 'owner@example.com', ?, 'active', ?, ?),
+           ('link-requester', 'requester@example.com', ?, 'active', ?, ?)
+  `).run(timestamp, timestamp, timestamp, timestamp, timestamp, timestamp);
+  database.database.prepare(`
+    INSERT INTO identities(provider, subject, user_id, provider_email, email_verified, created_at, last_login_at)
+    VALUES ('line', 'line-already-owned', 'identity-owner', NULL, 0, ?, ?)
+  `).run(timestamp, timestamp);
+  const { issueSession } = await import("../functions/_lib/db.js");
+  const session = await issueSession(database, "link-requester", timestamp);
+  const start = await onRequest({
+    env,
+    request: jsonRequest("/api/auth/oauth/line/start", {
+      link: true,
+      turnstileToken: "valid-turnstile-token",
+    }, {
+      cookie: `__Host-cg_session=${encodeURIComponent(session.token)}; __Host-cg_csrf=${encodeURIComponent(session.csrf)}`,
+      "x-csrf-token": session.csrf,
+    }),
+  });
+  const authorization = new URL((await start.json()).authorizationUrl);
+  const state = authorization.searchParams.get("state");
+  installLineCallbackMock(env, authorization.searchParams.get("nonce"), "line-already-owned");
+
+  const callback = await onRequest({
+    env,
+    request: new Request(
+      `https://chatgun.pages.dev/api/auth/oauth/line/callback?state=${encodeURIComponent(state)}&code=line-link-code`,
+      { headers: { cookie: `__Host-cg_oauth=${encodeURIComponent(cookieValue(start, "__Host-cg_oauth"))}` } },
+    ),
+  });
+  assert.equal(callback.status, 303);
+  assert.match(callback.headers.get("location"), /auth_error=identity_linked/u);
+  assert.equal(
+    database.database.prepare("SELECT user_id FROM identities WHERE provider = 'line' AND subject = 'line-already-owned'").get().user_id,
+    "identity-owner",
+  );
+  assert.equal(database.database.prepare("SELECT COUNT(*) count FROM identities").get().count, 1);
+  assert.equal(database.database.prepare("SELECT COUNT(*) count FROM sessions").get().count, 1);
   database.close();
 });
 

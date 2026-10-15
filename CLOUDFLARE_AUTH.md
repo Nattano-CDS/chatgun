@@ -64,6 +64,7 @@ Set these non-secret environment variables:
 
 - `EMAIL_OTP_ENABLED=false` — Phase 1 server-side gate; do not enable without a reviewed rollout
 - `MOBILE_OTP_ENABLED=false` — Phase 1 server-side gate; no mobile OTP implementation is active
+- `LINE_EMAIL_ENABLED=false` — request only `openid profile` until LINE grants email permission
 - `EMAIL_FROM` — sender on a Resend-verified domain
 - `GOOGLE_CLIENT_ID`
 - `FACEBOOK_CLIENT_ID`

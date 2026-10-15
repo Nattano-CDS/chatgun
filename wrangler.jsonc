@@ -5,7 +5,8 @@
   "compatibility_date": "2026-10-15",
   "vars": {
     "EMAIL_OTP_ENABLED": "false",
-    "MOBILE_OTP_ENABLED": "false"
+    "MOBILE_OTP_ENABLED": "false",
+    "LINE_EMAIL_ENABLED": "false"
   },
   "d1_databases": [
     {
@@ -20,7 +21,8 @@
     "production": {
       "vars": {
         "EMAIL_OTP_ENABLED": "false",
-        "MOBILE_OTP_ENABLED": "false"
+        "MOBILE_OTP_ENABLED": "false",
+        "LINE_EMAIL_ENABLED": "false"
       },
       "d1_databases": [
         {
@@ -35,7 +37,8 @@
     "preview": {
       "vars": {
         "EMAIL_OTP_ENABLED": "false",
-        "MOBILE_OTP_ENABLED": "false"
+        "MOBILE_OTP_ENABLED": "false",
+        "LINE_EMAIL_ENABLED": "false"
       },
       "d1_databases": [
         {

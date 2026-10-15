@@ -61,6 +61,7 @@ export function environment(database) {
     GOOGLE_CLIENT_SECRET: "google-secret",
     LINE_CLIENT_ID: "line-client",
     LINE_CLIENT_SECRET: "line-secret",
+    LINE_EMAIL_ENABLED: "false",
     FACEBOOK_CLIENT_ID: "facebook-client",
     FACEBOOK_CLIENT_SECRET: "facebook-secret",
     FACEBOOK_GRAPH_VERSION: "v24.0",
