@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="ร่างนโยบายการลบบัญชีและข้อมูล ChatGun สำหรับการตรวจสอบก่อนเผยแพร่">
+  <title>ร่างนโยบายการลบบัญชีและข้อมูล | ChatGun</title>
+  <link rel="icon" href="./favicon.svg">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./legal.css">
+</head>
+<body class="legal-page">
+  <header class="legal-header">
+    <a href="./" class="brand" aria-label="ChatGun หน้าแรก"><img src="./logo.svg" width="40" height="40" alt=""><span>Chat<span class="gradient">Gun</span></span></a>
+    <nav aria-label="เอกสารทางกฎหมาย"><a href="./privacy.html">ความเป็นส่วนตัว</a><a href="./terms.html">ข้อกำหนด</a><a href="./data-deletion.html" aria-current="page">การลบข้อมูล</a><a href="#english">English summary</a></nav>
+  </header>
+  <main class="legal-main">
+    <h1>ร่างนโยบายการลบบัญชีและข้อมูล</h1>
+    <p class="legal-meta">ChatGun · ฉบับสำหรับเจ้าของและที่ปรึกษากฎหมายตรวจสอบ · 16 ตุลาคม 2026</p>
+    <p class="legal-draft"><strong>ยังไม่มีผลใช้บังคับและยังไม่เผยแพร่:</strong> ระบบลบบัญชีแบบยืนยันตัวตนยังไม่ได้พัฒนา ระยะเวลา 30/90 วันด้านล่างเป็นเป้าหมายการออกแบบ ไม่ใช่คำรับประกัน จนกว่าจะติดตั้ง ทดสอบ และตรวจสอบข้อจำกัดของ Cloudflare D1, logs และสำเนาสำรองจริง</p>
+
+    <h2>1. ผู้รับผิดชอบและช่องทางติดต่อ</h2>
+    <p>ChatGun ดำเนินการโดยบุคคลธรรมดา ชื่อ <strong>เทพกร ทาโน</strong> ติดต่อคำขอลบบัญชีหรือใช้สิทธิได้ที่ <a href="mailto:natttano@outlook.com">natttano@outlook.com</a> ห้ามส่งรหัสผ่าน โทเคน OAuth หรือรหัส OTP ทางอีเมล</p>
+
+    <h2>2. วิธีขอลบที่ออกแบบไว้</h2>
+    <ol>
+      <li>ผู้ใช้เข้าสู่ระบบ ChatGun และเลือก “ลบบัญชี” ในหน้าบัญชี</li>
+      <li>ระบบตรวจสอบเซสชัน, same-origin และ CSRF และให้ยืนยันตัวตนอีกครั้งด้วยผู้ให้บริการที่เชื่อมอยู่</li>
+      <li>ระบบแสดงผลกระทบ ข้อมูล/เนื้อหาที่จะลบหรือทำให้ไม่ระบุตัวบุคคล และช่วงเวลายกเลิกคำขอหากผู้ดำเนินการอนุมัติให้มี</li>
+      <li>เมื่อยืนยัน ระบบเพิกถอนทุกเซสชันและเปลี่ยนบัญชีเป็นสถานะรอลบเพื่อหยุดการเข้าถึงทันที</li>
+      <li>งานเบื้องหลังลบตัวตนจากผู้ให้บริการ ข้อมูลโปรไฟล์ และข้อมูลส่วนบุคคลที่ไม่มีเหตุให้เก็บ พร้อมจัดการเนื้อหาตามนโยบายที่อนุมัติ</li>
+      <li>ระบบสร้างหลักฐานการเสร็จสิ้นแบบไม่เก็บอีเมล รหัสผู้ให้บริการ หรือข้อมูลที่เชื่อมกลับหาบุคคลโดยไม่จำเป็น</li>
+    </ol>
+    <p>จนกว่า workflow นี้จะเปิดใช้ ผู้ทดสอบอาจส่งคำขอจากอีเมลที่ควบคุมได้ไปยัง <a href="mailto:natttano@outlook.com">natttano@outlook.com</a> ผู้ดูแลต้องยืนยันตัวตนผ่านช่องทางที่ปลอดภัยก่อนดำเนินการ และห้ามลบข้อมูล Production ด้วยคำสั่งเฉพาะกิจที่ไม่มี audit trail หรือการตรวจสอบขอบเขต</p>
+
+    <h2>3. ขอบเขตข้อมูล</h2>
+    <p>คำขอมีเป้าหมายครอบคลุมข้อมูลบัญชี อีเมลที่จัดเก็บ ชื่อ รูปโปรไฟล์ ลิงก์ตัวตน Google/Facebook/LINE เซสชัน OAuth flow และข้อมูลควบคุมการใช้งานที่ผูกกับผู้ใช้เท่าที่ระบุได้ Email OTP, Mobile OTP และ LINE email permission ถูกปิด แต่ต้องตรวจและกำจัดข้อมูลทดสอบเดิมตามกฎเก็บรักษา</p>
+    <p>ระบบ social content ยังไม่มี schema ที่ตรวจสอบได้ จึงต้องกำหนดเป็นรายประเภทก่อนเปิดใช้งาน เช่น ลบข้อความส่วนตัวและร่าง, ทำให้ผู้เขียนไม่ระบุตัวในโพสต์สาธารณะที่จำเป็นต่อความต่อเนื่องของการสนทนา, และเก็บเฉพาะหลักฐานที่มีเหตุทางกฎหมายหรือความปลอดภัยพร้อมการจำกัดการเข้าถึงและวันหมดอายุ</p>
+
+    <h2>4. ระยะเวลาเป้าหมายที่ยังไม่รับประกัน</h2>
+    <table class="legal-table">
+      <thead><tr><th>ขั้นตอน</th><th>เป้าหมายเสนอ</th><th>สถานะปัจจุบัน</th></tr></thead>
+      <tbody>
+        <tr><td>หยุดการเข้าถึงและเพิกถอนเซสชัน</td><td>ทันทีหลังยืนยันคำขอ</td><td>ยังไม่มี endpoint ลบบัญชี</td></tr>
+        <tr><td>ลบ/ทำให้นิรนามในฐานข้อมูลหลัก</td><td>ภายใน 30 วัน</td><td>ยังไม่มี worker/job และสถานะ deletion pending</td></tr>
+        <tr><td>ข้อมูลในสำเนาสำรองหรือประวัติการกู้คืน</td><td>ภายใน 90 วันเท่าที่ระบบรองรับ</td><td>D1 Time Travel มีวงจร 7 หรือ 30 วันตามแผน แต่ต้องตรวจสอบ plan และสำเนาส่งออกอื่นทั้งหมด</td></tr>
+      </tbody>
+    </table>
+    <p>การลบแถวจาก D1 ไม่ได้ลบข้อมูลย้อนหลังออกจาก Time Travel แบบรายบุคคลในทันทีตามความเข้าใจทางเทคนิคที่ต้องยืนยันกับ Cloudflare ข้อมูลที่ลบอาจคงอยู่ในประวัติการกู้คืนจนพ้นวงจรของผู้ให้บริการ และหากมีการกู้คืนฐานข้อมูล ต้องมีขั้นตอน replay รายการลบก่อนนำระบบกลับให้บริการ</p>
+
+    <h2>5. ข้อยกเว้นที่ต้องผ่านการตรวจสอบ</h2>
+    <p>ChatGun อาจจำเป็นต้องปฏิเสธ จำกัด หรือชะลอการลบบางรายการเฉพาะเมื่อมีฐานทางกฎหมายที่ใช้ได้ เช่น การปฏิบัติตามกฎหมาย การก่อตั้ง ใช้ หรือต่อสู้สิทธิเรียกร้อง หรือการคุ้มครองสิทธิของบุคคลอื่น ผู้ดำเนินการต้องบันทึกเหตุผล ขอบเขต ระยะเวลา และการควบคุมการเข้าถึงโดยไม่ใช้ข้อยกเว้นแบบกว้างหรือไม่มีกำหนด ที่ปรึกษากฎหมายต้องอนุมัติรายการเหตุและระยะเวลาแต่ละประเภทก่อนเผยแพร่</p>
+
+    <h2>6. การยกเลิกสิทธิ์จากผู้ให้บริการ</h2>
+    <p>ผู้ใช้สามารถยกเลิกสิทธิ์ ChatGun จาก Google, Facebook หรือ LINE ได้โดยตรง แต่การยกเลิกดังกล่าวไม่ลบบัญชี ChatGun ปัจจุบัน ChatGun ไม่เก็บ provider access token หรือ refresh token หลัง callback จึงไม่มีโทเคนถาวรสำหรับเรียก revoke ในภายหลัง ต้องออกแบบให้ผู้ใช้ได้รับลิงก์และคำแนะนำยกเลิกสิทธิ์แต่ละบริการอย่างชัดเจน</p>
+
+    <h2>7. การยืนยันผลและการร้องเรียน</h2>
+    <p>เมื่อคำขอเสร็จสิ้น ChatGun ควรส่งผลไปยังช่องทางที่ผ่านการยืนยันและเก็บเพียงรหัสคำขอสุ่ม เวลาสำเร็จ ผลรวมหมวดข้อมูลที่ดำเนินการ และเวอร์ชันนโยบาย โดยไม่เก็บอีเมลหรือ provider subject ในหลักฐานถาวร หากไม่สามารถดำเนินการทั้งหมด ต้องแจ้งเหตุผล ขอบเขตที่ยังเก็บ ระยะเวลา และช่องทางคัดค้านหรือร้องเรียนตามกฎหมาย</p>
+
+    <section id="english" class="legal-summary" lang="en">
+      <h2>English summary</h2>
+      <p>Contact เทพกร ทาโน at <a href="mailto:natttano@outlook.com">natttano@outlook.com</a> for deletion or privacy requests. Never send passwords, OAuth tokens or OTP codes by email.</p>
+      <p>The intended workflow requires an authenticated session, CSRF protection and provider reauthentication; it immediately revokes sessions and disables access, then deletes or anonymizes applicable profile, identity and content data. Completion evidence should not retain unnecessary personal identifiers.</p>
+      <p>The proposed 30-day primary deletion and 90-day backup target are not yet guarantees. The workflow, content rules, legal exceptions, D1 cleanup and backup lifecycle must be implemented, tested and legally reviewed first.</p>
+    </section>
+  </main>
+  <footer class="legal-footer">ร่างเพื่อการตรวจสอบเท่านั้น · Draft for review only</footer>
+</body>
+</html>
