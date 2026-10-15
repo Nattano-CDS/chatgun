@@ -13,6 +13,8 @@ test("signup renders branded auth controls with Preview Turnstile", async ({ pag
   await expect(page.getByRole("button", { name: "Google" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Facebook" })).toBeVisible();
   await expect(page.getByRole("button", { name: "LINE" })).toBeVisible();
+  await expect(page.getByText(/รับชื่อ รูปโปรไฟล์ และอีเมลจากผู้ให้บริการ/u)).toBeVisible();
+  await expect(page.getByRole("link", { name: "นโยบายความเป็นส่วนตัว" })).toHaveAttribute("href", "./privacy.html");
   await expect(page.getByRole("button", { name: /เบอร์มือถือ/ })).toBeDisabled();
   await expect(page.locator('#turnstile input[name="cf-turnstile-response"]')).toBeAttached();
   await expect(page.getByRole("status")).toBeEmpty();
@@ -20,6 +22,14 @@ test("signup renders branded auth controls with Preview Turnstile", async ({ pag
     path: resolve(screenshotDirectory, testInfo.project.name.includes("mobile") ? "signup-mobile.png" : "signup-desktop.png"),
     fullPage: true,
   });
+});
+
+test("privacy notice explains social identity data use", async ({ page }) => {
+  await page.goto("/privacy.html");
+  await expect(page).toHaveTitle("นโยบายความเป็นส่วนตัว | ChatGun");
+  await expect(page.getByRole("heading", { name: "ข้อมูลที่เราเก็บ" })).toBeVisible();
+  await expect(page.getByText(/Google, Facebook หรือ LINE/u)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "การลบข้อมูล" })).toBeVisible();
 });
 
 test("account page redirects unauthenticated users to signup", async ({ page }) => {

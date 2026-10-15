@@ -8,6 +8,22 @@ This runbook is for the ChatGun Cloudflare account only.
 - Stable Preview origin: `https://feature-cloudflare-auth.chatgun.pages.dev`
 - Environment: Cloudflare Pages **Preview** only until provider E2E testing passes
 
+## Staging configuration status (2026-10-16)
+
+- Google: separate `ChatGun` project and `ChatGun Preview` web client created; Preview
+  origin/callback registered; external testing mode with an authorized test user; Preview
+  client ID and secret configured.
+- Facebook: separate `ChatGun` app created in development mode; Facebook Login and
+  `email` permission enabled for testing; Preview callback registered. App-secret export
+  remains blocked on Meta password reauthentication.
+- LINE: separate `ChatGun` provider and LINE Login channel created in Developing status;
+  Preview callback registered; Preview channel ID and secret configured. Email permission
+  remains blocked on screenshot upload and LINE review approval.
+- Resend: the only visible team, `nat.tanouxui`, is empty and cannot be identified as the
+  PiggyPrice integration owner. No API key or domain was created.
+- Turnstile: the existing dedicated ChatGun Preview widget and its Preview secrets were
+  preserved. SMS OTP remains disabled.
+
 Do not copy credentials from PiggyPrice. Reusing a developer account means creating a
 separate ChatGun project, application, channel, widget, or API key in that account.
 
