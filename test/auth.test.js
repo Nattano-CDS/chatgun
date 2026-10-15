@@ -285,6 +285,7 @@ test("Google callback verifies the ID token signature, audience, and nonce", asy
 test("Facebook callback debugs the token and does not mark its email verified", async () => {
   const database = new TestD1();
   const env = environment(database);
+  env.FACEBOOK_CLIENT_ID = "1136950635489003";
   installDeliveryMock();
   const start = await onRequest({
     env,
@@ -292,15 +293,19 @@ test("Facebook callback debugs the token and does not mark its email verified", 
   });
   const authorization = new URL((await start.json()).authorizationUrl);
   const state = authorization.searchParams.get("state");
-  globalThis.fetch = async (input) => {
+  globalThis.fetch = async (input, init) => {
     const url = String(input);
     if (url.endsWith("/oauth/access_token")) return Response.json({ access_token: "facebook-access" });
-    if (url.endsWith("/debug_token")) return Response.json({ data: {
-      is_valid: true, app_id: env.FACEBOOK_CLIENT_ID, user_id: "facebook-user-1",
-      expires_at: Math.floor(Date.now() / 1000) + 300,
-    } });
+    if (url.includes("/debug_token?")) {
+      assert.equal(new URL(url).searchParams.get("input_token"), "facebook-access");
+      assert.equal(init.headers.authorization, `Bearer ${env.FACEBOOK_CLIENT_ID}|${env.FACEBOOK_CLIENT_SECRET}`);
+      return Response.json({ data: {
+        is_valid: true, app_id: Number(env.FACEBOOK_CLIENT_ID), user_id: 123456789,
+        expires_at: Math.floor(Date.now() / 1000) + 300,
+      } });
+    }
     if (url.startsWith(`https://graph.facebook.com/${env.FACEBOOK_GRAPH_VERSION}/me`)) {
-      return Response.json({ id: "facebook-user-1", name: "Facebook Member", email: "facebook@example.com" });
+      return Response.json({ id: "123456789", name: "Facebook Member", email: "facebook@example.com" });
     }
     throw new Error(`Unexpected fetch: ${url}`);
   };

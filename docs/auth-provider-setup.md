@@ -17,9 +17,12 @@ This runbook is for the ChatGun Cloudflare account only.
   invalidation.
 - Facebook: separate `ChatGun` app created in development mode; Facebook Login and
   `email` permission enabled for testing; Preview callback, App Domains, and Website
-  platform registered; Preview app ID and secret configured. Real E2E remains blocked by
-  Meta rejecting the Preview callback domain before the consent screen, so no Facebook
-  login or account-linking success is claimed.
+  platform registered; Preview app ID and secret configured; Graph API `v26.0` selected.
+  Real Preview E2E passed for authorization, server-side token debugging, profile lookup,
+  initial account creation, secure session creation, and logout/session invalidation.
+  Account linking is not claimed: the authorized Facebook identity and LINE identity were
+  exercised as separate sessions and belong to two distinct staging users. Testing a real
+  link requires another authorized provider identity that is not already attached.
 - LINE: separate `ChatGun` provider and LINE Login channel created in Developing status;
   Preview callback registered; Preview channel ID and secret configured. Real profile-only
   Preview login, account creation, secure session creation, and logout passed. Email
@@ -28,7 +31,8 @@ This runbook is for the ChatGun Cloudflare account only.
 - Resend: the only visible team, `nat.tanouxui`, is empty and cannot be identified as the
   PiggyPrice integration owner. No API key or domain was created.
 - Turnstile: the existing dedicated ChatGun Preview widget and its Preview secrets were
-  preserved. SMS OTP remains disabled.
+  preserved. Its hostname allowlist contains the stable branch alias; immutable deployment
+  hostnames intentionally show a connection error. SMS OTP remains disabled.
 
 Do not copy credentials from PiggyPrice. Reusing a developer account means creating a
 separate ChatGun project, application, channel, widget, or API key in that account.

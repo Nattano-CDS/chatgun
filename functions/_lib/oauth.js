@@ -156,15 +156,29 @@ export async function verifyProviderIdentity(provider, configuration, token, non
   }
 
   const applicationToken = `${configuration.clientId}|${configuration.clientSecret}`;
-  const debugBody = new URLSearchParams({ input_token: token.access_token, access_token: applicationToken });
-  const debugResponse = await fetch(`https://graph.facebook.com/${configuration.version}/debug_token`, {
-    method: "POST",
-    headers: { accept: "application/json", "content-type": "application/x-www-form-urlencoded" },
-    body: debugBody,
+  const debugUrl = new URL(`https://graph.facebook.com/${configuration.version}/debug_token`);
+  debugUrl.searchParams.set("input_token", token.access_token);
+  const debugResponse = await fetch(debugUrl, {
+    headers: { accept: "application/json", authorization: `Bearer ${applicationToken}` },
   });
   const debug = await debugResponse.json().catch(() => ({}));
-  if (!debugResponse.ok || debug.data?.is_valid !== true || debug.data?.app_id !== configuration.clientId
-    || !debug.data?.user_id || debug.data.expires_at && Number(debug.data.expires_at) <= timestamp) {
+  const debugAppId = debug.data?.app_id == null ? "" : String(debug.data.app_id);
+  const debugUserId = debug.data?.user_id == null ? "" : String(debug.data.user_id);
+  const appIdMatches = debugAppId === String(configuration.clientId);
+  const expirationValid = !debug.data?.expires_at || Number(debug.data.expires_at) > timestamp;
+  if (!debugResponse.ok || debug.data?.is_valid !== true || !appIdMatches || !debugUserId || !expirationValid) {
+    console.error(JSON.stringify({
+      event: "facebook_token_debug_rejected",
+      httpStatus: debugResponse.status,
+      responseOk: debugResponse.ok,
+      isValid: debug.data?.is_valid === true,
+      appIdMatches,
+      appIdType: typeof debug.data?.app_id,
+      hasUserId: Boolean(debugUserId),
+      expirationValid,
+      errorCode: Number(debug.error?.code) || null,
+      errorSubcode: Number(debug.error?.error_subcode) || null,
+    }));
     throw new Error("invalid_facebook_token");
   }
   const proof = await hmacHex(configuration.clientSecret, token.access_token);
@@ -175,7 +189,7 @@ export async function verifyProviderIdentity(provider, configuration, token, non
     headers: { accept: "application/json", authorization: `Bearer ${token.access_token}` },
   });
   const profile = await profileResponse.json().catch(() => ({}));
-  if (!profileResponse.ok || profile.id !== debug.data.user_id) throw new Error("invalid_facebook_profile");
+  if (!profileResponse.ok || String(profile.id || "") !== debugUserId) throw new Error("invalid_facebook_profile");
   return {
     provider,
     subject: profile.id,
