@@ -6,7 +6,7 @@ const screenshotDirectory = resolve("test-results/screenshots");
 
 test.beforeAll(() => mkdirSync(screenshotDirectory, { recursive: true }));
 
-test("signup renders branded auth controls and fails closed without Preview credentials", async ({ page }, testInfo) => {
+test("signup renders branded auth controls with Preview Turnstile", async ({ page }, testInfo) => {
   await page.goto("/signup.html");
   await expect(page).toHaveTitle("สมัครสมาชิก | ChatGun");
   await expect(page.getByRole("heading", { name: "สร้างบัญชีใหม่" })).toBeVisible();
@@ -14,7 +14,8 @@ test("signup renders branded auth controls and fails closed without Preview cred
   await expect(page.getByRole("button", { name: "Facebook" })).toBeVisible();
   await expect(page.getByRole("button", { name: "LINE" })).toBeVisible();
   await expect(page.getByRole("button", { name: /เบอร์มือถือ/ })).toBeDisabled();
-  await expect(page.getByRole("status")).toContainText("ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย");
+  await expect(page.locator('#turnstile input[name="cf-turnstile-response"]')).toBeAttached();
+  await expect(page.getByRole("status")).toBeEmpty();
   await page.screenshot({
     path: resolve(screenshotDirectory, testInfo.project.name.includes("mobile") ? "signup-mobile.png" : "signup-desktop.png"),
     fullPage: true,
@@ -32,7 +33,9 @@ test("Pages Functions expose secure config and reject cross-origin mutations", a
   expect(configResponse.status()).toBe(200);
   expect(configResponse.headers()["cache-control"]).toBe("no-store");
   expect(configResponse.headers()["x-content-type-options"]).toBe("nosniff");
-  expect(await configResponse.json()).toEqual({ turnstileSiteKey: null, smsEnabled: false });
+  const config = await configResponse.json();
+  expect(config.smsEnabled).toBe(false);
+  expect(config.turnstileSiteKey).toMatch(/^0x[\w-]+$/u);
 
   const crossOriginResponse = await request.post("/api/auth/otp/start", {
     headers: { origin: "https://evil.example", "content-type": "application/json" },
