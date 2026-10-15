@@ -12,13 +12,19 @@ This runbook is for the ChatGun Cloudflare account only.
 
 - Google: separate `ChatGun` project and `ChatGun Preview` web client created; Preview
   origin/callback registered; external testing mode with an authorized test user; Preview
-  client ID and secret configured.
+  client ID and secret configured. Real Preview E2E passed for initial account creation,
+  existing-account login without duplication, secure session creation, and logout/session
+  invalidation.
 - Facebook: separate `ChatGun` app created in development mode; Facebook Login and
-  `email` permission enabled for testing; Preview callback registered. App-secret export
-  remains blocked on Meta password reauthentication.
+  `email` permission enabled for testing; Preview callback, App Domains, and Website
+  platform registered; Preview app ID and secret configured. Real E2E remains blocked by
+  Meta rejecting the Preview callback domain before the consent screen, so no Facebook
+  login or account-linking success is claimed.
 - LINE: separate `ChatGun` provider and LINE Login channel created in Developing status;
-  Preview callback registered; Preview channel ID and secret configured. Email permission
-  remains blocked on screenshot upload and LINE review approval.
+  Preview callback registered; Preview channel ID and secret configured. Real profile-only
+  Preview login, account creation, secure session creation, and logout passed. Email
+  permission remains blocked on the user-authorized screenshot upload and LINE review
+  approval, so verified-email behavior is not claimed.
 - Resend: the only visible team, `nat.tanouxui`, is empty and cannot be identified as the
   PiggyPrice integration owner. No API key or domain was created.
 - Turnstile: the existing dedicated ChatGun Preview widget and its Preview secrets were
