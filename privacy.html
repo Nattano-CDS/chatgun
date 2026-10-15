@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="ร่างนโยบายความเป็นส่วนตัวของ ChatGun สำหรับการตรวจสอบก่อนเผยแพร่">
+  <title>ร่างนโยบายความเป็นส่วนตัว | ChatGun</title>
+  <link rel="icon" href="./favicon.svg">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./legal.css">
+</head>
+<body class="legal-page">
+  <header class="legal-header">
+    <a href="./" class="brand" aria-label="ChatGun หน้าแรก"><img src="./logo.svg" width="40" height="40" alt=""><span>Chat<span class="gradient">Gun</span></span></a>
+    <nav aria-label="เอกสารทางกฎหมาย"><a href="./privacy.html" aria-current="page">ความเป็นส่วนตัว</a><a href="./terms.html">ข้อกำหนด</a><a href="./data-deletion.html">การลบข้อมูล</a><a href="#english">English summary</a></nav>
+  </header>
+  <main class="legal-main">
+    <h1>ร่างนโยบายความเป็นส่วนตัว</h1>
+    <p class="legal-meta">ChatGun · ฉบับสำหรับเจ้าของและที่ปรึกษากฎหมายตรวจสอบ · 16 ตุลาคม 2026</p>
+    <p class="legal-draft"><strong>ยังไม่มีผลใช้บังคับและยังไม่เผยแพร่:</strong> เอกสารนี้จัดทำให้สอดคล้องกับระบบที่อยู่ระหว่างพัฒนา ไม่ใช่คำรับรองว่า ChatGun ปฏิบัติตามกฎหมายครบถ้วน ต้องผ่านการตรวจสอบทางกฎหมายและการยืนยันว่ามาตรการทางเทคนิคทำงานจริงก่อนเผยแพร่</p>
+
+    <h2>1. ผู้ควบคุมข้อมูลและช่องทางติดต่อ</h2>
+    <p>ChatGun (<a href="https://chatgun.social">https://chatgun.social</a>) ดำเนินการโดยบุคคลธรรมดา ชื่อ <strong>เทพกร ทาโน</strong> ในฐานะผู้ควบคุมข้อมูลส่วนบุคคลสำหรับการดำเนินงานของแพลตฟอร์ม ติดต่อเรื่องความเป็นส่วนตัวและการใช้สิทธิได้ที่ <a href="mailto:natttano@outlook.com">natttano@outlook.com</a></p>
+    <p>เอกสารนี้ไม่ระบุเลขทะเบียนธุรกิจ ที่อยู่ทางกายภาพ หรือสถานะบริษัท เพราะผู้ดำเนินการไม่ได้ยืนยันข้อมูลดังกล่าว</p>
+
+    <h2>2. ข้อมูลที่ ChatGun ประมวลผล</h2>
+    <h3>ข้อมูลจาก Google, Facebook และ LINE</h3>
+    <ul>
+      <li>รหัสบัญชีเฉพาะที่ผู้ให้บริการกำหนด ชื่อที่แสดง และ URL รูปโปรไฟล์</li>
+      <li>อีเมลและสถานะการยืนยันอีเมลเท่าที่ผู้ให้บริการส่งมา โดย Facebook ไม่ได้ให้คำยืนยันอีเมลที่ระบบใช้เชื่อมบัญชีโดยอัตโนมัติ</li>
+      <li>LINE email permission ถูกปิด ระบบจึงขอเฉพาะ <code>openid profile</code> และไม่คาดว่าจะได้รับอีเมลจาก LINE</li>
+      <li>ชื่อผู้ให้บริการ เวลาที่สร้างการเชื่อมโยง และเวลาเข้าสู่ระบบล่าสุด</li>
+    </ul>
+    <h3>ข้อมูลการยืนยันตัวตนและความปลอดภัย</h3>
+    <ul>
+      <li>โทเคนเซสชันและค่า CSRF ในรูปแบบแฮช พร้อมเวลาสร้าง หมดอายุ ใช้งานล่าสุด และเพิกถอน</li>
+      <li>OAuth state ในรูปแบบแฮช รวมถึง nonce, PKCE verifier, ผู้ให้บริการ, เวลาสร้าง/หมดอายุ และตัวระบุเครือข่ายในรูปแบบ HMAC ระหว่างกระบวนการเข้าสู่ระบบ</li>
+      <li>ตัวนับจำกัดอัตราคำขอและตัวระบุในรูปแบบแฮช เพื่อป้องกันการใช้งานผิดปกติ</li>
+      <li>ข้อมูลคำขอและข้อผิดพลาดที่ Cloudflare ประมวลผลหรือบันทึกตามการตั้งค่าบริการ เช่น เวลา สถานะคำขอ IP address, User-Agent หรือ Cloudflare Ray ID ทั้งนี้ต้องตรวจสอบการตั้งค่า log จริงก่อนเผยแพร่</li>
+      <li>Cloudflare Turnstile ประมวลผลข้อมูลอุปกรณ์และเครือข่ายที่จำเป็นเพื่อแยกผู้ใช้จริงจากโปรแกรมอัตโนมัติ โดย ChatGun ส่ง token, IP address และ action/hostname ที่คาดหมายไปตรวจสอบฝั่งเซิร์ฟเวอร์</li>
+    </ul>
+    <h3>วิธีที่ยังปิดใช้งาน</h3>
+    <p>Email OTP และ Mobile OTP ถูกปิดทั้งหน้าเว็บและ API และ SMS OTP ไม่มีการใช้งาน ตารางรองรับ OTP ยังอยู่ใน Cloudflare D1 สำหรับการพัฒนาในอนาคต แต่ไม่ควรมีการสร้างรายการใหม่ตราบใดที่ feature flags ยังคงปิด ทั้งนี้ต้องตรวจสอบและลบข้อมูลทดสอบเดิมตามนโยบายเก็บรักษาก่อนเผยแพร่</p>
+
+    <h2>3. การสร้างบัญชีและการเชื่อมบัญชี</h2>
+    <p>เมื่อเข้าสู่ระบบสำเร็จ ChatGun ใช้รหัสผู้ใช้จากผู้ให้บริการเพื่อค้นหาหรือสร้างบัญชีและบันทึกความเชื่อมโยงใน Cloudflare D1 ระบบอาจเชื่อมบัญชีอัตโนมัติจากอีเมลได้เฉพาะเมื่อผู้ให้บริการยืนยันอีเมลและบัญชี ChatGun เดิมมีอีเมลที่ยืนยันแล้ว การเชื่อมผู้ให้บริการเพิ่มเติมต้องเกิดจากเซสชันที่เข้าสู่ระบบและผ่านการตรวจสอบ CSRF ระบบจะปฏิเสธตัวตนที่เชื่อมอยู่กับผู้ใช้อื่น</p>
+
+    <h2>4. วัตถุประสงค์และฐานทางกฎหมายที่เสนอ</h2>
+    <ul>
+      <li>สร้างและให้บริการบัญชี การเข้าสู่ระบบ และฟังก์ชันที่ผู้ใช้ร้องขอ</li>
+      <li>รักษาความปลอดภัย ป้องกันการยึดบัญชี การฉ้อโกง สแปม และการใช้ระบบอัตโนมัติในทางที่ผิด</li>
+      <li>วินิจฉัยข้อผิดพลาด ตอบคำขอใช้สิทธิ และปฏิบัติตามหน้าที่ตามกฎหมาย</li>
+    </ul>
+    <p>ฐานทางกฎหมายที่เสนอประกอบด้วยความจำเป็นเพื่อการปฏิบัติตามสัญญาหรือขั้นตอนก่อนเข้าทำสัญญา ประโยชน์โดยชอบด้วยกฎหมายด้านความปลอดภัย และหน้าที่ตามกฎหมาย ส่วนความยินยอมจะใช้เฉพาะกิจกรรมที่กฎหมายกำหนดหรือไม่มีฐานอื่นที่เหมาะสม การเลือกฐานทางกฎหมายและการประเมินประโยชน์โดยชอบด้วยกฎหมายต้องให้ผู้เชี่ยวชาญกฎหมายไทยตรวจสอบก่อนเผยแพร่</p>
+
+    <h2>5. คุกกี้</h2>
+    <p>ระบบออกคุกกี้ที่จำเป็น ได้แก่ <code>__Host-cg_session</code> สำหรับเซสชัน, <code>__Host-cg_csrf</code> สำหรับป้องกัน CSRF และ <code>__Host-cg_oauth</code> สำหรับผูกกระบวนการ OAuth กับเบราว์เซอร์ คุกกี้ใช้ Secure และ SameSite=Lax; session และ OAuth cookie เป็น HttpOnly ส่วน CSRF cookie ต้องอ่านได้โดย JavaScript เพื่อส่งกลับใน header เซสชันมีอายุสูงสุด 30 วัน และ OAuth cookie มีอายุ 10 นาทีตามโค้ดปัจจุบัน</p>
+
+    <h2>6. การจัดเก็บ ผู้รับข้อมูล และการโอนไปต่างประเทศ</h2>
+    <p>ข้อมูลบัญชีและข้อมูลยืนยันตัวตนจัดเก็บใน Cloudflare D1 ซึ่งฐานข้อมูลปัจจุบันทำงานในภูมิภาค APAC และไม่ได้กำหนด jurisdiction constraint ผู้รับหรือผู้ให้บริการที่เกี่ยวข้อง ได้แก่ Cloudflare (โฮสติ้ง, D1, Turnstile และความปลอดภัย), Google, Meta/Facebook และ LINE (การยืนยันตัวตนที่ผู้ใช้เลือก) แต่ละรายอาจประมวลผลข้อมูลนอกประเทศไทยตามโครงสร้างบริการและนโยบายของตน อ่านข้อมูลของผู้ให้บริการได้ที่ <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare</a>, <a href="https://policies.google.com/privacy">Google</a>, <a href="https://www.facebook.com/privacy/policy/">Meta</a> และ <a href="https://terms.line.me/line_terms_privacy?lang=th">LINE</a></p>
+    <p>บทบาทผู้ควบคุม/ผู้ประมวลผลของแต่ละรายขึ้นอยู่กับบริการและสัญญาที่ใช้ ChatGun ต้องตรวจสอบสัญญาประมวลผลข้อมูล มาตรการโอนข้อมูล รายชื่อผู้ประมวลผลช่วงย่อย และการเปลี่ยนแปลงผู้ให้บริการก่อนเปิดใช้งานสาธารณะ</p>
+
+    <h2>7. ระยะเวลาเก็บรักษา</h2>
+    <p>ระยะเวลาต่อไปนี้เป็น <strong>ข้อเสนอเพื่อออกแบบระบบ ไม่ใช่คำมั่นที่เผยแพร่ต่อผู้ใช้</strong>: บัญชีที่ใช้งานตลอดอายุบัญชี, OAuth state/nonce 10 นาที, เซสชันไม่เกิน 30 วัน, ตัวระบุ rate limit ไม่เกิน 7 วัน, security logs เป้าหมาย 90 วัน, ลบบัญชีเป้าหมายภายใน 30 วัน และจัดการสำเนาสำรองเป้าหมายภายใน 90 วันเท่าที่ระบบสำรองข้อมูลรองรับ</p>
+    <p>โค้ดปัจจุบันบังคับเพียงอายุใช้งาน OAuth และเซสชัน แต่ยังไม่มีงานลบแถวที่หมดอายุ ไม่มีระบบลบบัญชี และไม่มีคลัง security logs 90 วัน จึงห้ามเผยแพร่ระยะเวลาเหล่านี้เป็นการรับประกันจนกว่าจะติดตั้งและทดสอบกลไกตามเอกสารออกแบบ</p>
+
+    <h2>8. สิทธิของเจ้าของข้อมูล</h2>
+    <p>ภายใต้เงื่อนไขและข้อยกเว้นของพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 ผู้ใช้อาจมีสิทธิขอเข้าถึงและรับสำเนา ขอแก้ไข ขอให้ลบ ทำลาย หรือทำให้ไม่สามารถระบุตัวบุคคล ขอระงับการใช้ คัดค้าน ขอรับหรือโอนข้อมูลในกรณีที่ใช้บังคับ ถอนความยินยอม และร้องเรียนต่อสำนักงานคณะกรรมการคุ้มครองข้อมูลส่วนบุคคล ChatGun อาจขอข้อมูลเพื่อยืนยันตัวตนและป้องกันการเข้าถึงข้อมูลของผู้อื่น ติดต่อได้ที่ <a href="mailto:natttano@outlook.com">natttano@outlook.com</a></p>
+
+    <h2>9. การลบบัญชี</h2>
+    <p>ขั้นตอนและข้อจำกัดอยู่ใน <a href="./data-deletion.html">ร่างนโยบายการลบบัญชีและข้อมูล</a> ขณะนี้ workflow ลบแบบยืนยันตัวตนยังไม่ได้พัฒนา จึงต้องถือเป็น blocker ก่อนเปิดสาธารณะ การยกเลิกสิทธิ์ใน Google, Facebook หรือ LINE ไม่ได้ลบบัญชี ChatGun โดยอัตโนมัติ</p>
+
+    <h2>10. ผู้ใช้ที่มีอายุ 13–19 ปี</h2>
+    <p>ChatGun กำหนดอายุขั้นต่ำ 13 ปี แต่เกณฑ์ดังกล่าวไม่ทำให้ความยินยอมของผู้เยาว์มีผลโดยอัตโนมัติ มาตรา 20 ของ PDPA ไทยเชื่อมโยงกับความสามารถของผู้เยาว์ตามประมวลกฎหมายแพ่งและพาณิชย์และอาจต้องได้รับความยินยอมจากผู้ใช้อำนาจปกครอง ระบบยังไม่มี age gate หรือ parental-consent workflow จึงต้องออกแบบและให้ผู้เชี่ยวชาญกฎหมายตรวจสอบก่อนเปิดรับผู้ใช้วัย 13–19 ปี</p>
+
+    <h2>11. ความปลอดภัยและเหตุละเมิดข้อมูล</h2>
+    <p>มาตรการปัจจุบันรวมการแฮชโทเคน เซสชันคุกกี้แบบ Secure/HttpOnly, CSRF protection, OAuth state/nonce, PKCE สำหรับ Google และ LINE, การตรวจสอบ token ฝั่งเซิร์ฟเวอร์, Turnstile, rate limiting และ security headers มาตรการเหล่านี้ลดความเสี่ยงแต่ไม่สามารถรับประกันความปลอดภัยทั้งหมด แผนตอบสนองเหตุละเมิดและขั้นตอนแจ้งตามกฎหมายยังต้องจัดทำและทดสอบ</p>
+
+    <h2>12. การเปลี่ยนแปลงเอกสาร</h2>
+    <p>ก่อนเผยแพร่ต้องกำหนดวันที่มีผลและกระบวนการแจ้งการเปลี่ยนแปลงที่มีสาระสำคัญ เอกสารฉบับร่างนี้อาจเปลี่ยนตามผลการตรวจสอบทางกฎหมายและการพัฒนาระบบ</p>
+
+    <section id="english" class="legal-summary" lang="en">
+      <h2>English summary</h2>
+      <p>ChatGun is operated by an individual, เทพกร ทาโน, reachable at <a href="mailto:natttano@outlook.com">natttano@outlook.com</a>. Social login uses Google, Facebook and LINE. Email OTP, mobile OTP and LINE email permission are disabled.</p>
+      <p>The service processes provider identifiers, profile details, verified email where available, hashed session/CSRF tokens, short-lived OAuth-flow data, hashed abuse-prevention identifiers, and Cloudflare/Turnstile request data. Account and authentication records are stored in Cloudflare D1 in APAC. Cross-border processing requires further legal and contractual review.</p>
+      <p>This is an unpublished draft. Proposed retention periods, deletion targets, legal bases and protections for users aged 13–19 must be technically implemented, tested and reviewed by qualified Thai counsel before publication.</p>
+    </section>
+  </main>
+  <footer class="legal-footer">ร่างเพื่อการตรวจสอบเท่านั้น · Draft for review only</footer>
+</body>
+</html>
