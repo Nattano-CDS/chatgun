@@ -70,6 +70,7 @@ test("social capabilities fail closed and never expose a game capability", async
   assert.deepEqual(await config.json(), {
     socialAppEnabled: false,
     adultOnboardingEnabled: false,
+    adultNoticeVersion: null,
     publicDiscoveryEnabled: false,
     friendRequestsEnabled: false,
     messagingEnabled: false,
@@ -194,6 +195,8 @@ test("friendship, messaging, blocking, and reports enforce server-side relations
     method: "POST", body: { action: "block", target: "rel-alice" },
   }));
   assert.equal(blocked.status, 200);
+  const blockedList = await call(env, request("/api/social/blocks", bob));
+  assert.deepEqual((await blockedList.json()).blocked.map((item) => [item.user_id, item.name]), [["rel-alice", "Alice"]]);
   assert.equal(await database.prepare("SELECT COUNT(*) count FROM social_relationships").first().then((r) => r.count), 0);
   const denied = await call(env, request("/api/social/messages?target=rel-bob", alice));
   assert.equal(denied.status, 403);

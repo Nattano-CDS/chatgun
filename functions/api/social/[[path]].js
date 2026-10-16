@@ -109,9 +109,12 @@ function distanceMetres(a, b) {
 }
 
 async function config(env) {
+  const socialAppEnabled = enabled(env.SOCIAL_APP_ENABLED);
+  const adultOnboardingEnabled = socialAppEnabled && enabled(env.ADULT_ONBOARDING_ENABLED);
   return json({
-    socialAppEnabled: enabled(env.SOCIAL_APP_ENABLED),
-    adultOnboardingEnabled: enabled(env.ADULT_ONBOARDING_ENABLED),
+    socialAppEnabled,
+    adultOnboardingEnabled,
+    adultNoticeVersion: adultOnboardingEnabled ? String(env.ADULT_NOTICE_VERSION || "") || null : null,
     publicDiscoveryEnabled: enabled(env.PUBLIC_DISCOVERY_ENABLED),
     friendRequestsEnabled: enabled(env.FRIEND_REQUESTS_ENABLED),
     messagingEnabled: enabled(env.MESSAGING_ENABLED),
@@ -350,8 +353,18 @@ async function relationships(request, env) {
 
 async function blocks(request, env) {
   capability(env, "SOCIAL_APP_ENABLED");
-  const session = await authenticated(request, env, { csrf: true });
+  const session = await authenticated(request, env, { csrf: request.method === "POST" });
   await requireProfile(env.DB, session.user_id);
+  if (request.method === "GET") {
+    const rows = await env.DB.prepare(`
+      SELECT b.blocked_user_id user_id, p.name, p.gender, b.created_at
+      FROM social_blocks b
+      JOIN member_profiles p ON p.user_id = b.blocked_user_id
+      WHERE b.blocker_user_id = ?
+      ORDER BY b.created_at DESC
+    `).bind(session.user_id).all();
+    return json({ blocked: rows.results || [] });
+  }
   await limited(env, "block_write_user_hour", session.user_id, 30, 3600);
   const body = await readJson(request);
   const target = String(body.target || "");
@@ -513,7 +526,7 @@ export async function onRequest({ request, env }) {
     }
     if (path === "/api/social/discovery" && ["GET", "POST"].includes(request.method)) return await discovery(request, env);
     if (path === "/api/social/relationships" && ["GET", "POST"].includes(request.method)) return await relationships(request, env);
-    if (request.method === "POST" && path === "/api/social/blocks") return await blocks(request, env);
+    if (path === "/api/social/blocks" && ["GET", "POST"].includes(request.method)) return await blocks(request, env);
     if (path === "/api/social/messages" && ["GET", "POST"].includes(request.method)) return await messages(request, env);
     if (request.method === "POST" && path === "/api/social/reports") return await reports(request, env);
     if (path === "/api/social/ratings" && ["GET", "POST"].includes(request.method)) return await ratings(request, env);

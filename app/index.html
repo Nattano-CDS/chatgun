@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>ChatGun · เพื่อนใกล้คุณ</title>
+  <meta name="description" content="ค้นหาเพื่อนใกล้เคียง แชทเมื่อเป็นเพื่อนกัน และส่งความคิดเห็นส่วนตัว">
+  <link rel="icon" href="../favicon.svg">
+  <link rel="stylesheet" href="./social.css">
+  <script defer src="./social.js"></script>
+</head>
+<body>
+  <div id="app" class="app" aria-busy="true">
+    <aside class="sidebar">
+      <a class="social-brand" href="/"><img src="../logo.svg" alt=""><span>ChatGun</span></a>
+      <p class="brand-caption">เพื่อนใกล้คุณ</p>
+      <nav id="primary-nav" aria-label="เมนูหลัก">
+        <button data-tab="near" class="active"><span aria-hidden="true">⌖</span><b>หาเพื่อน</b></button>
+        <button data-tab="friends"><span aria-hidden="true">♧</span><b>เพื่อน</b><em id="request-badge" hidden></em></button>
+        <button data-tab="chat"><span aria-hidden="true">◌</span><b>แชท</b><em id="message-badge" hidden></em></button>
+        <button data-tab="reviews"><span aria-hidden="true">☆</span><b>ความคิดเห็น</b></button>
+        <button data-tab="profile"><span aria-hidden="true">○</span><b>โปรไฟล์</b></button>
+      </nav>
+      <div class="sidebar-bottom"><strong>ตำแหน่งเป็นส่วนตัว</strong><span>แสดงเฉพาะระยะโดยประมาณ</span></div>
+    </aside>
+
+    <main>
+      <div id="global-status" class="status" role="status" aria-live="polite">กำลังโหลด ChatGun…</div>
+
+      <section id="disabled-view" class="empty" hidden>
+        <img src="../logo.svg" alt="" width="72">
+        <h1>ChatGun Social ยังไม่เปิดใช้งาน</h1>
+        <p>ระบบอยู่ระหว่างการทดสอบในสภาพแวดล้อม Preview ที่แยกจาก Production</p>
+        <a class="primary" href="../account.html">กลับไปบัญชี</a>
+      </section>
+
+      <section id="onboarding-view" class="onboarding panel" hidden>
+        <div class="section-heading"><div><small>สมาชิกใหม่</small><h1>สร้างโปรไฟล์ ChatGun</h1></div><img src="../logo.svg" alt="" width="64"></div>
+        <p>โปรดยืนยันว่าคุณมีอายุ 18 ปีขึ้นไปก่อนสร้างโปรไฟล์ ข้อมูลนี้เป็นการยืนยันด้วยตนเองและไม่แสดงต่อสมาชิกอื่น</p>
+        <form id="onboarding-form" class="form-grid">
+          <label>ชื่อที่แสดง<input name="name" maxlength="50" required autocomplete="nickname"></label>
+          <label>เพศ<select name="gender"><option>ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option></select></label>
+          <label class="wide">เกี่ยวกับคุณ<textarea name="bio" maxlength="250"></textarea></label>
+          <label class="wide">ความสนใจ<input name="interests" maxlength="100" placeholder="กาแฟ, เทคโนโลยี, ท่องเที่ยว"></label>
+          <label class="adult-check wide"><input type="checkbox" name="adult" required> ฉันยืนยันว่ามีอายุ 18 ปีขึ้นไป และได้อ่านประกาศสำหรับการทดสอบนี้แล้ว</label>
+          <button class="primary wide" type="submit">สร้างโปรไฟล์และเริ่มใช้งาน</button>
+        </form>
+      </section>
+
+      <section id="social-view" hidden>
+        <header class="toolbar">
+          <a class="toolbar-brand" href="/"><img src="../logo.svg" alt=""><b>ChatGun</b></a>
+          <h1 id="page-title">หาเพื่อน</h1>
+          <div class="toolbar-actions"><button id="refresh" class="icon-button" aria-label="รีเฟรช">↻</button><a class="icon-button" href="../account.html" aria-label="บัญชี">⚙</a></div>
+        </header>
+
+        <div id="near-tab" class="tab-view">
+          <section id="location-banner" class="location-banner">
+            <span class="location-icon">⌖</span>
+            <div><strong>ค้นหาคนใกล้คุณ</strong><p>ตำแหน่งจริงไม่แสดงต่อสมาชิก และจะล้างเมื่อปิดการค้นหา</p></div>
+            <button id="location-toggle" class="lime">เปิดตำแหน่ง</button>
+          </section>
+          <div class="search-row">
+            <label class="search">⌕<input id="people-search" placeholder="ค้นหาชื่อหรือความสนใจ…"></label>
+            <label class="radius">ระยะ <select id="radius-filter"><option value="100">100 ม.</option><option value="1000">1 กม.</option><option value="5000" selected>5 กม.</option></select></label>
+          </div>
+          <div class="filter-row"><select id="gender-filter" aria-label="เพศ"><option>ทั้งหมด</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option><option>ไม่ระบุ</option></select><input id="interest-filter" placeholder="ความสนใจ"></div>
+          <div class="section-heading"><h2>คนใกล้คุณ <span id="people-count">0</span></h2></div>
+          <div id="people-grid" class="people-grid"></div>
+          <div class="rules"><div><b>♧</b><strong>เป็นเพื่อนก่อนแชท</strong><p>เริ่มคุยเมื่อทั้งสองคนยอมรับ</p></div><div><b>☆</b><strong>คะแนนจากคนใกล้ตัว</strong><p>คนละ 1 ครั้งต่อวัน ในระยะ 100 ม.</p></div><div><b>▣</b><strong>ความคิดเห็นส่วนตัว</strong><p>เจ้าของโปรไฟล์เท่านั้นที่อ่านได้</p></div></div>
+        </div>
+
+        <div id="friends-tab" class="tab-view" hidden><p class="subtitle">การเชื่อมต่อที่ทั้งสองคนเลือก</p><h2>คำขอเป็นเพื่อน</h2><div id="requests-grid" class="people-grid"></div><h2>เพื่อน</h2><div id="friends-grid" class="people-grid"></div></div>
+
+        <div id="chat-tab" class="tab-view" hidden>
+          <div class="chat-layout"><aside id="conversation-list" class="conversation-list"></aside><section id="thread" class="thread"><div class="empty"><h2>เลือกเพื่อนเพื่อเริ่มแชท</h2></div></section></div>
+        </div>
+
+        <div id="reviews-tab" class="tab-view" hidden><p class="subtitle">▣ มีเพียงคุณที่อ่านความคิดเห็นเหล่านี้ได้</p><div id="reviews-list"></div></div>
+
+        <div id="profile-tab" class="tab-view" hidden>
+          <p class="subtitle">แนะนำตัวในแบบที่เป็นคุณ</p>
+          <form id="profile-form" class="panel form-grid">
+            <label>ชื่อที่แสดง<input name="name" maxlength="50" required></label>
+            <label>เพศ<select name="gender"><option>ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option></select></label>
+            <label class="wide">เกี่ยวกับคุณ<textarea name="bio" maxlength="250"></textarea></label>
+            <label class="wide">ความสนใจ<input name="interests" maxlength="100"></label>
+            <button class="primary" type="submit">บันทึกโปรไฟล์</button><button id="hide-discovery" class="secondary" type="button">ปิดการหาเพื่อนและลบตำแหน่ง</button>
+          </form>
+          <section class="panel blocked-panel"><h2>ผู้ใช้ที่คุณบล็อก</h2><div id="blocked-list"><p>ยังไม่มีผู้ใช้ที่บล็อก</p></div></section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="profile-dialog"><button class="dialog-close" aria-label="ปิด">×</button><div id="profile-dialog-content"></div></dialog>
+  <dialog id="rating-dialog"><button class="dialog-close" aria-label="ปิด">×</button><form id="rating-form"><h2>ให้คะแนน</h2><input type="hidden" name="target"><label>คะแนน<select name="score"><option value="5">5 ดาว</option><option value="4">4 ดาว</option><option value="3">3 ดาว</option><option value="2">2 ดาว</option><option value="1">1 ดาว</option></select></label><label>ความคิดเห็น<textarea name="comment" maxlength="500"></textarea></label><button class="primary">ส่งความคิดเห็น</button></form></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

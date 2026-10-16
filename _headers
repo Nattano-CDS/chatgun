@@ -11,3 +11,7 @@
 
 /account.html
   Cache-Control: no-store
+
+/app/*
+  Cache-Control: no-store
+  Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=()
