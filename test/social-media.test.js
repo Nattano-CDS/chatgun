@@ -75,6 +75,11 @@ test("gallery validates bytes, stores private media, authorizes reads, and queue
   assert.equal(stored.state, "active");
   assert.equal(media.objects.size, 1);
 
+  const pendingRead = await onRequest({ env: runtime, request: new Request(`https://chatgun.pages.dev/api/social/media/${id}`, { headers: { cookie: authHeaders(owner).cookie } }) });
+  assert.equal(pendingRead.status, 404, "even the owner cannot retrieve media before review");
+  await database.prepare("UPDATE media_safety_reviews SET status='released',category='general',reviewed_at=? WHERE media_id=?")
+    .bind(unixTime(), id).run();
+
   const friendRead = await onRequest({ env: runtime, request: new Request(`https://chatgun.pages.dev/api/social/media/${id}`, { headers: { cookie: authHeaders(friend).cookie } }) });
   assert.equal(friendRead.status, 200);
   assert.equal(friendRead.headers.get("cache-control"), "private, no-store, max-age=0");
@@ -131,6 +136,7 @@ test("chat images require friendship, remain private, and retain only five activ
     const response = await onRequest({ env: runtime, request: new Request("https://chatgun.pages.dev/api/social/messages", { method: "POST", headers: authHeaders(sender), body: form }) });
     assert.equal(response.status, 201);
   }
+  await database.prepare("UPDATE media_safety_reviews SET status='released',category='general',reviewed_at=? WHERE status='pending'").bind(unixTime()).run();
   assert.equal((await database.prepare("SELECT COUNT(*) count FROM social_media WHERE owner_user_id='chat-media-a' AND state='active'").first()).count, 5);
   assert.equal((await database.prepare("SELECT COUNT(*) count FROM media_deletion_queue").first()).count, 1);
   const latest = await database.prepare("SELECT id media_id FROM social_media WHERE owner_user_id='chat-media-a' AND state='active' LIMIT 1").first();
@@ -158,6 +164,7 @@ test("received chat images can be reused only while an accepted unblocked relati
   const upload = await onRequest({ env: runtime, request: new Request("https://chatgun.pages.dev/api/social/messages", { method: "POST", headers: authHeaders(owner), body: form }) });
   assert.equal(upload.status, 201);
   const asset = await database.prepare("SELECT id FROM social_media WHERE owner_user_id='reuse-owner'").first();
+  await database.prepare("UPDATE media_safety_reviews SET status='released',category='general',reviewed_at=? WHERE media_id=?").bind(unixTime(), asset.id).run();
 
   const library = await onRequest({ env: runtime, request: new Request("https://chatgun.pages.dev/api/social/chat-assets", { headers: { cookie: authHeaders(recipient).cookie } }) });
   assert.deepEqual((await library.json()).assets.map((item) => item.id), [asset.id]);

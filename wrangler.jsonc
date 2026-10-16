@@ -19,10 +19,11 @@
     "FRIEND_REQUESTS_ENABLED": "true",
     "MESSAGING_ENABLED": "true",
     "MEDIA_UPLOAD_ENABLED": "true",
-    "MEDIA_QUARANTINE_ENABLED": "false",
+    "MEDIA_QUARANTINE_ENABLED": "true",
+    "SENSITIVE_CONTENT_ENABLED": "false",
     "RATINGS_ENABLED": "true",
     "IDENTITY_VERIFICATION_ENABLED": "false",
-    "MODERATION_TOOLS_ENABLED": "false",
+    "MODERATION_TOOLS_ENABLED": "true",
     "DEMO_MODE_ENABLED": "false"
   },
   "d1_databases": [
@@ -58,6 +59,7 @@
         "MESSAGING_ENABLED": "false",
         "MEDIA_UPLOAD_ENABLED": "false",
         "MEDIA_QUARANTINE_ENABLED": "true",
+        "SENSITIVE_CONTENT_ENABLED": "false",
         "RATINGS_ENABLED": "false",
         "IDENTITY_VERIFICATION_ENABLED": "false",
         "MODERATION_TOOLS_ENABLED": "false",

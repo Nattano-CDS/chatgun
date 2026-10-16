@@ -139,17 +139,81 @@ test("media quarantine hides pending objects and requires an audited safety-admi
   const object = await onRequest({ env: runtime, request: request("/api/social/moderation/media/quarantine-media", admin) });
   assert.equal(object.status, 200);
   const released = await onRequest({ env: runtime, request: request("/api/social/moderation/media", admin, {
-    method: "POST", body: { id: "quarantine-media", status: "released", reason: "ผ่านการตรวจสอบสำหรับการทดสอบ" },
+    method: "POST", body: { id: "quarantine-media", status: "released", category: "general", reason: "ผ่านการตรวจสอบสำหรับการทดสอบ", revision: 0 },
   }) });
   assert.equal(released.status, 200);
   assert.equal((await database.prepare("SELECT status FROM media_safety_reviews WHERE media_id='quarantine-media'").first()).status, "released");
   const visible = await onRequest({ env: runtime, request: request("/api/social/media/quarantine-media", ownerSession) });
   assert.equal(visible.status, 200);
   const duplicate = await onRequest({ env: runtime, request: request("/api/social/moderation/media", admin, {
-    method: "POST", body: { id: "quarantine-media", status: "rejected", reason: "ต้องไม่เขียนทับผลเดิม" },
+    method: "POST", body: { id: "quarantine-media", status: "rejected", category: "prohibited", reason: "ต้องไม่เขียนทับผลเดิม", revision: 0 },
   }) });
-  assert.equal(duplicate.status, 404);
+  assert.equal(duplicate.status, 409);
   const audits = await database.prepare("SELECT action FROM media_safety_audit_events ORDER BY created_at,action").all();
   assert.deepEqual(audits.results.map((row) => row.action).sort(), ["decision", "object_view", "queue_view"]);
+  database.close();
+});
+
+test("role administration is separated, recent-authenticated, audited, and revocable", async () => {
+  const database = new TestD1();
+  const accessAdmin = await member(database, "access-admin");
+  const reviewer = await member(database, "new-reviewer");
+  const ordinary = await member(database, "ordinary-member");
+  const now = unixTime();
+  await database.prepare(`
+    INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)
+    VALUES ('bootstrap-admin','access-admin','moderation_admin','Owner-approved staging bootstrap',?,?)
+  `).bind(now, now + 86400).run();
+  const runtime = { ...environment(database), SOCIAL_APP_ENABLED: "true", MODERATION_TOOLS_ENABLED: "true" };
+
+  const ordinaryDenied = await onRequest({ env: runtime, request: request("/api/social/moderation/roles", ordinary, {
+    method: "POST",
+    body: { action: "grant", userId: "ordinary-member", role: "safety_admin", reason: "Attempted unauthorized privilege escalation", expiresAt: now + 86400 },
+  }) });
+  assert.equal(ordinaryDenied.status, 403);
+
+  const inspect = await onRequest({ env: runtime, request: request("/api/social/moderation/roles", accessAdmin, {
+    purpose: "Review current least privilege assignments",
+  }) });
+  assert.equal(inspect.status, 200);
+  assert.ok((await inspect.json()).grants.some((grant) => grant.role === "moderation_admin"));
+  const adminCannotReviewMedia = await onRequest({ env: runtime, request: request("/api/social/moderation/media", accessAdmin) });
+  assert.equal(adminCannotReviewMedia.status, 403, "role administrators do not automatically receive private-media access");
+
+  const selfGrant = await onRequest({ env: runtime, request: request("/api/social/moderation/roles", accessAdmin, {
+    method: "POST",
+    purpose: "Attempt an unauthorized self privilege change",
+    body: { action: "grant", userId: "access-admin", role: "report_reviewer", reason: "Self grant must be rejected", expiresAt: now + 86400 },
+  }) });
+  assert.equal(selfGrant.status, 403);
+
+  const granted = await onRequest({ env: runtime, request: request("/api/social/moderation/roles", accessAdmin, {
+    method: "POST",
+    purpose: "Provision a reviewer for a synthetic staging drill",
+    body: { action: "grant", userId: "new-reviewer", role: "report_reviewer", reason: "Owner-approved staging drill assignment", expiresAt: now + 86400 },
+  }) });
+  assert.equal(granted.status, 201);
+  const grantId = (await granted.json()).grantId;
+
+  const reviewerQueue = await onRequest({ env: runtime, request: request("/api/social/moderation/reports", reviewer) });
+  assert.equal(reviewerQueue.status, 200);
+  const privateMediaDenied = await onRequest({ env: runtime, request: request("/api/social/moderation/media", reviewer) });
+  assert.equal(privateMediaDenied.status, 403, "report reviewers cannot inspect private media");
+
+  const revoked = await onRequest({ env: runtime, request: request("/api/social/moderation/roles", accessAdmin, {
+    method: "POST",
+    purpose: "End the reviewer staging drill assignment",
+    body: { action: "revoke", grantId, reason: "Staging drill completed and access is no longer needed" },
+  }) });
+  assert.equal(revoked.status, 200);
+  const deniedAfterRevoke = await onRequest({ env: runtime, request: request("/api/social/moderation/reports", reviewer) });
+  assert.equal(deniedAfterRevoke.status, 403);
+  const events = await database.prepare("SELECT action FROM moderation_role_events ORDER BY created_at,id").all();
+  assert.deepEqual(events.results.map((event) => event.action).sort(), ["grant", "inspect", "revoke"]);
+
+  await database.prepare("UPDATE session_auth_evidence SET authenticated_at=? WHERE user_id='access-admin'").bind(now - 1000).run();
+  const staleSession = await onRequest({ env: runtime, request: request("/api/social/moderation/roles", accessAdmin) });
+  assert.equal(staleSession.status, 403);
+  assert.equal((await staleSession.json()).code, "recent_authentication_required");
   database.close();
 });

@@ -23,12 +23,34 @@ cannot retrieve them. Only a `safety_admin` with a recorded case purpose can vie
 and release or reject it. Every queue view, object view, and decision is audited. Rejection
 immediately revokes access and adds an idempotent deletion-queue entry.
 
-Preview uses `staging_bypass` for synthetic fixtures so parity tests remain usable. This
-bypass is unacceptable for invited real-person Beta accounts. Until a scanner and staffed
-review path exist, keep real-person uploads disabled and use synthetic media only. Production has quarantine enabled but
+Preview no longer uses `staging_bypass`: every gallery and chat-image upload creates a
+`pending`/`manual` review record. Until a scanner and staffed review path exist, keep
+real-person uploads disabled and use synthetic media only. Production has quarantine enabled but
 `MEDIA_UPLOAD_ENABLED=false` and no R2 binding, so uploads fail closed.
 
-## Scanner options and launch gate
+## Scanner comparison (research only; no selection)
+
+| Option | Useful signals | Architectural fit | Material limitations to validate |
+| --- | --- | --- | --- |
+| Google Cloud Vision SafeSearch | Likelihoods for adult, racy, violence, medical and spoof | A Worker can send sanitized bytes to the API and persist only normalized scores/model metadata | Cross-cloud transfer, Thai-context error testing, region/subprocessor review, no complete report/appeal workflow, and no substitute for known-CSAM hash matching |
+| Amazon Rekognition moderation labels | Hierarchical labels, confidence and model version | Synchronous byte submission is feasible after validation and before human release | The documented image byte path is JPEG/PNG, so WebP needs a reviewed conversion path; cross-cloud/privacy review and threshold calibration remain |
+| Azure AI Content Safety | Severity for sexual, violence, hate and self-harm | Simple synchronous image endpoint and explicit severity levels | Documented 4 MB and 2048×2048 limits are lower than ChatGun's current upload envelope; cross-cloud/privacy review and Thai calibration remain |
+| Qualified known-CSAM hash service/program | Matching against known illegal-content hashes | Separate high-severity signal before any release | Access is restricted/qualified; legal reporting, preservation, escalation, false-match handling and trained staffing must be approved before integration |
+| Human-only review (current) | Contextual policy decisions and appeals | Already implemented behind `safety_admin` and purpose/audit controls | Does not scale, depends on confirmed trained coverage, exposes reviewers to harmful content, and cannot guarantee immediate detection |
+
+Primary technical references reviewed: [Google SafeSearch](https://docs.cloud.google.com/vision/docs/detecting-safe-search),
+[Amazon Rekognition moderation](https://docs.aws.amazon.com/rekognition/latest/dg/moderation-api.html),
+and [Azure image analysis](https://learn.microsoft.com/en-us/rest/api/contentsafety/image-operations/analyze-image?view=rest-contentsafety-2024-09-01).
+The owner must obtain privacy/security terms, data location, price, deletion, incident handling,
+model-change notice, and production eligibility directly from shortlisted vendors before approval.
+
+No option should auto-release media. Low-risk results may prioritize a queue only after a measured
+staging trial; scanner timeouts, errors, unknown categories, and model changes stay quarantined.
+High-risk matches require the approved protective/escalation process. False positives need a
+timely independent appeal; false negatives require member reporting, retrospective review, and
+threshold/model monitoring. Human review remains necessary for context and policy application.
+
+## Evaluation and launch gate
 
 Evaluate at least two vendors for CSAM hash matching (through an authorized program), nudity
 and sexual-content classification, violence, malware/polyglots, and duplicate abuse. Review
@@ -52,6 +74,9 @@ scanner failure. Vendor credentials must be environment-specific encrypted secre
 
 Alert on deletion attempts exceeding the retry budget, aged pending reviews, missing R2
 objects, and D1/R2 reconciliation mismatches. Keep failed objects private and inaccessible.
+The cleanup worker now emits aggregate `exhausted` counts once an item reaches ten attempts;
+it does not log private object keys. An aggregate above zero requires an operational alert and
+manual retry/reconciliation procedure that is not yet staffed.
 Rehearse account deletion with an injected R2 failure and prove that access is immediately
 revoked and eventual retry succeeds. D1 Time Travel/manual exports may retain metadata after
 live deletion; document restore-time deletion replay and never promise selective backup

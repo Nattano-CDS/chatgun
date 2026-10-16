@@ -4,23 +4,42 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>เครื่องมือดูแล · ChatGun</title>
+  <title>ศูนย์ดูแลสื่อ · ChatGun</title>
   <link rel="icon" href="../favicon.svg">
   <link rel="stylesheet" href="./social.css">
   <script defer src="./moderation.js"></script>
 </head>
 <body>
   <main class="moderation-shell">
-    <header class="toolbar"><a class="toolbar-brand moderation-brand" href="./"><img src="../logo.svg" alt=""><b>ChatGun</b></a><h1>เครื่องมือดูแล</h1><a class="icon-button" href="./" aria-label="กลับ">←</a></header>
-    <section class="panel moderation-purpose">
-      <h2>ระบุวัตถุประสงค์ก่อนเข้าถึง</h2>
-      <p>ทุกการเปิดคิว หลักฐาน หรือข้อความจะบันทึกผู้เข้าถึง วัตถุประสงค์ และเวลา</p>
+    <header class="toolbar moderation-toolbar">
+      <a class="toolbar-brand moderation-brand" href="./"><img src="../logo.svg" alt=""><b>ChatGun</b></a>
+      <div><p class="eyebrow">TRUST &amp; SAFETY</p><h1>ศูนย์ดูแลสื่อ</h1></div>
+      <a class="icon-button" href="./" aria-label="กลับ">←</a>
+    </header>
+    <section class="panel moderation-purpose" aria-labelledby="purpose-heading">
+      <div><h2 id="purpose-heading">ระบุวัตถุประสงค์ก่อนเข้าถึง</h2><p>ทุกการเปิดคิว รูปภาพ และการตัดสินใจจะบันทึกผู้เข้าถึง วัตถุประสงค์ และเวลา</p></div>
       <label>วัตถุประสงค์เฉพาะกรณี<input id="moderation-purpose" minlength="10" maxlength="300" placeholder="เช่น ตรวจสอบรายงานความปลอดภัยเลขที่…"></label>
-      <div class="dialog-actions"><button class="primary" data-load="reports">รายงาน</button><button class="secondary" data-load="messages">ตรวจข้อความ</button><button class="secondary" data-load="media">คิวรูปภาพ</button><button class="secondary" data-load="verification">ยืนยันตัวตน</button></div>
     </section>
-    <p id="moderation-status" class="status" role="status" aria-live="polite">เครื่องมือยังไม่โหลดข้อมูล</p>
-    <section id="moderation-results" class="moderation-results"></section>
+    <nav class="moderation-nav" aria-label="ส่วนงานดูแล">
+      <button class="active" type="button" data-load="overview">ภาพรวม</button>
+      <button type="button" data-load="pending">รอตรวจ</button>
+      <button type="button" data-load="approved">อนุมัติแล้ว</button>
+      <button type="button" data-load="sensitive">เนื้อหาละเอียดอ่อน</button>
+      <button type="button" data-load="rejected">ปฏิเสธแล้ว</button>
+      <button type="button" data-load="media-reports">เนื้อหาที่ถูกรายงาน</button>
+      <button type="button" data-load="appeals">คำอุทธรณ์</button>
+      <button type="button" data-load="audit">ประวัติการดูแล</button>
+    </nav>
+    <section id="moderation-filters" class="panel moderation-filters" hidden aria-label="ตัวกรองรายการ">
+      <label>ค้นหา<input id="moderation-search" type="search" maxlength="80" placeholder="รหัสสื่อ ประเภท หรือชื่อสมาชิก"></label>
+      <label>หมวดหมู่<select id="moderation-category"><option value="">ทั้งหมด</option><option value="general">ทั่วไป</option><option value="sensitive">ละเอียดอ่อน</option><option value="prohibited">ต้องห้าม</option></select></label>
+      <button id="apply-filters" class="secondary" type="button">ใช้ตัวกรอง</button>
+    </section>
+    <section id="moderation-stats" class="moderation-stats" aria-label="สถิติการดูแล"></section>
+    <p id="moderation-status" class="status" role="status" aria-live="polite">กรอกวัตถุประสงค์ แล้วเลือกส่วนงานที่ต้องการ</p>
+    <section id="moderation-results" class="moderation-results" aria-live="polite"></section>
+    <div id="moderation-pagination" class="moderation-pagination" hidden><button class="secondary" data-page="previous">ก่อนหน้า</button><span id="moderation-page">หน้า 1</span><button class="secondary" data-page="next">ถัดไป</button></div>
   </main>
-  <dialog id="moderation-dialog"><button class="dialog-close" aria-label="ปิด">×</button><div id="moderation-detail"></div></dialog>
+  <dialog id="moderation-dialog" aria-labelledby="moderation-dialog-heading"><button class="dialog-close" aria-label="ปิด">×</button><div id="moderation-detail"></div></dialog>
 </body>
 </html>

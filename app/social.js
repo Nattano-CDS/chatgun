@@ -7,6 +7,9 @@ const state = {
   ratings: [],
   blocked: [],
   myGallery: [],
+  mediaAppeals: [],
+  appealableMedia: [],
+  moderationNotifications: [],
   verification: null,
   activeTab: "near",
   selectedPerson: null,
@@ -394,6 +397,22 @@ async function loadOwnGallery() {
   renderOwnGallery();
 }
 
+function renderMediaSafety() {
+  const appealable = $("#appealable-media");
+  appealable.innerHTML = state.appealableMedia.length ? state.appealableMedia.map((item) => `<article class="blocked-row"><span><strong>รูป ${escapeHtml(item.media_id)}</strong><small>${escapeHtml(item.decision_reason || "ถูกจำกัดการเข้าถึง")}</small></span><button class="secondary" data-media-appeal="${escapeHtml(item.media_id)}">ยื่นอุทธรณ์</button></article>`).join("") : `<p class="subtitle">ไม่มีรูปที่ยื่นอุทธรณ์ได้</p>`;
+  const notificationLabels = { media_approved_general: "รูปได้รับอนุมัติเป็นเนื้อหาทั่วไป", media_approved_sensitive: "รูปได้รับอนุมัติเป็นเนื้อหาละเอียดอ่อน", media_rejected_prohibited: "รูปถูกปฏิเสธและจำกัดการเข้าถึง", appeal_granted: "คำอุทธรณ์ได้รับอนุมัติ", appeal_denied: "ยืนยันคำตัดสินเดิมหลังตรวจอุทธรณ์" };
+  $("#moderation-notifications").innerHTML = state.moderationNotifications.length ? state.moderationNotifications.map((item) => `<p class="notification-row"><strong>${escapeHtml(notificationLabels[item.message_code] || "มีผลการดูแลสื่อ")}</strong><small>${new Date(Number(item.created_at) * 1000).toLocaleString("th-TH")}</small></p>`).join("") : `<p class="subtitle">ยังไม่มีการแจ้งผลการดูแล</p>`;
+}
+
+async function loadMediaSafety() {
+  if (state.demo) return;
+  const [appeals, notifications] = await Promise.all([api("/api/social/media/appeals"), api("/api/social/moderation/notifications")]);
+  state.mediaAppeals = appeals.appeals || [];
+  state.appealableMedia = appeals.appealable || [];
+  state.moderationNotifications = notifications.notifications || [];
+  renderMediaSafety();
+}
+
 async function loadVerification() {
   if (!state.config.identityVerificationEnabled) return;
   state.verification = (await api("/api/social/verification")).verification;
@@ -548,7 +567,8 @@ function renderGalleryPost() {
   const { owner, photos, comments, index } = state.galleryView;
   const item = photos[index];
   if (!item) return;
-  $("#profile-dialog-content").innerHTML = `<div class="dialog-profile"><img class="gallery-view" src="${escapeHtml(galleryMediaUrl(item.id))}" alt="${escapeHtml(item.caption || "รูปในแกลเลอรี")}"><p>${escapeHtml(item.caption || "")}</p><div class="dialog-actions"><button class="secondary" data-gallery-action="previous" ${index <= 0 ? "disabled" : ""}>← รูปก่อนหน้า</button><button class="secondary" data-gallery-action="like" data-photo="${escapeHtml(item.id)}">${item.liked ? "♥" : "♡"} ${Number(item.like_count || 0)}</button><button class="secondary" data-gallery-action="next" ${index >= photos.length - 1 ? "disabled" : ""}>รูปถัดไป →</button></div><div class="comments">${comments.map((comment) => `<p><strong>${escapeHtml(comment.sender_name)}</strong> ${escapeHtml(comment.body)}</p>`).join("") || "<p>ยังไม่มีความคิดเห็นที่คุณมีสิทธิ์อ่าน</p>"}</div><form id="gallery-comment"><input type="hidden" name="photo" value="${escapeHtml(item.id)}"><input type="hidden" name="owner" value="${escapeHtml(owner)}"><input name="comment" maxlength="500" required placeholder="เขียนถึงเจ้าของโปรไฟล์…"><button class="primary">ส่ง</button></form><small>เจ้าของโปรไฟล์และเพื่อนที่ยอมรับกันแล้วอ่านความคิดเห็นได้</small></div>`;
+  const report = owner === state.account?.user?.id ? "" : `<button class="danger" data-media-report="${escapeHtml(item.id)}">รายงานรูป</button>`;
+  $("#profile-dialog-content").innerHTML = `<div class="dialog-profile"><img class="gallery-view" src="${escapeHtml(galleryMediaUrl(item.id))}" alt="${escapeHtml(item.caption || "รูปในแกลเลอรี")}"><p>${escapeHtml(item.caption || "")}</p><div class="dialog-actions"><button class="secondary" data-gallery-action="previous" ${index <= 0 ? "disabled" : ""}>← รูปก่อนหน้า</button><button class="secondary" data-gallery-action="like" data-photo="${escapeHtml(item.id)}">${item.liked ? "♥" : "♡"} ${Number(item.like_count || 0)}</button><button class="secondary" data-gallery-action="next" ${index >= photos.length - 1 ? "disabled" : ""}>รูปถัดไป →</button>${report}</div><div class="comments">${comments.map((comment) => `<p><strong>${escapeHtml(comment.sender_name)}</strong> ${escapeHtml(comment.body)}</p>`).join("") || "<p>ยังไม่มีความคิดเห็นที่คุณมีสิทธิ์อ่าน</p>"}</div><form id="gallery-comment"><input type="hidden" name="photo" value="${escapeHtml(item.id)}"><input type="hidden" name="owner" value="${escapeHtml(owner)}"><input name="comment" maxlength="500" required placeholder="เขียนถึงเจ้าของโปรไฟล์…"><button class="primary">ส่ง</button></form><small>เจ้าของโปรไฟล์และเพื่อนที่ยอมรับกันแล้วอ่านความคิดเห็นได้</small></div>`;
 }
 
 async function openGalleryPhoto(owner, photo, { historyMode = "push" } = {}) {
@@ -637,7 +657,7 @@ async function initialize() {
     $("#social-view").hidden = false;
     if (localStorage.getItem("chatgun-notifications") === "enabled") $("#notification-toggle").textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
     fillProfile();
-    await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked(), loadOwnGallery(), loadVerification()]);
+    await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked(), loadOwnGallery(), loadVerification(), loadMediaSafety()]);
     await monitorLocationPermission();
     if (location.pathname === "/app/photos") switchTab("profile");
     const route = routedProfile();
@@ -760,6 +780,19 @@ document.addEventListener("click", async (event) => {
     const dialog = close.closest("dialog");
     dialog.close();
     if (dialog.id === "profile-dialog" && routedProfile()) history.pushState({}, "", "/app/");
+    return;
+  }
+  const mediaReport = event.target.closest("[data-media-report]");
+  if (mediaReport) {
+    $("#profile-dialog").close();
+    $("#media-report-form").elements.mediaId.value = mediaReport.dataset.mediaReport;
+    $("#media-report-dialog").showModal();
+    return;
+  }
+  const mediaAppeal = event.target.closest("[data-media-appeal]");
+  if (mediaAppeal) {
+    $("#media-appeal-form").elements.mediaId.value = mediaAppeal.dataset.mediaAppeal;
+    $("#media-appeal-dialog").showModal();
     return;
   }
   if (event.target.closest(".chat-back")) { $(".chat-layout").classList.remove("open"); state.selectedChat = null; return; }
@@ -901,6 +934,24 @@ $("#report-form").addEventListener("submit", async (event) => {
   try {
     await api("/api/social/reports", { method: "POST", body: { target: data.get("target"), category: data.get("category"), details: data.get("details") } });
     $("#report-dialog").close(); event.currentTarget.reset(); toast("ส่งรายงานให้ผู้ดูแลแล้ว");
+  } catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
+});
+
+$("#media-report-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const data = new FormData(event.currentTarget); setBusy(event.submitter, true);
+  try {
+    await api("/api/social/reports/media", { method: "POST", body: { mediaId: data.get("mediaId"), reason: data.get("reason"), details: data.get("details") } });
+    $("#media-report-dialog").close(); event.currentTarget.reset(); toast("ส่งรายงานรูปภาพให้ผู้ดูแลแล้ว");
+  } catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
+});
+
+$("#media-appeal-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const data = new FormData(event.currentTarget); setBusy(event.submitter, true);
+  try {
+    await api("/api/social/media/appeals", { method: "POST", body: { mediaId: data.get("mediaId"), reason: data.get("reason") } });
+    $("#media-appeal-dialog").close(); event.currentTarget.reset(); await loadMediaSafety(); toast("ส่งคำอุทธรณ์แล้ว");
   } catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
 });
 
