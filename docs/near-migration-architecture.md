@@ -47,7 +47,7 @@ Production activation still requires qualified Thai legal review of the threshol
 - The ChatGun Cloudflare account was re-confirmed as `23017b53386fb67fc62a52cdd017454c` before mutation.
 - `0003_social.sql` and `0004_moderation_audit.sql` were applied only to D1 `chatgun-auth-staging` (`5bbfd55d-eb22-4324-8a7d-57bef14110ea`). Existing staging users were preserved and the foreign-key check passed.
 - The repository default Pages binding now points to staging D1; only `[env.production]` points to `chatgun-auth`. This matches the configuration downloaded read-only from Pages.
-- Preview is deployed at `https://0451ea92.chatgun.pages.dev` (branch alias `https://codex-near-migration.chatgun.pages.dev`) with every social capability disabled and `noindex` behavior intact.
+- Preview is deployed at the branch alias `https://codex-near-migration.chatgun.pages.dev` with every social capability disabled and `noindex` behavior intact. Immutable validation URLs are recorded in PR #6 instead of this document because documentation-only deployments also receive new identifiers.
 - R2 cannot yet be configured: the ChatGun account API returns `10042` and requires R2 enablement in the Cloudflare Dashboard. Media flags and the cleanup Worker must remain undeployed until that action is complete.
 - Production migrations `0002`–`0004` remain pending and were not applied.
 

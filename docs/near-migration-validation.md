@@ -9,7 +9,7 @@ Scope: isolated Preview and `chatgun-auth-staging` only
 - Cloudflare account confirmed before mutation: `23017b53386fb67fc62a52cdd017454c` (ChatGun).
 - No PiggyPrice or NEAR Cloudflare resource was accessed or modified.
 - No ChatGun Production deployment, D1 migration, user-data mutation, PR merge, or legal publication occurred.
-- Preview URL: `https://0451ea92.chatgun.pages.dev` (branch alias `https://codex-near-migration.chatgun.pages.dev`).
+- Preview branch alias: `https://codex-near-migration.chatgun.pages.dev`. Exact immutable validation URLs are recorded in PR #6 because each documentation-only deployment receives a new identifier.
 - All social, demo, registration, media, moderation, verification, email-OTP, and mobile-OTP capabilities are disabled in the deployed environment.
 
 ## D1 result

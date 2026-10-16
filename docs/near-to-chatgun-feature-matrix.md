@@ -48,7 +48,7 @@ Implementation evidence at this checkpoint:
 
 - Migrations `0003_social.sql` and `0004_moderation_audit.sql` were applied only to `chatgun-auth-staging`; three pre-existing staging users were preserved and `PRAGMA foreign_key_check` returned no violations.
 - Production was inspected read-only and still has migrations `0002`–`0004` pending; none were applied.
-- Preview deployment: `https://0451ea92.chatgun.pages.dev` (alias `https://codex-near-migration.chatgun.pages.dev`), with every social, demo, media, moderation, identity-verification, registration, email-OTP, and mobile-OTP flag disabled.
+- Preview branch alias: `https://codex-near-migration.chatgun.pages.dev`, with every social, demo, media, moderation, identity-verification, registration, email-OTP, and mobile-OTP flag disabled. The exact immutable URL used for each validation run is recorded in PR #6 rather than hard-coded here, because every documentation-only deployment receives a new identifier.
 - Current automated evidence: 49 unit/integration tests pass; the complete deployed-Preview Playwright suite passes 21 tests on desktop/mobile with one intentional desktop skip for the mobile-only assertion.
 - Cloudflare R2 is not enabled for the ChatGun account (API code `10042`), so private-media live E2E and the scheduled media-deletion Worker remain blocked. No NEAR, PiggyPrice, or Production resource was accessed or mutated.
 
