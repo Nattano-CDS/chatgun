@@ -2,6 +2,8 @@
 .github/
 .wrangler/
 coverage/
+playwright-report/
+test-results/
 functions/
 e2e/
 migrations/

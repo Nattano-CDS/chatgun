@@ -592,7 +592,14 @@ async function showPerson(id, { historyMode = "push", photo = null } = {}) {
   state.selectedPerson = person;
   const relation = relationshipFor(id);
   const friendAction = own ? "" : !relation && state.config.friendRequestsEnabled ? `<button class="primary" data-action="request" data-user="${escapeHtml(id)}">ขอเป็นเพื่อน</button>` : relation?.status === "accepted" && state.config.messagingEnabled ? `<button class="primary" data-action="chat" data-user="${escapeHtml(id)}">แชท</button><button class="secondary" data-action="unfriend" data-user="${escapeHtml(id)}">เลิกเป็นเพื่อน</button>` : "";
-  $("#profile-dialog-content").innerHTML = `<div class="dialog-profile">${portrait(person, false)}<h2>${escapeHtml(person.name)}${person.identity_verified ? " ✓" : ""}</h2><p>${escapeHtml(person.gender || "ไม่ระบุ")} ${person.distance !== undefined ? `· ${escapeHtml(formatDistance(person.distance, person.distance_label))}` : ""}</p><p>${escapeHtml(person.bio || "ยังไม่ได้แนะนำตัว")}</p><p><small>${escapeHtml(person.interests || "")}</small></p><div id="dialog-gallery" class="gallery-grid"></div><div class="dialog-actions">${friendAction}${!own && state.config.ratingsEnabled && Number(person.distance) <= 100 ? `<button class="secondary" data-action="rate" data-user="${escapeHtml(id)}">ให้คะแนน</button>` : ""}${own ? "" : `<button class="danger" data-action="block" data-user="${escapeHtml(id)}">บล็อก</button><button class="secondary" data-action="report" data-user="${escapeHtml(id)}">รายงาน</button>`}</div></div>`;
+  const interests = String(person.interests || "").split(",").map((item) => item.trim()).filter(Boolean);
+  $("#profile-dialog-content").innerHTML = `<article class="dialog-profile member-profile-view">
+    <div class="member-profile-image">${portrait(person, false)}</div><div class="member-profile-shade"></div>
+    <div class="member-profile-brand"><img src="/logo.svg" alt=""><span>ChatGun</span><strong>โปรไฟล์</strong></div>
+    <button class="member-profile-gallery-top" type="button" data-profile-gallery aria-expanded="false">▦ แกลเลอรี</button>
+    <section class="member-profile-info"><h2>${escapeHtml(person.name)}${person.identity_verified ? " ✓" : ""}</h2><p class="member-profile-facts">${escapeHtml(person.gender || "ไม่ระบุ")} ${person.distance !== undefined ? `· ${escapeHtml(formatDistance(person.distance, person.distance_label))}` : ""}</p><p class="member-profile-bio">${escapeHtml(person.bio || "ยังไม่ได้แนะนำตัว")}</p><div class="member-profile-interests">${interests.map((interest) => `<span>${escapeHtml(interest)}</span>`).join("")}</div><div class="dialog-actions">${friendAction}${!own && state.config.ratingsEnabled && Number(person.distance) <= 100 ? `<button class="secondary" data-action="rate" data-user="${escapeHtml(id)}">ให้คะแนน</button>` : ""}${own ? "" : `<button class="danger" data-action="block" data-user="${escapeHtml(id)}">บล็อก</button><button class="secondary" data-action="report" data-user="${escapeHtml(id)}">รายงาน</button>`}</div></section>
+    <section class="member-profile-gallery" aria-label="แกลเลอรี" hidden><header><button type="button" data-profile-gallery>← กลับโปรไฟล์</button><h3>แกลเลอรีของ ${escapeHtml(person.name)}</h3></header><div id="dialog-gallery" class="gallery-grid"></div></section>
+  </article>`;
   $("#profile-dialog").showModal();
   try {
     const gallery = (await api(`/api/social/gallery?user=${encodeURIComponent(id)}`)).photos;
@@ -681,6 +688,7 @@ async function initialize() {
       return location.replace("/acceptance");
     }
     if (state.account.nextPath === "/app/?onboarding=1") {
+      document.body.dataset.flow = "onboarding";
       $("#global-status").textContent = "";
       $("#onboarding-view").hidden = false;
       $("#onboarding-form").elements.name.value = state.account.user.displayName || "";
@@ -689,6 +697,7 @@ async function initialize() {
     try { state.profile = (await api("/api/social/profile")).profile; }
     catch (error) {
       if (error.code === "not_found" && state.config.adultOnboardingEnabled) {
+        document.body.dataset.flow = "onboarding";
         $("#global-status").textContent = "";
         $("#onboarding-view").hidden = false;
         $("#onboarding-form").elements.name.value = state.account.user.displayName || "";
@@ -697,6 +706,7 @@ async function initialize() {
       throw error;
     }
     $("#global-status").textContent = "";
+    delete document.body.dataset.flow;
     $("#social-view").hidden = false;
     if (localStorage.getItem("chatgun-notifications") === "enabled") $("#notification-toggle").textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
     fillProfile();
@@ -827,6 +837,16 @@ $("#refresh").addEventListener("click", async () => { try { await Promise.all([l
 [$("#people-search"), $("#radius-filter"), $("#gender-filter"), $("#interest-filter"), $("#relationship-filter")].forEach((input) => input.addEventListener("input", renderPeople));
 
 document.addEventListener("click", async (event) => {
+  const profileGallery = event.target.closest("[data-profile-gallery]");
+  if (profileGallery) {
+    const view = profileGallery.closest(".member-profile-view");
+    const gallery = view.querySelector(".member-profile-gallery");
+    const open = gallery.hidden;
+    gallery.hidden = !open;
+    view.classList.toggle("gallery-open", open);
+    view.querySelector(".member-profile-gallery-top")?.setAttribute("aria-expanded", String(open));
+    return;
+  }
   const close = event.target.closest(".dialog-close");
   if (close) {
     const dialog = close.closest("dialog");

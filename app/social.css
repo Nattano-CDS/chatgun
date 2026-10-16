@@ -513,6 +513,43 @@ body:not([data-active-tab="near"]) .app .toolbar h1 { font-size: 25px; color: va
 .evidence-grid img { width: 100%; max-height: 420px; object-fit: contain; border-radius: 14px; background: #eee; }
 .moderation-media { display: block; width: 100%; max-height: 68vh; object-fit: contain; border-radius: 14px; background: #eee; }
 .status.error, .moderation-card .error { color: #9e2639; }
+
+/* NEAR v91 visual restoration — Phase 2: onboarding and image-first profile. */
+body[data-flow="onboarding"] { background: radial-gradient(circle at 50% 7%, #f1e8ff 0, transparent 34%), #faf8fd; }
+body[data-flow="onboarding"] .sidebar { display: none; }
+body[data-flow="onboarding"] .app { padding: 0; }
+body[data-flow="onboarding"] main { width: 100%; max-width: none; padding: 0; }
+body[data-flow="onboarding"] #global-status { display: none; }
+.onboarding { width: min(100%, 560px); margin: 0 auto; padding: 36px 24px 64px; }
+.onboarding-panel { display: flex; flex-direction: column; gap: 18px; padding: 36px; border: 1px solid #e7dcf2; border-radius: 28px; background: #ffffffeb; box-shadow: 0 20px 70px #5030860c; backdrop-filter: blur(12px); }
+.onboarding-mark { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 20px; background: #f0e9ff; }
+.onboarding-mark img { width: 46px; height: 46px; }
+.onboarding-kicker { margin: 0; color: #6f3cff; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.onboarding-panel h1 { margin: 0; color: #241533; font-size: 30px; line-height: 1.28; letter-spacing: -.025em; }
+.onboarding-intro { margin: -5px 0 0; color: #827291; font-size: 15px; line-height: 1.75; }
+.onboarding-form { display: grid; gap: 15px; }
+.onboarding-form label { display: grid; gap: 7px; color: #3f3150; font-size: 14px; font-weight: 700; }
+.onboarding-form input,.onboarding-form select,.onboarding-form textarea { border-color: #e7dcf2; border-radius: 12px; background: #faf8fd; }
+.onboarding-form button { width: 100%; margin-top: 3px; }
+
+#profile-dialog { inset: 0; width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; overflow: hidden; border-radius: 0; background: #17121c; color: #fff; }
+#profile-dialog::backdrop { background: #17121c; }
+#profile-dialog .dialog-close { z-index: 8; top: max(18px, env(safe-area-inset-top)); right: 20px; color: #fff; background: #1d1724a8; border: 1px solid #ffffff30; backdrop-filter: blur(10px); }
+#profile-dialog-content,.member-profile-view { width: 100%; height: 100%; }
+.member-profile-view { position: relative; overflow: hidden; text-align: left; }
+.member-profile-image { position: absolute; inset: 0; display: flex; justify-content: center; background: #17121c; }
+.member-profile-image .portrait { width: min(100%, 850px); height: 100%; margin: 0; border-radius: 0; }
+.member-profile-image .portrait img { width: 100%; height: 100%; object-fit: cover; }
+.member-profile-shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, #160f220d 18%, #160f2240 54%, #160f22ed 100%); }
+.member-profile-brand { position: absolute; z-index: 4; top: max(20px, env(safe-area-inset-top)); left: 24px; display: flex; align-items: center; gap: 8px; padding: 7px 12px 7px 8px; border: 1px solid #ffffff30; border-radius: 999px; background: #1d17248c; backdrop-filter: blur(12px); }
+.member-profile-brand img { width: 30px; height: 30px; }.member-profile-brand span { font-weight: 850; }.member-profile-brand strong { color: #d0f17b; font-size: 12px; }
+.member-profile-gallery-top { position: absolute; z-index: 4; top: max(78px, calc(env(safe-area-inset-top) + 58px)); right: 20px; min-height: 42px; padding: 8px 15px; border: 1px solid #ffffff30; border-radius: 999px; color: #fff; background: #1d17248c; font-weight: 750; backdrop-filter: blur(12px); }
+.member-profile-info { position: absolute; z-index: 3; inset: auto 0 0; width: min(740px, 100%); margin: 0 auto; padding: 32px 28px max(28px, env(safe-area-inset-bottom)); }
+.member-profile-info h2 { margin: 0; color: #fff; font-size: 36px; line-height: 1.15; letter-spacing: -.035em; }.member-profile-facts { margin: 8px 0; color: #d9cfe2; font-weight: 650; }.member-profile-bio { max-width: 620px; margin: 10px 0; color: #fff; line-height: 1.65; }
+.member-profile-interests { display: flex; flex-wrap: wrap; gap: 7px; }.member-profile-interests span { padding: 6px 11px; border: 1px solid #ffffff30; border-radius: 999px; background: #ffffff18; font-size: 12px; backdrop-filter: blur(8px); }
+.member-profile-info .dialog-actions { justify-content: flex-start; margin-top: 18px; }.member-profile-info .dialog-actions button { min-width: 118px; }.member-profile-info .dialog-actions .primary { color: #241533; background: #d0f17b; }.member-profile-info .dialog-actions .secondary { color: #fff; border-color: #ffffff45; background: #ffffff17; }.member-profile-info .dialog-actions .danger { color: #ffd9df; border-color: #ffb1c040; background: #6f1b2ba8; }
+.member-profile-gallery { position: absolute; z-index: 6; inset: 0; padding: 0 20px 32px; overflow: auto; color: #241533; background: #faf8fd; transform: translateY(102%); transition: transform .24s ease; }.gallery-open .member-profile-gallery { transform: translateY(0); }.member-profile-gallery header { position: sticky; z-index: 2; top: 0; display: flex; align-items: center; gap: 16px; padding: 18px 0; background: #faf8fdeb; backdrop-filter: blur(12px); }.member-profile-gallery header button { border: 0; color: #6f3cff; background: transparent; font-weight: 750; }.member-profile-gallery h3 { margin: 0; font-size: 20px; }.member-profile-gallery .gallery-grid { width: min(820px, 100%); margin: auto; grid-template-columns: repeat(3, 1fr); gap: 4px; }.member-profile-gallery .gallery-item { border-radius: 2px; }
+@media(max-width:640px){.onboarding{padding:16px 14px 40px}.onboarding-panel{padding:24px;border-radius:24px}.onboarding-panel h1{font-size:26px}.member-profile-info{padding:24px 20px max(24px,env(safe-area-inset-bottom))}.member-profile-info h2{font-size:30px}.member-profile-bio{font-size:14px}.member-profile-brand span{display:none}.member-profile-gallery-top{top:max(72px,calc(env(safe-area-inset-top) + 52px))}.member-profile-info .dialog-actions{gap:6px}.member-profile-info .dialog-actions button{min-width:0;padding-inline:12px}}
 @media (max-width: 900px) { .moderation-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } .moderation-daily-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 700px) {
   .moderation-shell { width: min(100% - 20px, 1180px); padding-top: 16px; }

@@ -35,16 +35,20 @@
         <a class="primary" href="/account.html">กลับไปบัญชี</a>
       </section>
 
-      <section id="onboarding-view" class="onboarding panel" hidden>
-        <div class="section-heading"><div><small>สมาชิกใหม่</small><h1>สร้างโปรไฟล์ ChatGun</h1></div><img src="/logo.svg" alt="" width="64"></div>
-        <p>ตั้งค่าโปรไฟล์สำหรับ ChatGun Social การยืนยันอายุและข้อกำหนดของคุณถูกบันทึกแล้ว โดยไม่มีการจัดเก็บวันเกิด</p>
-        <form id="onboarding-form" class="form-grid">
+      <section id="onboarding-view" class="onboarding" hidden>
+        <div class="onboarding-panel">
+        <div class="onboarding-mark" aria-hidden="true"><img src="/logo.svg" alt=""></div>
+        <p class="onboarding-kicker">สมาชิกใหม่</p>
+        <h1>สร้างโปรไฟล์ ChatGun</h1>
+        <p class="onboarding-intro">ตั้งค่าโปรไฟล์สำหรับ ChatGun Social การยืนยันอายุและข้อกำหนดของคุณถูกบันทึกแล้ว โดยไม่มีการจัดเก็บวันเกิด</p>
+        <form id="onboarding-form" class="onboarding-form">
           <label>ชื่อที่แสดง<input name="name" maxlength="50" required autocomplete="nickname"></label>
           <label>เพศ<select name="gender"><option>ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option></select></label>
           <label class="wide">เกี่ยวกับคุณ<textarea name="bio" maxlength="250"></textarea></label>
           <label class="wide">ความสนใจ<input name="interests" maxlength="100" placeholder="กาแฟ, เทคโนโลยี, ท่องเที่ยว"></label>
           <button class="primary wide" type="submit">สร้างโปรไฟล์และเข้าสู่ ChatGun Social</button>
         </form>
+        </div>
       </section>
 
       <section id="social-view" hidden>
