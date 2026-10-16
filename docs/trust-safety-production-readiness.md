@@ -73,7 +73,7 @@ documents, provider publishing, and an approved Production deployment/smoke test
 
 ## Validation evidence
 
-- Immutable Preview: `https://f0b0f206.chatgun.pages.dev` (Preview only).
+- Committed-candidate Preview: `https://d0db539e.chatgun.pages.dev` (Preview only).
 - Node unit/integration/security: **63 passed, 0 failed, 0 skipped**.
 - Final Playwright: **30 passed, 0 failed, 4 intentional project-specific skips** across
   desktop and mobile Chromium. Stateful live mutations run once on desktop; the mobile

@@ -9,7 +9,7 @@ Scope: isolated Preview and `chatgun-auth-staging` only
 - Cloudflare account confirmed before mutation: `23017b53386fb67fc62a52cdd017454c` (ChatGun).
 - No PiggyPrice or NEAR Cloudflare resource was accessed or modified.
 - No ChatGun Production deployment, D1 migration, user-data mutation, PR merge, or legal publication occurred. Only clearly prefixed synthetic rows were created or replaced in staging.
-- Validated immutable Preview: `https://f0b0f206.chatgun.pages.dev`.
+- Validated committed-candidate Preview: `https://d0db539e.chatgun.pages.dev`.
 - Preview enables invitation-only 18+ onboarding plus the social shell, discovery, friend requests, messaging, ratings, and private gallery/chat media for authorized staging tests. Public registration, moderation tools, identity verification, Demo, Game, email OTP, and mobile OTP remain disabled. Production has no `MEDIA` binding and keeps Beta onboarding, media, and every social capability disabled.
 - R2 bucket `chatgun-media-staging` and Worker `chatgun-media-cleanup-staging` are staging-only. No custom domain or public R2 development URL was enabled.
 
