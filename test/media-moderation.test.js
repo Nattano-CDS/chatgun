@@ -100,7 +100,16 @@ test("single-operator overview prioritizes urgent queues and exposes aggregate w
   assert.equal(payload.coverage.reportingAlwaysAvailable, true);
   assert.equal(payload.coverage.immediateResponseGuaranteed, false);
   assert.ok(payload.daily.oldestOpenAt <= now - 180);
-  assert.equal((await database.prepare("SELECT COUNT(*) count FROM media_safety_audit_events WHERE action='queue_view'").first()).count, 1);
+  assert.equal((await database.prepare("SELECT purpose FROM media_safety_audit_events WHERE action='queue_view' ORDER BY created_at DESC LIMIT 1").first()).purpose, "routine_admin_dashboard_access");
+
+  await database.prepare("UPDATE session_auth_evidence SET authenticated_at=? WHERE user_id='overview-admin'").bind(now - 3600).run();
+  const staleButAuthorized = await onRequest({ env, request: request("/api/social/moderation/overview", admin, { purpose: "" }) });
+  assert.equal(staleButAuthorized.status, 200, "routine overview requires a valid session and role, not a fresh high-risk reauthentication");
+
+  const ordinary = await member(database, "overview-ordinary");
+  const unauthorized = await onRequest({ env, request: request("/api/social/moderation/overview", ordinary, { purpose: "" }) });
+  assert.equal(unauthorized.status, 403);
+  assert.equal((await database.prepare("SELECT COUNT(*) count FROM media_safety_audit_events WHERE action='queue_view'").first()).count, 2);
   database.close();
 });
 

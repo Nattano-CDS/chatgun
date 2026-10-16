@@ -221,7 +221,7 @@ dialog::backdrop { background: rgba(24, 20, 32, .56); backdrop-filter: blur(3px)
 .moderation-toolbar .eyebrow { margin: 0 0 5px; color: var(--primary); font-size: 11px; font-weight: 850; letter-spacing: .14em; }
 .moderation-brand { display: flex; }
 .moderation-brand img { width: 38px; }
-.moderation-purpose { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 460px); align-items: end; gap: 28px; margin-bottom: 18px; }
+.moderation-purpose { display: grid; grid-template-columns: minmax(0, 1fr); align-items: end; gap: 28px; margin-bottom: 18px; }
 .moderation-purpose p { margin: 8px 0 0; color: var(--muted); line-height: 1.55; }
 .moderation-purpose label, .moderation-filters label, .moderation-decision label { display: grid; gap: 7px; color: #3f3d48; font-weight: 650; }
 .moderation-nav { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 14px; scrollbar-width: thin; }

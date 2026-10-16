@@ -21,20 +21,29 @@ minutes, a case-specific purpose, and CSRF/same-origin validation for writes. Pr
 ## Initial bootstrap
 
 There is deliberately no self-service first-admin path. The owner must first approve a named
-person, role, reason, expiry, and environment. A trusted infrastructure operator then performs one
-reviewed, staging-only D1 transaction to insert the first `moderation_admin` grant and matching
-`moderation_role_events` grant event. Before running it, the operator must:
+person, roles, reason, expiry, and environment. A trusted infrastructure operator then performs
+one reviewed, staging-only D1 import to insert the approved initial grants and matching
+`moderation_role_events` grant events. For the single-owner Phase 1 model, the least-privilege
+initial set is `moderation_admin`, `report_reviewer`, and `safety_admin`; do not include
+`identity_reviewer` while identity verification is disabled. Before running it, the operator must:
 
 1. confirm Cloudflare account `23017b53386fb67fc62a52cdd017454c`;
 2. confirm the selected database is `chatgun-auth-staging`, never `chatgun-auth`;
 3. create a D1 Time Travel bookmark and record aggregate counts;
 4. resolve the approved user's opaque D1 user ID without copying email or provider identifiers;
-5. use fresh UUIDs and a maximum 90-day expiry; and
+5. use fresh UUIDs and a maximum 90-day expiry (30 days for the initial owner bootstrap); and
 6. have a second person compare the target, environment and owner approval before execution.
 
 Do not place a bootstrap SQL command containing a real user ID in Git, PR comments, tickets, or
-chat. After bootstrap, use the authenticated API rather than direct SQL. No role was assigned as
-part of this engineering change because the owner has not named personnel.
+chat. Use `scripts/bootstrap-moderation-staging.mjs` only after the exact opaque ID is confirmed;
+the script is pinned to the ChatGun account and staging database, requires an exact confirmation,
+requires a recently authenticated active/onboarded target, refuses existing grants, uses fresh
+UUIDs, and verifies the result. After bootstrap, use the authenticated API rather than direct SQL.
+
+The owner-confirmed Phase 1 bootstrap was completed in isolated Staging on 2026-10-16. Three
+separate 30-day grants expire on 2026-11-15 at 22:48 Asia/Bangkok. The opaque user ID is retained
+only in the restricted operational record, not this repository. Production moderation remains
+disabled and unchanged.
 
 ## Grant procedure
 
@@ -71,4 +80,3 @@ Investigate self-interest conflicts, unnecessary `safety_admin` access, repeated
 after-hours changes, generic purposes, and grants near the 90-day ceiling. Retention for these
 events is not yet approved; reviewers must keep reasons concise and free of unnecessary personal
 or case-content data.
-

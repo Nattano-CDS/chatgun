@@ -13,15 +13,17 @@ This document does not authorize Production deployment or activation of Sensitiv
 - Only `safety_admin` can view protected media, classify it, approve/reject it, reclassify released
   media, decide appeals, or inspect decision history. Report reviewers can inspect report queues and
   overview counts but cannot retrieve media objects.
-- Moderator access requires an authenticated active account, completed acceptance/onboarding,
-  an unexpired/unrevoked role, authentication within ten minutes, a case-specific purpose of at
-  least ten characters, same-origin CSRF on writes, and immutable audit records.
+- Routine aggregate Overview requires an authenticated active account, completed acceptance/
+  onboarding, and an unexpired/unrevoked reviewer role; the server records
+  `routine_admin_dashboard_access`. Restricted queue/object views and decisions additionally
+  require authentication within ten minutes and a case-specific purpose of at least ten
+  characters. Writes retain same-origin CSRF and immutable audit records.
 - `moderation_admin` is separate from reviewer roles. It can grant/revoke time-bounded access but
   cannot inspect reports or private media unless separately assigned the least-privilege reviewer
   role. Self-grants are rejected and every access change is audited.
-- The feature branch enables the moderation API only in Preview. It does not grant any staging user
-  a moderation role; role provisioning requires an owner-approved named reviewer. Production keeps
-  the moderation feature flag disabled.
+- The feature branch enables the moderation API only in Preview. The owner-confirmed Staging
+  account now has time-bounded, audited roles; Production keeps the moderation feature flag
+  disabled and has no moderation grant from this operation.
 - Optimistic revision checks prevent two reviewers from silently overwriting each other.
 - A `prohibited` decision immediately changes D1 state to deny member access and schedules private
   R2 deletion. The seven-day staging appeal window does not make the object available to members.
@@ -86,9 +88,10 @@ counts, and keep media delivery disabled until rollback and reviewer drills pass
 ## Operational blockers
 
 - No approved independent age-assurance provider or documented manual age-review procedure.
-- The owner is confirmed as the Phase 1 primary administrator/moderator/safety decision maker, but
-  the exact ChatGun account, support/alert channel, emergency/legal escalation, independent appeal
-  capacity, and backup are not yet verified. Coverage is approved every day from 19:00–22:00
+- The owner is confirmed as the Phase 1 primary administrator/moderator/safety decision maker and
+  the exact Staging account has time-bounded audited grants. The support/alert channel,
+  emergency/legal escalation, independent appeal capacity, and backup are not yet verified.
+  Coverage is approved every day from 19:00–22:00
   Asia/Bangkok (21 hours/week); reporting queues 24/7 with no immediate-response guarantee. The
   operating model is in
   `single-admin-beta-operations.md`.

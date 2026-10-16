@@ -3,12 +3,15 @@ import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 
 const screenshotDirectory = resolve("test-results/screenshots");
+const overviewRequests = [];
 test.beforeAll(() => mkdirSync(screenshotDirectory, { recursive: true }));
+test.beforeEach(() => { overviewRequests.length = 0; });
 
 test.beforeEach(async ({ page }) => {
   await page.route("**/api/social/moderation/**", async (route) => {
     const request = route.request(); const url = new URL(request.url());
     if (url.pathname === "/api/social/moderation/overview") {
+      overviewRequests.push(request.headers());
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
         counts: { pending: 1, general: 8, sensitive: 2, rejected: 3, reports: 2, userReports: 1, mediaReports: 1, appeals: 1, critical: 1, high: 1 },
         coverage: { timezone: "Asia/Bangkok", start: "19:00", end: "22:00", days: "every_day", weeklyHours: 21, isOpen: false, reportingAlwaysAvailable: true, immediateResponseGuaranteed: false },
@@ -42,21 +45,21 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test("admin media dashboard requires purpose, renders safely, and records a classified decision", async ({ page }, testInfo) => {
+test("admin dashboard opens routine overview automatically and requires justification for restricted evidence", async ({ page }, testInfo) => {
   const decisions = [];
   page.on("request", (request) => { if (request.url().endsWith("/api/social/moderation/media") && request.method() === "POST") decisions.push(request.postDataJSON()); });
   await page.goto("/app/moderation.html");
   await expect(page).toHaveTitle("ศูนย์ดูแลสื่อ · ChatGun");
-  await page.getByRole("button", { name: "ภาพรวม" }).click();
-  await expect(page.getByRole("status")).toContainText("อย่างน้อย 10 ตัวอักษร");
-  await page.getByLabel("วัตถุประสงค์เฉพาะกรณี").fill("ตรวจสอบคิวสื่อสังเคราะห์สำหรับ QA");
-  await page.getByRole("button", { name: "ภาพรวม" }).click();
   await expect(page.locator("#moderation-stats")).toContainText("รายงานผู้ใช้");
+  await expect(page.getByLabel("วัตถุประสงค์เฉพาะกรณี")).toHaveCount(0);
+  expect(overviewRequests).toHaveLength(1);
+  expect(overviewRequests[0]["x-moderation-purpose"]).toBeUndefined();
   await expect(page.locator("#moderation-stats")).toContainText("สื่อรอตรวจ");
   await expect(page.getByText("สรุปภาระงานย้อนหลัง 24 ชั่วโมง")).toBeVisible();
   await expect(page.getByText(/ทุกวัน 19:00–22:00 น. Asia\/Bangkok/)).toBeVisible();
   await expect(page.getByText(/ระบบยังรับรายงานตลอด 24 ชั่วโมง/)).toBeVisible();
   await expect(page.getByText("รายการเข้าใหม่")).toBeVisible();
+  page.once("dialog", (dialog) => dialog.accept("ตรวจสอบคิวและหลักฐานสังเคราะห์สำหรับ QA"));
   await page.getByRole("button", { name: "งานด่วน" }).click();
   await expect(page.locator("#moderation-results .moderation-card").first()).toContainText("รายงานสื่อ");
   await expect(page.locator("#moderation-results").getByText("วิกฤต", { exact: true })).toHaveCount(2);

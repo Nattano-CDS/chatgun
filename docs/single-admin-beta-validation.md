@@ -57,16 +57,17 @@ Post-test staging checks:
 
 ## Access decision
 
-No real Admin/Moderator privilege was assigned. The seed created only a short-lived synthetic
-`safety_admin` grant for `cg-stage-moderator`, limited to the staging test. The intended owner's
-real ChatGun account has not been privately verified, and the bootstrap two-person comparison has
-not occurred. Production keeps moderation disabled.
+The owner later completed interactive sign-in and explicitly confirmed the opaque Staging target.
+The reviewed bootstrap created separate 30-day `moderation_admin`, `report_reviewer`, and
+`safety_admin` grants with matching audit events; `identity_reviewer` was excluded. Details and the
+pre-change bookmark are in `primary-admin-bootstrap-validation.md`. Production keeps moderation
+disabled.
 
 ## Assessment
 
 - **GO:** synthetic Staging exercises and owner review of the single-admin operating model.
 - **NO-GO:** real-user controlled Beta or Production. Required owner actions are exact account
-  verification, approved support/alert channels, qualified emergency/legal path,
+  access review before the 30-day expiry, approved support/alert channels, qualified emergency/legal path,
   independent appeal/backup arrangement, content-scanning or demonstrated manual-review capacity,
   and qualified legal approval. Coverage is approved, but is not 24/7 and carries no immediate
   response guarantee. Public registration and Sensitive content remain disabled.

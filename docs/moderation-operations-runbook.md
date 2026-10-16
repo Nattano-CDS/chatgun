@@ -13,8 +13,9 @@ unverified; real-user activation therefore remains blocked. See
 Use individual accounts with least-privilege roles: `moderation_admin` only for time-bounded role
 administration, `report_reviewer` for report queues,
 `identity_reviewer` for identity evidence, and `safety_admin` only for message/media access
-and high-risk decisions. Require recent authentication, a case-specific purpose, and no
-shared accounts. Review audit logs weekly; a reviewer must not handle a case involving
+and high-risk decisions. Routine aggregate Overview uses a fixed audit purpose. Require recent
+authentication and a case-specific purpose before restricted queues, evidence, private objects,
+or decisions, and use no shared accounts. Review audit logs weekly; a reviewer must not handle a case involving
 themselves or a close relationship. Remove access immediately on role change. Never export
 case content to personal devices or informal chat.
 
@@ -23,7 +24,8 @@ least intrusive effective action, record reason and decision, notify affected us
 safe/lawful, offer an appeal, and schedule evidence deletion under the approved policy.
 
 The current tools provide report, message, identity-evidence, and quarantined-media queues.
-Every queue/object view and decision requires a case-specific purpose and is audited. The
+Every restricted queue/object view and decision requires a case-specific purpose and is audited;
+routine aggregate Overview records `routine_admin_dashboard_access` automatically. The
 technical capability must remain disabled until named people are assigned the roles below:
 
 | Duty | Minimum assignment before real Beta |

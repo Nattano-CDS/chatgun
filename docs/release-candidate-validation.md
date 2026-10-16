@@ -89,12 +89,12 @@ synthetic staging data.
 | Authentication and CSRF | Same-origin mutations require session cookie plus matching CSRF; OAuth state/nonce/PKCE and provider validation retain PR #3/#6 coverage |
 | Registration | Unknown identities fail closed because public and invitation registration flags are both false; existing provider identities may sign in |
 | Account state | Pending accounts are restricted to acceptance/onboarding/privacy/deletion/logout paths; direct-route/API bypass is denied |
-| RBAC | Moderation is disabled without its flag, requires an explicit non-expired grant and recorded purpose, and separates grant administration from case review |
+| RBAC | Moderation is disabled without its flag, requires an explicit non-expired grant, records a fixed routine Overview purpose, requires explicit justification for restricted evidence, and separates grant administration from case review |
 | Media | R2 has no public URL path; bytes/signatures/dimensions are validated, unnecessary metadata is stripped, pending content is quarantined, and reads are relationship/owner/moderator scoped |
 | Sensitive content | Feature flag is false; released Sensitive/Prohibited object counts are zero |
 | Location privacy | Cross-user responses omit coordinates/accuracy, use 250 m bands, expire stale presence, and throttle repeated discovery reads |
 | Deletion/retention | Access is revoked transactionally; binary deletion is asynchronous, bounded, retryable, and confirmed by the staging scheduled Worker |
-| Audit | Role changes, queue/object access, decisions, reports, appeals, and message/media inspection require purpose-bearing audit events |
+| Audit | Routine Overview records a server-fixed purpose; restricted queue/object access, role changes, decisions, reports, appeals, and message/media inspection require purpose-bearing audit events |
 | Environment isolation | Preview uses staging D1/R2. Production has a distinct D1 binding, no R2 binding, and fail-closed social/media/moderation flags |
 
 ## Remaining blockers
@@ -102,10 +102,11 @@ synthetic staging data.
 1. Owner and qualified Thai legal review of Terms, Privacy, Data Deletion, Beta notice, adult
    eligibility/assurance, location processing, retention, and appeals is incomplete. Imported PR #4
    documents remain drafts and are not published as approved policies.
-2. The owner is the confirmed moderation primary and daily 19:00–22:00 Asia/Bangkok coverage is
-   approved. The exact admin account, backup, emergency escalation, support/alert channels, appeal
-   independence, takedown intake, and access-review ownership remain unconfirmed. Reports queue
-   24/7, but immediate response is not guaranteed.
+2. The owner is the confirmed moderation primary, the exact Staging account has been bootstrapped
+   with time-bounded roles, and daily 19:00–22:00 Asia/Bangkok coverage is approved. Backup,
+   emergency escalation, support/alert channels, appeal independence, takedown intake, and the
+   recurring access-review procedure remain unconfirmed. Reports queue 24/7, but immediate
+   response is not guaranteed.
 3. No approved automated content-safety scanner or confirmed staffed pre-release review service
    exists. Quarantine must remain enabled and real-user uploads/social activation must remain gated.
 4. Provider Production publishing/approval and Production callback validation remain separate
@@ -133,7 +134,8 @@ queue, workload/cleanup summary, operating model, approved coverage display, dai
 monitoring, and rollback gates. The implementation and deployed Staging evidence are recorded in
 `docs/single-admin-beta-operations.md` and `docs/single-admin-beta-validation.md`.
 
-No real role was granted because the intended ChatGun account has not been privately verified.
-Single-person coverage does not resolve emergency/legal escalation, independent appeals, backup
+The intended Staging account was subsequently verified and received separate 30-day Admin/report/
+safety grants with matching audit evidence. Single-person coverage does not resolve emergency/
+legal escalation, independent appeals, backup
 availability, media-scanning capacity, or qualified legal review; the Production/real-user Beta
 assessment therefore remains **NO-GO**.

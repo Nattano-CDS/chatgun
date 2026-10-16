@@ -47,10 +47,13 @@ test("responsive social route receives only the required geolocation permission"
   assert.match(redirects, /\/app\/people\/\* \/app\/ 200/u);
 });
 
-test("moderation UI requires a recorded purpose and renders untrusted data as text", () => {
-  assert.match(moderationHtml, /id="moderation-purpose"[^>]+minlength="10"/u);
+test("moderation UI auto-loads routine overview, justifies restricted evidence, and renders untrusted data as text", () => {
+  assert.doesNotMatch(moderationHtml, /id="moderation-purpose"/u);
+  assert.match(moderationHtml, /กำลังโหลดภาพรวม/u);
   assert.match(moderationHtml, /name="robots" content="noindex,nofollow"/u);
-  assert.match(moderationScript, /"x-moderation-purpose": encodeURIComponent\(purpose\(\)\)/u);
+  assert.match(moderationScript, /exceptionalPurpose/u);
+  assert.match(moderationScript, /options\.routine \? \{\} : \{ "x-moderation-purpose": encodeURIComponent\(purpose\(\)\) \}/u);
+  assert.match(moderationScript, /load\("overview"\)/u);
   assert.match(moderationScript, /element\.textContent = String\(text\)/u);
   assert.doesNotMatch(moderationScript, /innerHTML|insertAdjacentHTML|document\.write/u);
   assert.match(moderationScript, /__Host-cg_csrf/u);

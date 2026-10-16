@@ -821,18 +821,21 @@ async function reports(request, env) {
   return json({ ok: true }, 201);
 }
 
-async function moderationAccess(request, env, roles) {
+async function moderationAccess(request, env, roles, options = {}) {
   capability(env, "SOCIAL_APP_ENABLED");
   capability(env, "MODERATION_TOOLS_ENABLED");
   const session = await authenticated(request, env, { csrf: request.method === "POST" });
-  const encodedPurpose = String(request.headers.get("x-moderation-purpose") || "");
-  if (encodedPurpose.length > 900) throw new SocialError("purpose_required", "วัตถุประสงค์การเข้าถึงไม่ถูกต้อง");
-  let decodedPurpose;
-  try { decodedPurpose = decodeURIComponent(encodedPurpose); }
-  catch { throw new SocialError("purpose_required", "วัตถุประสงค์การเข้าถึงไม่ถูกต้อง"); }
-  const purpose = cleanText(decodedPurpose, 300, { required: true });
-  if (purpose.length < 10) throw new SocialError("purpose_required", "กรุณาระบุวัตถุประสงค์การเข้าถึงอย่างน้อย 10 ตัวอักษร");
-  if (!hasRecentAuthentication(session)) {
+  let purpose = options.fixedPurpose;
+  if (!purpose) {
+    const encodedPurpose = String(request.headers.get("x-moderation-purpose") || "");
+    if (encodedPurpose.length > 900) throw new SocialError("purpose_required", "วัตถุประสงค์การเข้าถึงไม่ถูกต้อง");
+    let decodedPurpose;
+    try { decodedPurpose = decodeURIComponent(encodedPurpose); }
+    catch { throw new SocialError("purpose_required", "วัตถุประสงค์การเข้าถึงไม่ถูกต้อง"); }
+    purpose = cleanText(decodedPurpose, 300, { required: true });
+    if (purpose.length < 10) throw new SocialError("purpose_required", "กรุณาระบุวัตถุประสงค์การเข้าถึงอย่างน้อย 10 ตัวอักษร");
+  }
+  if (options.requireRecentAuthentication !== false && !hasRecentAuthentication(session)) {
     throw new SocialError("recent_authentication_required", "กรุณาเข้าสู่ระบบอีกครั้งก่อนใช้เครื่องมือดูแล", 403);
   }
   const placeholders = roles.map(() => "?").join(",");
@@ -1168,7 +1171,10 @@ async function moderationMediaObject(request, env, id) {
 }
 
 async function moderationOverview(request, env) {
-  const { session, purpose } = await moderationAccess(request, env, ["report_reviewer", "safety_admin"]);
+  const { session, purpose } = await moderationAccess(request, env, ["report_reviewer", "safety_admin"], {
+    fixedPurpose: "routine_admin_dashboard_access",
+    requireRecentAuthentication: false,
+  });
   const since = unixTime() - 86400;
   const counts = await env.DB.prepare(`
     SELECT

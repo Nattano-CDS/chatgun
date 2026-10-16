@@ -13,17 +13,15 @@ publish legal terms, or authorize Production deployment.
 One owner may hold `moderation_admin`, `report_reviewer`, and `safety_admin` as separate,
 time-bounded grants on the same individually controlled ChatGun account. Role separation still
 matters: the server checks the grant required for each endpoint, role administration does not
-implicitly expose evidence, each queue/object access needs a case-specific purpose, and every
-write requires recent authentication plus CSRF. Never create a shared admin account.
+implicitly expose evidence, routine Overview uses a server-fixed audit purpose, each restricted
+queue/object access needs a case-specific purpose, and every write requires recent authentication
+plus CSRF. Never create a shared admin account.
 
-The intended account is not yet verified. No real grant may be inserted until the owner signs in
-to Staging, supplies the opaque ChatGun user ID through a private authenticated workflow, and
-explicitly confirms that exact account, environment, roles, reasons, and expiry. Follow
+The owner completed the private authenticated Staging verification and explicitly confirmed the
+opaque target, environment, roles, reason, and 30-day expiry. Follow
 `admin-access-role-management.md`; never identify the account by display name alone or paste a
-provider subject/email into SQL, Git, chat, or a PR. The initial bootstrap still requires the
-staging account/database checks and an independent comparison of the prepared target. If no second
-person is available, do not silently remove that safeguard: record bootstrap as blocked and keep
-moderation/public features disabled until a trusted infrastructure reviewer is available.
+provider subject/email into SQL, Git, chat, or a PR. Future renewals or replacements still require
+the staging account/database checks and an independent comparison of the prepared target.
 
 Single-operator limitations:
 
@@ -204,7 +202,7 @@ is a monitoring checklist rather than a claim that paging exists.
 ## Current assessment
 
 - **GO:** dashboard engineering, synthetic Staging drills, and owner review of this operating model.
-- **NO-GO:** real-user Beta or Production. The intended admin account, support/alert channels,
+- **NO-GO:** real-user Beta or Production. Support/alert channels,
   emergency/legal route, independent appeal capacity, scanning/review plan, and legal approval are
   not yet verified. The coverage schedule is approved but is not 24/7 and has no guaranteed
   immediate response. Sensitive content and public registration remain disabled.

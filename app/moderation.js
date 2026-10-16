@@ -1,7 +1,7 @@
 "use strict";
 
 const $ = (selector, root = document) => root.querySelector(selector);
-const state = { view: "overview", page: 1, hasMore: false };
+const state = { view: "overview", page: 1, hasMore: false, exceptionalPurpose: "" };
 const labels = {
   general: "ทั่วไป", sensitive: "ละเอียดอ่อน", prohibited: "ต้องห้าม",
   pending: "รอตรวจ", released: "อนุมัติแล้ว", rejected: "ปฏิเสธแล้ว",
@@ -14,14 +14,16 @@ function cookie(name) {
 }
 
 function purpose() {
-  const value = $("#moderation-purpose").value.trim();
-  if (value.length < 10) throw new Error("กรุณาระบุวัตถุประสงค์อย่างน้อย 10 ตัวอักษร");
-  return value;
+  if (state.exceptionalPurpose.length >= 10) return state.exceptionalPurpose;
+  const value = prompt("ระบุเหตุผลเฉพาะกรณีสำหรับการเปิดคิวหรือหลักฐาน (อย่างน้อย 10 ตัวอักษร)")?.trim() || "";
+  if (value.length < 10) throw new Error("ต้องระบุเหตุผลเฉพาะกรณีอย่างน้อย 10 ตัวอักษรก่อนเปิดข้อมูลที่จำกัด");
+  state.exceptionalPurpose = value.slice(0, 300);
+  return state.exceptionalPurpose;
 }
 
 async function api(path, options = {}) {
   const method = options.method || "GET";
-  const headers = { accept: "application/json", "x-moderation-purpose": encodeURIComponent(purpose()), ...(options.headers || {}) };
+  const headers = { accept: "application/json", ...(options.routine ? {} : { "x-moderation-purpose": encodeURIComponent(purpose()) }), ...(options.headers || {}) };
   let body;
   if (options.body !== undefined) {
     headers["content-type"] = "application/json";
@@ -251,7 +253,7 @@ async function load(view = state.view) {
   $("#moderation-filters").hidden = !["pending", "approved", "sensitive", "rejected"].includes(view);
   $("#moderation-pagination").hidden = !["pending", "approved", "sensitive", "rejected", "audit"].includes(view);
   let payload;
-  if (view === "overview") { payload = await api("/api/social/moderation/overview"); renderStats(payload.counts); renderDaily(payload.daily, payload.cleanup); renderCoverage(payload.coverage); empty("เลือกงานด่วนหรือคิวด้านบนเพื่อเริ่มตรวจสอบ"); }
+  if (view === "overview") { payload = await api("/api/social/moderation/overview", { routine: true }); renderStats(payload.counts); renderDaily(payload.daily, payload.cleanup); renderCoverage(payload.coverage); empty("เลือกงานด่วนหรือคิวด้านบนเพื่อเริ่มตรวจสอบ"); }
   else if (view === "priority") {
     const [userReports, mediaReports, appeals, media] = await Promise.all([
       api("/api/social/moderation/reports?status=pending"), api("/api/social/moderation/media-reports?status=pending"),
@@ -327,3 +329,5 @@ document.addEventListener("click", async (event) => {
     }
   } catch (error) { setStatus(error.message, true); }
 });
+
+load("overview").catch((error) => setStatus(error.message, true));
