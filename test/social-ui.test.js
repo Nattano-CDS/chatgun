@@ -27,5 +27,6 @@ test("social client uses same-origin APIs, CSRF, escaped rendering, and fail-clo
 
 test("responsive social route receives only the required geolocation permission", () => {
   assert.match(styles, /@media \(max-width: 760px\)/u);
-  assert.match(headers, /\/app\/\*\s+[\s\S]*Permissions-Policy: geolocation=\(self\), camera=\(\), microphone=\(\), payment=\(\)/u);
+  assert.match(headers, /Permissions-Policy: camera=\(\), microphone=\(\), geolocation=\(self\), payment=\(\)/u);
+  assert.match(headers, /\/app\/\*\s+[\s\S]*Cache-Control: no-store/u);
 });
