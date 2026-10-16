@@ -48,6 +48,12 @@ function cleanText(value, maximum, { required = false } = {}) {
   return result;
 }
 
+function identifier(value, message = "ไม่พบผู้ใช้") {
+  const result = String(value || "");
+  if (!result || result.length > 128) throw new SocialError("invalid_target", message, 404);
+  return result;
+}
+
 function pair(a, b) {
   if (!b || a === b) throw new SocialError("invalid_target", "ไม่พบผู้ใช้");
   return a < b ? [a, b] : [b, a];
@@ -437,12 +443,13 @@ async function messages(request, env) {
   await requireProfile(env.DB, session.user_id);
   if (request.method === "GET") {
     const url = new URL(request.url);
-    const target = String(url.searchParams.get("target") || "");
+    const target = identifier(url.searchParams.get("target"));
     if (!await accepted(env.DB, session.user_id, target) || await isBlocked(env.DB, session.user_id, target)) {
       throw new SocialError("not_friends", "ต้องเป็นเพื่อนกันก่อนแชท", 403);
     }
     const before = Number(url.searchParams.get("before") || Number.MAX_SAFE_INTEGER);
-    if (!Number.isFinite(before)) throw new SocialError("invalid_cursor", "คำขอไม่ถูกต้อง");
+    const beforeId = String(url.searchParams.get("beforeId") || "\uffff");
+    if (!Number.isFinite(before) || beforeId.length > 128) throw new SocialError("invalid_cursor", "คำขอไม่ถูกต้อง");
     const rows = await env.DB.prepare(`
       SELECT id, sender_user_id, receiver_user_id,
              CASE WHEN unsent_at IS NULL THEN body ELSE '' END body,
@@ -451,9 +458,9 @@ async function messages(request, env) {
       FROM social_messages
       WHERE ((sender_user_id = ? AND receiver_user_id = ?)
           OR (sender_user_id = ? AND receiver_user_id = ?))
-        AND created_at < ?
+        AND (created_at < ? OR (created_at = ? AND id < ?))
       ORDER BY created_at DESC, id DESC LIMIT 51
-    `).bind(session.user_id, target, target, session.user_id, before).all();
+    `).bind(session.user_id, target, target, session.user_id, before, before, beforeId).all();
     return json({ messages: (rows.results || []).slice(0, 50), hasMore: (rows.results || []).length > 50 });
   }
   await limited(env, "message_write_user_minute", session.user_id, 30, 60);
@@ -505,10 +512,11 @@ async function messages(request, env) {
   }
   const body = await readJson(request);
   if (body.action === "unsend") {
+    const messageId = identifier(body.id, "ไม่พบข้อความ");
     const result = await env.DB.prepare(`
       UPDATE social_messages SET unsent_at = ?
       WHERE id = ? AND sender_user_id = ? AND unsent_at IS NULL
-    `).bind(unixTime(), String(body.id || ""), session.user_id).run();
+    `).bind(unixTime(), messageId, session.user_id).run();
     if (!Number(result.meta?.changes || 0)) throw new SocialError("message_not_found", "ไม่พบข้อความ", 404);
     return json({ ok: true });
   }
@@ -558,14 +566,15 @@ async function chatMedia(request, env, id) {
   capability(env, "MESSAGING_ENABLED");
   const session = await authenticated(request, env);
   const media = await env.DB.prepare(`
-    SELECT m.object_key, m.content_type,
+    SELECT m.object_key, m.content_type, m.owner_user_id,
       CASE WHEN msg.sender_user_id = ? THEN msg.receiver_user_id ELSE msg.sender_user_id END other_user_id
     FROM social_media m JOIN social_messages msg ON msg.media_id = m.id
     WHERE m.id = ? AND m.state = 'active' AND (msg.sender_user_id = ? OR msg.receiver_user_id = ?)
     LIMIT 1
   `).bind(session.user_id, id, session.user_id, session.user_id).first();
-  if (!media || !await accepted(env.DB, session.user_id, media.other_user_id)
-    || await isBlocked(env.DB, session.user_id, media.other_user_id) || !env.MEDIA) {
+  const ownerAccess = media?.owner_user_id === session.user_id;
+  if (!media || (!ownerAccess && (!await accepted(env.DB, session.user_id, media.other_user_id)
+    || await isBlocked(env.DB, session.user_id, media.other_user_id))) || !env.MEDIA) {
     throw new SocialError("not_found", "ไม่พบรูปภาพ", 404);
   }
   const object = await env.MEDIA.get(media.object_key);
@@ -602,7 +611,12 @@ async function moderationAccess(request, env, roles) {
   capability(env, "SOCIAL_APP_ENABLED");
   capability(env, "MODERATION_TOOLS_ENABLED");
   const session = await authenticated(request, env, { csrf: request.method === "POST" });
-  const purpose = cleanText(request.headers.get("x-moderation-purpose"), 300, { required: true });
+  const encodedPurpose = String(request.headers.get("x-moderation-purpose") || "");
+  if (encodedPurpose.length > 900) throw new SocialError("purpose_required", "วัตถุประสงค์การเข้าถึงไม่ถูกต้อง");
+  let decodedPurpose;
+  try { decodedPurpose = decodeURIComponent(encodedPurpose); }
+  catch { throw new SocialError("purpose_required", "วัตถุประสงค์การเข้าถึงไม่ถูกต้อง"); }
+  const purpose = cleanText(decodedPurpose, 300, { required: true });
   if (purpose.length < 10) throw new SocialError("purpose_required", "กรุณาระบุวัตถุประสงค์การเข้าถึงอย่างน้อย 10 ตัวอักษร");
   const placeholders = roles.map(() => "?").join(",");
   const role = await env.DB.prepare(`
@@ -670,6 +684,29 @@ async function moderationMessages(request, env) {
   `).bind(before).all();
   await auditModeration(env.DB, session.user_id, "message_audit_view", "message_audit", String(before), purpose);
   return json({ messages: (rows.results || []).slice(0, 100), hasMore: (rows.results || []).length > 100 });
+}
+
+async function moderationMessageMedia(request, env, id) {
+  const { session, purpose } = await moderationAccess(request, env, ["safety_admin"]);
+  const mediaId = identifier(id, "ไม่พบรูปในข้อความ");
+  const media = await env.DB.prepare(`
+    SELECT media.object_key, media.content_type, message.id message_id
+    FROM social_media media
+    JOIN social_messages message ON message.media_id = media.id
+    WHERE media.id = ? AND media.state = 'active' AND message.unsent_at IS NULL
+    LIMIT 1
+  `).bind(mediaId).first();
+  if (!media || !env.MEDIA) throw new SocialError("not_found", "ไม่พบรูปในข้อความ", 404);
+  const object = await env.MEDIA.get(media.object_key);
+  if (!object) throw new SocialError("not_found", "ไม่พบรูปในข้อความ", 404);
+  await auditModeration(env.DB, session.user_id, "message_audit_view", "message_audit", media.message_id, purpose);
+  return new Response(object.body, { headers: {
+    "content-type": media.content_type,
+    "cache-control": "private, no-store, max-age=0",
+    "x-content-type-options": "nosniff",
+    "content-security-policy": "default-src 'none'; sandbox",
+    "content-disposition": "inline",
+  } });
 }
 
 async function ratings(request, env) {
@@ -1047,6 +1084,9 @@ export async function onRequest({ request, env }) {
     if (request.method === "POST" && path === "/api/social/reports") return await reports(request, env);
     if (path === "/api/social/moderation/reports" && ["GET", "POST"].includes(request.method)) return await moderationReports(request, env);
     if (request.method === "GET" && path === "/api/social/moderation/messages") return await moderationMessages(request, env);
+    if (request.method === "GET" && path.startsWith("/api/social/moderation/messages/media/")) {
+      return await moderationMessageMedia(request, env, decodeURIComponent(path.slice("/api/social/moderation/messages/media/".length)));
+    }
     if (path === "/api/social/ratings" && ["GET", "POST"].includes(request.method)) return await ratings(request, env);
     if (path === "/api/social/gallery" && ["GET", "POST"].includes(request.method)) return await gallery(request, env);
     if (request.method === "GET" && path.startsWith("/api/social/media/")) {

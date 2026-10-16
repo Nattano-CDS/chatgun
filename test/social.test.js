@@ -204,6 +204,32 @@ test("friendship, messaging, blocking, and reports enforce server-side relations
   database.close();
 });
 
+test("message cursor pagination is stable when many messages share a timestamp", async () => {
+  const database = new TestD1();
+  const env = socialEnvironment(database);
+  const alice = await addUser(database, "page-alice", "Alice");
+  const bob = await addUser(database, "page-bob", "Bob");
+  await onboard(env, alice, "Alice");
+  await onboard(env, bob, "Bob");
+  await database.prepare(`INSERT INTO social_relationships(id,user_low,user_high,requested_by,status,created_at,updated_at) VALUES ('page-rel','page-alice','page-bob','page-alice','accepted',1,1)`).run();
+  for (let index = 0; index < 55; index += 1) {
+    const id = `message-${String(index).padStart(3, "0")}`;
+    await database.prepare("INSERT INTO social_messages(id,sender_user_id,receiver_user_id,body,created_at) VALUES (?,?,?,?,100)")
+      .bind(id, "page-alice", "page-bob", id).run();
+  }
+  const first = await call(env, request("/api/social/messages?target=page-bob", alice));
+  const firstPage = await first.json();
+  assert.equal(firstPage.messages.length, 50);
+  assert.equal(firstPage.hasMore, true);
+  const cursor = firstPage.messages.at(-1);
+  const second = await call(env, request(`/api/social/messages?target=page-bob&before=${cursor.created_at}&beforeId=${cursor.id}`, alice));
+  const secondPage = await second.json();
+  assert.equal(secondPage.messages.length, 5);
+  assert.equal(secondPage.hasMore, false);
+  assert.equal(new Set([...firstPage.messages, ...secondPage.messages].map((message) => message.id)).size, 55);
+  database.close();
+});
+
 test("proximity ratings are recipient-private and limited to once per Bangkok day", async () => {
   const database = new TestD1();
   const env = socialEnvironment(database);

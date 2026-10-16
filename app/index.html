@@ -66,7 +66,7 @@
             <label class="search">⌕<input id="people-search" placeholder="ค้นหาชื่อหรือความสนใจ…"></label>
             <label class="radius">ระยะ <select id="radius-filter"><option value="100">100 ม.</option><option value="1000">1 กม.</option><option value="5000" selected>5 กม.</option></select></label>
           </div>
-          <div class="filter-row"><select id="gender-filter" aria-label="เพศ"><option>ทั้งหมด</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option><option>ไม่ระบุ</option></select><input id="interest-filter" placeholder="ความสนใจ"></div>
+          <div class="filter-row"><select id="gender-filter" aria-label="เพศ"><option>ทั้งหมด</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option><option>ไม่ระบุ</option></select><input id="interest-filter" placeholder="ความสนใจ"><select id="relationship-filter" aria-label="สถานะเพื่อน"><option value="all">ทั้งหมด</option><option value="friend">เพื่อน</option><option value="not-friend">ยังไม่เป็นเพื่อน</option></select></div>
           <div class="section-heading"><h2>คนใกล้คุณ <span id="people-count">0</span></h2></div>
           <div id="people-grid" class="people-grid"></div>
           <div class="rules"><div><b>♧</b><strong>เป็นเพื่อนก่อนแชท</strong><p>เริ่มคุยเมื่อทั้งสองคนยอมรับ</p></div><div><b>☆</b><strong>คะแนนจากคนใกล้ตัว</strong><p>คนละ 1 ครั้งต่อวัน ในระยะ 100 ม.</p></div><div><b>▣</b><strong>ความคิดเห็นส่วนตัว</strong><p>เจ้าของโปรไฟล์เท่านั้นที่อ่านได้</p></div></div>
@@ -118,6 +118,8 @@
 
   <dialog id="profile-dialog"><button class="dialog-close" aria-label="ปิด">×</button><div id="profile-dialog-content"></div></dialog>
   <dialog id="rating-dialog"><button class="dialog-close" aria-label="ปิด">×</button><form id="rating-form"><h2>ให้คะแนน</h2><input type="hidden" name="target"><label>คะแนน<select name="score"><option value="5">5 ดาว</option><option value="4">4 ดาว</option><option value="3">3 ดาว</option><option value="2">2 ดาว</option><option value="1">1 ดาว</option></select></label><label>ความคิดเห็น<textarea name="comment" maxlength="500"></textarea></label><button class="primary">ส่งความคิดเห็น</button></form></dialog>
+  <dialog id="report-dialog"><button class="dialog-close" aria-label="ปิด">×</button><form id="report-form"><h2>รายงานผู้ใช้</h2><input type="hidden" name="target"><label>ประเภท<select name="category"><option value="harassment">การคุกคาม</option><option value="spam">สแปม</option><option value="impersonation">แอบอ้างตัวตน</option><option value="sexual_content">เนื้อหาทางเพศ</option><option value="violence">ความรุนแรง</option><option value="privacy">ละเมิดความเป็นส่วนตัว</option><option value="other">อื่น ๆ</option></select></label><label>รายละเอียด<textarea name="details" maxlength="1000" required></textarea></label><p class="subtitle">ข้อมูลนี้ส่งให้ผู้ดูแลที่มีสิทธิ์เท่านั้น</p><button class="primary">ส่งรายงาน</button></form></dialog>
+  <dialog id="asset-dialog"><button class="dialog-close" aria-label="ปิด">×</button><h2>รูปที่ส่งล่าสุด</h2><p class="subtitle">เลือกส่งซ้ำได้สูงสุดจาก 5 รูปล่าสุด</p><div id="asset-grid" class="gallery-grid"></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

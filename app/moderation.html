@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>เครื่องมือดูแล · ChatGun</title>
+  <link rel="icon" href="../favicon.svg">
+  <link rel="stylesheet" href="./social.css">
+  <script defer src="./moderation.js"></script>
+</head>
+<body>
+  <main class="moderation-shell">
+    <header class="toolbar"><a class="toolbar-brand moderation-brand" href="./"><img src="../logo.svg" alt=""><b>ChatGun</b></a><h1>เครื่องมือดูแล</h1><a class="icon-button" href="./" aria-label="กลับ">←</a></header>
+    <section class="panel moderation-purpose">
+      <h2>ระบุวัตถุประสงค์ก่อนเข้าถึง</h2>
+      <p>ทุกการเปิดคิว หลักฐาน หรือข้อความจะบันทึกผู้เข้าถึง วัตถุประสงค์ และเวลา</p>
+      <label>วัตถุประสงค์เฉพาะกรณี<input id="moderation-purpose" minlength="10" maxlength="300" placeholder="เช่น ตรวจสอบรายงานความปลอดภัยเลขที่…"></label>
+      <div class="dialog-actions"><button class="primary" data-load="reports">รายงาน</button><button class="secondary" data-load="messages">ตรวจข้อความ</button><button class="secondary" data-load="verification">ยืนยันตัวตน</button></div>
+    </section>
+    <p id="moderation-status" class="status" role="status" aria-live="polite">เครื่องมือยังไม่โหลดข้อมูล</p>
+    <section id="moderation-results" class="moderation-results"></section>
+  </main>
+  <dialog id="moderation-dialog"><button class="dialog-close" aria-label="ปิด">×</button><div id="moderation-detail"></div></dialog>
+</body>
+</html>

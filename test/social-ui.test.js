@@ -6,6 +6,8 @@ const html = readFileSync("app/index.html", "utf8");
 const script = readFileSync("app/social.js", "utf8");
 const styles = readFileSync("app/social.css", "utf8");
 const headers = readFileSync("_headers", "utf8");
+const moderationHtml = readFileSync("app/moderation.html", "utf8");
+const moderationScript = readFileSync("app/moderation.js", "utf8");
 
 test("social UI exposes only the approved non-game navigation", () => {
   for (const tab of ["near", "friends", "chat", "reviews", "profile"]) {
@@ -29,4 +31,13 @@ test("responsive social route receives only the required geolocation permission"
   assert.match(styles, /@media \(max-width: 760px\)/u);
   assert.match(headers, /Permissions-Policy: camera=\(\), microphone=\(\), geolocation=\(self\), payment=\(\)/u);
   assert.match(headers, /\/app\/\*\s+[\s\S]*Cache-Control: no-store/u);
+});
+
+test("moderation UI requires a recorded purpose and renders untrusted data as text", () => {
+  assert.match(moderationHtml, /id="moderation-purpose"[^>]+minlength="10"/u);
+  assert.match(moderationHtml, /name="robots" content="noindex,nofollow"/u);
+  assert.match(moderationScript, /"x-moderation-purpose": encodeURIComponent\(purpose\(\)\)/u);
+  assert.match(moderationScript, /element\.textContent = String\(text\)/u);
+  assert.doesNotMatch(moderationScript, /innerHTML|insertAdjacentHTML|document\.write/u);
+  assert.match(moderationScript, /__Host-cg_csrf/u);
 });

@@ -59,7 +59,7 @@ main { grid-column: 2; width: min(1180px, 100%); margin: 0 auto; padding: 32px 4
 .subtitle { color: var(--muted); margin: -18px 0 25px; }
 
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.form-grid label, #rating-form label { display: grid; gap: 8px; color: #3f3d48; font-weight: 650; }
+.form-grid label, #rating-form label, #report-form label { display: grid; gap: 8px; color: #3f3d48; font-weight: 650; }
 .wide { grid-column: 1 / -1; }
 input, select, textarea { width: 100%; border: 1px solid #dad7e4; border-radius: 13px; color: var(--ink); background: #fff; padding: 12px 14px; outline: none; }
 textarea { min-height: 100px; resize: vertical; }
@@ -115,6 +115,8 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .message.mine { align-self: flex-end; color: #fff; background: var(--primary); border-radius: 15px 15px 4px 15px; }
 .message.unsent { color: var(--muted); font-style: italic; background: transparent; border: 1px dashed var(--line); }
 .message time { display: block; margin-top: 4px; font-size: 10px; opacity: .7; }
+.message-tools { display: flex; justify-content: flex-end; margin-top: 4px; }
+.message-tools button { padding: 0; border: 0; color: inherit; background: transparent; font-size: 10px; text-decoration: underline; }
 .chat-image { display: block; width: min(320px, 100%); max-height: 360px; object-fit: contain; margin-bottom: 7px; border-radius: 10px; }
 .composer { display: flex; gap: 10px; padding: 14px; border-top: 1px solid var(--line); }
 .composer input { flex: 1; }
@@ -148,7 +150,7 @@ dialog::backdrop { background: rgba(24, 20, 32, .56); backdrop-filter: blur(3px)
 .dialog-profile { text-align: center; }
 .dialog-profile .portrait { width: 130px; margin: 0 auto 16px; border-radius: 28px; }
 .dialog-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 18px; }
-#rating-form { display: grid; gap: 16px; }
+#rating-form, #report-form { display: grid; gap: 16px; }
 .toast { position: fixed; z-index: 50; right: 24px; bottom: 24px; max-width: min(390px, calc(100% - 32px)); padding: 13px 17px; border-radius: 13px; color: #fff; background: #2c2932; box-shadow: var(--shadow); }
 .toast.error { background: #9e2639; }
 
@@ -180,6 +182,7 @@ dialog::backdrop { background: rgba(24, 20, 32, .56); backdrop-filter: blur(3px)
   .search-row { flex-wrap: wrap; }
   .search { flex-basis: 100%; }
   .radius { width: 100%; justify-content: space-between; }
+  .filter-row { flex-wrap: wrap; }
   .filter-row > * { width: calc(50% - 6px); max-width: none !important; }
   .form-grid { grid-template-columns: 1fr; }
   .upload-form { grid-template-columns: 1fr; }
@@ -200,3 +203,18 @@ dialog::backdrop { background: rgba(24, 20, 32, .56); backdrop-filter: blur(3px)
 @media (prefers-reduced-motion: no-preference) {
   .person-card, .primary, .secondary, .icon-button { transition: transform .16s ease, color .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease; }
 }
+
+.moderation-shell { width: min(1080px, calc(100% - 30px)); margin: 0 auto; padding: 28px 0 70px; }
+.moderation-brand { display: flex; }
+.moderation-brand img { width: 38px; }
+.moderation-purpose { max-width: 720px; margin: 0 auto 20px; }
+.moderation-purpose label { display: grid; gap: 7px; }
+.moderation-results { display: grid; gap: 12px; }
+.moderation-card { padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
+.moderation-card header { display: flex; justify-content: space-between; gap: 12px; }
+.moderation-card p { white-space: pre-wrap; line-height: 1.55; }
+.evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.evidence-grid img { width: 100%; max-height: 420px; object-fit: contain; border-radius: 14px; background: #eee; }
+.moderation-media { display: block; width: 100%; max-height: 68vh; object-fit: contain; border-radius: 14px; background: #eee; }
+.status.error, .moderation-card .error { color: #9e2639; }
+@media (max-width: 700px) { .evidence-grid { grid-template-columns: 1fr; } }
