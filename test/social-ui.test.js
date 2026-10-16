@@ -33,6 +33,9 @@ test("social client uses same-origin APIs, CSRF, escaped rendering, and fail-clo
   assert.match(script, /10_000/u);
   assert.match(script, /\/app\/people\//u);
   assert.match(script, /popstate/u);
+  assert.match(script, /fileDataUrl/u);
+  assert.match(script, /demoGallery/u);
+  assert.match(script, /demoAssets/u);
   assert.doesNotMatch(script, /innerHTML\s*=\s*(?:location|document\.cookie)/u);
 });
 

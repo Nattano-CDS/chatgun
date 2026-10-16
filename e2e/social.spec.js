@@ -106,3 +106,26 @@ test("optional demo remains browser-only and contains no game", async ({ page })
   await expect(page.locator("#people-grid").getByText("มิน")).toBeVisible();
   await expect(page.getByRole("button", { name: "เกม" })).toHaveCount(0);
 });
+
+test("browser-only demo supports local gallery and chat image workflows", async ({ page }) => {
+  await page.unroute("**/api/**");
+  await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false, demoModeEnabled: true }) }));
+  await page.goto("/app/");
+  await page.getByRole("button", { name: "ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์" }).click();
+  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Z0ioAAAAASUVORK5CYII=", "base64");
+
+  await page.locator('#primary-nav button[data-tab="profile"]').click();
+  await page.locator('#gallery-upload input[type="file"]').setInputFiles({ name: "demo.png", mimeType: "image/png", buffer: png });
+  await page.locator('#gallery-upload input[name="caption"]').fill("รูปตัวอย่างในเครื่อง");
+  await page.getByRole("button", { name: "อัปโหลดรูป" }).click();
+  await expect(page.locator("#gallery-count")).toHaveText("1 / 12");
+  await expect(page.locator("#my-gallery img")).toHaveAttribute("src", /^data:image\//u);
+
+  await page.locator('#primary-nav button[data-tab="chat"]').click();
+  await page.getByRole("button", { name: /พลอย/u }).click();
+  await page.locator('#thread input[type="file"]').setInputFiles({ name: "chat.png", mimeType: "image/png", buffer: png });
+  await page.locator("#thread .composer").getByRole("button", { name: "ส่ง", exact: true }).click();
+  await expect(page.locator("#thread .chat-image")).toHaveAttribute("src", /^data:image\//u);
+  await page.getByRole("button", { name: "รูปที่ส่งล่าสุด" }).click();
+  await expect(page.locator("#asset-grid img")).toHaveAttribute("src", /^data:image\//u);
+});
