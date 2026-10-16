@@ -109,7 +109,13 @@ test("staging social APIs persist positive and negative non-media workflows", as
 test("desktop and mobile render persisted staging profile, discovery, notifications, and reviews", async ({ page, context, baseURL }, testInfo) => {
   const bob = member("cg-stage-bob");
   await authenticate(context, baseURL, bob);
-  await context.grantPermissions(["notifications"], { origin: baseURL });
+  await page.addInitScript(() => {
+    class StagingNotification {
+      static permission = "granted";
+      static async requestPermission() { return "granted"; }
+    }
+    Object.defineProperty(window, "Notification", { value: StagingNotification, configurable: true });
+  });
   await page.goto("/app/");
   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();
   await expect(page.locator("#people-grid").getByText("อลิซ ทดสอบ")).toBeVisible();

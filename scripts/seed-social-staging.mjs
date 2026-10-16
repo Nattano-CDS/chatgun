@@ -17,7 +17,7 @@ const members = [
 ].map((member) => ({ ...member, token: randomBytes(32).toString("base64url"), csrf: randomBytes(32).toString("base64url") }));
 
 function hash(value) {
-  return createHash("sha256").update(value).digest("hex");
+  return createHash("sha256").update(value).digest("base64url");
 }
 
 function sql(value) {

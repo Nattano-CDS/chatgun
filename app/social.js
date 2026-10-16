@@ -677,16 +677,17 @@ $("#hide-discovery").addEventListener("click", async (event) => {
 
 $("#notification-toggle").addEventListener("click", async (event) => {
   if (!("Notification" in window)) return toast("เบราว์เซอร์นี้ไม่รองรับการแจ้งเตือน", true);
+  const button = event.currentTarget;
   const enabled = localStorage.getItem("chatgun-notifications") === "enabled";
   if (enabled) {
     localStorage.removeItem("chatgun-notifications");
-    event.currentTarget.textContent = "เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
+    button.textContent = "เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
     return toast("ปิดการแจ้งเตือนในอุปกรณ์นี้แล้ว");
   }
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return toast("ไม่ได้รับอนุญาตให้แสดงการแจ้งเตือน", true);
   localStorage.setItem("chatgun-notifications", "enabled");
-  event.currentTarget.textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
+  button.textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
   toast("เปิดการแจ้งเตือนแล้ว");
 });
 $("#view-own-profile").addEventListener("click", () => showPerson(state.account.user.id));
