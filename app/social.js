@@ -379,6 +379,10 @@ function personCard(person, context = "near") {
 }
 
 function renderPeople() {
+  const interestSelect=$('#interest-filter');
+  const interests=[...new Set(state.people.flatMap(p=>String(p.interests||'').split(',').map(s=>s.trim()).filter(Boolean)))].sort((a,b)=>a.localeCompare(b,'th'));
+  const optionKey=JSON.stringify(interests);
+  if(interestSelect.dataset.options!==optionKey){const selected=interestSelect.value;interestSelect.innerHTML='<option value="">ทั้งหมด</option>'+interests.map(i=>`<option value="${escapeHtml(i)}">${escapeHtml(i)}</option>`).join('');interestSelect.value=interests.includes(selected)?selected:'';interestSelect.dataset.options=optionKey;}
   const query = $("#people-search").value.trim().toLocaleLowerCase("th");
   const gender = $("#gender-filter").value;
   const interest = $("#interest-filter").value.trim().toLocaleLowerCase("th");
