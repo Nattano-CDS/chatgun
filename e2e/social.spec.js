@@ -129,3 +129,14 @@ test("browser-only demo supports local gallery and chat image workflows", async 
   await page.getByRole("button", { name: "รูปที่ส่งล่าสุด" }).click();
   await expect(page.locator("#asset-grid img")).toHaveAttribute("src", /^data:image\//u);
 });
+
+test("social shell reports offline state and recovers when connectivity returns", async ({ page, context }) => {
+  await page.goto("/app/");
+  await expect(page.locator("#app")).toHaveAttribute("aria-busy", "false");
+  await context.setOffline(true);
+  await page.evaluate(() => window.dispatchEvent(new Event("offline")));
+  await expect(page.locator("#global-status")).toContainText("ออฟไลน์");
+  await context.setOffline(false);
+  await page.evaluate(() => window.dispatchEvent(new Event("online")));
+  await expect(page.locator("#toast")).toHaveText("กลับมาออนไลน์แล้ว");
+});

@@ -48,6 +48,11 @@ test("staging social APIs persist positive and negative non-media workflows", as
   const discovery = await read(request, baseURL, alice, "/api/social/discovery");
   expect(discovery.status()).toBe(200);
   expect((await discovery.json()).people.map((person) => person.user_id)).toEqual(expect.arrayContaining([bob.id, charlie.id]));
+  const refreshLocation = await mutate(request, baseURL, alice, "/api/social/discovery", { action: "location", latitude: 13.75630, longitude: 100.50180, accuracy: 5 });
+  expect(refreshLocation.status()).toBe(200);
+  const inaccurateLocation = await mutate(request, baseURL, alice, "/api/social/discovery", { action: "location", latitude: 13.75630, longitude: 100.50180, accuracy: 51 });
+  expect(inaccurateLocation.status()).toBe(400);
+  expect((await inaccurateLocation.json()).code).toBe("location_inaccurate");
 
   const profileEdit = await mutate(request, baseURL, alice, "/api/social/profile", { action: "edit", name: "อลิซ ทดสอบอัปเดต", gender: "ไม่ระบุ", bio: "บัญชีสังเคราะห์สำหรับทดสอบ staging", interests: "ทดสอบ, ความปลอดภัย" });
   expect(profileEdit.status()).toBe(200);
@@ -119,6 +124,16 @@ test("desktop and mobile render persisted staging profile, discovery, notificati
   await page.goto("/app/");
   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();
   await expect(page.locator("#people-grid").getByText("อลิซ ทดสอบ")).toBeVisible();
+  await page.locator("#people-search").fill("อลิซ");
+  await expect(page.locator("#people-grid").getByText("ชาร์ลี ทดสอบ")).toHaveCount(0);
+  await page.locator("#people-search").fill("");
+  await page.locator("#radius-filter").selectOption("100");
+  await expect(page.locator("#people-grid").getByText("อลิซ ทดสอบ")).toBeVisible();
+  await expect(page.locator("#people-grid").getByText("ชาร์ลี ทดสอบ")).toHaveCount(0);
+  await page.locator("#radius-filter").selectOption("5000");
+  await page.locator("#people-grid").getByText("อลิซ ทดสอบ").click();
+  await expect(page.locator("#profile-dialog").getByRole("heading", { name: "อลิซ ทดสอบ" })).toBeVisible();
+  await page.locator("#profile-dialog .dialog-close").click();
   await page.locator('#primary-nav button[data-tab="friends"]').click();
   await expect(page.locator("#friends-grid").getByText("อลิซ ทดสอบ")).toBeVisible();
   await page.locator('#primary-nav button[data-tab="chat"]').click();
