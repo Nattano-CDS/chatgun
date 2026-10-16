@@ -14,8 +14,11 @@ for (const width of [390,768,1440]) {
     const shot=async(name)=>{await page.screenshot({path:resolve(directory,`${name}-${width}.png`),fullPage:!["member-profile","member-gallery","gallery-post"].includes(name)});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);};
     await page.goto("/?demo=1");
     await expect(page.locator("#demo-banner")).toContainText("สมมติ");
-    await expect(page.locator("#people-grid .person-card")).toHaveCount(20);
-    await expect.poll(()=>page.locator("#people-grid img").evaluateAll(images=>images.filter(i=>i.complete&&i.naturalWidth>0).length)).toBe(20);
+    await expect(page.locator("#people-grid .person-card")).toHaveCount(16);
+    await expect.poll(()=>page.locator("#people-grid img").evaluateAll(images=>images.filter(i=>i.complete&&i.naturalWidth>0).length)).toBe(16);
+    await page.locator('[data-discovery-page="2"]').click();
+    await expect(page.locator("#people-grid .person-card")).toHaveCount(4);
+    await page.locator('[data-discovery-page="1"]').click();
     await shot("discovery");
     await page.locator('#primary-nav [data-tab="friends"]').click();
     await expect(page.locator("#friends-grid .person-card")).toHaveCount(10);
