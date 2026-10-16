@@ -115,8 +115,14 @@ fetch("/api/auth/me", { credentials: "same-origin" })
     account = result;
     document.getElementById("status").textContent = `เข้าสู่ระบบแล้ว ${account.user.displayName || account.user.email || "สมาชิก ChatGun"}`;
     document.getElementById("logout").hidden = false;
-    document.getElementById("linking").hidden = false;
+    document.getElementById("linking").hidden = !account.canLinkAccounts;
     document.getElementById("deletion").hidden = false;
+    fetch("/api/social/config", { credentials: "same-origin" })
+      .then((response) => response.ok ? response.json() : null)
+      .then((config) => {
+        if (config?.socialAppEnabled && account.nextPath === "/app/") document.getElementById("open-social").hidden = false;
+      })
+      .catch(() => {});
     if (new URLSearchParams(window.location.search).get("reauth") === "account_deletion") {
       deletionMessage("ยืนยันตัวตนสำเร็จแล้ว คุณสามารถเริ่มคำขอลบบัญชีได้");
     }
@@ -167,9 +173,11 @@ document.getElementById("delete-confirm").addEventListener("submit", async (even
     const main = document.querySelector("main");
     main.replaceChildren();
     const heading = document.createElement("h1");
-    heading.textContent = "ลบบัญชีแล้ว";
+    heading.textContent = result.mediaDeletionPending ? "ปิดบัญชีและเริ่มลบข้อมูลแล้ว" : "ลบบัญชีแล้ว";
     const summary = document.createElement("p");
-    summary.textContent = "บัญชีและข้อมูลยืนยันตัวตนในฐานข้อมูลหลักถูกลบแล้ว";
+    summary.textContent = result.mediaDeletionPending
+      ? `ปิดการเข้าถึงบัญชีแล้ว และมีไฟล์ ${result.mediaDeletionPending} รายการอยู่ในคิวลบอย่างปลอดภัย`
+      : "บัญชีและข้อมูลที่เกี่ยวข้องถูกลบแล้ว";
     const receipt = document.createElement("p");
     receipt.append("รหัสยืนยัน: ");
     const code = document.createElement("code");

@@ -1,0 +1,9 @@
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 12% 25%,#e5f6ff,transparent 38%),radial-gradient(circle at 88% 42%,#f1e8ff,transparent 46%),#fbfbff;color:#182043}
+header{max-width:1100px;margin:auto;padding:24px}
+header .brand{font-size:28px;font-weight:700}
+main{min-height:calc(100vh - 92px);display:grid;place-items:center;padding:20px 24px 56px}
+.acceptance-card{width:min(100%,620px);padding:42px;background:#fff;border:1px solid #eceafa;border-radius:28px;box-shadow:0 25px 80px #7163ac1a;text-align:center}
+.mark{display:block;margin:0 auto 12px}.eyebrow{margin:0;color:#7853db;font-size:12px;font-weight:700;letter-spacing:1px}.acceptance-card h1{margin:10px 0 12px;font-size:clamp(28px,5vw,38px)}.intro,.safety-note{color:#707890;line-height:1.7}.intro{margin:0 auto 28px;max-width:520px}.safety-note{margin:24px 0 0;font-size:12px}
+form{display:grid;gap:14px;text-align:left}.confirmation{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:18px;border:1px solid #dedfec;border-radius:16px;line-height:1.65;cursor:pointer}.confirmation:focus-within{border-color:#7253df;box-shadow:0 0 0 3px #7253df18}.confirmation input{width:21px;height:21px;margin:2px 0 0;accent-color:#7253df}.confirmation a{color:#6948df;text-decoration:underline;text-underline-offset:2px;margin:0 4px}
+button{width:100%;border:0;border-radius:14px;padding:14px 18px;font:600 16px Kanit,system-ui,sans-serif;cursor:pointer}.continue{margin-top:4px;background:linear-gradient(110deg,#5369f6,#9b49ed);color:#fff;box-shadow:0 10px 22px #6855f638}.decline{background:#fff;color:#626981;border:1px solid #dedfec}.continue:disabled,.decline:disabled{opacity:.55;cursor:wait}#message{min-height:22px;margin:0;text-align:center;color:#b83c63;font-size:13px}
+@media(max-width:640px){header{padding:18px}.acceptance-card{padding:28px 20px;border-radius:22px}.intro{font-size:14px}.confirmation{padding:15px;font-size:14px}main{padding:8px 14px 34px}}

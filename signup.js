@@ -55,7 +55,9 @@ document.querySelectorAll("[data-provider]").forEach((button) => {
     try { token = turnstileToken(); } catch (error) { message(error.message); return; }
     lock(true);
     try {
-      const result = await api(`/api/auth/oauth/${button.dataset.provider}/start`, { turnstileToken: token });
+      const result = await api(`/api/auth/oauth/${button.dataset.provider}/start`, {
+        turnstileToken: token,
+      });
       const target = new URL(result.authorizationUrl);
       if (target.protocol !== "https:") throw new Error("ปลายทางเข้าสู่ระบบไม่ถูกต้อง");
       window.location.assign(target.toString());

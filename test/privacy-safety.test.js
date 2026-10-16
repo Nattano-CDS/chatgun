@@ -64,21 +64,41 @@ test("retention cleanup removes only expired or aged security records", async ()
     VALUES ('active-otp','a@example.test','h','i',?,?,0,NULL),
            ('expired-otp','b@example.test','h','i',?,?,0,NULL)
   `).run(now + 100, now - 10, now - 1, now - 400);
+  database.exec(`
+    INSERT INTO beta_invitations(id,token_hash,label,expires_at,created_at)
+    VALUES ('expired-invite','invite-hash','cleanup-test',${now - 700000},${now - 800000});
+    INSERT INTO age_assurance_events(id,user_id,age_band,method,notice_version,declared_at,revoked_at)
+    VALUES ('current-age','cleanup-user','adult_18_plus','self_declaration','test',${now - 200},NULL),
+           ('old-age','cleanup-user','adult_18_plus','self_declaration','test',${now - 100000},${now - 90000});
+    INSERT INTO member_profiles(
+      user_id,age_assurance_id,name,discovery_visible,latitude,longitude,accuracy,located_at,created_at,updated_at
+    ) VALUES ('cleanup-user','current-age','Cleanup',1,13.75,100.5,10,${now - 90000},${now - 100000},${now - 90000});
+    INSERT INTO media_deletion_queue(object_key,operation_id,next_attempt_at,created_at,completed_at)
+    VALUES ('old-completed.webp','op',${now - 1000000},${now - 1000000},${now - 700000});
+  `);
 
   const deleted = await runRetentionCleanup(database, now);
   assert.deepEqual(deleted, {
     oauthFlows: 1,
+    betaInvitations: 1,
     sessions: 1,
     rateLimits: 1,
     otpChallenges: 1,
     authEvidence: 0,
     deletionRequests: 0,
     deletionReceipts: 0,
+    stalePresence: 1,
+    revokedAgeAssurance: 1,
+    completedMediaQueue: 1,
   });
   assert.equal(database.database.prepare("SELECT COUNT(*) count FROM sessions WHERE token_hash='active-session'").get().count, 1);
   assert.equal(database.database.prepare("SELECT COUNT(*) count FROM sessions WHERE token_hash='recently-revoked'").get().count, 1);
   assert.equal(database.database.prepare("SELECT COUNT(*) count FROM oauth_flows WHERE state_hash='active-flow'").get().count, 1);
   assert.equal(database.database.prepare("SELECT COUNT(*) count FROM otp_challenges WHERE id='active-otp'").get().count, 1);
+  const presence = database.database.prepare(
+    "SELECT discovery_visible,latitude,longitude,located_at FROM member_profiles WHERE user_id='cleanup-user'",
+  ).get();
+  assert.deepEqual({ ...presence }, { discovery_visible: 0, latitude: null, longitude: null, located_at: null });
   database.close();
 });
 
@@ -105,12 +125,24 @@ test("account deletion requires CSRF and recent authentication", async () => {
   database.close();
 });
 
-test("confirmed deletion erases account data, revokes access, and leaves a minimal receipt", async () => {
+test("confirmed deletion erases account data, queues owned media, revokes access, and leaves a minimal receipt", async () => {
   const database = new TestD1();
   const env = environment(database);
   const now = Math.floor(Date.now() / 1000);
   seedUser(database, "delete-user", now);
   const session = await issueSession(database, "delete-user", now);
+  database.exec(`
+    INSERT INTO beta_invitations(id,token_hash,label,max_uses,use_count,expires_at,created_at,consumed_at)
+    VALUES ('delete-invite','delete-invite-hash','deletion-test',1,1,${now + 3600},${now - 60},${now});
+    INSERT INTO beta_enrollments(user_id,invitation_id,status,created_at,activated_at)
+    VALUES ('delete-user','delete-invite','active',${now - 60},${now});
+    INSERT INTO age_assurance_events(id,user_id,age_band,method,notice_version,declared_at)
+    VALUES ('age-delete','delete-user','adult_18_plus','self_declaration','test',${now});
+    INSERT INTO member_profiles(user_id,age_assurance_id,name,created_at,updated_at)
+    VALUES ('delete-user','age-delete','Delete User',${now},${now});
+    INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,created_at)
+    VALUES ('media-delete','delete-user','staging/delete-user/photo.webp','gallery','image/webp',100,${now});
+  `);
 
   const requested = await onRequest({
     env,
@@ -133,13 +165,26 @@ test("confirmed deletion erases account data, revokes access, and leaves a minim
   assert.equal(confirmed.status, 200);
   const result = await confirmed.json();
   assert.deepEqual(result, {
-    deleted: true,
+    deleted: false,
+    accountAccessRevoked: true,
+    mediaDeletionPending: 1,
     receipt: { requestId: deletion.requestId, completedAt: result.receipt.completedAt },
   });
   assert.match(confirmed.headers.getSetCookie().join("\n"), /__Host-cg_session=;.*Max-Age=0/u);
-  for (const table of ["users", "identities", "sessions", "session_auth_evidence", "account_deletion_requests"]) {
+  for (const table of [
+    "users", "identities", "sessions", "session_auth_evidence", "account_deletion_requests",
+    "age_assurance_events", "beta_enrollments", "member_profiles", "social_media",
+  ]) {
     assert.equal(database.database.prepare(`SELECT COUNT(*) count FROM ${table}`).get().count, 0, table);
   }
+  assert.equal(database.database.prepare("SELECT COUNT(*) count FROM beta_invitations WHERE id='delete-invite'").get().count, 1);
+  assert.deepEqual({ ...database.database.prepare(
+    "SELECT object_key, attempts, completed_at FROM media_deletion_queue",
+  ).get() }, {
+    object_key: "staging/delete-user/photo.webp",
+    attempts: 0,
+    completed_at: null,
+  });
   const receipt = database.database.prepare("SELECT * FROM deletion_receipts").get();
   assert.deepEqual(Object.keys(receipt).sort(), [
     "completed_at", "expires_at", "implementation_version", "outcome", "policy_version", "request_id",

@@ -13,8 +13,11 @@ Status captured on 2026-10-16 for Cloudflare account
   (`9738a051-d914-42d0-8e7b-8098ef2b959d`).
 - [x] Preview D1 targets the distinct `chatgun-auth-staging`
   (`5bbfd55d-eb22-4324-8a7d-57bef14110ea`).
-- [x] Production and Preview both have migration `0001_auth.sql`; no migrations are pending.
-- [x] Production schema, indexes, and foreign keys pass read-only inspection.
+- [ ] Production has only `0001_auth.sql`; read-only inspection on 2026-10-16 found
+  `0002_privacy_safety.sql` through `0007_controlled_beta.sql` pending. Preview is current after 0007 is applied.
+- [x] The current Production authentication-only schema has no foreign-key violations, but
+  it is not ready for the privacy/social application until the pending additive migrations
+  are reviewed, backed up, applied under separate approval, and re-verified.
 - [x] Email and mobile OTP flags are false, the signup UI has no OTP controls, and both OTP
   endpoints fail closed with `otp_disabled`.
 - [x] Google, Facebook, and LINE real Preview login/session/logout flows pass.
@@ -100,6 +103,7 @@ Never place real values in Git, PR comments, terminal arguments, or test artifac
 - No Production deployment was created. The latest deployment remains Preview-only.
 
 **Release assessment: NO-GO.** Infrastructure and encrypted credentials are prepared, but the
-provider applications are not published/approved and real Production-hostname authentication
+  provider applications are not published/approved and real Production-hostname authentication
 smoke tests cannot be performed until those manual provider actions and an explicitly approved
-Production deployment are complete.
+Production deployment are complete. In addition, Production D1 migrations 0002–0007 are now
+confirmed pending; this supersedes the earlier no-pending-migrations statement.

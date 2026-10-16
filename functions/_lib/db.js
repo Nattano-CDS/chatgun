@@ -54,7 +54,7 @@ export async function getSession(request, db, timestamp = unixTime()) {
   return db.prepare(`
     SELECT s.token_hash, s.csrf_hash, s.user_id, s.expires_at,
            sae.authenticated_at,
-           u.email, u.display_name, u.avatar_url, u.status
+           u.email, u.display_name, u.avatar_url, u.status, u.account_state
     FROM sessions s
     JOIN users u ON u.id = s.user_id
     LEFT JOIN session_auth_evidence sae ON sae.token_hash = s.token_hash
@@ -149,10 +149,20 @@ export async function confirmAccountDeletion(
       )
     `).bind(requestId, operationId),
     db.prepare(`
+      INSERT OR IGNORE INTO media_deletion_queue(
+        object_key, operation_id, attempts, next_attempt_at, created_at
+      )
+      SELECT object_key, ?, 0, ?, ? FROM social_media
+      WHERE owner_user_id = (
+        SELECT user_id FROM account_deletion_requests
+        WHERE request_id = ? AND operation_id = ? AND status = 'processing'
+      ) AND state IN ('active', 'pending_deletion')
+    `).bind(operationId, timestamp, timestamp, requestId, operationId),
+    db.prepare(`
       INSERT INTO deletion_receipts(
         request_id, completed_at, policy_version, implementation_version, outcome, expires_at
       )
-      SELECT request_id, ?, 'technical-draft-v1', 'privacy-safety-v1', 'deleted', ?
+      SELECT request_id, ?, 'technical-draft-v1', 'near-migration-v1', 'deleted', ?
       FROM account_deletion_requests
       WHERE request_id = ? AND operation_id = ? AND status = 'processing'
     `).bind(timestamp, receiptExpiresAt, requestId, operationId),
@@ -164,7 +174,12 @@ export async function confirmAccountDeletion(
     `).bind(requestId, operationId),
   ]);
   if (Number(results[0]?.meta?.changes || 0) !== 1) return null;
-  return { requestId, completedAt: timestamp, receiptExpiresAt };
+  return {
+    requestId,
+    completedAt: timestamp,
+    receiptExpiresAt,
+    mediaDeletionPending: Number(results[5]?.meta?.changes || 0),
+  };
 }
 
 export async function requireCsrf(request, session) {
@@ -179,7 +194,7 @@ export async function findOrCreateIdentity(
   profile,
   linkUserId,
   timestamp = unixTime(),
-  { allowRegistration = true } = {},
+  { allowRegistration = true, allowInvitationRegistration = false, invitationId = null } = {},
 ) {
   const existing = await db.prepare(
     `SELECT i.user_id, u.status FROM identities i JOIN users u ON u.id = i.user_id
@@ -196,7 +211,8 @@ export async function findOrCreateIdentity(
     return existing.user_id;
   }
 
-  if (!linkUserId && !allowRegistration) throw new Error("registration_closed");
+  const invitedRegistration = !linkUserId && allowInvitationRegistration && Boolean(invitationId);
+  if (!linkUserId && !allowRegistration && !invitedRegistration) throw new Error("registration_closed");
 
   let userId = linkUserId || null;
   if (!userId && profile.email && profile.emailVerified) {
@@ -209,9 +225,70 @@ export async function findOrCreateIdentity(
   if (!userId) {
     userId = safeUuid();
     const safeEmail = profile.email && profile.emailVerified ? profile.email : null;
+    if (invitedRegistration) {
+      const claimNonce = safeUuid();
+      let results;
+      try {
+        results = await db.batch([
+        db.prepare(`
+          UPDATE beta_invitations
+          SET use_count = use_count + 1,
+              consumed_at = CASE WHEN use_count + 1 = max_uses THEN ? ELSE consumed_at END,
+              last_claim_nonce = ?
+          WHERE id = ? AND status = 'active' AND max_uses = 1
+            AND expires_at > ? AND use_count < max_uses
+        `).bind(timestamp, claimNonce, invitationId, timestamp),
+        db.prepare(`
+          INSERT INTO users(id, email, email_verified_at, display_name, avatar_url, status, account_state, created_at, updated_at)
+          SELECT ?, ?, ?, ?, ?, 'active', 'pending_acceptance', ?, ?
+          WHERE EXISTS (
+            SELECT 1 FROM beta_invitations WHERE id = ? AND last_claim_nonce = ?
+          )
+        `).bind(
+          userId,
+          safeEmail,
+          safeEmail ? timestamp : null,
+          profile.name || null,
+          profile.picture || null,
+          timestamp,
+          timestamp,
+          invitationId,
+          claimNonce,
+        ),
+        db.prepare(`
+          INSERT INTO identities(provider, subject, user_id, provider_email, email_verified, created_at, last_login_at)
+          SELECT ?, ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM users WHERE id = ?)
+        `).bind(
+          profile.provider,
+          profile.subject,
+          userId,
+          profile.email || null,
+          profile.emailVerified ? 1 : 0,
+          timestamp,
+          timestamp,
+          userId,
+        ),
+        db.prepare(`
+          INSERT INTO beta_enrollments(user_id, invitation_id, status, created_at)
+          SELECT ?, ?, 'pending_age', ? WHERE EXISTS (SELECT 1 FROM users WHERE id = ?)
+        `).bind(userId, invitationId, timestamp, userId),
+        ]);
+      } catch (error) {
+        // A concurrent callback for the same provider subject rolls this batch back.
+        // Trust only a winner that is already attached to an active account.
+        const winner = await db.prepare(`
+          SELECT i.user_id, u.status FROM identities i JOIN users u ON u.id = i.user_id
+          WHERE i.provider = ? AND i.subject = ?
+        `).bind(profile.provider, profile.subject).first();
+        if (!winner || winner.status !== "active") throw error;
+        return winner.user_id;
+      }
+      if (Number(results[0]?.meta?.changes || 0) !== 1) throw new Error("invitation_unavailable");
+      return userId;
+    }
     await db.prepare(`
-      INSERT INTO users(id, email, email_verified_at, display_name, avatar_url, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, 'active', ?, ?)
+      INSERT INTO users(id, email, email_verified_at, display_name, avatar_url, status, account_state, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, 'active', 'pending_acceptance', ?, ?)
     `).bind(
       userId,
       safeEmail,
@@ -260,8 +337,8 @@ export async function createVerifiedEmailUser(db, email, timestamp = unixTime())
   const userId = safeUuid();
   try {
     await db.prepare(`
-      INSERT INTO users(id, email, email_verified_at, status, created_at, updated_at)
-      VALUES (?, ?, ?, 'active', ?, ?)
+      INSERT INTO users(id, email, email_verified_at, status, account_state, created_at, updated_at)
+      VALUES (?, ?, ?, 'active', 'pending_acceptance', ?, ?)
     `).bind(userId, email, timestamp, timestamp, timestamp).run();
     return userId;
   } catch (error) {
