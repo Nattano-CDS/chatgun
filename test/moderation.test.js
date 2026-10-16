@@ -139,16 +139,16 @@ test("media quarantine hides pending objects and requires an audited safety-admi
   const object = await onRequest({ env: runtime, request: request("/api/social/moderation/media/quarantine-media", admin) });
   assert.equal(object.status, 200);
   const released = await onRequest({ env: runtime, request: request("/api/social/moderation/media", admin, {
-    method: "POST", body: { id: "quarantine-media", status: "released", reason: "ผ่านการตรวจสอบสำหรับการทดสอบ" },
+    method: "POST", body: { id: "quarantine-media", status: "released", category: "general", reason: "ผ่านการตรวจสอบสำหรับการทดสอบ", revision: 0 },
   }) });
   assert.equal(released.status, 200);
   assert.equal((await database.prepare("SELECT status FROM media_safety_reviews WHERE media_id='quarantine-media'").first()).status, "released");
   const visible = await onRequest({ env: runtime, request: request("/api/social/media/quarantine-media", ownerSession) });
   assert.equal(visible.status, 200);
   const duplicate = await onRequest({ env: runtime, request: request("/api/social/moderation/media", admin, {
-    method: "POST", body: { id: "quarantine-media", status: "rejected", reason: "ต้องไม่เขียนทับผลเดิม" },
+    method: "POST", body: { id: "quarantine-media", status: "rejected", category: "prohibited", reason: "ต้องไม่เขียนทับผลเดิม", revision: 0 },
   }) });
-  assert.equal(duplicate.status, 404);
+  assert.equal(duplicate.status, 409);
   const audits = await database.prepare("SELECT action FROM media_safety_audit_events ORDER BY created_at,action").all();
   assert.deepEqual(audits.results.map((row) => row.action).sort(), ["decision", "object_view", "queue_view"]);
   database.close();
