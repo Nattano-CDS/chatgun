@@ -51,6 +51,15 @@ test.beforeEach(async ({ page }) => {
   await mockSocialApi(page);
 });
 
+test("root is the authenticated discovery entry while welcome retains marketing", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/$/u);
+  await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();
+  await expect(page.locator("#people-grid .person-card")).toHaveCount(2);
+  await page.goto("/welcome");
+  await expect(page.getByRole("heading", { name: /เรื่องดี ๆ เริ่มต้นจาก/u })).toBeVisible();
+});
+
 test("desktop social shell preserves discovery, friends, chat, reviews, and profile without game", async ({ page }, testInfo) => {
   await page.goto("/app/");
   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();

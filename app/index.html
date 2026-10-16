@@ -15,11 +15,11 @@
       <a class="social-brand" href="/"><img src="/logo.svg" alt=""><span>ChatGun</span></a>
       <p class="brand-caption">เพื่อนใกล้คุณ</p>
       <nav id="primary-nav" aria-label="เมนูหลัก">
-        <button data-tab="near" class="active"><span aria-hidden="true">⌖</span><b>หาเพื่อน</b></button>
-        <button data-tab="friends"><span aria-hidden="true">♧</span><b>เพื่อน</b><em id="request-badge" hidden></em></button>
-        <button data-tab="chat"><span aria-hidden="true">◌</span><b>แชท</b><em id="message-badge" hidden></em></button>
-        <button data-tab="reviews"><span aria-hidden="true">☆</span><b>ความคิดเห็น</b></button>
-        <button data-tab="profile"><span aria-hidden="true">○</span><b>โปรไฟล์</b></button>
+        <button data-tab="near" class="active"><span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m16 8-2.7 5.3L8 16l2.7-5.3Z"/></svg></span><b>หาเพื่อน</b></button>
+        <button data-tab="friends"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><b>เพื่อน</b><em id="request-badge" hidden></em></button>
+        <button data-tab="chat"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/></svg></span><b>แชท</b><em id="message-badge" hidden></em></button>
+        <button data-tab="reviews"><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.2L5.8 21 7 14.2l-5-4.9 6.9-1Z"/></svg></span><b>ความคิดเห็น</b></button>
+        <button data-tab="profile"><span aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><b>โปรไฟล์</b></button>
       </nav>
       <div class="sidebar-bottom"><strong>ตำแหน่งเป็นส่วนตัว</strong><span>แสดงเฉพาะระยะโดยประมาณ</span></div>
     </aside>
@@ -49,8 +49,17 @@
 
       <section id="social-view" hidden>
         <header class="toolbar">
-          <a class="toolbar-brand" href="/"><img src="/logo.svg" alt=""><b>ChatGun</b></a>
-          <h1 id="page-title">หาเพื่อน</h1>
+          <div class="toolbar-context"><a class="toolbar-brand" href="/"><img src="/logo.svg" alt=""><b>ChatGun</b></a><h1 id="page-title">หาเพื่อน</h1></div>
+          <div class="discovery-controls">
+            <label class="search">⌕<input id="people-search" aria-label="ค้นหาชื่อหรือความสนใจ" placeholder="ค้นหาคนใกล้คุณ…"></label>
+            <button id="filter-toggle" class="filter-trigger" type="button" aria-label="เปิดตัวกรอง" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></button>
+            <div class="filter-row" aria-label="ตัวกรองการค้นหา">
+              <label><span>เพศ</span><select id="gender-filter" aria-label="เพศ"><option>ทั้งหมด</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option><option>ไม่ระบุ</option></select></label>
+              <label><span>ความสนใจ</span><input id="interest-filter" aria-label="ความสนใจ" placeholder="ทั้งหมด"></label>
+              <label><span>เพื่อน</span><select id="relationship-filter" aria-label="สถานะเพื่อน"><option value="all">ทั้งหมด</option><option value="friend">เพื่อน</option><option value="not-friend">ยังไม่เป็นเพื่อน</option></select></label>
+              <label><span>ระยะ</span><select id="radius-filter" aria-label="ระยะค้นหา"><option value="250">250 ม.</option><option value="1000">1 กม.</option><option value="5000" selected>5 กม.</option></select></label>
+            </div>
+          </div>
           <div class="toolbar-actions"><button id="refresh" class="icon-button" aria-label="รีเฟรช">↻</button><a class="icon-button" href="/account.html" aria-label="บัญชี">⚙</a></div>
         </header>
         <div id="demo-banner" class="demo-banner" hidden>โหมดสาธิต · ข้อมูลอยู่เฉพาะในเบราว์เซอร์นี้และไม่ส่งไปยัง D1</div>
@@ -61,11 +70,6 @@
             <div><strong>ค้นหาคนใกล้คุณ</strong><p>ตำแหน่งจริงไม่แสดงต่อสมาชิก และจะล้างเมื่อปิดการค้นหา</p></div>
             <button id="location-toggle" class="lime">เปิดตำแหน่ง</button>
           </section>
-          <div class="search-row">
-            <label class="search">⌕<input id="people-search" placeholder="ค้นหาชื่อหรือความสนใจ…"></label>
-            <label class="radius">ระยะ <select id="radius-filter"><option value="250">250 ม.</option><option value="1000">1 กม.</option><option value="5000" selected>5 กม.</option></select></label>
-          </div>
-          <div class="filter-row"><select id="gender-filter" aria-label="เพศ"><option>ทั้งหมด</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option><option>ไม่ระบุ</option></select><input id="interest-filter" placeholder="ความสนใจ"><select id="relationship-filter" aria-label="สถานะเพื่อน"><option value="all">ทั้งหมด</option><option value="friend">เพื่อน</option><option value="not-friend">ยังไม่เป็นเพื่อน</option></select></div>
           <div class="section-heading"><h2>คนใกล้คุณ <span id="people-count">0</span></h2></div>
           <div id="people-grid" class="people-grid"></div>
           <div class="rules"><div><b>♧</b><strong>เป็นเพื่อนก่อนแชท</strong><p>เริ่มคุยเมื่อทั้งสองคนยอมรับ</p></div><div><b>☆</b><strong>คะแนนจากคนใกล้ตัว</strong><p>คนละ 1 ครั้งต่อวัน ในระยะ 100 ม.</p></div><div><b>▣</b><strong>ความคิดเห็นส่วนตัว</strong><p>เจ้าของโปรไฟล์เท่านั้นที่อ่านได้</p></div></div>

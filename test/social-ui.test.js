@@ -10,6 +10,7 @@ const redirects = readFileSync("_redirects", "utf8");
 const moderationHtml = readFileSync("app/moderation.html", "utf8");
 const moderationScript = readFileSync("app/moderation.js", "utf8");
 const wrangler = readFileSync("wrangler.jsonc", "utf8");
+const welcome = readFileSync("welcome.html", "utf8");
 
 test("social UI exposes only the approved non-game navigation", () => {
   for (const tab of ["near", "friends", "chat", "reviews", "profile"]) {
@@ -18,6 +19,25 @@ test("social UI exposes only the approved non-game navigation", () => {
   assert.doesNotMatch(html, /data-tab="(?:game|estate|pet|garden|studio)"/u);
   assert.doesNotMatch(html, /Mobile OTP|Email OTP|เบอร์มือถือ|อีเมล/u);
   assert.match(html, /ChatGun/u);
+});
+
+test("root is the authenticated discovery entry and marketing moved to welcome", () => {
+  assert.match(redirects, /^\/ \/app\/ 200$/mu);
+  assert.match(welcome, /เรื่องดี ๆ เริ่มต้นจาก/u);
+  assert.match(headers, /^\/$[\s\S]*?Cache-Control: no-store/mu);
+});
+
+test("Phase 1 uses the canonical NEAR tokens, typography, navigation and portrait cards", () => {
+  assert.match(styles, /font-family: "Noto Sans Thai", Arial, Tahoma, sans-serif/u);
+  assert.match(styles, /--primary: #6d42e5/u);
+  assert.match(styles, /--lime: #d0f17b/u);
+  assert.match(styles, /\.app \.sidebar nav \{ display: grid; grid-template-columns: repeat\(5/u);
+  assert.match(styles, /\.app #people-grid \{ grid-template-columns: repeat\(3/u);
+  assert.match(styles, /\.app \.person-card\.context-near/u);
+  assert.match(styles, /linear-gradient\(180deg, rgba\(20,17,28/u);
+  assert.match(html, /id="filter-toggle"/u);
+  assert.match(script, /dataset\.activeTab/u);
+  assert.doesNotMatch(html, />เกม</u);
 });
 
 test("social client uses same-origin APIs, CSRF, escaped rendering, and fail-closed config", () => {

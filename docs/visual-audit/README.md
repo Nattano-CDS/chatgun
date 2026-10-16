@@ -14,6 +14,15 @@ node docs/visual-audit/capture-baseline.mjs
 
 The capture script uses browser request mocks only for authenticated ChatGun social and acceptance states. It does not write to D1 or R2. Public and NEAR pages are rendered normally.
 
+To capture only the Phase 1 ChatGun result from a local Pages server:
+
+```sh
+CHATGUN_URL=http://127.0.0.1:8791 \
+CHATGUN_OUTPUT=chatgun-phase1-after \
+SKIP_NEAR=1 PHASE1_ONLY=1 \
+node docs/visual-audit/capture-baseline.mjs
+```
+
 Expected CSS viewport widths are 390, 768, and 1440 pixels. PNG height varies because screenshots are full-page.
 
 ## Limitations

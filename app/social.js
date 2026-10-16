@@ -312,6 +312,7 @@ function portrait(person, distance = true) {
 function personCard(person, context = "near") {
   const relation = relationshipFor(person.user_id || person.other_user_id);
   const id = person.user_id || person.other_user_id;
+  const discovery = context === "near";
   let action = "";
   if (context === "request") {
     action = `<div class="card-actions"><button class="primary" data-action="accept" data-user="${escapeHtml(id)}">ยอมรับ</button><button class="secondary" data-action="reject" data-user="${escapeHtml(id)}">ปฏิเสธ</button></div>`;
@@ -320,11 +321,15 @@ function personCard(person, context = "near") {
   } else if (context === "friend") {
     action = state.config.messagingEnabled ? `<div class="card-actions"><button class="primary" data-action="chat" data-user="${escapeHtml(id)}">แชท</button></div>` : "";
   } else if (!relation && state.config.friendRequestsEnabled) {
-    action = `<div class="card-actions"><button class="primary" data-action="request" data-user="${escapeHtml(id)}">ขอเป็นเพื่อน</button></div>`;
+    action = discovery
+      ? `<div class="card-actions"><button class="primary discovery-action" data-action="request" data-user="${escapeHtml(id)}" aria-label="ขอเป็นเพื่อนกับ ${escapeHtml(person.name)}"><span aria-hidden="true">♧+</span><span class="action-label">ขอเป็นเพื่อน</span></button></div>`
+      : `<div class="card-actions"><button class="primary" data-action="request" data-user="${escapeHtml(id)}">ขอเป็นเพื่อน</button></div>`;
   } else if (relation?.status === "pending") {
-    action = `<div class="card-actions"><button class="secondary" disabled>ส่งคำขอแล้ว</button></div>`;
+    action = discovery
+      ? `<div class="card-actions"><button class="secondary discovery-action" disabled aria-label="ส่งคำขอเป็นเพื่อนแล้ว"><span aria-hidden="true">✓</span><span class="action-label">ส่งคำขอแล้ว</span></button></div>`
+      : `<div class="card-actions"><button class="secondary" disabled>ส่งคำขอแล้ว</button></div>`;
   }
-  return `<article class="person-card" data-person="${escapeHtml(id)}" tabindex="0">
+  return `<article class="person-card context-${escapeHtml(context)}" data-person="${escapeHtml(id)}" tabindex="0" aria-label="เปิดโปรไฟล์ ${escapeHtml(person.name)}">
     ${portrait(person)}
     <div class="person-info"><strong>${escapeHtml(person.name)}${person.identity_verified ? " <span title=\"ยืนยันตัวตนแล้ว\">✓</span>" : ""}</strong><p>${escapeHtml(person.bio || person.interests || "ยังไม่ได้แนะนำตัว")}</p><div class="person-meta"><span>${escapeHtml(person.gender || "ไม่ระบุ")}</span><span>${person.rating ? `★ ${Number(person.rating).toFixed(1)} (${Number(person.rating_count || 0)})` : ""}</span></div></div>${action}
   </article>`;
@@ -648,6 +653,9 @@ async function openChat(id) {
 
 function switchTab(tab) {
   state.activeTab = tab;
+  document.body.dataset.activeTab = tab;
+  $(".toolbar")?.classList.remove("filters-open");
+  $("#filter-toggle")?.setAttribute("aria-expanded", "false");
   const labels = { near: "หาเพื่อน", friends: "เพื่อน", chat: "แชท", reviews: "ความคิดเห็น", profile: "โปรไฟล์" };
   $$("#primary-nav button").forEach((button) => button.classList.toggle("active", button.dataset.tab === tab));
   $$(".tab-view").forEach((view) => { view.hidden = view.id !== `${tab}-tab`; });
@@ -656,6 +664,7 @@ function switchTab(tab) {
 
 async function initialize() {
   try {
+    document.body.dataset.activeTab = state.activeTab;
     state.config = await api("/api/social/config");
     if (!state.config.socialAppEnabled) {
       $("#global-status").textContent = "";
@@ -809,6 +818,10 @@ $("#verification-form").addEventListener("submit", async (event) => {
 });
 
 $("#location-toggle").addEventListener("click", updateLocation);
+$("#filter-toggle").addEventListener("click", () => {
+  const open = $(".toolbar").classList.toggle("filters-open");
+  $("#filter-toggle").setAttribute("aria-expanded", String(open));
+});
 $("#demo-start").addEventListener("click", () => startDemo().catch((error) => toast(error.message, true)));
 $("#refresh").addEventListener("click", async () => { try { await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked()]); toast("อัปเดตข้อมูลแล้ว"); } catch (error) { toast(error.message, true); } });
 [$("#people-search"), $("#radius-filter"), $("#gender-filter"), $("#interest-filter"), $("#relationship-filter")].forEach((input) => input.addEventListener("input", renderPeople));

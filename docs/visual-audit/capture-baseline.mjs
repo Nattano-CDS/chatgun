@@ -1,5 +1,5 @@
 import { chromium } from "@playwright/test";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const root = resolve("docs/visual-audit/screenshots");
@@ -11,9 +11,12 @@ const viewports = [
 
 const chatgun = process.env.CHATGUN_URL || "https://20ad10a1.chatgun.pages.dev";
 const near = process.env.NEAR_URL || "http://127.0.0.1:5173";
+const chatgunOutput = process.env.CHATGUN_OUTPUT || "chatgun";
+const skipNear = process.env.SKIP_NEAR === "1";
+const phase1Only = process.env.PHASE1_ONLY === "1";
 
 await mkdir(resolve(root, "near"), { recursive: true });
-await mkdir(resolve(root, "chatgun"), { recursive: true });
+await mkdir(resolve(root, chatgunOutput), { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
 
@@ -49,8 +52,8 @@ const socialResponses = {
   "/api/auth/me": { user: { id: "visual-me", displayName: "นัท" }, providers: ["google"], recentlyAuthenticated: true },
   "/api/social/profile": { profile: { user_id: "visual-me", name: "นัท", gender: "ไม่ระบุ", bio: "ชอบทำความรู้จักเพื่อนใหม่", interests: "กาแฟ, เทคโนโลยี", discovery_visible: 1 } },
   "/api/social/discovery": { locationFresh: true, people: [
-    { user_id: "near-1", name: "มิน", gender: "หญิง", bio: "ชอบคาเฟ่และถ่ายรูป", interests: "กาแฟ, ถ่ายรูป", distance: 82, rating: 4.8, rating_count: 12 },
-    { user_id: "near-2", name: "ต้น", gender: "ชาย", bio: "วิ่งและท่องเที่ยว", interests: "วิ่ง, ท่องเที่ยว", distance: 640, rating: 4.5, rating_count: 6 },
+    { user_id: "near-1", name: "มิน", gender: "หญิง", bio: "ชอบคาเฟ่และถ่ายรูป", interests: "กาแฟ, ถ่ายรูป", distance: 82, rating: 4.8, rating_count: 12, selected_photo_id: "visual-1" },
+    { user_id: "near-2", name: "ต้น", gender: "ชาย", bio: "วิ่งและท่องเที่ยว", interests: "วิ่ง, ท่องเที่ยว", distance: 640, rating: 4.5, rating_count: 6, selected_photo_id: "visual-2" },
   ] },
   "/api/social/relationships": { relationships: [
     { id: "r1", other_user_id: "friend-1", requested_by: "friend-1", status: "accepted", name: "พลอย", gender: "หญิง", bio: "เพื่อนใน ChatGun", last_message_at: 1790000100, last_message_body: "เจอกันที่คาเฟ่", last_message_sender_id: "visual-me", unread_count: 0 },
@@ -69,6 +72,11 @@ const socialResponses = {
 async function mockSocial(page) {
   await page.route("**/api/**", async (route) => {
     const path = new URL(route.request().url()).pathname;
+    const media = path.match(/^\/api\/social\/media\/(visual-[123])$/u)?.[1];
+    if (media) {
+      const number = media.slice(-1);
+      return route.fulfill({ status: 200, contentType: "image/png", body: await readFile(resolve("docs/visual-audit/fixtures", `portrait-${number}.png`)) });
+    }
     const body = socialResponses[path];
     await route.fulfill({
       status: body ? 200 : 404,
@@ -105,22 +113,25 @@ async function mockOnboarding(page) {
 }
 
 for (const [name, width, height] of viewports) {
-  await capture(`${near}/`, `near/home-${name}.png`, width, height);
-  await capture(`${near}/login`, `near/login-${name}.png`, width, height);
-  await capture(`${near}/register`, `near/register-${name}.png`, width, height);
-  await capture(`${chatgun}/`, `chatgun/home-${name}.png`, width, height);
-  await capture(`${chatgun}/signup.html`, `chatgun/signup-${name}.png`, width, height);
-  await capture(`${chatgun}/acceptance`, `chatgun/acceptance-${name}.png`, width, height, mockAcceptance);
-  await capture(`${chatgun}/app/`, `chatgun/social-${name}.png`, width, height, mockSocial);
-  await capture(`${chatgun}/app/?onboarding=1`, `chatgun/onboarding-${name}.png`, width, height, mockOnboarding);
-  await capture(`${chatgun}/app/people/near-1`, `chatgun/member-profile-${name}.png`, width, height, mockSocial);
+  if (!skipNear) {
+    await capture(`${near}/`, `near/home-${name}.png`, width, height);
+    await capture(`${near}/login`, `near/login-${name}.png`, width, height);
+    await capture(`${near}/register`, `near/register-${name}.png`, width, height);
+  }
+  await capture(`${chatgun}/`, `${chatgunOutput}/home-${name}.png`, width, height, mockSocial);
+  if (phase1Only) continue;
+  await capture(`${chatgun}/signup.html`, `${chatgunOutput}/signup-${name}.png`, width, height);
+  await capture(`${chatgun}/acceptance`, `${chatgunOutput}/acceptance-${name}.png`, width, height, mockAcceptance);
+  await capture(`${chatgun}/app/`, `${chatgunOutput}/social-${name}.png`, width, height, mockSocial);
+  await capture(`${chatgun}/app/?onboarding=1`, `${chatgunOutput}/onboarding-${name}.png`, width, height, mockOnboarding);
+  await capture(`${chatgun}/app/people/near-1`, `${chatgunOutput}/member-profile-${name}.png`, width, height, mockSocial);
   for (const tab of ["friends", "reviews", "profile"]) {
-    await capture(`${chatgun}/app/`, `chatgun/${tab}-${name}.png`, width, height, mockSocial, async (page) => {
+    await capture(`${chatgun}/app/`, `${chatgunOutput}/${tab}-${name}.png`, width, height, mockSocial, async (page) => {
       await page.locator(`#primary-nav button[data-tab="${tab}"]`).click();
       await page.waitForTimeout(150);
     });
   }
-  await capture(`${chatgun}/app/`, `chatgun/chat-${name}.png`, width, height, mockSocial, async (page) => {
+  await capture(`${chatgun}/app/`, `${chatgunOutput}/chat-${name}.png`, width, height, mockSocial, async (page) => {
     await page.locator('#primary-nav button[data-tab="chat"]').click();
     await page.getByRole("button", { name: /พลอย/u }).click();
     await page.waitForTimeout(150);
