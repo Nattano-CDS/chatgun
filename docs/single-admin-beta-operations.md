@@ -2,7 +2,10 @@
 
 Status: owner-review draft for the isolated controlled Beta. The owner has confirmed that they
 will be the Primary Administrator, Primary Content Moderator, and Primary Trust & Safety Decision
-Maker for Phase 1. This decision does not create 24/7 coverage, approve a real account for access,
+Maker for Phase 1. The approved staffed coverage is every day from **19:00–22:00
+Asia/Bangkok (UTC+7)**, totaling 21 scheduled hours per week. Reports remain available 24/7 and
+queue outside those hours. This decision does not create 24/7 monitoring, guarantee an immediate
+response, approve a real account for access,
 publish legal terms, or authorize Production deployment.
 
 ## Operating model and boundaries
@@ -61,23 +64,22 @@ The current schema has no dedicated severity column; severity is derived from no
 case status for display. Durable manual overrides, cross-case linkage, and non-media appeal records
 remain future work requiring a reviewed migration.
 
-## Proposed coverage for owner approval
+## Approved coverage
 
-Recommended Phase 1 proposal (not active until the owner checks and dates it):
+- The owner staffs moderation **every day from 19:00–22:00 Asia/Bangkok (UTC+7)**: three hours
+  per day and 21 scheduled hours per week.
+- User reporting remains available 24/7. Reports received outside coverage are stored in the same
+  audited queue and reviewed during the next staffed window, with Critical and High items first.
+- The service does not promise immediate acknowledgement or resolution outside—or within—the
+  staffed window and must not describe this schedule as 24/7 monitoring.
+- At 19:00 the owner checks Critical/High cases before routine queues. At 22:00 the owner records
+  unresolved risk and applies available containment; an open inbox after 22:00 is not monitored
+  coverage.
+- If the owner cannot staff the approved window, media remains quarantined and invitations or
+  affected real-time capabilities must be paused before the gap begins.
 
-- two staffed review blocks every Beta day, **09:00–11:00** and **19:00–21:00 Asia/Bangkok**;
-- owner checks Critical/High, pending uploads, reports, appeals, authentication failures, and
-  cleanup health at the start and end of each block;
-- participant notice states the exact approved blocks, that response is not immediate, and that
-  ChatGun is not an emergency service;
-- no guarantee is published for resolution time; and
-- if the owner cannot staff a block, media upload remains quarantined and real-time social
-  capabilities/invitations are paused before the gap begins.
+Remaining owner approval fields:
 
-Owner approval fields:
-
-- [ ] Accept or replace the proposed coverage blocks: ____________________
-- [ ] Confirm operating days and planned no-coverage periods: ____________________
 - [ ] Confirm the private alert channel used by Cloudflare/GitHub monitoring: ____________________
 - [ ] Confirm the participant-facing report/support channel: ____________________
 - [ ] Confirm the qualified legal/emergency escalation contact or keep real-user Beta blocked.
@@ -102,7 +104,7 @@ Owner approval fields:
 
 ## Daily checklist
 
-### Opening each coverage block
+### Opening coverage at 19:00
 
 - [ ] Reauthenticate; confirm the exact Staging hostname/account and case-specific purpose.
 - [ ] Read Critical/High counts, oldest open item, and rolling 24-hour intake/resolution.
@@ -118,7 +120,7 @@ Owner approval fields:
 - [ ] Disclose self-review conflict on appeals and queue later independent review when available.
 - [ ] Confirm every prohibited/rejected item is inaccessible before relying on asynchronous delete.
 
-### Closing each coverage block
+### Closing coverage at 22:00
 
 - [ ] Recheck Critical/High and oldest-open counts; explicitly escalate unresolved Critical cases.
 - [ ] Verify deletion queue has no exhausted retries and scheduled Worker is healthy.
@@ -167,7 +169,8 @@ is a monitoring checklist rather than a claim that paging exists.
 
 ### Release gate
 
-- [ ] Owner approves coverage, support channel, emergency/legal route, policies, and participant
+- [x] Owner approved daily staffed coverage of 19:00–22:00 Asia/Bangkok (21 hours/week).
+- [ ] Owner approves the support/alert channels, emergency/legal route, policies, and participant
   notice; qualified Thai legal review remains required.
 - [ ] Exact owner account is privately verified; time-bounded grants and revocation drill pass.
 - [ ] No unresolved Critical case; workload is within two daily blocks.
@@ -201,7 +204,7 @@ is a monitoring checklist rather than a claim that paging exists.
 ## Current assessment
 
 - **GO:** dashboard engineering, synthetic Staging drills, and owner review of this operating model.
-- **NO-GO:** real-user Beta or Production. The intended admin account, coverage/support channels,
+- **NO-GO:** real-user Beta or Production. The intended admin account, support/alert channels,
   emergency/legal route, independent appeal capacity, scanning/review plan, and legal approval are
-  not yet verified. Sensitive content and public registration remain disabled.
-
+  not yet verified. The coverage schedule is approved but is not 24/7 and has no guaranteed
+  immediate response. Sensitive content and public registration remain disabled.

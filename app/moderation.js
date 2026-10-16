@@ -162,6 +162,16 @@ function renderDaily(daily = {}, cleanup = {}) {
   if (Number(cleanup.exhausted || 0) > 0) section.append(node("p", `ต้องหยุดการเผยแพร่สื่อ: คิวลบล้มเหลวถาวร ${Number(cleanup.exhausted).toLocaleString("th-TH")} รายการ`, "error"));
 }
 
+function renderCoverage(coverage = {}) {
+  const section = $("#moderation-daily");
+  const state = coverage.isOpen ? "อยู่ในช่วงดูแล" : "อยู่นอกช่วงดูแล";
+  const detail = `ทุกวัน ${coverage.start || "19:00"}–${coverage.end || "22:00"} น. ${coverage.timezone || "Asia/Bangkok"} (${Number(coverage.weeklyHours || 21).toLocaleString("th-TH")} ชั่วโมง/สัปดาห์)`;
+  section.prepend(
+    node("p", `${state} · ${detail}`, `moderation-coverage ${coverage.isOpen ? "open" : "closed"}`),
+    node("p", coverage.isOpen ? "ตรวจงานวิกฤตและความรุนแรงสูงก่อน" : "ระบบยังรับรายงานตลอด 24 ชั่วโมงและจัดคิวไว้ แต่ไม่รับประกันการตอบกลับทันทีนอกช่วงดูแล", "moderation-coverage-note"),
+  );
+}
+
 function renderUserReports(reports) {
   const results = $("#moderation-results"); results.replaceChildren();
   if (!reports.length) return empty("ไม่มีรายงานผู้ใช้ที่รอดำเนินการ");
@@ -241,7 +251,7 @@ async function load(view = state.view) {
   $("#moderation-filters").hidden = !["pending", "approved", "sensitive", "rejected"].includes(view);
   $("#moderation-pagination").hidden = !["pending", "approved", "sensitive", "rejected", "audit"].includes(view);
   let payload;
-  if (view === "overview") { payload = await api("/api/social/moderation/overview"); renderStats(payload.counts); renderDaily(payload.daily, payload.cleanup); empty("เลือกงานด่วนหรือคิวด้านบนเพื่อเริ่มตรวจสอบ"); }
+  if (view === "overview") { payload = await api("/api/social/moderation/overview"); renderStats(payload.counts); renderDaily(payload.daily, payload.cleanup); renderCoverage(payload.coverage); empty("เลือกงานด่วนหรือคิวด้านบนเพื่อเริ่มตรวจสอบ"); }
   else if (view === "priority") {
     const [userReports, mediaReports, appeals, media] = await Promise.all([
       api("/api/social/moderation/reports?status=pending"), api("/api/social/moderation/media-reports?status=pending"),

@@ -101,8 +101,10 @@ synthetic staging data.
 1. Owner and qualified Thai legal review of Terms, Privacy, Data Deletion, Beta notice, adult
    eligibility/assurance, location processing, retention, and appeals is incomplete. Imported PR #4
    documents remain drafts and are not published as approved policies.
-2. Named moderation primary/backup, coverage hours, emergency escalation, appeal independence,
-   takedown intake, and access-review ownership are not confirmed.
+2. The owner is the confirmed moderation primary and daily 19:00–22:00 Asia/Bangkok coverage is
+   approved. The exact admin account, backup, emergency escalation, support/alert channels, appeal
+   independence, takedown intake, and access-review ownership remain unconfirmed. Reports queue
+   24/7, but immediate response is not guaranteed.
 3. No approved automated content-safety scanner or confirmed staffed pre-release review service
    exists. Quarantine must remain enabled and real-user uploads/social activation must remain gated.
 4. Provider Production publishing/approval and Production callback validation remain separate
@@ -126,7 +128,7 @@ synthetic staging data.
 
 The owner subsequently confirmed that they will be the Phase 1 primary administrator, moderator,
 and Trust & Safety decision maker. The release candidate now includes a single-operator urgent
-queue, workload/cleanup summary, operating model, coverage proposal, daily checklist, backup plan,
+queue, workload/cleanup summary, operating model, approved coverage display, daily checklist, backup plan,
 monitoring, and rollback gates. The implementation and deployed Staging evidence are recorded in
 `docs/single-admin-beta-operations.md` and `docs/single-admin-beta-validation.md`.
 

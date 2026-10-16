@@ -6,6 +6,14 @@ import { acceptanceFlowEnabled, currentAcceptance } from "../../_lib/acceptance.
 import { selfDeclaredAdult } from "../../_lib/age.js";
 
 const LOCATION_FRESH_SECONDS = 120;
+const MODERATION_COVERAGE = Object.freeze({
+  timezone: "Asia/Bangkok",
+  utcOffset: "+07:00",
+  start: "19:00",
+  end: "22:00",
+  days: "every_day",
+  weeklyHours: 21,
+});
 const ALLOWED_GENDERS = new Set([
   "ไม่ระบุ", "ชาย", "หญิง", "เกย์", "ทอม", "ดี้", "เลสเบี้ยน", "ไบเซ็กชวล", "นอนไบนารี", "อื่น ๆ",
 ]);
@@ -20,6 +28,24 @@ class SocialError extends Error {
 
 function enabled(value) {
   return String(value || "").trim().toLowerCase() === "true";
+}
+
+export function moderationCoverage(timestampMs = Date.now()) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: MODERATION_COVERAGE.timezone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(timestampMs));
+  const hour = Number(parts.find((part) => part.type === "hour")?.value);
+  const minute = Number(parts.find((part) => part.type === "minute")?.value);
+  const minutes = hour * 60 + minute;
+  return {
+    ...MODERATION_COVERAGE,
+    isOpen: minutes >= 19 * 60 && minutes < 22 * 60,
+    reportingAlwaysAvailable: true,
+    immediateResponseGuaranteed: false,
+  };
 }
 
 function capability(env, name) {
@@ -1186,6 +1212,7 @@ async function moderationOverview(request, env) {
   await auditMediaSafety(env.DB, session.user_id, "queue_view", "overview", purpose);
   return json({
     counts,
+    coverage: moderationCoverage(),
     daily: {
       newLast24Hours: Number(daily?.newLast24Hours || 0),
       resolvedLast24Hours: Number(daily?.resolvedLast24Hours || 0),

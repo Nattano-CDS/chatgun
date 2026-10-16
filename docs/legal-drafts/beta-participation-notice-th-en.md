@@ -60,6 +60,8 @@ deletion, subject to the approved notice about D1 Time Travel and backup limitat
 - Approved notice version: **[OWNER DECISION REQUIRED]**
 - Enabled Wave 1 features: **[OWNER DECISION REQUIRED]**
 - Participant report/support channel: **[OWNER DECISION REQUIRED]**
-- Coverage hours and escalation owner: **[OWNER DECISION REQUIRED]**
+- Coverage hours: **every day 19:00–22:00 Asia/Bangkok (UTC+7), 21 hours/week**. Reports may be
+  submitted 24/7 and queue outside coverage; immediate response is not guaranteed.
+- Escalation owner/qualified route: **[OWNER DECISION REQUIRED]**
 - Appeal channel/independent reviewer: **[OWNER DECISION REQUIRED]**
 - Effective date and acceptance record: **[OWNER/LEGAL DECISION REQUIRED]**

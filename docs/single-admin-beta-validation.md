@@ -18,7 +18,8 @@ registration, real-user invitations, Sensitive content, or a real Admin grant.
   object keys, provider subjects, or evidence.
 - Preserved recent-authentication, purpose logging, CSRF, least-privilege roles, private object
   access, decision revisions, quarantine, and audit controls.
-- Added the confirmed single-owner operating model, proposed coverage blocks, daily checklist,
+- Added the confirmed single-owner operating model, approved daily 19:00–22:00 Asia/Bangkok
+  coverage, 24/7 queued-report/no-immediate-response notice, daily checklist,
   severity/escalation matrix, emergency limits, backup onboarding/handover, monitoring, release
   gate, and rollback sequence in `single-admin-beta-operations.md`.
 
@@ -26,7 +27,7 @@ registration, real-user invitations, Sensitive content, or a real Admin grant.
 
 | Check | Result |
 | --- | --- |
-| Unit/integration/security | **77 passed, 0 failed, 0 skipped** |
+| Unit/integration/security | **78 passed, 0 failed, 0 skipped** |
 | Playwright desktop/mobile | **32 passed, 0 failed, 4 intentional duplicate-mutation skips** |
 | Focused local dashboard Playwright | **2 passed** across desktop and mobile before deployment |
 | Live overview endpoint | **200** with pending/general/Sensitive/rejected, user/media report, appeal, severity, rolling workload, oldest-open, and cleanup aggregates |
@@ -62,7 +63,7 @@ not occurred. Production keeps moderation disabled.
 
 - **GO:** synthetic Staging exercises and owner review of the single-admin operating model.
 - **NO-GO:** real-user controlled Beta or Production. Required owner actions are exact account
-  verification, approved coverage/support/alert channels, qualified emergency/legal path,
+  verification, approved support/alert channels, qualified emergency/legal path,
   independent appeal/backup arrangement, content-scanning or demonstrated manual-review capacity,
-  and qualified legal approval. Public registration and Sensitive content remain disabled.
-
+  and qualified legal approval. Coverage is approved, but is not 24/7 and carries no immediate
+  response guarantee. Public registration and Sensitive content remain disabled.

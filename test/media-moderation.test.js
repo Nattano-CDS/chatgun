@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { issueSession, unixTime } from "../functions/_lib/db.js";
-import { onRequest } from "../functions/api/social/[[path]].js";
+import { moderationCoverage, onRequest } from "../functions/api/social/[[path]].js";
 import { environment, TestD1 } from "./helpers/d1.js";
 
 class TestR2 {
@@ -42,6 +42,21 @@ async function seedMedia(database, media, owner, id = "media-1") {
   media.objects.set(key, new Uint8Array([1, 2, 3, 4]));
 }
 
+test("approved Bangkok moderation coverage opens exactly from 19:00 through 21:59", () => {
+  const before = moderationCoverage(Date.parse("2026-10-16T11:59:00Z"));
+  const opening = moderationCoverage(Date.parse("2026-10-16T12:00:00Z"));
+  const beforeClose = moderationCoverage(Date.parse("2026-10-16T14:59:00Z"));
+  const closed = moderationCoverage(Date.parse("2026-10-16T15:00:00Z"));
+  assert.equal(before.isOpen, false);
+  assert.equal(opening.isOpen, true);
+  assert.equal(beforeClose.isOpen, true);
+  assert.equal(closed.isOpen, false);
+  assert.deepEqual(
+    { timezone: opening.timezone, start: opening.start, end: opening.end, weeklyHours: opening.weeklyHours, reportingAlwaysAvailable: opening.reportingAlwaysAvailable, immediateResponseGuaranteed: opening.immediateResponseGuaranteed },
+    { timezone: "Asia/Bangkok", start: "19:00", end: "22:00", weeklyHours: 21, reportingAlwaysAvailable: true, immediateResponseGuaranteed: false },
+  );
+});
+
 test("single-operator overview prioritizes urgent queues and exposes aggregate workload health", async () => {
   const database = new TestD1(); const media = new TestR2();
   const admin = await member(database, "overview-admin");
@@ -78,6 +93,12 @@ test("single-operator overview prioritizes urgent queues and exposes aggregate w
   assert.equal(payload.daily.newLast24Hours, 4);
   assert.equal(payload.cleanup.pending, 1);
   assert.equal(payload.cleanup.exhausted, 1);
+  assert.equal(payload.coverage.timezone, "Asia/Bangkok");
+  assert.equal(payload.coverage.start, "19:00");
+  assert.equal(payload.coverage.end, "22:00");
+  assert.equal(payload.coverage.weeklyHours, 21);
+  assert.equal(payload.coverage.reportingAlwaysAvailable, true);
+  assert.equal(payload.coverage.immediateResponseGuaranteed, false);
   assert.ok(payload.daily.oldestOpenAt <= now - 180);
   assert.equal((await database.prepare("SELECT COUNT(*) count FROM media_safety_audit_events WHERE action='queue_view'").first()).count, 1);
   database.close();

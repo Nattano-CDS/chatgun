@@ -11,6 +11,7 @@ test.beforeEach(async ({ page }) => {
     if (url.pathname === "/api/social/moderation/overview") {
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
         counts: { pending: 1, general: 8, sensitive: 2, rejected: 3, reports: 2, userReports: 1, mediaReports: 1, appeals: 1, critical: 1, high: 1 },
+        coverage: { timezone: "Asia/Bangkok", start: "19:00", end: "22:00", days: "every_day", weeklyHours: 21, isOpen: false, reportingAlwaysAvailable: true, immediateResponseGuaranteed: false },
         daily: { newLast24Hours: 4, resolvedLast24Hours: 2, oldestOpenAt: 1_790_000_000 },
         cleanup: { pending: 1, exhausted: 0 },
       }) });
@@ -53,6 +54,8 @@ test("admin media dashboard requires purpose, renders safely, and records a clas
   await expect(page.locator("#moderation-stats")).toContainText("รายงานผู้ใช้");
   await expect(page.locator("#moderation-stats")).toContainText("สื่อรอตรวจ");
   await expect(page.getByText("สรุปภาระงานย้อนหลัง 24 ชั่วโมง")).toBeVisible();
+  await expect(page.getByText(/ทุกวัน 19:00–22:00 น. Asia\/Bangkok/)).toBeVisible();
+  await expect(page.getByText(/ระบบยังรับรายงานตลอด 24 ชั่วโมง/)).toBeVisible();
   await expect(page.getByText("รายการเข้าใหม่")).toBeVisible();
   await page.getByRole("button", { name: "งานด่วน" }).click();
   await expect(page.locator("#moderation-results .moderation-card").first()).toContainText("รายงานสื่อ");

@@ -15,8 +15,9 @@ Scope: ChatGun Preview, `chatgun-auth-staging`, and `chatgun-media-staging` only
   live Pages/D1/R2 workflows persisted correctly, negative authorization paths failed
   closed, and all generated media/content residue was removed.
 - **Real-user invitation-only Beta: NO-GO.** Real Google, Facebook, and LINE browser E2E now
-  passes on the stable Preview. The operator has not confirmed named moderation coverage,
-  escalation ownership/hours, approved age-assurance
+  passes on the stable Preview. The owner is the named moderation primary and has approved daily
+  19:00–22:00 Asia/Bangkok coverage. The exact admin account, backup, escalation ownership,
+  support/alert channels, approved age-assurance
   treatment, location/media notices, scanning/review capacity, appeal handling, or the Beta
   participation notice.
 - **Production: NO-GO.** No Production deployment, migration, data access, or feature
@@ -146,8 +147,9 @@ Screenshots are local ignored test artifacts and contain only synthetic UI data:
   residual movement/collusion inference risk.
 - [ ] Select and validate a media malware/content-safety scanner, or approve a documented
   staffed quarantine-review alternative; do not allow unreviewed real-user uploads.
-- [ ] Name a trained moderation primary and backup and provision least-privilege roles.
-- [ ] Define coverage hours, response targets, emergency/NCII/threat escalation contacts,
+- [x] Owner is the moderation primary and approved daily 19:00–22:00 Asia/Bangkok coverage.
+- [ ] Name a trained backup and provision verified least-privilege roles to exact accounts.
+- [ ] Define support/alert channels, emergency/NCII/threat escalation contacts,
   reviewer wellbeing, and out-of-coverage shutdown criteria.
 - [ ] Rehearse report intake, preservation minimization, decisions, notices, appeals, audit
   review, abuse of moderator access, and urgent law-enforcement requests.
@@ -166,8 +168,8 @@ Screenshots are local ignored test artifacts and contain only synthetic UI data:
 
 1. Provider publishing/approval status and production callback readiness.
 2. Owner/legal approval of adult assurance, location, legal notices, retention, and appeals.
-3. Named moderation primary/backup, coverage hours, escalation contacts, access provisioning,
-   and rehearsed procedures.
+3. Exact admin account, backup moderator, escalation/support contacts, access provisioning, and
+   rehearsed procedures. Reports queue 24/7, without a guaranteed immediate response.
 4. Production-grade media scanning or an approved staffed review path; Preview bypass is
    synthetic-only.
 5. PR #3/#5 dependency completion and the documented conflict-free rebase sequence.

@@ -35,8 +35,12 @@ where marked; this checklist is not legal advice.
 
 ## Moderation staffing and escalation
 
-- [ ] Name an intake primary and backup using individual accounts; record coverage hours and
-  absence handoff.
+- [x] Owner is the intake primary; staffed coverage is every day 19:00–22:00 Asia/Bangkok
+  (21 hours/week). Reporting remains available 24/7 and queues outside coverage.
+- [ ] Name a backup moderator using an individual account and document absence handoff. No backup
+  is currently assigned.
+- [ ] Approve participant-facing wording that there is no 24/7 monitoring or guaranteed immediate
+  response, plus the report/support and restricted alert channels.
 - [ ] Name the safety escalation owner and technical privacy/security owner, with reachable
   channels during the approved coverage period.
 - [ ] Assign least-privilege roles (`report_reviewer`, `safety_admin`, and, only if later needed,

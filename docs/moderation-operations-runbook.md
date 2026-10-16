@@ -1,8 +1,10 @@
 # Moderation operating procedures
 
 Draft updated for the confirmed Phase 1 model in which the owner is the single primary
-administrator, moderator, and Trust & Safety decision maker. The exact account, access grant,
-coverage, training evidence, alert/support channel, emergency/legal route, and backup remain
+administrator, moderator, and Trust & Safety decision maker. Staffed coverage is approved for
+every day from 19:00–22:00 Asia/Bangkok (21 hours/week). Reporting remains available 24/7 and
+queues outside coverage, without an immediate-response guarantee. The exact account, access
+grant, training evidence, alert/support channel, emergency/legal route, and backup remain
 unverified; real-user activation therefore remains blocked. See
 `single-admin-beta-operations.md` for the daily procedure and owner-approval fields.
 
@@ -26,7 +28,7 @@ technical capability must remain disabled until named people are assigned the ro
 
 | Duty | Minimum assignment before real Beta |
 | --- | --- |
-| Intake/reports | Named primary and backup; published coverage hours |
+| Intake/reports | Owner primary; daily 19:00–22:00 coverage; backup unresolved; reports queue 24/7 |
 | High-risk escalation | Named safety owner with a reachable escalation channel |
 | Media review | Trained `safety_admin`; no reviewer may use a shared account |
 | Privacy/security incident | Named technical owner for location, access, and deletion failures |
@@ -101,14 +103,16 @@ features to claim in participant notices.
 
 ## Shift opening and closing
 
-At coverage start, the assigned reviewer confirms access, reads pending and escalated counts,
-checks deletion/quarantine alerts, and records the handoff. At coverage end, they hand every
-open high-risk case to a named person; if no qualified handoff exists, pause invitations and
-contact features. Never leave a high-risk case assigned to an unmonitored shared inbox.
+At 19:00 Asia/Bangkok, the owner confirms access, reads Critical/High and escalated counts,
+checks deletion/quarantine alerts, and records the opening check. At 22:00, they record every
+open high-risk case and apply available containment; if no qualified handoff exists, pause
+invitations and affected contact features. Never leave a high-risk case assigned to an
+unmonitored shared inbox.
 
-The owner must set coverage hours, acknowledgement targets, escalation contacts, and the
-participant-facing support channel. Do not publish numerical response targets until staffing
-has demonstrated them.
+The coverage hours are approved. The owner must still set escalation contacts and the
+participant-facing support/alert channels. Outside coverage, incoming reports remain queued;
+there is no guaranteed immediate response. Do not publish numerical response targets until
+staffing has demonstrated them.
 
 Use this handover record without copying evidence: open case ID, severity, current protection,
 next required action, owner, approved deadline (if any), deletion/appeal state, and confirmation

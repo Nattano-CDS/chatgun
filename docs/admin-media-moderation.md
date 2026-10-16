@@ -87,8 +87,10 @@ counts, and keep media delivery disabled until rollback and reviewer drills pass
 
 - No approved independent age-assurance provider or documented manual age-review procedure.
 - The owner is confirmed as the Phase 1 primary administrator/moderator/safety decision maker, but
-  the exact ChatGun account, coverage hours, support/alert channel, emergency/legal escalation,
-  independent appeal capacity, and backup are not yet verified. The proposed operating model is in
+  the exact ChatGun account, support/alert channel, emergency/legal escalation, independent appeal
+  capacity, and backup are not yet verified. Coverage is approved every day from 19:00–22:00
+  Asia/Bangkok (21 hours/week); reporting queues 24/7 with no immediate-response guarantee. The
+  operating model is in
   `single-admin-beta-operations.md`.
 - No content-safety scanner/vendor. Human review is the only implemented release path and must not
   be represented as automated detection.

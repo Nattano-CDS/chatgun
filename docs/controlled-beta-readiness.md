@@ -43,7 +43,13 @@ Do not share codes in tickets, chat logs, analytics, URLs, screenshots, or sourc
 
 ## Operator launch gates
 
-Before inviting any real participant, the owner must name at least one trained safety reviewer and one escalation owner, define coverage hours and participant support channel, approve the Beta notice/consent wording, confirm lawful age-assurance handling with qualified Thai counsel, and rehearse report, threat, NCII, account-deletion, and lost-access cases. Disable invitations immediately if review coverage is unavailable.
+The owner is the primary reviewer and has approved daily coverage from 19:00–22:00
+Asia/Bangkok (21 hours/week). Reporting remains open 24/7 and queues outside those hours; there is
+no 24/7 monitoring or guaranteed immediate response. Before inviting any real participant, the
+exact owner account and least-privilege grants, participant support/alert channels, emergency/legal
+route, backup/independent appeal arrangement, Beta notice, and lawful age-assurance handling still
+require approval or verification. Rehearse report, threat, NCII, account-deletion, and lost-access
+cases, and disable invitations immediately if the approved coverage cannot be staffed.
 
 Media remains synthetic-only until a scanner/vendor decision, human review path, appeal path, and deletion SLA are approved. Location discovery should initially use synthetic accounts; real participants require explicit location-risk notice and abuse monitoring. The 250 m bands reduce disclosure but do not eliminate collusion or movement-based inference.
 
@@ -58,7 +64,7 @@ from a successful test run.
 | Google/Facebook/LINE login, logout, account linking | Enabled | Dedicated Preview credentials and callbacks already pass; keep public registration off |
 | One-use invitations and adult onboarding | Disabled until approval | Owner plus qualified Thai legal review of 18+ threshold, self-declaration wording, correction, and evasion handling |
 | Own profile create/edit | Wave 1 candidate | Approved Beta notice; no public discovery; privacy-first defaults |
-| Blocking and report submission | Required before any member interaction | Named intake primary/backup, coverage, escalation owner, tested queue access, and participant contact channel |
+| Blocking and report submission | Required before any member interaction | Owner primary and approved coverage; backup, escalation owner, tested queue access, and participant contact channel remain required |
 | Friend requests/list | Wave 2 candidate | Report operations staffed and rehearsed; requests restricted to the invited cohort |
 | Text messaging and notifications | Disabled initially | Staffed harassment/threat response, retention decision, escalation drill, and appeals process |
 | Nearby discovery/location | Disabled initially | Approved location notice/lawful basis, field threat model, multi-account probing response, and rollback rehearsal |
@@ -93,7 +99,7 @@ These values are a proposed configuration record, not authorization to change Cl
 1. **Gate 0 — configuration rehearsal:** keep invitations at zero; select the isolated Beta
    hostname/configuration; verify ChatGun account, `DB -> chatgun-auth-staging`, private R2
    state, encrypted Preview secrets, migrations, flags, and zero synthetic residue. Run the
-   report/threat/NCII/deletion/lost-access tabletop with the named primary and backup.
+   report/threat/NCII/deletion/lost-access tabletop with the owner; repeat with a backup when one is assigned.
 2. **Wave 1 — account and profile only:** after owner/legal approval, enable one-use invitations,
    adult onboarding, own-profile editing, block, and report intake. Keep discovery, location,
    friend requests, messaging, ratings, and all uploads off. The owner must set the cohort size
