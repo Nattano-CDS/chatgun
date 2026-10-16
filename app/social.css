@@ -107,9 +107,17 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .conversation-list { border-right: 1px solid var(--line); padding: 10px; }
 .conversation { width: 100%; display: flex; gap: 11px; align-items: center; padding: 12px; border: 0; border-radius: 14px; background: transparent; text-align: left; }
 .conversation:hover, .conversation.active { background: var(--primary-soft); }
+.conversation-copy { min-width: 0; flex: 1; }
+.conversation-copy > span { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.conversation-copy time { color: var(--muted); font-size: 10px; white-space: nowrap; }
+.conversation-copy small { display: block; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+.inbox-unread { min-width: 22px; height: 22px; display: grid; place-items: center; border-radius: 999px; color: #fff; background: var(--primary); font-size: 11px; }
 .avatar { width: 42px; height: 42px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; color: var(--primary); background: #e9e3fa; font-weight: 800; }
 .thread { display: flex; flex-direction: column; min-width: 0; }
 .thread-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.chat-safety { padding: 9px 18px; border-bottom: 1px solid #eadfb3; color: #5f4a00; background: #fff9df; font-size: 12px; }
+.chat-safety summary { cursor: pointer; font-weight: 800; }
+.chat-safety p { margin: 7px 0 0; line-height: 1.5; }
 .messages { flex: 1; display: flex; flex-direction: column-reverse; gap: 8px; padding: 18px; overflow-y: auto; }
 .message { max-width: 75%; align-self: flex-start; padding: 10px 13px; border-radius: 15px 15px 15px 4px; background: #f0eff3; }
 .message.mine { align-self: flex-end; color: #fff; background: var(--primary); border-radius: 15px 15px 4px 15px; }

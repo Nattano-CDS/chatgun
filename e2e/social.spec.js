@@ -19,6 +19,12 @@ const config = {
 async function mockSocialApi(page) {
   await page.route("**/api/**", async (route) => {
     const url = new URL(route.request().url());
+    if (url.pathname === "/api/social/messages") {
+      const body = route.request().method() === "GET" ? { messages: [
+        { id: "message-1", sender_user_id: "friend-1", receiver_user_id: "me", body: "สวัสดี ยินดีที่ได้รู้จัก", media_id: null, unsent_at: null, read_at: null, created_at: 1_790_000_100 },
+      ], hasMore: false } : { ok: true };
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
+    }
     const responses = {
       "/api/social/config": config,
       "/api/auth/me": { user: { id: "me", displayName: "นัท" }, providers: ["google"], recentlyAuthenticated: true },
@@ -28,7 +34,7 @@ async function mockSocialApi(page) {
         { user_id: "near-2", name: "ต้น", gender: "ชาย", bio: "วิ่งและท่องเที่ยว", interests: "วิ่ง, ท่องเที่ยว", distance: 640, rating: 4.5, rating_count: 6 },
       ] },
       "/api/social/relationships": { relationships: [
-        { id: "r1", other_user_id: "friend-1", requested_by: "friend-1", status: "accepted", name: "พลอย", gender: "หญิง", bio: "เพื่อนใน ChatGun" },
+        { id: "r1", other_user_id: "friend-1", requested_by: "friend-1", status: "accepted", name: "พลอย", gender: "หญิง", bio: "เพื่อนใน ChatGun", last_message_at: 1_790_000_100, last_message_body: "เจอกันที่คาเฟ่", last_message_sender_id: "me", unread_count: 0 },
       ] },
       "/api/social/ratings": { ratings: [{ id: "v1", score: 5, comment: "สุภาพและเป็นมิตร", sender_name: "พลอย", created_at: 1_790_000_000 }] },
       "/api/social/blocks": { blocked: [] },
@@ -53,6 +59,11 @@ test("desktop social shell preserves discovery, friends, chat, reviews, and prof
   await expect(page.locator("#friends-grid").getByText("พลอย")).toBeVisible();
   await page.locator('#primary-nav button[data-tab="reviews"]').click();
   await expect(page.locator("#reviews-list").getByText("สุภาพและเป็นมิตร")).toBeVisible();
+  await page.locator('#primary-nav button[data-tab="chat"]').click();
+  await expect(page.locator("#conversation-list").getByText("คุณ: เจอกันที่คาเฟ่")).toBeVisible();
+  await page.getByRole("button", { name: /พลอย/u }).click();
+  await expect(page.getByText("ระวังการหลอกโอนเงินและขอข้อมูลส่วนตัว")).toBeVisible();
+  await expect(page.getByText("สวัสดี ยินดีที่ได้รู้จัก")).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("social-desktop.png"), fullPage: true });
 });
 
@@ -72,6 +83,18 @@ test("disabled social environment reveals no member features", async ({ page }) 
   await page.goto("/app/");
   await expect(page.getByRole("heading", { name: "ChatGun Social ยังไม่เปิดใช้งาน" })).toBeVisible();
   await expect(page.locator("#social-view")).toBeHidden();
+});
+
+test("member profile routes are deep-linkable and preserve browser history", async ({ page }) => {
+  await page.goto("/app/people/near-1");
+  await expect(page).toHaveURL(/\/app\/people\/near-1$/u);
+  await expect(page.locator("#profile-dialog")).toBeVisible();
+  await expect(page.locator("#profile-dialog").getByRole("heading", { name: "มิน" })).toBeVisible();
+  await page.locator("#profile-dialog .dialog-close").click();
+  await expect(page).toHaveURL(/\/app\/$/u);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/app\/people\/near-1$/u);
+  await expect(page.locator("#profile-dialog")).toBeVisible();
 });
 
 test("optional demo remains browser-only and contains no game", async ({ page }) => {

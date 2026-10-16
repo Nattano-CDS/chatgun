@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>ChatGun · เพื่อนใกล้คุณ</title>
   <meta name="description" content="ค้นหาเพื่อนใกล้เคียง แชทเมื่อเป็นเพื่อนกัน และส่งความคิดเห็นส่วนตัว">
-  <link rel="icon" href="../favicon.svg">
-  <link rel="stylesheet" href="./social.css">
-  <script defer src="./social.js"></script>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/app/social.css">
+  <script defer src="/app/social.js"></script>
 </head>
 <body>
   <div id="app" class="app" aria-busy="true">
     <aside class="sidebar">
-      <a class="social-brand" href="/"><img src="../logo.svg" alt=""><span>ChatGun</span></a>
+      <a class="social-brand" href="/"><img src="/logo.svg" alt=""><span>ChatGun</span></a>
       <p class="brand-caption">เพื่อนใกล้คุณ</p>
       <nav id="primary-nav" aria-label="เมนูหลัก">
         <button data-tab="near" class="active"><span aria-hidden="true">⌖</span><b>หาเพื่อน</b></button>
@@ -28,15 +28,15 @@
       <div id="global-status" class="status" role="status" aria-live="polite">กำลังโหลด ChatGun…</div>
 
       <section id="disabled-view" class="empty" hidden>
-        <img src="../logo.svg" alt="" width="72">
+        <img src="/logo.svg" alt="" width="72">
         <h1>ChatGun Social ยังไม่เปิดใช้งาน</h1>
         <p>ระบบอยู่ระหว่างการทดสอบในสภาพแวดล้อม Preview ที่แยกจาก Production</p>
         <button id="demo-start" class="secondary" type="button" hidden>ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์</button>
-        <a class="primary" href="../account.html">กลับไปบัญชี</a>
+        <a class="primary" href="/account.html">กลับไปบัญชี</a>
       </section>
 
       <section id="onboarding-view" class="onboarding panel" hidden>
-        <div class="section-heading"><div><small>สมาชิกใหม่</small><h1>สร้างโปรไฟล์ ChatGun</h1></div><img src="../logo.svg" alt="" width="64"></div>
+        <div class="section-heading"><div><small>สมาชิกใหม่</small><h1>สร้างโปรไฟล์ ChatGun</h1></div><img src="/logo.svg" alt="" width="64"></div>
         <p>โปรดยืนยันว่าคุณมีอายุ 18 ปีขึ้นไปก่อนสร้างโปรไฟล์ ข้อมูลนี้เป็นการยืนยันด้วยตนเองและไม่แสดงต่อสมาชิกอื่น</p>
         <form id="onboarding-form" class="form-grid">
           <label>ชื่อที่แสดง<input name="name" maxlength="50" required autocomplete="nickname"></label>
@@ -50,9 +50,9 @@
 
       <section id="social-view" hidden>
         <header class="toolbar">
-          <a class="toolbar-brand" href="/"><img src="../logo.svg" alt=""><b>ChatGun</b></a>
+          <a class="toolbar-brand" href="/"><img src="/logo.svg" alt=""><b>ChatGun</b></a>
           <h1 id="page-title">หาเพื่อน</h1>
-          <div class="toolbar-actions"><button id="refresh" class="icon-button" aria-label="รีเฟรช">↻</button><a class="icon-button" href="../account.html" aria-label="บัญชี">⚙</a></div>
+          <div class="toolbar-actions"><button id="refresh" class="icon-button" aria-label="รีเฟรช">↻</button><a class="icon-button" href="/account.html" aria-label="บัญชี">⚙</a></div>
         </header>
         <div id="demo-banner" class="demo-banner" hidden>โหมดสาธิต · ข้อมูลอยู่เฉพาะในเบราว์เซอร์นี้และไม่ส่งไปยัง D1</div>
 
@@ -87,7 +87,7 @@
             <label>เพศ<select name="gender"><option>ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option></select></label>
             <label class="wide">เกี่ยวกับคุณ<textarea name="bio" maxlength="250"></textarea></label>
             <label class="wide">ความสนใจ<input name="interests" maxlength="100"></label>
-            <button class="primary" type="submit">บันทึกโปรไฟล์</button><button id="hide-discovery" class="secondary" type="button">ปิดการหาเพื่อนและลบตำแหน่ง</button>
+            <button class="primary" type="submit">บันทึกโปรไฟล์</button><button id="view-own-profile" class="secondary" type="button">ดูโปรไฟล์และแกลเลอรี</button><button id="hide-discovery" class="secondary" type="button">ปิดการหาเพื่อนและลบตำแหน่ง</button>
             <button id="notification-toggle" class="secondary wide" type="button">เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้</button>
           </form>
           <section class="panel gallery-panel">

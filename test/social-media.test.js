@@ -139,3 +139,44 @@ test("chat images require friendship, remain private, and retain only five activ
   assert.equal(denied.status, 404);
   database.close();
 });
+
+test("received chat images can be reused only while an accepted unblocked relationship grants access", async () => {
+  const database = new TestD1();
+  const media = new TestR2();
+  const runtime = { ...env(database, media), MESSAGING_ENABLED: "true" };
+  const owner = await member(database, "reuse-owner", "เจ้าของรูป");
+  const recipient = await member(database, "reuse-recipient", "ผู้รับรูป");
+  const nextFriend = await member(database, "reuse-friend", "เพื่อนอีกคน");
+  const outsider = await member(database, "reuse-outsider", "บุคคลอื่น");
+  await database.prepare(`INSERT INTO social_relationships(id,user_low,user_high,requested_by,status,created_at,updated_at) VALUES ('reuse-original','reuse-owner','reuse-recipient','reuse-owner','accepted',1,1)`).run();
+  await database.prepare(`INSERT INTO social_relationships(id,user_low,user_high,requested_by,status,created_at,updated_at) VALUES ('reuse-next','reuse-friend','reuse-recipient','reuse-recipient','accepted',1,1)`).run();
+  const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
+  const form = new FormData();
+  form.set("target", "reuse-recipient");
+  form.set("file", new File([png], "shared.png", { type: "image/png" }));
+  const upload = await onRequest({ env: runtime, request: new Request("https://chatgun.pages.dev/api/social/messages", { method: "POST", headers: authHeaders(owner), body: form }) });
+  assert.equal(upload.status, 201);
+  const asset = await database.prepare("SELECT id FROM social_media WHERE owner_user_id='reuse-owner'").first();
+
+  const library = await onRequest({ env: runtime, request: new Request("https://chatgun.pages.dev/api/social/chat-assets", { headers: { cookie: authHeaders(recipient).cookie } }) });
+  assert.deepEqual((await library.json()).assets.map((item) => item.id), [asset.id]);
+  const privateRead = await onRequest({ env: runtime, request: new Request(`https://chatgun.pages.dev/api/social/chat/media/${asset.id}`, { headers: { cookie: authHeaders(recipient).cookie } }) });
+  assert.equal(privateRead.status, 200);
+
+  await database.prepare("DELETE FROM social_relationships WHERE id='reuse-original'").run();
+  const revokedLibrary = await onRequest({ env: runtime, request: new Request("https://chatgun.pages.dev/api/social/chat-assets", { headers: { cookie: authHeaders(recipient).cookie } }) });
+  assert.deepEqual((await revokedLibrary.json()).assets, []);
+  const revokedReuse = await jsonCall(runtime, "/api/social/messages", recipient, { action: "send", target: "reuse-friend", mediaId: asset.id, body: "" });
+  assert.equal(revokedReuse.status, 404);
+  const ownerLibrary = await onRequest({ env: runtime, request: new Request("https://chatgun.pages.dev/api/social/chat-assets", { headers: { cookie: authHeaders(owner).cookie } }) });
+  assert.deepEqual((await ownerLibrary.json()).assets.map((item) => item.id), [asset.id]);
+
+  await database.prepare(`INSERT INTO social_relationships(id,user_low,user_high,requested_by,status,created_at,updated_at) VALUES ('reuse-restored','reuse-owner','reuse-recipient','reuse-owner','accepted',2,2)`).run();
+  const forwarded = await jsonCall(runtime, "/api/social/messages", recipient, { action: "send", target: "reuse-friend", mediaId: asset.id, body: "" });
+  assert.equal(forwarded.status, 200);
+  const forwardedRead = await onRequest({ env: runtime, request: new Request(`https://chatgun.pages.dev/api/social/chat/media/${asset.id}`, { headers: { cookie: authHeaders(nextFriend).cookie } }) });
+  assert.equal(forwardedRead.status, 200);
+  const denied = await onRequest({ env: runtime, request: new Request(`https://chatgun.pages.dev/api/social/chat/media/${asset.id}`, { headers: { cookie: authHeaders(outsider).cookie } }) });
+  assert.equal(denied.status, 404);
+  database.close();
+});

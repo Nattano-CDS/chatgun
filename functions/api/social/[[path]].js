@@ -335,11 +335,27 @@ async function relationships(request, env) {
       SELECT r.id, r.user_low, r.user_high, r.requested_by, r.status, r.created_at, r.updated_at,
              p.user_id other_user_id, p.name, p.gender, p.bio, p.interests, p.selected_photo_id
              ,EXISTS(SELECT 1 FROM identity_verification_requests v WHERE v.user_id = p.user_id AND v.status = 'approved') identity_verified
-             ,(SELECT COUNT(*) FROM social_messages m WHERE m.sender_user_id = p.user_id
+             ,(SELECT COUNT(*) FROM social_messages m WHERE r.status = 'accepted' AND m.sender_user_id = p.user_id
                 AND m.receiver_user_id = ? AND m.read_at IS NULL AND m.unsent_at IS NULL) unread_count
-             ,(SELECT MAX(m.created_at) FROM social_messages m WHERE
+             ,(SELECT MAX(m.created_at) FROM social_messages m WHERE r.status = 'accepted' AND (
                 (m.sender_user_id = ? AND m.receiver_user_id = p.user_id)
-                OR (m.sender_user_id = p.user_id AND m.receiver_user_id = ?)) last_message_at
+                OR (m.sender_user_id = p.user_id AND m.receiver_user_id = ?))) last_message_at
+             ,(SELECT CASE WHEN m.unsent_at IS NULL THEN m.body ELSE '' END FROM social_messages m WHERE r.status = 'accepted' AND (
+                (m.sender_user_id = ? AND m.receiver_user_id = p.user_id)
+                OR (m.sender_user_id = p.user_id AND m.receiver_user_id = ?))
+                ORDER BY m.created_at DESC, m.id DESC LIMIT 1) last_message_body
+             ,(SELECT m.media_id FROM social_messages m WHERE r.status = 'accepted' AND (
+                (m.sender_user_id = ? AND m.receiver_user_id = p.user_id)
+                OR (m.sender_user_id = p.user_id AND m.receiver_user_id = ?))
+                ORDER BY m.created_at DESC, m.id DESC LIMIT 1) last_message_media_id
+             ,(SELECT m.sender_user_id FROM social_messages m WHERE r.status = 'accepted' AND (
+                (m.sender_user_id = ? AND m.receiver_user_id = p.user_id)
+                OR (m.sender_user_id = p.user_id AND m.receiver_user_id = ?))
+                ORDER BY m.created_at DESC, m.id DESC LIMIT 1) last_message_sender_id
+             ,(SELECT m.unsent_at FROM social_messages m WHERE r.status = 'accepted' AND (
+                (m.sender_user_id = ? AND m.receiver_user_id = p.user_id)
+                OR (m.sender_user_id = p.user_id AND m.receiver_user_id = ?))
+                ORDER BY m.created_at DESC, m.id DESC LIMIT 1) last_message_unsent_at
       FROM social_relationships r
       JOIN member_profiles p ON p.user_id = CASE WHEN r.user_low = ? THEN r.user_high ELSE r.user_low END
       WHERE (r.user_low = ? OR r.user_high = ?)
@@ -351,6 +367,8 @@ async function relationships(request, env) {
       ORDER BY r.updated_at DESC
     `).bind(
       session.user_id, session.user_id, session.user_id,
+      session.user_id, session.user_id, session.user_id, session.user_id,
+      session.user_id, session.user_id, session.user_id, session.user_id,
       session.user_id, session.user_id, session.user_id, session.user_id, session.user_id,
     ).all();
     return json({ relationships: rows.results || [] });
@@ -533,9 +551,7 @@ async function messages(request, env) {
     const mediaId = String(body.mediaId || "") || null;
     const text = cleanText(body.body, 2000, { required: !mediaId });
     if (mediaId) {
-      const reusable = await env.DB.prepare(`
-        SELECT 1 reusable FROM social_media WHERE id = ? AND owner_user_id = ? AND purpose = 'chat' AND state = 'active'
-      `).bind(mediaId, session.user_id).first();
+      const reusable = await accessibleChatAsset(env.DB, mediaId, session.user_id);
       if (!reusable) throw new SocialError("media_not_found", "ไม่พบรูปภาพที่ส่งได้", 404);
     }
     await env.DB.prepare(`
@@ -548,16 +564,61 @@ async function messages(request, env) {
   return json({ ok: true });
 }
 
+async function accessibleChatAsset(db, mediaId, userId) {
+  return db.prepare(`
+    SELECT media.id, media.object_key, media.content_type, media.byte_size, media.created_at
+    FROM social_media media
+    WHERE media.id = ? AND media.purpose = 'chat' AND media.state = 'active' AND (
+      media.owner_user_id = ? OR EXISTS (
+        SELECT 1 FROM social_messages message
+        WHERE message.media_id = media.id AND message.unsent_at IS NULL
+          AND (message.sender_user_id = ? OR message.receiver_user_id = ?)
+          AND EXISTS (
+            SELECT 1 FROM social_relationships relationship
+            WHERE relationship.status = 'accepted' AND (
+              (relationship.user_low = message.sender_user_id AND relationship.user_high = message.receiver_user_id)
+              OR (relationship.user_low = message.receiver_user_id AND relationship.user_high = message.sender_user_id)
+            )
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM social_blocks blocked
+            WHERE (blocked.blocker_user_id = message.sender_user_id AND blocked.blocked_user_id = message.receiver_user_id)
+               OR (blocked.blocker_user_id = message.receiver_user_id AND blocked.blocked_user_id = message.sender_user_id)
+          )
+      )
+    )
+    LIMIT 1
+  `).bind(mediaId, userId, userId, userId).first();
+}
+
 async function chatAssets(request, env) {
   capability(env, "SOCIAL_APP_ENABLED");
   capability(env, "MESSAGING_ENABLED");
   const session = await authenticated(request, env);
   await requireProfile(env.DB, session.user_id);
   const rows = await env.DB.prepare(`
-    SELECT id, content_type, byte_size, created_at FROM social_media
-    WHERE owner_user_id = ? AND purpose = 'chat' AND state = 'active'
-    ORDER BY created_at DESC LIMIT 5
-  `).bind(session.user_id).all();
+    SELECT media.id, media.content_type, media.byte_size, media.created_at FROM social_media media
+    WHERE media.purpose = 'chat' AND media.state = 'active' AND (
+      media.owner_user_id = ? OR EXISTS (
+        SELECT 1 FROM social_messages message
+        WHERE message.media_id = media.id AND message.unsent_at IS NULL
+          AND (message.sender_user_id = ? OR message.receiver_user_id = ?)
+          AND EXISTS (
+            SELECT 1 FROM social_relationships relationship
+            WHERE relationship.status = 'accepted' AND (
+              (relationship.user_low = message.sender_user_id AND relationship.user_high = message.receiver_user_id)
+              OR (relationship.user_low = message.receiver_user_id AND relationship.user_high = message.sender_user_id)
+            )
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM social_blocks blocked
+            WHERE (blocked.blocker_user_id = message.sender_user_id AND blocked.blocked_user_id = message.receiver_user_id)
+               OR (blocked.blocker_user_id = message.receiver_user_id AND blocked.blocked_user_id = message.sender_user_id)
+          )
+      )
+    )
+    ORDER BY media.created_at DESC, media.id DESC LIMIT 5
+  `).bind(session.user_id, session.user_id, session.user_id).all();
   return json({ assets: rows.results || [] });
 }
 
@@ -565,16 +626,8 @@ async function chatMedia(request, env, id) {
   capability(env, "SOCIAL_APP_ENABLED");
   capability(env, "MESSAGING_ENABLED");
   const session = await authenticated(request, env);
-  const media = await env.DB.prepare(`
-    SELECT m.object_key, m.content_type, m.owner_user_id,
-      CASE WHEN msg.sender_user_id = ? THEN msg.receiver_user_id ELSE msg.sender_user_id END other_user_id
-    FROM social_media m JOIN social_messages msg ON msg.media_id = m.id
-    WHERE m.id = ? AND m.state = 'active' AND (msg.sender_user_id = ? OR msg.receiver_user_id = ?)
-    LIMIT 1
-  `).bind(session.user_id, id, session.user_id, session.user_id).first();
-  const ownerAccess = media?.owner_user_id === session.user_id;
-  if (!media || (!ownerAccess && (!await accepted(env.DB, session.user_id, media.other_user_id)
-    || await isBlocked(env.DB, session.user_id, media.other_user_id))) || !env.MEDIA) {
+  const media = await accessibleChatAsset(env.DB, id, session.user_id);
+  if (!media || !env.MEDIA) {
     throw new SocialError("not_found", "ไม่พบรูปภาพ", 404);
   }
   const object = await env.MEDIA.get(media.object_key);

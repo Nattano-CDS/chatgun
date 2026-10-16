@@ -185,6 +185,17 @@ test("friendship, messaging, blocking, and reports enforce server-side relations
   const thread = await call(env, request("/api/social/messages?target=rel-alice", bob));
   const payload = await thread.json();
   assert.equal(payload.messages[0].body, "hello");
+  const inbox = await call(env, request("/api/social/relationships", alice));
+  const conversation = (await inbox.json()).relationships.find((item) => item.other_user_id === "rel-bob");
+  assert.equal(conversation.last_message_body, "hello");
+  assert.equal(conversation.last_message_sender_id, "rel-alice");
+  assert.ok(Number(conversation.last_message_at) > 0);
+  await database.prepare("UPDATE social_relationships SET status='pending' WHERE id=?").bind(conversation.id).run();
+  const pendingInbox = await call(env, request("/api/social/relationships", alice));
+  const pendingConversation = (await pendingInbox.json()).relationships.find((item) => item.other_user_id === "rel-bob");
+  assert.equal(pendingConversation.last_message_body, null, "pending relationships do not receive message previews");
+  assert.equal(pendingConversation.unread_count, 0);
+  await database.prepare("UPDATE social_relationships SET status='accepted' WHERE id=?").bind(conversation.id).run();
 
   const report = await call(env, request("/api/social/reports", bob, {
     method: "POST",

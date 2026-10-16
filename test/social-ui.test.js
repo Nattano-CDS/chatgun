@@ -6,6 +6,7 @@ const html = readFileSync("app/index.html", "utf8");
 const script = readFileSync("app/social.js", "utf8");
 const styles = readFileSync("app/social.css", "utf8");
 const headers = readFileSync("_headers", "utf8");
+const redirects = readFileSync("_redirects", "utf8");
 const moderationHtml = readFileSync("app/moderation.html", "utf8");
 const moderationScript = readFileSync("app/moderation.js", "utf8");
 
@@ -24,6 +25,14 @@ test("social client uses same-origin APIs, CSRF, escaped rendering, and fail-clo
   assert.match(script, /node\.textContent = String/u);
   assert.match(script, /if \(!state\.config\.socialAppEnabled\)/u);
   assert.match(script, /\/api\/social\/onboarding\/adult/u);
+  assert.match(script, /ระวังการหลอกโอนเงินและขอข้อมูลส่วนตัว/u);
+  assert.match(script, /last_message_sender_id/u);
+  assert.match(script, /navigator\.permissions\.query\(\{ name: "geolocation" \}\)/u);
+  assert.match(script, /revokeLocationPublication/u);
+  assert.match(script, /refreshOpenThread/u);
+  assert.match(script, /10_000/u);
+  assert.match(script, /\/app\/people\//u);
+  assert.match(script, /popstate/u);
   assert.doesNotMatch(script, /innerHTML\s*=\s*(?:location|document\.cookie)/u);
 });
 
@@ -31,6 +40,7 @@ test("responsive social route receives only the required geolocation permission"
   assert.match(styles, /@media \(max-width: 760px\)/u);
   assert.match(headers, /Permissions-Policy: camera=\(\), microphone=\(\), geolocation=\(self\), payment=\(\)/u);
   assert.match(headers, /\/app\/\*\s+[\s\S]*Cache-Control: no-store/u);
+  assert.match(redirects, /\/app\/people\/\* \/app\/ 200/u);
 });
 
 test("moderation UI requires a recorded purpose and renders untrusted data as text", () => {

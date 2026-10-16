@@ -20,6 +20,8 @@ const state = {
   threadMessages: [],
   threadHasMore: false,
   galleryView: null,
+  threadPolling: false,
+  locationPermission: null,
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -210,6 +212,23 @@ function relationshipFor(userId) {
   return state.relationships.find((item) => item.other_user_id === userId);
 }
 
+function routedProfile() {
+  const match = location.pathname.match(/^\/app\/people\/([^/]+)(?:\/gallery(?:\/([^/]+))?)?\/?$/u);
+  if (!match) return null;
+  try { return { user: decodeURIComponent(match[1]), photo: match[2] ? decodeURIComponent(match[2]) : null }; }
+  catch { return { user: "", photo: null }; }
+}
+
+function profilePath(user, photo = null) {
+  return `/app/people/${encodeURIComponent(user)}${photo ? `/gallery/${encodeURIComponent(photo)}` : ""}`;
+}
+
+function updateProfileRoute(user, photo = null, mode = "push") {
+  const path = profilePath(user, photo);
+  if (`${location.pathname}${location.search}` === path) return;
+  history[mode === "replace" ? "replaceState" : "pushState"]({ user, photo }, "", path);
+}
+
 function portrait(person, distance = true) {
   const image = person.selected_photo_id
     ? `<img src="/api/social/media/${encodeURIComponent(person.selected_photo_id)}" alt="รูปของ ${escapeHtml(person.name)}" loading="lazy">`
@@ -273,7 +292,13 @@ function renderRelationships() {
 
 function renderConversations(friends = state.relationships.filter((item) => item.status === "accepted")) {
   const list = $("#conversation-list");
-  list.innerHTML = friends.length ? friends.sort((a, b) => Number(b.last_message_at || b.updated_at) - Number(a.last_message_at || a.updated_at)).map((person) => `<button class="conversation ${state.selectedChat === person.other_user_id ? "active" : ""}" data-chat="${escapeHtml(person.other_user_id)}"><span class="avatar">${escapeHtml(initials(person.name))}</span><span><strong>${escapeHtml(person.name)}</strong><br><small>${Number(person.unread_count || 0) ? `${Number(person.unread_count)} ข้อความใหม่` : "เปิดบทสนทนา"}</small></span></button>`).join("") : `<div class="empty"><p>ต้องเป็นเพื่อนกันก่อนจึงจะแชทได้</p></div>`;
+  list.innerHTML = friends.length ? friends.sort((a, b) => Number(b.last_message_at || b.updated_at) - Number(a.last_message_at || a.updated_at)).map((person) => {
+    const preview = !person.last_message_at ? "เริ่มบทสนทนา"
+      : person.last_message_unsent_at ? "ยกเลิกส่งข้อความแล้ว"
+        : `${person.last_message_sender_id === state.account.user.id ? "คุณ: " : ""}${person.last_message_media_id ? "ส่งรูปภาพ" : person.last_message_body || "ข้อความ"}`;
+    const time = person.last_message_at ? new Date(Number(person.last_message_at) * 1000).toLocaleString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+    return `<button class="conversation ${state.selectedChat === person.other_user_id ? "active" : ""}" data-chat="${escapeHtml(person.other_user_id)}"><span class="avatar">${escapeHtml(initials(person.name))}</span><span class="conversation-copy"><span><strong>${escapeHtml(person.name)}</strong><time>${escapeHtml(time)}</time></span><small>${escapeHtml(preview)}</small></span>${Number(person.unread_count || 0) ? `<b class="inbox-unread">${Number(person.unread_count)}</b>` : ""}</button>`;
+  }).join("") : `<div class="empty"><p>ต้องเป็นเพื่อนกันก่อนจึงจะแชทได้</p></div>`;
 }
 
 function renderRatings() {
@@ -381,12 +406,14 @@ async function updateLocation() {
     state.lastLocationPost = Date.now();
     try {
       await api("/api/social/discovery", { method: "POST", body: { action: "location", latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy } });
+      state.locationFresh = true;
       await loadPeople();
       toast("เปิดการค้นหาคนใกล้คุณแล้ว");
-    } catch (error) { toast(error.message, true); }
+    } catch (error) { await revokeLocationPublication({ notifyServer: state.locationFresh }); toast(error.message, true); }
     finally { button.disabled = false; delete button.dataset.label; }
   };
-  const failed = (error) => {
+  const failed = async (error) => {
+    await revokeLocationPublication({ notifyServer: state.locationFresh });
     button.disabled = false;
     button.textContent = "เปิดตำแหน่ง";
     delete button.dataset.label;
@@ -395,17 +422,61 @@ async function updateLocation() {
   state.locationWatch = navigator.geolocation.watchPosition(publish, failed, { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 });
 }
 
-async function showPerson(id) {
-  const person = state.people.find((item) => item.user_id === id) || state.relationships.find((item) => item.other_user_id === id);
-  if (!person) return;
+async function revokeLocationPublication({ notifyServer = true } = {}) {
+  if (state.locationWatch !== null && navigator.geolocation) navigator.geolocation.clearWatch(state.locationWatch);
+  state.locationWatch = null;
+  state.lastLocationPost = 0;
+  if (notifyServer && !state.demo && state.config?.socialAppEnabled && state.profile) {
+    await api("/api/social/discovery", { method: "POST", body: { action: "hide" } }).catch(() => {});
+  }
+  state.locationFresh = false;
+  state.people = [];
+  $("#location-banner")?.classList.remove("active");
+  if ($("#location-toggle")) $("#location-toggle").textContent = "เปิดตำแหน่ง";
+  if ($("#people-grid")) renderPeople();
+}
+
+async function monitorLocationPermission() {
+  if (!navigator.permissions?.query || !navigator.geolocation) return;
+  try {
+    const permission = await navigator.permissions.query({ name: "geolocation" });
+    state.locationPermission = permission;
+    if (permission.state === "denied") await revokeLocationPublication({ notifyServer: state.locationFresh });
+    permission.onchange = () => {
+      if (permission.state === "denied") {
+        revokeLocationPublication({ notifyServer: state.locationFresh }).then(() => toast("สิทธิ์ตำแหน่งถูกปิด จึงซ่อนคุณจากการค้นหาแล้ว", true));
+      }
+    };
+  } catch { /* Permission status is optional; watchPosition remains authoritative. */ }
+}
+
+async function refreshOpenThread() {
+  if (!state.selectedChat || state.threadPolling || state.demo || !state.config?.messagingEnabled) return;
+  state.threadPolling = true;
+  try {
+    await loadMessagePage(state.selectedChat);
+    await api("/api/social/messages", { method: "POST", body: { action: "read", target: state.selectedChat } });
+  } finally { state.threadPolling = false; }
+}
+
+async function showPerson(id, { historyMode = "push", photo = null } = {}) {
+  const own = id === state.account?.user?.id;
+  const person = own ? state.profile : state.people.find((item) => item.user_id === id) || state.relationships.find((item) => item.other_user_id === id);
+  if (!person) {
+    $("#profile-dialog-content").innerHTML = `<div class="empty"><h2>ไม่พบโปรไฟล์นี้</h2><p>บัญชีอาจอยู่นอกระยะค้นหา ปิดการหาเพื่อน หรือคุณไม่มีสิทธิ์ดู</p></div>`;
+    $("#profile-dialog").showModal();
+    return;
+  }
+  if (historyMode !== "none") updateProfileRoute(id, photo, historyMode);
   state.selectedPerson = person;
   const relation = relationshipFor(id);
-  const friendAction = !relation && state.config.friendRequestsEnabled ? `<button class="primary" data-action="request" data-user="${escapeHtml(id)}">ขอเป็นเพื่อน</button>` : relation?.status === "accepted" && state.config.messagingEnabled ? `<button class="primary" data-action="chat" data-user="${escapeHtml(id)}">แชท</button><button class="secondary" data-action="unfriend" data-user="${escapeHtml(id)}">เลิกเป็นเพื่อน</button>` : "";
-  $("#profile-dialog-content").innerHTML = `<div class="dialog-profile">${portrait(person, false)}<h2>${escapeHtml(person.name)}${person.identity_verified ? " ✓" : ""}</h2><p>${escapeHtml(person.gender || "ไม่ระบุ")} ${person.distance !== undefined ? `· ${escapeHtml(formatDistance(person.distance))}` : ""}</p><p>${escapeHtml(person.bio || "ยังไม่ได้แนะนำตัว")}</p><p><small>${escapeHtml(person.interests || "")}</small></p><div id="dialog-gallery" class="gallery-grid"></div><div class="dialog-actions">${friendAction}${state.config.ratingsEnabled && Number(person.distance) <= 100 ? `<button class="secondary" data-action="rate" data-user="${escapeHtml(id)}">ให้คะแนน</button>` : ""}<button class="danger" data-action="block" data-user="${escapeHtml(id)}">บล็อก</button><button class="secondary" data-action="report" data-user="${escapeHtml(id)}">รายงาน</button></div></div>`;
+  const friendAction = own ? "" : !relation && state.config.friendRequestsEnabled ? `<button class="primary" data-action="request" data-user="${escapeHtml(id)}">ขอเป็นเพื่อน</button>` : relation?.status === "accepted" && state.config.messagingEnabled ? `<button class="primary" data-action="chat" data-user="${escapeHtml(id)}">แชท</button><button class="secondary" data-action="unfriend" data-user="${escapeHtml(id)}">เลิกเป็นเพื่อน</button>` : "";
+  $("#profile-dialog-content").innerHTML = `<div class="dialog-profile">${portrait(person, false)}<h2>${escapeHtml(person.name)}${person.identity_verified ? " ✓" : ""}</h2><p>${escapeHtml(person.gender || "ไม่ระบุ")} ${person.distance !== undefined ? `· ${escapeHtml(formatDistance(person.distance))}` : ""}</p><p>${escapeHtml(person.bio || "ยังไม่ได้แนะนำตัว")}</p><p><small>${escapeHtml(person.interests || "")}</small></p><div id="dialog-gallery" class="gallery-grid"></div><div class="dialog-actions">${friendAction}${!own && state.config.ratingsEnabled && Number(person.distance) <= 100 ? `<button class="secondary" data-action="rate" data-user="${escapeHtml(id)}">ให้คะแนน</button>` : ""}${own ? "" : `<button class="danger" data-action="block" data-user="${escapeHtml(id)}">บล็อก</button><button class="secondary" data-action="report" data-user="${escapeHtml(id)}">รายงาน</button>`}</div></div>`;
   $("#profile-dialog").showModal();
   try {
     const gallery = (await api(`/api/social/gallery?user=${encodeURIComponent(id)}`)).photos;
     $("#dialog-gallery").innerHTML = gallery.map((photo) => `<button class="gallery-item" data-gallery-action="view" data-user="${escapeHtml(id)}" data-photo="${escapeHtml(photo.id)}"><img src="/api/social/media/${encodeURIComponent(photo.id)}" alt="${escapeHtml(photo.caption || "รูปในแกลเลอรี")}" loading="lazy"></button>`).join("");
+    if (photo) await openGalleryPhoto(id, photo, { historyMode: "none" });
   } catch { /* The profile remains usable if its gallery is unavailable. */ }
 }
 
@@ -416,9 +487,10 @@ function renderGalleryPost() {
   $("#profile-dialog-content").innerHTML = `<div class="dialog-profile"><img class="gallery-view" src="/api/social/media/${encodeURIComponent(item.id)}" alt="${escapeHtml(item.caption || "รูปในแกลเลอรี")}"><p>${escapeHtml(item.caption || "")}</p><div class="dialog-actions"><button class="secondary" data-gallery-action="previous" ${index <= 0 ? "disabled" : ""}>← รูปก่อนหน้า</button><button class="secondary" data-gallery-action="like" data-photo="${escapeHtml(item.id)}">${item.liked ? "♥" : "♡"} ${Number(item.like_count || 0)}</button><button class="secondary" data-gallery-action="next" ${index >= photos.length - 1 ? "disabled" : ""}>รูปถัดไป →</button></div><div class="comments">${comments.map((comment) => `<p><strong>${escapeHtml(comment.sender_name)}</strong> ${escapeHtml(comment.body)}</p>`).join("") || "<p>ยังไม่มีความคิดเห็นที่คุณมีสิทธิ์อ่าน</p>"}</div><form id="gallery-comment"><input type="hidden" name="photo" value="${escapeHtml(item.id)}"><input type="hidden" name="owner" value="${escapeHtml(owner)}"><input name="comment" maxlength="500" required placeholder="เขียนถึงเจ้าของโปรไฟล์…"><button class="primary">ส่ง</button></form><small>เจ้าของโปรไฟล์และเพื่อนที่ยอมรับกันแล้วอ่านความคิดเห็นได้</small></div>`;
 }
 
-async function openGalleryPhoto(owner, photo) {
+async function openGalleryPhoto(owner, photo, { historyMode = "push" } = {}) {
   const result = await api(`/api/social/gallery?user=${encodeURIComponent(owner)}&photo=${encodeURIComponent(photo)}`);
   state.galleryView = { ...result, index: Math.max(0, result.photos.findIndex((entry) => entry.id === photo)) };
+  if (historyMode !== "none") updateProfileRoute(owner, photo, historyMode);
   renderGalleryPost();
 }
 
@@ -445,7 +517,7 @@ async function openChat(id) {
   $(".chat-layout").classList.add("open");
   renderConversations();
   const thread = $("#thread");
-  thread.innerHTML = `<header class="thread-head"><button class="icon-button chat-back" aria-label="กลับ">←</button><span class="avatar">${escapeHtml(initials(person.name))}</span><strong>${escapeHtml(person.name)}</strong></header><div class="messages"><p>กำลังโหลด…</p></div><form class="composer">${state.config.mediaUploadEnabled ? `<label class="icon-button" title="ส่งรูป">▧<input type="file" name="file" accept="image/jpeg,image/png,image/webp" hidden></label><button class="icon-button asset-library" type="button" title="รูปที่ส่งล่าสุด">▦</button>` : ""}<input name="body" maxlength="2000" placeholder="พิมพ์ข้อความ…"><button class="primary">ส่ง</button></form>`;
+  thread.innerHTML = `<header class="thread-head"><button class="icon-button chat-back" aria-label="กลับ">←</button><span class="avatar">${escapeHtml(initials(person.name))}</span><strong>${escapeHtml(person.name)}</strong></header><details class="chat-safety"><summary>⚠ ระวังการหลอกโอนเงินและขอข้อมูลส่วนตัว</summary><p>อย่าโอนเงินหรือส่งรหัส OTP รหัสผ่าน ข้อมูลบัญชีธนาคาร หรือรูปเอกสารยืนยันตัวตนให้คู่สนทนา</p><p>${person.identity_verified ? "บัญชีนี้ยืนยันตัวตนแล้ว แต่ตรายืนยันไม่รับรองพฤติกรรมหรือความปลอดภัยในการทำธุรกรรม" : "บัญชีนี้ยังไม่ยืนยันตัวตน โปรดระมัดระวังเป็นพิเศษ"}</p></details><div class="messages"><p>กำลังโหลด…</p></div><form class="composer">${state.config.mediaUploadEnabled ? `<label class="icon-button" title="ส่งรูป">▧<input type="file" name="file" accept="image/jpeg,image/png,image/webp" hidden></label><button class="icon-button asset-library" type="button" title="รูปที่ส่งล่าสุด">▦</button>` : ""}<input name="body" maxlength="2000" placeholder="พิมพ์ข้อความ…"><button class="primary">ส่ง</button></form>`;
   try {
     await loadMessagePage(id);
     await api("/api/social/messages", { method: "POST", body: { action: "read", target: id } });
@@ -489,6 +561,10 @@ async function initialize() {
     if (localStorage.getItem("chatgun-notifications") === "enabled") $("#notification-toggle").textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
     fillProfile();
     await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked(), loadOwnGallery(), loadVerification()]);
+    await monitorLocationPermission();
+    if (location.pathname === "/app/photos") switchTab("profile");
+    const route = routedProfile();
+    if (route) await showPerson(route.user, { historyMode: "none", photo: route.photo });
   } catch (error) {
     $("#global-status").textContent = error.message || "ไม่สามารถโหลด ChatGun ได้";
     toast(error.message, true);
@@ -546,6 +622,7 @@ $("#notification-toggle").addEventListener("click", async (event) => {
   event.currentTarget.textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
   toast("เปิดการแจ้งเตือนแล้ว");
 });
+$("#view-own-profile").addEventListener("click", () => showPerson(state.account.user.id));
 
 $("#gallery-upload").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -592,7 +669,12 @@ $("#refresh").addEventListener("click", async () => { try { await Promise.all([l
 
 document.addEventListener("click", async (event) => {
   const close = event.target.closest(".dialog-close");
-  if (close) return close.closest("dialog").close();
+  if (close) {
+    const dialog = close.closest("dialog");
+    dialog.close();
+    if (dialog.id === "profile-dialog" && routedProfile()) history.pushState({}, "", "/app/");
+    return;
+  }
   if (event.target.closest(".chat-back")) { $(".chat-layout").classList.remove("open"); state.selectedChat = null; return; }
   if (event.target.closest(".load-older")) {
     const oldest = state.threadMessages.at(-1);
@@ -640,7 +722,7 @@ document.addEventListener("click", async (event) => {
     try {
       await api("/api/social/gallery", { method: "POST", body: { action: name, id: photo } });
       if (["delete", "select"].includes(name)) await loadOwnGallery();
-      if (name === "like" && state.galleryView) await openGalleryPhoto(state.galleryView.owner, photo);
+      if (name === "like" && state.galleryView) await openGalleryPhoto(state.galleryView.owner, photo, { historyMode: "replace" });
       toast(name === "delete" ? "ซ่อนรูปและส่งเข้าคิวลบแล้ว" : name === "select" ? "ตั้งรูปหลักแล้ว" : "บันทึกแล้ว");
     } catch (error) { toast(error.message, true); }
     return;
@@ -670,6 +752,12 @@ document.addEventListener("click", async (event) => {
   if (card && !event.target.closest("button")) showPerson(card.dataset.person);
 });
 
+document.addEventListener("keydown", (event) => {
+  if (!['Enter', ' '].includes(event.key) || event.target.closest("button, a, input, select, textarea")) return;
+  const card = event.target.closest("[data-person]");
+  if (card) { event.preventDefault(); showPerson(card.dataset.person); }
+});
+
 $("#profile-dialog").addEventListener("submit", async (event) => {
   if (!event.target.matches("#gallery-comment")) return;
   event.preventDefault();
@@ -678,7 +766,7 @@ $("#profile-dialog").addEventListener("submit", async (event) => {
   try {
     await api("/api/social/gallery", { method: "POST", body: { action: "comment", id: data.get("photo"), comment: data.get("comment") } });
     toast("ส่งความคิดเห็นแล้ว");
-    await openGalleryPhoto(data.get("owner"), data.get("photo"));
+    await openGalleryPhoto(data.get("owner"), data.get("photo"), { historyMode: "replace" });
   } catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
 });
 
@@ -723,10 +811,19 @@ $("#report-form").addEventListener("submit", async (event) => {
 initialize();
 
 window.addEventListener("offline", () => { $("#global-status").textContent = "ออฟไลน์ — การเปลี่ยนแปลงจะยังไม่ถูกส่ง"; });
-window.addEventListener("online", () => { $("#global-status").textContent = ""; toast("กลับมาออนไลน์แล้ว"); });
+window.addEventListener("online", () => { $("#global-status").textContent = ""; toast("กลับมาออนไลน์แล้ว"); refreshOpenThread().catch(() => {}); });
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible" && state.config?.socialAppEnabled && state.profile) {
-    Promise.all([loadPeople(), loadRelationships()]).catch(() => {});
+    Promise.all([loadPeople(), loadRelationships(), refreshOpenThread()]).catch(() => {});
+    if (state.locationWatch !== null && Date.now() - state.lastLocationPost > 55_000) {
+      navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+        state.lastLocationPost = Date.now();
+        try {
+          await api("/api/social/discovery", { method: "POST", body: { action: "location", latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy } });
+          await loadPeople();
+        } catch { await revokeLocationPublication({ notifyServer: state.locationFresh }); }
+      }, () => revokeLocationPublication({ notifyServer: state.locationFresh }), { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
+    }
   }
 });
 setInterval(() => {
@@ -734,3 +831,15 @@ setInterval(() => {
     Promise.all([loadPeople(), loadRelationships()]).catch(() => {});
   }
 }, 30_000);
+setInterval(() => {
+  if (document.visibilityState === "visible" && navigator.onLine) refreshOpenThread().catch(() => {});
+}, 10_000);
+window.addEventListener("pagehide", () => {
+  if (state.locationWatch !== null && navigator.geolocation) navigator.geolocation.clearWatch(state.locationWatch);
+  if (state.locationPermission) state.locationPermission.onchange = null;
+});
+window.addEventListener("popstate", () => {
+  const route = routedProfile();
+  if (route) showPerson(route.user, { historyMode: "none", photo: route.photo });
+  else if ($("#profile-dialog").open) $("#profile-dialog").close();
+});
