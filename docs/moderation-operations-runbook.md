@@ -1,7 +1,10 @@
 # Moderation operating procedures
 
-Draft for an operator who has not yet confirmed moderation staffing. The tools remain
-disabled until named reviewers, coverage, training, and escalation contacts exist.
+Draft updated for the confirmed Phase 1 model in which the owner is the single primary
+administrator, moderator, and Trust & Safety decision maker. The exact account, access grant,
+coverage, training evidence, alert/support channel, emergency/legal route, and backup remain
+unverified; real-user activation therefore remains blocked. See
+`single-admin-beta-operations.md` for the daily procedure and owner-approval fields.
 
 ## Access and case handling
 

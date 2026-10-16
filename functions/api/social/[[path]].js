@@ -1143,17 +1143,59 @@ async function moderationMediaObject(request, env, id) {
 
 async function moderationOverview(request, env) {
   const { session, purpose } = await moderationAccess(request, env, ["report_reviewer", "safety_admin"]);
+  const since = unixTime() - 86400;
   const counts = await env.DB.prepare(`
     SELECT
       (SELECT COUNT(*) FROM media_safety_reviews WHERE status='pending') pending,
       (SELECT COUNT(*) FROM media_safety_reviews WHERE status='released' AND COALESCE(category,'general')='general') general,
       (SELECT COUNT(*) FROM media_safety_reviews WHERE status='released' AND category='sensitive') sensitive,
       (SELECT COUNT(*) FROM media_safety_reviews WHERE status='rejected') rejected,
-      (SELECT COUNT(*) FROM media_reports WHERE status IN ('pending','escalated')) reports,
-      (SELECT COUNT(*) FROM media_appeals WHERE status='pending') appeals
+      (SELECT COUNT(*) FROM social_reports WHERE status IN ('pending','escalated')) userReports,
+      (SELECT COUNT(*) FROM media_reports WHERE status IN ('pending','escalated')) mediaReports,
+      ((SELECT COUNT(*) FROM social_reports WHERE status IN ('pending','escalated')) +
+       (SELECT COUNT(*) FROM media_reports WHERE status IN ('pending','escalated'))) reports,
+      (SELECT COUNT(*) FROM media_appeals WHERE status='pending') appeals,
+      ((SELECT COUNT(*) FROM media_reports WHERE status IN ('pending','escalated') AND (status='escalated' OR reason_code IN ('ncii','minor_safety'))) +
+       (SELECT COUNT(*) FROM social_reports WHERE status IN ('pending','escalated') AND (status='escalated' OR reason_code IN ('threat','ncii','child_safety')))) critical,
+      ((SELECT COUNT(*) FROM media_reports WHERE status IN ('pending','escalated') AND reason_code IN ('violence','privacy','sexual_content')) +
+       (SELECT COUNT(*) FROM social_reports WHERE status IN ('pending','escalated') AND reason_code IN ('sexual_content','privacy'))) high
+  `).first();
+  const daily = await env.DB.prepare(`
+    SELECT
+      ((SELECT COUNT(*) FROM media_safety_reviews WHERE created_at >= ?) +
+       (SELECT COUNT(*) FROM social_reports WHERE created_at >= ?) +
+       (SELECT COUNT(*) FROM media_reports WHERE created_at >= ?) +
+       (SELECT COUNT(*) FROM media_appeals WHERE created_at >= ?)) newLast24Hours,
+      ((SELECT COUNT(*) FROM media_safety_reviews WHERE reviewed_at >= ?) +
+       (SELECT COUNT(*) FROM social_reports WHERE reviewed_at >= ?) +
+       (SELECT COUNT(*) FROM media_reports WHERE reviewed_at >= ?) +
+       (SELECT COUNT(*) FROM media_appeals WHERE reviewed_at >= ?)) resolvedLast24Hours,
+      (SELECT MIN(created_at) FROM (
+        SELECT created_at FROM media_safety_reviews WHERE status='pending'
+        UNION ALL SELECT created_at FROM social_reports WHERE status IN ('pending','escalated')
+        UNION ALL SELECT created_at FROM media_reports WHERE status IN ('pending','escalated')
+        UNION ALL SELECT created_at FROM media_appeals WHERE status='pending'
+      )) oldestOpenAt
+  `).bind(since, since, since, since, since, since, since, since).first();
+  const cleanup = await env.DB.prepare(`
+    SELECT
+      SUM(CASE WHEN completed_at IS NULL THEN 1 ELSE 0 END) pending,
+      SUM(CASE WHEN completed_at IS NULL AND attempts >= 10 THEN 1 ELSE 0 END) exhausted
+    FROM media_deletion_queue
   `).first();
   await auditMediaSafety(env.DB, session.user_id, "queue_view", "overview", purpose);
-  return json({ counts });
+  return json({
+    counts,
+    daily: {
+      newLast24Hours: Number(daily?.newLast24Hours || 0),
+      resolvedLast24Hours: Number(daily?.resolvedLast24Hours || 0),
+      oldestOpenAt: daily?.oldestOpenAt || null,
+    },
+    cleanup: {
+      pending: Number(cleanup?.pending || 0),
+      exhausted: Number(cleanup?.exhausted || 0),
+    },
+  });
 }
 
 async function reportMedia(request, env) {

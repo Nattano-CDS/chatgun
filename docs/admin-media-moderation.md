@@ -86,14 +86,17 @@ counts, and keep media delivery disabled until rollback and reviewer drills pass
 ## Operational blockers
 
 - No approved independent age-assurance provider or documented manual age-review procedure.
-- No named moderation primary/backup, access provisioning, coverage hours, escalation contact, or
-  appeals SLA.
+- The owner is confirmed as the Phase 1 primary administrator/moderator/safety decision maker, but
+  the exact ChatGun account, coverage hours, support/alert channel, emergency/legal escalation,
+  independent appeal capacity, and backup are not yet verified. The proposed operating model is in
+  `single-admin-beta-operations.md`.
 - No content-safety scanner/vendor. Human review is the only implemented release path and must not
   be represented as automated detection.
 - No approved legal/community rules mapping examples to General, Sensitive, and Prohibited.
 - No approved evidence-retention period for rejected media or appeals. The seven-day deletion delay
   is a staging engineering default, not a published commitment.
-- No emergency, NCII, child-safety, or law-enforcement operating owner has been confirmed.
+- The owner is the accountable decision maker, but no approved qualified emergency, NCII,
+  child-safety, or law-enforcement reporting procedure/contact has been confirmed.
 
 ## Release assessment
 

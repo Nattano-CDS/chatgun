@@ -42,6 +42,47 @@ async function seedMedia(database, media, owner, id = "media-1") {
   media.objects.set(key, new Uint8Array([1, 2, 3, 4]));
 }
 
+test("single-operator overview prioritizes urgent queues and exposes aggregate workload health", async () => {
+  const database = new TestD1(); const media = new TestR2();
+  const admin = await member(database, "overview-admin");
+  await member(database, "overview-owner");
+  await member(database, "overview-reporter");
+  const now = unixTime();
+  await database.prepare("INSERT INTO moderation_roles(user_id,role,created_at) VALUES ('overview-admin','safety_admin',?)").bind(now).run();
+  await seedMedia(database, media, "overview-owner", "overview-media");
+  await database.prepare(`
+    INSERT INTO social_reports(id,reporter_user_id,subject_user_id,category,reason_code,details,status,created_at)
+    VALUES ('urgent-user-report','overview-reporter','overview-owner','violence','threat','synthetic threat report','pending',?)
+  `).bind(now - 120).run();
+  await database.prepare(`
+    INSERT INTO media_reports(id,media_id,reporter_user_id,reason_code,details,status,created_at)
+    VALUES ('urgent-media-report','overview-media','overview-reporter','ncii','synthetic NCII report','pending',?)
+  `).bind(now - 180).run();
+  await database.prepare(`
+    INSERT INTO media_appeals(id,media_id,appellant_user_id,reason,status,created_at)
+    VALUES ('pending-appeal','overview-media','overview-owner','Synthetic appeal for workload summary','pending',?)
+  `).bind(now - 60).run();
+  await database.prepare(`
+    INSERT INTO media_deletion_queue(object_key,operation_id,attempts,next_attempt_at,created_at)
+    VALUES ('synthetic-exhausted','cleanup-op',10,?,?)
+  `).bind(now, now - 300).run();
+  const env = runtime(database, media);
+  const response = await onRequest({ env, request: request("/api/social/moderation/overview", admin) });
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.counts.pending, 1);
+  assert.equal(payload.counts.userReports, 1);
+  assert.equal(payload.counts.mediaReports, 1);
+  assert.equal(payload.counts.appeals, 1);
+  assert.equal(payload.counts.critical, 2);
+  assert.equal(payload.daily.newLast24Hours, 4);
+  assert.equal(payload.cleanup.pending, 1);
+  assert.equal(payload.cleanup.exhausted, 1);
+  assert.ok(payload.daily.oldestOpenAt <= now - 180);
+  assert.equal((await database.prepare("SELECT COUNT(*) count FROM media_safety_audit_events WHERE action='queue_view'").first()).count, 1);
+  database.close();
+});
+
 test("media classification is role-gated, concurrency-safe, and revokes access immediately", async () => {
   const database = new TestD1(); const media = new TestR2();
   const admin = await member(database, "media-admin");

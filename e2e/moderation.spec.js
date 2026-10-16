@@ -9,7 +9,11 @@ test.beforeEach(async ({ page }) => {
   await page.route("**/api/social/moderation/**", async (route) => {
     const request = route.request(); const url = new URL(request.url());
     if (url.pathname === "/api/social/moderation/overview") {
-      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ counts: { pending: 1, general: 8, sensitive: 2, rejected: 3, reports: 1, appeals: 1 } }) });
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
+        counts: { pending: 1, general: 8, sensitive: 2, rejected: 3, reports: 2, userReports: 1, mediaReports: 1, appeals: 1, critical: 1, high: 1 },
+        daily: { newLast24Hours: 4, resolvedLast24Hours: 2, oldestOpenAt: 1_790_000_000 },
+        cleanup: { pending: 1, exhausted: 0 },
+      }) });
     }
     if (url.pathname === "/api/social/moderation/media" && request.method() === "GET") {
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ media: [{
@@ -24,6 +28,15 @@ test.beforeEach(async ({ page }) => {
     if (url.pathname === "/api/social/moderation/media/media-1") {
       return route.fulfill({ status: 200, contentType: "image/png", body: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Z0ioAAAAASUVORK5CYII=", "base64") });
     }
+    if (url.pathname === "/api/social/moderation/reports" && request.method() === "GET") {
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ reports: [{ id: "report-1", reason_code: "threat", details: "มีข้อความข่มขู่ที่ต้องประเมิน", status: "pending", created_at: 1_790_000_020, subject_name: "สมาชิกทดสอบ" }] }) });
+    }
+    if (url.pathname === "/api/social/moderation/media-reports") {
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ reports: [{ id: "media-report-1", media_id: "media-1", reason_code: "ncii", details: "สงสัยว่าเผยแพร่โดยไม่ได้รับความยินยอม", status: "pending", created_at: 1_790_000_010, media_purpose: "gallery", category: null }] }) });
+    }
+    if (url.pathname === "/api/social/moderation/appeals") {
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ appeals: [{ id: "appeal-1", media_id: "media-2", reason: "ขอให้ตรวจสอบผลการตัดสินอีกครั้ง", status: "pending", revision: 0, created_at: 1_790_000_030, category: "prohibited" }] }) });
+    }
     return route.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ error: "ไม่พบ" }) });
   });
 });
@@ -37,7 +50,15 @@ test("admin media dashboard requires purpose, renders safely, and records a clas
   await expect(page.getByRole("status")).toContainText("อย่างน้อย 10 ตัวอักษร");
   await page.getByLabel("วัตถุประสงค์เฉพาะกรณี").fill("ตรวจสอบคิวสื่อสังเคราะห์สำหรับ QA");
   await page.getByRole("button", { name: "ภาพรวม" }).click();
-  await expect(page.getByText("8")).toBeVisible();
+  await expect(page.locator("#moderation-stats")).toContainText("รายงานผู้ใช้");
+  await expect(page.locator("#moderation-stats")).toContainText("สื่อรอตรวจ");
+  await expect(page.getByText("สรุปภาระงานย้อนหลัง 24 ชั่วโมง")).toBeVisible();
+  await expect(page.getByText("รายการเข้าใหม่")).toBeVisible();
+  await page.getByRole("button", { name: "งานด่วน" }).click();
+  await expect(page.locator("#moderation-results .moderation-card").first()).toContainText("รายงานสื่อ");
+  await expect(page.locator("#moderation-results").getByText("วิกฤต", { exact: true })).toHaveCount(2);
+  await page.getByRole("button", { name: "รายงานผู้ใช้" }).click();
+  await expect(page.getByText("มีข้อความข่มขู่ที่ต้องประเมิน")).toBeVisible();
   await page.getByRole("button", { name: "รอตรวจ" }).click();
   await expect(page.getByText("<img src=x onerror=alert(1)>")).toBeVisible();
   await expect(page.locator("#moderation-results img")).toHaveCount(0);
