@@ -1,8 +1,8 @@
 # Single-admin controlled Beta validation
 
-Validation date: 2026-10-16 (Asia/Bangkok)  
-Implementation commit: `ff25a88`  
-Isolated Preview: `https://9c0e7aca.chatgun.pages.dev`
+Validation date: 2026-10-16 (Asia/Bangkok)
+Implementation commit: `58dba13`
+Isolated Preview: `https://6706d666.chatgun.pages.dev`
 
 This is Staging evidence only. It does not authorize Production deployment, a PR merge, public
 registration, real-user invitations, Sensitive content, or a real Admin grant.
@@ -16,6 +16,8 @@ registration, real-user invitations, Sensitive content, or a real Admin grant.
 - Added aggregate rolling 24-hour intake/resolution, oldest-open-item, pending R2 deletion, and
   exhausted-cleanup indicators. Responses contain counts/timestamps, not reporter identity,
   object keys, provider subjects, or evidence.
+- Added the approved daily 19:00–22:00 Asia/Bangkok coverage state to the dashboard. Reporting
+  remains available 24/7 and queues outside the window; the UI makes no immediate-response claim.
 - Preserved recent-authentication, purpose logging, CSRF, least-privilege roles, private object
   access, decision revisions, quarantine, and audit controls.
 - Added the confirmed single-owner operating model, approved daily 19:00–22:00 Asia/Bangkok
@@ -30,14 +32,15 @@ registration, real-user invitations, Sensitive content, or a real Admin grant.
 | Unit/integration/security | **78 passed, 0 failed, 0 skipped** |
 | Playwright desktop/mobile | **32 passed, 0 failed, 4 intentional duplicate-mutation skips** |
 | Focused local dashboard Playwright | **2 passed** across desktop and mobile before deployment |
+| Deployed full Playwright regression | **32 passed, 0 failed, 4 intentional duplicate-mutation skips** on `6706d666` |
 | Live overview endpoint | **200** with pending/general/Sensitive/rejected, user/media report, appeal, severity, rolling workload, oldest-open, and cleanup aggregates |
 | Live private media/moderation | **PASS** for quarantine, audited view/release, report, prohibited reclassification, appeal, relationship/block revocation, and delete queue |
 | Live account deletion | **PASS** for session/access revocation and queued R2 cleanup |
 
 The deployed full suite used only reserved `cg-stage-*` identities. Before reseeding, Staging had
 four users: three reserved synthetic users and one preserved unrelated account. A D1 Time Travel
-bookmark was recorded before the run:
-`00000032-00000000-00005106-6111a52baf921c39e6b65f5a53232210`.
+bookmark was recorded before the latest run:
+`00000033-00000000-00005106-35573f0f30bd21d3b8807aa216299dec`.
 
 Post-test staging checks:
 

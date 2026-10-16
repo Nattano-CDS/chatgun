@@ -26,7 +26,8 @@ disabled and Production has no R2 binding.
 ## Isolated Preview evidence
 
 - Cloudflare account: `23017b53386fb67fc62a52cdd017454c` (reverified before staging work).
-- Pages Preview deployment: `https://a4620500.chatgun.pages.dev`.
+- Pages Preview deployment for the approved moderation schedule: `https://6706d666.chatgun.pages.dev`
+  (implementation commit `58dba13`).
 - Branch alias: `https://codex-chatgun-release-candid.chatgun.pages.dev`.
 - Preview D1: `DB → chatgun-auth-staging`
   (`5bbfd55d-eb22-4324-8a7d-57bef14110ea`).
@@ -47,7 +48,7 @@ security/browser tests.
 
 | Layer | Result | Evidence |
 | --- | --- | --- |
-| Unit/integration/security | **PASS — 76 passed, 0 failed, 0 skipped** | OAuth/PKCE/state/nonce, Turnstile, CSRF, linking/takeover denial, sessions, acceptance, onboarding, RBAC, media, location privacy, rate limits, deletion, cleanup, migrations, and feature isolation |
+| Unit/integration/security | **PASS — 78 passed, 0 failed, 0 skipped** | OAuth/PKCE/state/nonce, Turnstile, CSRF, linking/takeover denial, sessions, acceptance, onboarding, RBAC, media, location privacy, moderation schedule boundaries, rate limits, deletion, cleanup, migrations, and feature isolation |
 | Playwright desktop/mobile | **PASS — 32 passed, 0 failed, 4 intentional skips** | The four skips prevent destructive API mutations from running twice across browser projects; both browser projects executed responsive UI and moderation checks |
 | Live non-media social APIs | **PASS** | Profile edit/validation, discovery, location accuracy denial, requests/duplicate denial, friendship, text message/non-friend denial, rating/duplicate denial, report validation, block/unblock, CSRF denial |
 | Live private media | **PASS** | Anonymous denial, pending quarantine denial, audited moderator read/release, metadata stripping, friend authorization, like/comment, non-owner delete denial, report/reclassification/appeal, chat-image authorization, immediate block revocation, deletion queue |
