@@ -69,7 +69,8 @@ for (const width of [390,768,1440]) {
     await page.locator("#gallery-comment input[name=comment]").fill("ภาพตัวอย่างน่ารักดี");
     await page.locator("#gallery-comment button").click();
     await expect(page.locator(".comments")).toContainText("ภาพตัวอย่างน่ารักดี");await shot("gallery-post");
-    await page.locator("#profile-dialog .dialog-close").click();
+    await page.locator('#profile-dialog [data-gallery-return]').click();
+    await page.locator('#profile-dialog [data-close-profile]').click();
     await page.reload();await expect(page.locator("#demo-banner")).toBeVisible();
     await page.locator('#primary-nav [data-tab="chat"]').click();await page.locator(".conversation-list .conversation").first().click();
     await expect(page.locator("#thread .message")).toHaveCount(13);
