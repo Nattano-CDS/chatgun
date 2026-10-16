@@ -1048,7 +1048,7 @@ document.addEventListener("click", async (event) => {
   }
   const reusableAsset = event.target.closest("[data-asset]");
   if (reusableAsset) {
-    $('#asset-grid').innerHTML=`<div class="forward-friends"><h2>เลือกเพื่อนที่จะส่งรูป</h2>${state.relationships.filter(p=>p.status==='accepted').map(p=>`<button data-forward-user="${escapeHtml(p.other_user_id)}" data-forward-asset="${escapeHtml(reusableAsset.dataset.asset)}">${escapeHtml(p.name)} <span aria-hidden="true">➤</span></button>`).join('')}</div>`;
+    $('#asset-grid').innerHTML=`<div class="forward-friends"><h2>เลือกเพื่อนที่จะส่งรูป</h2>${state.relationships.filter(p=>p.status==='accepted').map(p=>`<button data-forward-user="${escapeHtml(p.other_user_id)}" data-forward-asset="${escapeHtml(reusableAsset.dataset.asset)}"><div class="chat-friend-photo">${portrait(p,false)}</div>${escapeHtml(p.name)} <span aria-hidden="true">➤</span></button>`).join('')}</div>`;
     return;
   }
   const forward=event.target.closest('[data-forward-user]');
