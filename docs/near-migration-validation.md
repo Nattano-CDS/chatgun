@@ -9,7 +9,7 @@ Scope: isolated Preview and `chatgun-auth-staging` only
 - Cloudflare account confirmed before mutation: `23017b53386fb67fc62a52cdd017454c` (ChatGun).
 - No PiggyPrice or NEAR Cloudflare resource was accessed or modified.
 - No ChatGun Production deployment, D1 migration, user-data mutation, PR merge, or legal publication occurred.
-- Preview URL: `https://ee2405db.chatgun.pages.dev` (branch alias `https://codex-near-migration.chatgun.pages.dev`).
+- Preview URL: `https://0451ea92.chatgun.pages.dev` (branch alias `https://codex-near-migration.chatgun.pages.dev`).
 - All social, demo, registration, media, moderation, verification, email-OTP, and mobile-OTP capabilities are disabled in the deployed environment.
 
 ## D1 result
@@ -31,8 +31,8 @@ Post-migration checks:
 
 | Suite | Result | Coverage summary |
 | --- | --- | --- |
-| Node unit/integration | 48 passed, 0 failed | OAuth/OTP regressions; flags; CSRF; rate limits; D1 migration/idempotency; retention; deletion retry/concurrency; discovery privacy; stable message cursors; blocking; reports; ratings; gallery/R2 mock; private chat images; moderator media/purpose auditing; verification evidence lifecycle |
-| Complete deployed-Preview Playwright suite | 19 passed, 1 intentional skip | Signup and Turnstile; legal/account regressions; desktop/mobile social shell; fail-closed screen; IndexedDB demo; explicit game absence; purpose-gated moderator queue; untrusted report markup rendered as text |
+| Node unit/integration | 49 passed, 0 failed | OAuth/OTP regressions; flags; CSRF; rate limits; D1 migration/idempotency; retention; deletion retry/concurrency; discovery privacy; stable message cursors and private inbox previews; blocking; reports; ratings; gallery/R2 mock; private received-image forwarding; moderator media/purpose auditing; verification evidence lifecycle |
+| Complete deployed-Preview Playwright suite | 21 passed, 1 intentional skip | Signup and Turnstile; legal/account regressions; desktop/mobile social shell; chat preview/safety guidance; deep profile routes and browser history; fail-closed screen; IndexedDB demo; explicit game absence; purpose-gated moderator queue; untrusted report markup rendered as text |
 | Real Preview HTTP | passed | `/app/` 200/no-store/noindex; same-origin geolocation policy; `/api/social/config` all false; disabled social API returns 404 `feature_disabled` |
 | Preview D1 | passed | Migrations applied only to staging and foreign keys verified |
 
@@ -42,9 +42,11 @@ Playwright screenshots are generated locally under `test-results/artifacts/` for
 
 - ChatGun sessions, exact-origin CSRF, rate limits, active-account checks, recent-auth checks, and Thai safe errors are reused.
 - Discovery never returns raw latitude/longitude and requires fresh, accurate presence.
+- Browser geolocation permission loss clears the active watch, requests server-side location hiding, and immediately removes local discovery state; visible-session recovery refreshes stale presence.
 - Blocking is enforced across discovery, profiles, galleries, friendships, messages, ratings, and media.
 - Gallery comment bodies are returned only to the profile owner or accepted friends.
 - Private media uses authorization checks plus `private, no-store`, `nosniff`, restrictive CSP, random object keys, byte-signature validation, and bounded size/count.
+- Received chat images appear in the five-item reuse library only while an accepted, unblocked relationship grants access. Access is revoked when that relationship ends; forwarding creates a new relationship-gated message rather than making an object public.
 - Moderation requires a D1 role, feature flag, explicit access purpose, and audit event. Decisions and their audit records are transactional.
 - The restricted moderator console percent-encodes non-Latin access purposes for transport, records the decoded purpose, renders report/message data with `textContent`, and retrieves sensitive images through private purpose-audited endpoints.
 - Verification evidence is never public, requires recent auth and explicit consent, and enters the deletion queue immediately after a decision. The feature remains disabled.

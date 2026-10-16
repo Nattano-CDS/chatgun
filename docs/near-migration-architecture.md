@@ -47,7 +47,7 @@ Production activation still requires qualified Thai legal review of the threshol
 - The ChatGun Cloudflare account was re-confirmed as `23017b53386fb67fc62a52cdd017454c` before mutation.
 - `0003_social.sql` and `0004_moderation_audit.sql` were applied only to D1 `chatgun-auth-staging` (`5bbfd55d-eb22-4324-8a7d-57bef14110ea`). Existing staging users were preserved and the foreign-key check passed.
 - The repository default Pages binding now points to staging D1; only `[env.production]` points to `chatgun-auth`. This matches the configuration downloaded read-only from Pages.
-- Preview is deployed at `https://ee2405db.chatgun.pages.dev` (branch alias `https://codex-near-migration.chatgun.pages.dev`) with every social capability disabled and `noindex` behavior intact.
+- Preview is deployed at `https://0451ea92.chatgun.pages.dev` (branch alias `https://codex-near-migration.chatgun.pages.dev`) with every social capability disabled and `noindex` behavior intact.
 - R2 cannot yet be configured: the ChatGun account API returns `10042` and requires R2 enablement in the Cloudflare Dashboard. Media flags and the cleanup Worker must remain undeployed until that action is complete.
 - Production migrations `0002`–`0004` remain pending and were not applied.
 
@@ -114,6 +114,7 @@ The UI must not claim complete media deletion while the queue is pending. D1 Tim
 
 - Port NEAR v91 non-game components, not screenshots or static mockups.
 - Preserve discovery cards, filters, friend requests, profile/gallery routes, chat inbox/thread states, private reviews, settings controls, empty/error/loading states, and mobile/desktop breakpoints.
+- Profile and gallery views remain deep-linkable under `/app/people/:id` and `/app/people/:id/gallery/:photo`, with the same server-authorized discovery/friend data controlling resolution; a route never expands profile visibility.
 - Replace only NEAR brand strings, favicon, and wordmark with approved ChatGun assets/copy.
 - Remove the game tab, game query/deep links, game invitation cards, Pig Studio, game CSS/assets, `three`, and every game import.
 - Retain shared error recovery, image optimization, visible polling, portrait, dialog, and accessibility behavior.
