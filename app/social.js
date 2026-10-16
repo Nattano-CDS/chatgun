@@ -41,6 +41,7 @@ const state = {
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+const userPlusIcon='<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></svg>';
 
 // Keep a labelled, bounded portrait when a private or demonstration image fails.
 document.addEventListener('error',event=>{
@@ -367,7 +368,7 @@ function personCard(person, context = "near") {
     action = state.config.messagingEnabled ? `<div class="card-actions"><button class="primary" data-action="chat" data-user="${escapeHtml(id)}">แชท</button></div>` : "";
   } else if (!relation && state.config.friendRequestsEnabled) {
     action = discovery
-      ? `<div class="card-actions"><button class="primary discovery-action" data-action="request" data-user="${escapeHtml(id)}" aria-label="ขอเป็นเพื่อนกับ ${escapeHtml(person.name)}"><span aria-hidden="true">♧+</span><span class="action-label">ขอเป็นเพื่อน</span></button></div>`
+      ? `<div class="card-actions"><button class="primary discovery-action" data-action="request" data-user="${escapeHtml(id)}" aria-label="ขอเป็นเพื่อนกับ ${escapeHtml(person.name)}">${userPlusIcon}<span class="action-label">ขอเป็นเพื่อน</span></button></div>`
       : `<div class="card-actions"><button class="primary" data-action="request" data-user="${escapeHtml(id)}">ขอเป็นเพื่อน</button></div>`;
   } else if (relation?.status === "pending") {
     action = discovery
@@ -375,8 +376,10 @@ function personCard(person, context = "near") {
       : `<div class="card-actions"><button class="secondary" disabled>ส่งคำขอแล้ว</button></div>`;
   }
   const request = context === "request" || context === "sent";
+  const incoming = relation?.status==='pending' && relation.requested_by!==state.account.user.id;
+  if(discovery&&incoming)action='';
   return `${request ? '<div class="request-card">' : ''}<article class="person person-card photo-card context-${escapeHtml(context)}" data-person="${escapeHtml(id)}" tabindex="0" aria-label="เปิดโปรไฟล์ ${escapeHtml(person.name)}"><div class="card-photo">${portrait(person, false)}</div><div class="photo-shade"></div>${person.distance !== undefined ? `<span class="card-distance">${escapeHtml(formatDistance(person.distance, person.distance_label))}</span>` : ""}
-    <div class="person-info"><div class="card-name-row"><strong class="person-name">${escapeHtml(person.name)}${person.identity_verified ? " <span title=\"ยืนยันตัวตนแล้ว\">✓</span>" : ""}</strong></div><p class="person-bio">${escapeHtml(person.bio || person.interests || "ยังไม่ได้แนะนำตัว")}</p><div class="person-meta rating-line"><span>${escapeHtml(person.gender || "ไม่ระบุ")}</span><span>${person.rating ? `☆ ${Number(person.rating).toFixed(1)} (${Number(person.rating_count || 0)})` : ""}</span></div></div>${request ? '' : action}
+    ${incoming ? `<button class="incoming-bell" data-person-open="${escapeHtml(id)}" aria-label="${escapeHtml(person.name)} ส่งคำขอเป็นเพื่อน">${userPlusIcon}</button>` : ''}<div class="person-info"><div class="card-name-row"><strong class="person-name">${escapeHtml(person.name)}${person.identity_verified ? " <span title=\"ยืนยันตัวตนแล้ว\">✓</span>" : ""}</strong></div><p class="person-bio">${escapeHtml(person.bio || person.interests || "ยังไม่ได้แนะนำตัว")}</p><div class="person-meta rating-line"><span>${escapeHtml(person.gender || "ไม่ระบุ")}</span><span>${person.rating ? `☆ ${Number(person.rating).toFixed(1)} (${Number(person.rating_count || 0)})` : ""}</span></div></div>${request ? '' : action}
   </article>${request ? `<div class="request-decisions">${action}</div></div>` : ''}`;
 }
 
@@ -421,6 +424,7 @@ function renderRelationships() {
   state.lastUnread = unread;
   $("#request-badge").hidden = incoming.length === 0;
   $("#message-badge").hidden = unread === 0;
+  $('#request-badge').textContent=String(incoming.length);$('#message-badge').textContent=String(unread);
   $("#requests-grid").innerHTML = [...incoming.map((item) => personCard(item, "request")), ...sent.map((item) => personCard(item, "sent"))].join("") || `<p class="subtitle">ไม่มีคำขอที่รอดำเนินการ</p>`;
   $("#friends-tab>h2:first-of-type").textContent = `คำขอเป็นเพื่อน · ${incoming.length + sent.length}`;
   $("#friends-tab>h2:last-of-type").textContent = `เพื่อน · ${friends.length}`;
@@ -434,7 +438,8 @@ function renderConversations(friends = state.relationships.filter((item) => item
     const preview = !person.last_message_at ? "เริ่มบทสนทนา"
       : person.last_message_unsent_at ? "ยกเลิกส่งข้อความแล้ว"
         : `${person.last_message_sender_id === state.account.user.id ? "คุณ: " : ""}${person.last_message_media_id ? "ส่งรูปภาพ" : person.last_message_body || "ข้อความ"}`;
-    const time = person.last_message_at ? new Date(Number(person.last_message_at) * 1000).toLocaleString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+    const date=person.last_message_at?new Date(Number(person.last_message_at)*1000):null;
+    const time=date?(date.toLocaleDateString('th-TH')===new Date().toLocaleDateString('th-TH')?date.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}):date.toLocaleDateString('th-TH',{day:'numeric',month:'short'})):'';
     return `<button class="conversation ${state.selectedChat === person.other_user_id ? "active" : ""}" data-chat="${escapeHtml(person.other_user_id)}"><span class="avatar">${escapeHtml(initials(person.name))}</span><span class="conversation-copy"><span><strong>${escapeHtml(person.name)}</strong><time>${escapeHtml(time)}</time></span><small>${escapeHtml(preview)}</small></span>${Number(person.unread_count || 0) ? `<b class="inbox-unread">${Number(person.unread_count)}</b>` : ""}</button>`;
   }).join("") : `<div class="empty"><p>ต้องเป็นเพื่อนกันก่อนจึงจะแชทได้</p></div>`;
   for (const person of friends) populateAvatar($(`[data-chat="${CSS.escape(person.other_user_id)}"] .avatar`, list), person);
@@ -715,7 +720,7 @@ function renderThreadMessages() {
   messages.innerHTML = state.threadMessages.length ? `${state.threadMessages.map((message) => {
     const media = message.media_id && !message.unsent_at ? chatMediaUrl(message.media_id) : "";
     const attachment = message.media_id && !message.unsent_at ? (media ? `<img class="chat-image" src="${escapeHtml(media)}" alt="รูปในแชท" loading="lazy">` : `<em>รูปนี้ไม่อยู่ในคลังแล้ว</em>`) : "";
-    return `<div class="message ${message.sender_user_id === state.account.user.id ? "mine" : ""} ${message.unsent_at ? "unsent" : ""}">${attachment}${escapeHtml(message.unsent_at ? "ยกเลิกข้อความแล้ว" : message.body)}<time>${new Date(Number(message.created_at) * 1000).toLocaleString("th-TH")}</time>${message.sender_user_id === state.account.user.id && !message.unsent_at ? `<span class="message-tools"><button type="button" data-message-action="unsend" data-message="${escapeHtml(message.id)}">ยกเลิกข้อความ</button></span>` : ""}</div>`;
+    return `<div class="message ${message.sender_user_id === state.account.user.id ? "mine" : ""} ${message.unsent_at ? "unsent" : ""}">${attachment}${escapeHtml(message.unsent_at ? "ยกเลิกข้อความแล้ว" : message.body)}<time>${new Date(Number(message.created_at) * 1000).toLocaleTimeString("th-TH", {hour:"2-digit",minute:"2-digit"})}</time>${message.sender_user_id === state.account.user.id && !message.unsent_at ? `<span class="message-tools"><button type="button" data-message-action="unsend" data-message="${escapeHtml(message.id)}">ยกเลิกข้อความ</button></span>` : ""}</div>`;
   }).join("")}${loadMore}` : `<div class="empty"><p>เริ่มบทสนทนาด้วยความสุภาพ</p></div>`;
 }
 
@@ -977,6 +982,7 @@ $("#refresh").addEventListener("click", async () => { try { await Promise.all([l
 [$("#people-search"), $("#radius-filter"), $("#gender-filter"), $("#interest-filter"), $("#relationship-filter")].forEach((input) => input.addEventListener("input", renderPeople));
 
 document.addEventListener("click", async (event) => {
+  const profileOpen=event.target.closest('[data-person-open]');if(profileOpen){await showPerson(profileOpen.dataset.personOpen);return;}
   if(event.target.closest('.picker-toggle')){
     const picker=$('#thread .chat-image-picker');picker.hidden=!picker.hidden;$('#thread .picker-toggle').setAttribute('aria-expanded',String(!picker.hidden));
     if(picker.hidden){state.chosenAsset=null;$('#thread input[name=body]').disabled=false;}

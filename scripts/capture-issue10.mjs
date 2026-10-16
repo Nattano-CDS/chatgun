@@ -3,6 +3,8 @@ import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 const target=process.env.AUDIT_URL||'https://chatgun.social';
 const original=process.env.AUDIT_KIND==='near';
+const release=original?null:await fetch(target+'/release.json').then(r=>r.json());
+if(process.env.EXPECTED_SHA&&release?.commit!==process.env.EXPECTED_SHA)throw Error('Unexpected capture deployment SHA');
 const output=resolve(process.env.AUDIT_OUTPUT||'docs/issue-10/before');
 await mkdir(output,{recursive:true});
 const browser=await chromium.launch();
@@ -33,7 +35,7 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
       const me={id:'demo-me',name:'คุณ',gender:'ไม่ระบุ',bio:'กำลังทดลอง ChatGun',interests:'กาแฟ, เพื่อนใหม่',visible:1,locationFresh:true};
       const relations=fixture.conversations.map((c,i)=>({id:`fixture-${i}`,sender:'demo-me',receiver:`demo-${c.with}`,status:'accepted'}));
       relations.push(...people.slice(11,16).map(p=>({id:`request-${p.id}`,sender:p.id,receiver:'demo-me',status:'pending'})));
-      const messages=fixture.conversations.flatMap(c=>c.messages.map((body,i)=>({id:`message-${c.with}-${i}`,sender:i%2?'demo-me':`demo-${c.with}`,receiver:i%2?`demo-${c.with}`:'demo-me',body,created:now-(12-i)*120000})));
+      const messages=fixture.conversations.flatMap((c,ci)=>c.messages.map((body,i)=>({id:`message-${c.with}-${i}`,sender:i%2?'demo-me':`demo-${c.with}`,receiver:i%2?`demo-${c.with}`:'demo-me',body,created:now-(12-i)*120000,read_at:i%2===0&&ci<3&&i/2<ci+1?null:now})));
       const galleryPhotos=people.map(p=>({id:`demo-portrait-${p.slug}`,owner:p.id,caption:`ภาพตัวละครสมมติ ${p.name}`,url:p.photoUrl,likeCount:3,likedByMe:false,comments:[{id:`comment-${p.id}`,name:'เพื่อนตัวอย่าง',body:'รูปนี้ดูสดใสดีมาก'}]}));
       galleryPhotos.push(...people.slice(0,2).map(p=>({id:`own-${p.id}`,owner:'demo-me',caption:'แกลเลอรีตัวอย่าง — ตัวละครสมมติ',url:p.photoUrl,likeCount:4,comments:[]})));
       const value={me,people,relations,messages,galleryPhotos,ownRatings:people.slice(0,15).map((p,i)=>({name:p.name,score:4+i%2,comment:['คุยเป็นกันเองและสุภาพ','ชอบแลกเปลี่ยนเรื่องคาเฟ่กับหนังสือ','เป็นเพื่อนที่รับฟังและให้เกียรติกัน'][i%3],created:now-i*3600000})),blockedUsers:[],chatImages:[{id:'fixture-chat-01',url:'/assets/demo/01.png',created:now}],reports:[]};
@@ -74,10 +76,11 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
   await nav('near');await context.setOffline(true);await shot('offline');await context.setOffline(false);
   for(const [name,path] of [['upload-photos',original?'/photos':'/app/photos'],['login',original?'/login':'/signup'],['register',original?'/register':'/acceptance'],['account','/account'],['admin-denied','/app/moderation.html']]){
     if(original&&['account','admin-denied'].includes(name))continue;
-    await attempt(name,()=>page.goto(target+path));
+    await attempt(name,async()=>{await page.goto(target+path);if(!original&&name==='account')await page.waitForURL(/\/signup(?:\.html)?(?:\?|$)/,{timeout:10000});});
   }
   await context.close();
 }
-await writeFile(resolve(output,'capture.json'),JSON.stringify({target,kind:original?'canonical-source-render':'live-site',referenceCommit:original?'98bb83e44bf88eddb9822d7875f18cd4fe833ee2':undefined,fixture:'chatgun-browser-demo-v1; browser-only adapter and empty-state variations',viewports:[[390,844],[768,1024],[1440,1100]],failures},null,2));
+if(!original&&(await fetch(target+'/release.json').then(r=>r.json())).commit!==release.commit)throw Error('Deployment changed during capture; recapture required');
+await writeFile(resolve(output,'capture.json'),JSON.stringify({target,commit:release?.commit,kind:original?'canonical-source-render':'live-site',referenceCommit:original?'98bb83e44bf88eddb9822d7875f18cd4fe833ee2':undefined,fixture:'chatgun-browser-demo-v1; browser-only adapter and empty-state variations',viewports:[[390,844],[768,1024],[1440,1100]],failures},null,2));
 await browser.close();
 console.log(JSON.stringify({output,failures}));
