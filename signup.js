@@ -4,6 +4,12 @@ const $ = (id) => document.getElementById(id);
 let busy = false;
 let turnstileWidget = null;
 let turnstileReady = false;
+let turnstileSiteKey = null;
+let turnstileScript = null;
+let turnstileLoadTimer = null;
+
+const TURNSTILE_SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+const TURNSTILE_CONNECTION_MESSAGE = "ไม่สามารถเชื่อมต่อระบบยืนยันความปลอดภัยได้ โปรดตรวจสอบอินเทอร์เน็ต อนุญาต challenges.cloudflare.com ในตัวบล็อกเนื้อหา แล้วลองใหม่";
 
 const ERROR_MESSAGES = {
   provider_denied: "คุณยกเลิกการเข้าสู่ระบบ กรุณาลองอีกครั้งเมื่อต้องการ",
@@ -35,6 +41,89 @@ function turnstileToken() {
 function resetTurnstile() {
   if (turnstileReady && turnstileWidget !== null) window.turnstile.reset(turnstileWidget);
 }
+
+function showTurnstileFailure(text = TURNSTILE_CONNECTION_MESSAGE, retry = true) {
+  turnstileReady = false;
+  message(text);
+  $("turnstile-retry").hidden = !retry;
+}
+
+function handleTurnstileError(code) {
+  const normalizedCode = String(code || "");
+  if (["110100", "110110", "110200", "400020", "400021", "400070"].includes(normalizedCode)) {
+    showTurnstileFailure("เว็บไซต์ทดสอบนี้ยังไม่ได้รับอนุญาตให้ใช้ระบบยืนยันความปลอดภัย โปรดแจ้งผู้ดูแล ChatGun", false);
+    return;
+  }
+  showTurnstileFailure();
+}
+
+function renderTurnstile() {
+  if (!window.turnstile || !turnstileSiteKey) {
+    showTurnstileFailure();
+    return;
+  }
+  try {
+    turnstileWidget = window.turnstile.render("#turnstile", {
+      sitekey: turnstileSiteKey,
+      action: "auth_start",
+      theme: "light",
+      callback: () => {
+        turnstileReady = true;
+        $("turnstile-retry").hidden = true;
+        message("");
+      },
+      "error-callback": handleTurnstileError,
+      "expired-callback": () => {
+        turnstileReady = true;
+        message("การยืนยันหมดอายุแล้ว กรุณายืนยันอีกครั้ง");
+      },
+      "timeout-callback": () => showTurnstileFailure("ระบบยืนยันใช้เวลานานเกินไป กรุณาลองโหลดอีกครั้ง"),
+      "unsupported-callback": () => showTurnstileFailure("เบราว์เซอร์นี้ไม่รองรับระบบยืนยันความปลอดภัย กรุณาอัปเดตเบราว์เซอร์หรือใช้เบราว์เซอร์อื่น", false),
+    });
+    turnstileReady = true;
+  } catch {
+    showTurnstileFailure();
+  }
+}
+
+function loadTurnstileScript() {
+  clearTimeout(turnstileLoadTimer);
+  turnstileScript?.remove();
+  turnstileScript = document.createElement("script");
+  turnstileScript.src = TURNSTILE_SCRIPT_URL;
+  turnstileScript.async = true;
+  turnstileScript.defer = true;
+  turnstileScript.onload = () => {
+    clearTimeout(turnstileLoadTimer);
+    renderTurnstile();
+  };
+  turnstileScript.onerror = () => {
+    clearTimeout(turnstileLoadTimer);
+    showTurnstileFailure();
+  };
+  document.head.appendChild(turnstileScript);
+  turnstileLoadTimer = window.setTimeout(() => {
+    if (!window.turnstile) showTurnstileFailure();
+  }, 15000);
+}
+
+$("turnstile-retry").addEventListener("click", () => {
+  $("turnstile-retry").hidden = true;
+  message("กำลังโหลดระบบยืนยันความปลอดภัยอีกครั้ง…");
+  turnstileReady = false;
+  if (window.turnstile) {
+    try {
+      if (turnstileWidget !== null) window.turnstile.remove(turnstileWidget);
+    } catch {
+      // The failed widget might already have been removed by Turnstile.
+    }
+    turnstileWidget = null;
+    $("turnstile").replaceChildren();
+    renderTurnstile();
+    return;
+  }
+  loadTurnstileScript();
+});
 
 async function api(path, data) {
   const response = await fetch(path, {
@@ -79,18 +168,10 @@ async function initializeTurnstile() {
       $("auth-description").textContent = "เลือกบัญชีโซเชียลที่คุณต้องการใช้กับ ChatGun";
       $("social-consent").textContent = "เมื่อดำเนินการต่อ ChatGun จะรับชื่อ รูปโปรไฟล์ และอีเมลเท่าที่ผู้ให้บริการอนุญาต เพื่อสร้างหรือยืนยันบัญชีและรักษาความปลอดภัยในการเข้าสู่ระบบ";
     }
-    const script = document.createElement("script");
-    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      turnstileWidget = window.turnstile.render("#turnstile", { sitekey: config.turnstileSiteKey, action: "auth_start", theme: "light" });
-      turnstileReady = true;
-    };
-    script.onerror = () => message("โหลดระบบตรวจสอบความปลอดภัยไม่สำเร็จ กรุณารีเฟรชหน้า");
-    document.head.appendChild(script);
+    turnstileSiteKey = config.turnstileSiteKey;
+    loadTurnstileScript();
   } catch (error) {
-    message(error.message);
+    showTurnstileFailure(error.message);
   }
 }
 

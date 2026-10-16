@@ -17,6 +17,9 @@ button{font-family:inherit;cursor:pointer}
 .card .social-consent{margin:12px 3px 0;color:#777d94;font-size:11px;line-height:1.65;text-align:left}
 .providers button:disabled{opacity:.55;cursor:wait}
 .turnstile{min-height:65px;margin-top:20px;display:flex;justify-content:center}
+.turnstile-retry{display:block;margin:8px auto 0;padding:9px 16px;border:1px solid #7253df;border-radius:999px;background:#fff;color:#6045c7;font-size:12px;font-weight:600}
+.turnstile-retry:hover{background:#f6f2ff}
+.turnstile-retry[hidden]{display:none}
 .card small{display:block;text-align:center;color:#9699ac;font-size:11px;margin-top:24px}
 .card small a{color:#7253df;margin:0 3px}
 #message{color:#b83c63;font-size:12px;min-height:20px}

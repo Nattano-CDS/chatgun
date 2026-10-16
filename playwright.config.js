@@ -13,7 +13,7 @@ export default defineConfig({
   reporter: [["list"], ["html", { open: "never" }]],
   outputDir: "test-results/artifacts",
   use: {
-    baseURL: process.env.E2E_BASE_URL || "https://feature-cloudflare-auth.chatgun.pages.dev",
+    baseURL: process.env.E2E_BASE_URL || "https://codex-chatgun-release-candid.chatgun.pages.dev",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },

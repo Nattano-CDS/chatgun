@@ -5,7 +5,7 @@ This runbook is for the ChatGun Cloudflare account only.
 - Cloudflare account ID: `23017b53386fb67fc62a52cdd017454c`
 - Pages project: `chatgun`
 - Preview database: `chatgun-auth-staging`
-- Stable Preview origin: `https://feature-cloudflare-auth.chatgun.pages.dev`
+- Stable release-candidate Preview origin: `https://codex-chatgun-release-candid.chatgun.pages.dev`
 - Environment: Cloudflare Pages **Preview** only until provider E2E testing passes
 
 ## Staging configuration status (2026-10-16)
@@ -41,9 +41,9 @@ separate ChatGun project, application, channel, widget, or API key in that accou
 
 Register these exact HTTPS callback URLs:
 
-- Google: `https://feature-cloudflare-auth.chatgun.pages.dev/api/auth/oauth/google/callback`
-- Facebook: `https://feature-cloudflare-auth.chatgun.pages.dev/api/auth/oauth/facebook/callback`
-- LINE: `https://feature-cloudflare-auth.chatgun.pages.dev/api/auth/oauth/line/callback`
+- Google: `https://codex-chatgun-release-candid.chatgun.pages.dev/api/auth/oauth/google/callback`
+- Facebook: `https://codex-chatgun-release-candid.chatgun.pages.dev/api/auth/oauth/facebook/callback`
+- LINE: `https://codex-chatgun-release-candid.chatgun.pages.dev/api/auth/oauth/line/callback`
 
 Do not register an immutable deployment hostname such as `<deployment>.chatgun.pages.dev`.
 The branch alias above remains stable across Preview deployments.
@@ -112,7 +112,7 @@ register wildcard or immutable deployment URLs.
 Create a separate managed widget in the ChatGun Cloudflare account:
 
 - Name: `ChatGun Preview Authentication`
-- Hostname: `feature-cloudflare-auth.chatgun.pages.dev`
+- Hostname: `codex-chatgun-release-candid.chatgun.pages.dev`
 - Mode: Managed
 - Pre-clearance: disabled / no clearance
 

@@ -6,7 +6,68 @@ const screenshotDirectory = resolve("test-results/screenshots");
 
 test.beforeAll(() => mkdirSync(screenshotDirectory, { recursive: true }));
 
+test("signup explains a Turnstile connection failure in Thai and retries before OAuth", async ({ page }) => {
+  await page.route("https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/javascript",
+      body: `
+        (() => {
+          let renders = 0;
+          let token = "";
+          window.turnstile = {
+            render(target, options) {
+              renders += 1;
+              const container = document.querySelector(target);
+              container.replaceChildren();
+              const input = document.createElement("input");
+              input.name = "cf-turnstile-response";
+              input.type = "hidden";
+              container.appendChild(input);
+              if (renders === 1) {
+                setTimeout(() => options["error-callback"]("200500"), 0);
+              } else {
+                token = "synthetic-ui-token";
+                input.value = token;
+                setTimeout(() => options.callback(token), 0);
+              }
+              return "synthetic-widget";
+            },
+            getResponse() { return token; },
+            remove() { token = ""; },
+            reset() { token = ""; },
+          };
+        })();
+      `,
+    });
+  });
+  await page.route("**/api/auth/oauth/google/start", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth?client_id=preview" }),
+  }));
+  await page.route("https://accounts.google.com/**", (route) => route.fulfill({
+    status: 200,
+    contentType: "text/html",
+    body: "<h1>Google authorization</h1>",
+  }));
+
+  await page.goto("/signup.html");
+  await expect(page.getByRole("status")).toContainText("ไม่สามารถเชื่อมต่อระบบยืนยันความปลอดภัยได้");
+  const retry = page.getByRole("button", { name: "ลองโหลดระบบยืนยันอีกครั้ง" });
+  await expect(retry).toBeVisible();
+  await retry.click();
+  await expect(retry).toBeHidden();
+  await expect(page.getByRole("status")).toBeEmpty();
+  await page.getByRole("button", { name: "ดำเนินการต่อด้วย Google" }).click();
+  await expect(page).toHaveURL(/accounts\.google\.com\/o\/oauth2\/v2\/auth/u);
+});
+
 test("signup permits existing social login while public registration remains closed", async ({ page }, testInfo) => {
+  const cspErrors = [];
+  page.on("console", (entry) => {
+    if (/Content Security Policy directive/iu.test(entry.text())) cspErrors.push(entry.text());
+  });
   await page.goto("/signup.html");
   await expect(page).toHaveTitle("สมัครสมาชิก | ChatGun");
   await expect(page.getByRole("heading", { name: "เข้าสู่ระบบด้วยบัญชีเดิม" })).toBeVisible();
@@ -22,6 +83,7 @@ test("signup permits existing social login while public registration remains clo
   await expect(page.locator('input[type="email"], input[inputmode="tel"]')).toHaveCount(0);
   await expect(page.locator('#turnstile input[name="cf-turnstile-response"]')).toBeAttached();
   await expect(page.getByRole("status")).toBeEmpty();
+  expect(cspErrors).toEqual([]);
   await page.screenshot({
     path: resolve(screenshotDirectory, testInfo.project.name.includes("mobile") ? "signup-mobile.png" : "signup-desktop.png"),
     fullPage: true,
