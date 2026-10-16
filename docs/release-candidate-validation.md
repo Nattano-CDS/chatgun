@@ -122,3 +122,15 @@ synthetic staging data.
   operations, provider publishing checks, and the approved Production migration/recovery window
   remain unresolved. Public registration and Sensitive content must stay disabled.
 
+## Single-admin Phase 1 update
+
+The owner subsequently confirmed that they will be the Phase 1 primary administrator, moderator,
+and Trust & Safety decision maker. The release candidate now includes a single-operator urgent
+queue, workload/cleanup summary, operating model, coverage proposal, daily checklist, backup plan,
+monitoring, and rollback gates. The implementation and deployed Staging evidence are recorded in
+`docs/single-admin-beta-operations.md` and `docs/single-admin-beta-validation.md`.
+
+No real role was granted because the intended ChatGun account has not been privately verified.
+Single-person coverage does not resolve emergency/legal escalation, independent appeals, backup
+availability, media-scanning capacity, or qualified legal review; the Production/real-user Beta
+assessment therefore remains **NO-GO**.
