@@ -14,6 +14,9 @@ const state = {
   locationFresh: false,
   locationWatch: null,
   lastLocationPost: 0,
+  demo: false,
+  demoMessages: {},
+  lastUnread: 0,
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -24,6 +27,7 @@ function cookie(name) {
 }
 
 async function api(path, options = {}) {
+  if (state.demo) return demoApi(path, options);
   const headers = { accept: "application/json", ...(options.headers || {}) };
   const method = options.method || "GET";
   if (options.body !== undefined) {
@@ -40,6 +44,103 @@ async function api(path, options = {}) {
     throw error;
   }
   return payload;
+}
+
+function demoDatabase() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("chatgun-demo", 1);
+    request.onupgradeneeded = () => request.result.createObjectStore("state");
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function demoRead() {
+  const database = await demoDatabase();
+  return new Promise((resolve) => {
+    const request = database.transaction("state").objectStore("state").get("social");
+    request.onsuccess = () => { database.close(); resolve(request.result || null); };
+    request.onerror = () => { database.close(); resolve(null); };
+  });
+}
+
+async function demoSave() {
+  const database = await demoDatabase();
+  const snapshot = { profile: state.profile, relationships: state.relationships, ratings: state.ratings, blocked: state.blocked, messages: state.demoMessages };
+  await new Promise((resolve, reject) => {
+    const request = database.transaction("state", "readwrite").objectStore("state").put(snapshot, "social");
+    request.onsuccess = resolve;
+    request.onerror = () => reject(request.error);
+  }).finally(() => database.close());
+}
+
+async function demoApi(path, options = {}) {
+  const url = new URL(path, location.origin);
+  const method = options.method || "GET";
+  const body = options.body || {};
+  if (url.pathname === "/api/auth/me") return state.account;
+  if (url.pathname === "/api/social/profile") {
+    if (method === "POST" && body.action === "edit") Object.assign(state.profile, { name: body.name, gender: body.gender, bio: body.bio, interests: body.interests });
+    if (method === "POST" && body.action === "hide") state.profile.discovery_visible = 0;
+    await demoSave();
+    return { profile: state.profile };
+  }
+  if (url.pathname === "/api/social/discovery") return { people: state.people.filter((person) => !state.blocked.some((item) => item.user_id === person.user_id)), locationFresh: state.locationFresh };
+  if (url.pathname === "/api/social/relationships") {
+    if (method === "GET") return { relationships: state.relationships };
+    const person = state.people.find((item) => item.user_id === body.target) || state.relationships.find((item) => item.other_user_id === body.target);
+    const current = relationshipFor(body.target);
+    if (body.action === "request" && person && !current) state.relationships.unshift({ ...person, other_user_id: body.target, requested_by: "demo-me", status: "pending", updated_at: Date.now() / 1000 });
+    if (body.action === "accept" && current) current.status = "accepted";
+    if (["reject", "cancel", "unfriend"].includes(body.action)) state.relationships = state.relationships.filter((item) => item.other_user_id !== body.target);
+    await demoSave(); return { ok: true };
+  }
+  if (url.pathname === "/api/social/blocks") {
+    if (method === "GET") return { blocked: state.blocked };
+    const person = state.people.find((item) => item.user_id === body.target) || state.relationships.find((item) => item.other_user_id === body.target);
+    if (body.action === "block" && person) { state.blocked.unshift({ user_id: body.target, name: person.name }); state.relationships = state.relationships.filter((item) => item.other_user_id !== body.target); }
+    if (body.action === "unblock") state.blocked = state.blocked.filter((item) => item.user_id !== body.target);
+    await demoSave(); return { ok: true };
+  }
+  if (url.pathname === "/api/social/messages") {
+    const target = method === "GET" ? url.searchParams.get("target") : body.target;
+    state.demoMessages[target] ||= [];
+    if (method === "GET") return { messages: [...state.demoMessages[target]].reverse(), hasMore: false };
+    if (body.action === "send") state.demoMessages[target].push({ id: crypto.randomUUID(), sender_user_id: "demo-me", receiver_user_id: target, body: body.body, created_at: Math.floor(Date.now() / 1000) });
+    await demoSave(); return { ok: true };
+  }
+  if (url.pathname === "/api/social/ratings") {
+    if (method === "GET") return { ratings: state.ratings };
+    state.ratings.unshift({ id: crypto.randomUUID(), score: body.score, comment: body.comment, sender_name: "สมาชิกสาธิต", created_at: Math.floor(Date.now() / 1000) });
+    await demoSave(); return { ok: true };
+  }
+  if (url.pathname === "/api/social/gallery") return { photos: [], comments: [], owner: url.searchParams.get("user") || "demo-me" };
+  if (url.pathname === "/api/social/reports") return { ok: true };
+  throw new Error("ฟีเจอร์นี้ไม่ทำงานในโหมดสาธิต");
+}
+
+async function startDemo() {
+  const saved = await demoRead().catch(() => null);
+  state.demo = true;
+  state.config = { ...state.config, socialAppEnabled: true, publicDiscoveryEnabled: true, friendRequestsEnabled: true, messagingEnabled: true, ratingsEnabled: true, mediaUploadEnabled: false, identityVerificationEnabled: false };
+  state.account = { user: { id: "demo-me", displayName: "คุณ" }, providers: [] };
+  state.profile = saved?.profile || { user_id: "demo-me", name: "คุณ", gender: "ไม่ระบุ", bio: "กำลังทดลอง ChatGun", interests: "กาแฟ, เพื่อนใหม่", discovery_visible: 1 };
+  state.people = [
+    { user_id: "demo-min", name: "มิน", gender: "หญิง", bio: "ชอบคาเฟ่และถ่ายรูป", interests: "กาแฟ, ถ่ายรูป", distance: 82, rating: 4.8, rating_count: 12 },
+    { user_id: "demo-ton", name: "ต้น", gender: "ชาย", bio: "วิ่งและท่องเที่ยว", interests: "วิ่ง, ท่องเที่ยว", distance: 640, rating: 4.5, rating_count: 6 },
+    { user_id: "demo-ploy", name: "พลอย", gender: "หญิง", bio: "อ่านหนังสือและดนตรี", interests: "หนังสือ, ดนตรี", distance: 1200, rating: 4.9, rating_count: 18 },
+  ];
+  state.relationships = saved?.relationships || [{ other_user_id: "demo-ploy", requested_by: "demo-ploy", status: "accepted", name: "พลอย", gender: "หญิง", bio: "เพื่อนในโหมดสาธิต", updated_at: 1 }];
+  state.ratings = saved?.ratings || [{ id: "demo-rating", score: 5, comment: "สุภาพและเป็นมิตร", sender_name: "พลอย", created_at: Math.floor(Date.now() / 1000) }];
+  state.blocked = saved?.blocked || [];
+  state.demoMessages = saved?.messages || { "demo-ploy": [{ id: "demo-message", sender_user_id: "demo-ploy", receiver_user_id: "demo-me", body: "ยินดีต้อนรับสู่โหมดสาธิต 👋", created_at: Math.floor(Date.now() / 1000) }] };
+  state.locationFresh = true;
+  $("#disabled-view").hidden = true;
+  $("#global-status").textContent = "";
+  $("#social-view").hidden = false;
+  $("#demo-banner").hidden = false;
+  fillProfile(); renderPeople(); renderRelationships(); renderRatings(); renderBlocked(); renderOwnGallery();
+  $("#app").setAttribute("aria-busy", "false");
 }
 
 function escapeHtml(value) {
@@ -130,6 +231,10 @@ function renderRelationships() {
   const sent = state.relationships.filter((item) => item.status === "pending" && item.requested_by === state.account.user.id);
   const friends = state.relationships.filter((item) => item.status === "accepted");
   const unread = friends.reduce((total, item) => total + Number(item.unread_count || 0), 0);
+  if (unread > state.lastUnread && document.visibilityState !== "visible" && "Notification" in window && Notification.permission === "granted" && localStorage.getItem("chatgun-notifications") === "enabled") {
+    new Notification("ChatGun", { body: `คุณมี ${unread} ข้อความที่ยังไม่ได้อ่าน`, icon: "/favicon.svg" });
+  }
+  state.lastUnread = unread;
   $("#request-badge").hidden = incoming.length === 0;
   $("#message-badge").hidden = unread === 0;
   $("#requests-grid").innerHTML = [...incoming.map((item) => personCard(item, "request")), ...sent.map((item) => personCard(item, "sent"))].join("") || `<p class="subtitle">ไม่มีคำขอที่รอดำเนินการ</p>`;
@@ -219,6 +324,13 @@ async function relationshipAction(action, target, button) {
 
 async function updateLocation() {
   const button = $("#location-toggle");
+  if (state.demo) {
+    state.locationFresh = !state.locationFresh;
+    button.textContent = state.locationFresh ? "ปิดตำแหน่ง" : "เปิดตำแหน่ง";
+    $("#location-banner").classList.toggle("active", state.locationFresh);
+    renderPeople();
+    return;
+  }
   if (state.locationFresh) {
     setBusy(button, true);
     try {
@@ -299,6 +411,7 @@ async function initialize() {
     if (!state.config.socialAppEnabled) {
       $("#global-status").textContent = "";
       $("#disabled-view").hidden = false;
+      $("#demo-start").hidden = !state.config.demoModeEnabled;
       return;
     }
     try { state.account = await api("/api/auth/me"); }
@@ -318,6 +431,7 @@ async function initialize() {
     }
     $("#global-status").textContent = "";
     $("#social-view").hidden = false;
+    if (localStorage.getItem("chatgun-notifications") === "enabled") $("#notification-toggle").textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
     fillProfile();
     await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked(), loadOwnGallery(), loadVerification()]);
   } catch (error) {
@@ -363,6 +477,21 @@ $("#hide-discovery").addEventListener("click", async (event) => {
   } catch (error) { toast(error.message, true); } finally { setBusy(event.currentTarget, false); }
 });
 
+$("#notification-toggle").addEventListener("click", async (event) => {
+  if (!("Notification" in window)) return toast("เบราว์เซอร์นี้ไม่รองรับการแจ้งเตือน", true);
+  const enabled = localStorage.getItem("chatgun-notifications") === "enabled";
+  if (enabled) {
+    localStorage.removeItem("chatgun-notifications");
+    event.currentTarget.textContent = "เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
+    return toast("ปิดการแจ้งเตือนในอุปกรณ์นี้แล้ว");
+  }
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") return toast("ไม่ได้รับอนุญาตให้แสดงการแจ้งเตือน", true);
+  localStorage.setItem("chatgun-notifications", "enabled");
+  event.currentTarget.textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
+  toast("เปิดการแจ้งเตือนแล้ว");
+});
+
 $("#gallery-upload").addEventListener("submit", async (event) => {
   event.preventDefault();
   const button = event.submitter;
@@ -396,6 +525,7 @@ $("#verification-form").addEventListener("submit", async (event) => {
 });
 
 $("#location-toggle").addEventListener("click", updateLocation);
+$("#demo-start").addEventListener("click", () => startDemo().catch((error) => toast(error.message, true)));
 $("#refresh").addEventListener("click", async () => { try { await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked()]); toast("อัปเดตข้อมูลแล้ว"); } catch (error) { toast(error.message, true); } });
 [$("#people-search"), $("#radius-filter"), $("#gender-filter"), $("#interest-filter")].forEach((input) => input.addEventListener("input", renderPeople));
 

@@ -125,6 +125,7 @@ async function config(env) {
     mediaUploadEnabled: enabled(env.MEDIA_UPLOAD_ENABLED),
     ratingsEnabled: enabled(env.RATINGS_ENABLED),
     identityVerificationEnabled: enabled(env.IDENTITY_VERIFICATION_ENABLED),
+    demoModeEnabled: enabled(env.DEMO_MODE_ENABLED),
     gameEnabled: false,
     emailOtpEnabled: false,
     mobileOtpEnabled: false,
@@ -639,11 +640,19 @@ async function moderationReports(request, env) {
   const status = String(body.status || "");
   if (!["reviewed", "escalated", "closed"].includes(status)) throw new SocialError("invalid_status", "สถานะไม่ถูกต้อง");
   const decisionPurpose = `${purpose}; ${cleanText(body.note, 300, { required: true })}`.slice(0, 300);
-  const result = await env.DB.prepare(`
-    UPDATE social_reports SET status = ?, reviewed_at = ? WHERE id = ? AND status <> 'closed'
-  `).bind(status, unixTime(), id).run();
-  if (!Number(result.meta?.changes || 0)) throw new SocialError("not_found", "ไม่พบรายงานที่ดำเนินการได้", 404);
-  await auditModeration(env.DB, session.user_id, "report_review", "report", id, decisionPurpose);
+  const timestamp = unixTime();
+  const results = await env.DB.batch([
+    env.DB.prepare(`
+      INSERT INTO moderation_audit_events(id,actor_user_id,action,subject_type,subject_id,purpose,created_at)
+      SELECT ?,?,'report_review','report',?,?,? WHERE EXISTS(
+        SELECT 1 FROM social_reports WHERE id = ? AND status <> 'closed'
+      )
+    `).bind(safeUuid(), session.user_id, id, decisionPurpose, timestamp, id),
+    env.DB.prepare(`
+      UPDATE social_reports SET status = ?, reviewed_at = ? WHERE id = ? AND status <> 'closed'
+    `).bind(status, timestamp, id),
+  ]);
+  if (!Number(results[1]?.meta?.changes || 0)) throw new SocialError("not_found", "ไม่พบรายงานที่ดำเนินการได้", 404);
   return json({ ok: true });
 }
 
@@ -679,6 +688,7 @@ async function ratings(request, env) {
   await limited(env, "rating_user_day", session.user_id, 30, 86400);
   const body = await readJson(request);
   const target = String(body.target || "");
+  if (!target || target === session.user_id) throw new SocialError("invalid_target", "ไม่พบผู้ใช้", 404);
   const score = Number(body.score);
   if (!Number.isInteger(score) || score < 1 || score > 5) throw new SocialError("invalid_score", "เลือกคะแนน 1–5");
   if (await isBlocked(env.DB, session.user_id, target)) throw new SocialError("blocked", "ไม่สามารถให้คะแนนผู้ใช้นี้", 403);
@@ -757,6 +767,8 @@ async function gallery(request, env) {
     if (url.searchParams.get("photo")) {
       const id = String(url.searchParams.get("photo"));
       if (!photos.some((photo) => photo.id === id)) throw new SocialError("not_found", "ไม่พบรูปภาพ", 404);
+      const canReadComments = owner === session.user_id || await accepted(env.DB, session.user_id, owner);
+      if (!canReadComments) return json({ photos, comments: [], owner });
       const comments = await env.DB.prepare(`
         SELECT c.id, c.body, c.created_at, p.user_id sender_user_id, p.name sender_name
         FROM photo_comments c JOIN member_profiles p ON p.user_id = c.sender_user_id
@@ -905,8 +917,15 @@ async function verification(request, env) {
     if (!contentType) throw new SocialError("invalid_image", "รองรับเฉพาะ JPG, PNG และ WebP ที่ถูกต้อง");
     prepared.push({ kind, id: safeUuid(), key: `verification/${safeUuid()}`, bytes, contentType });
   }
-  for (const item of prepared) {
-    await env.MEDIA.put(item.key, item.bytes, { httpMetadata: { contentType: item.contentType }, customMetadata: { purpose: `verification_${item.kind}` } });
+  const uploaded = [];
+  try {
+    for (const item of prepared) {
+      await env.MEDIA.put(item.key, item.bytes, { httpMetadata: { contentType: item.contentType }, customMetadata: { purpose: `verification_${item.kind}` } });
+      uploaded.push(item.key);
+    }
+  } catch (error) {
+    await Promise.all(uploaded.map((key) => env.MEDIA.delete(key).catch(() => {})));
+    throw error;
   }
   const timestamp = unixTime();
   try {
@@ -956,19 +975,33 @@ async function moderationVerification(request, env) {
   `).bind(target).first();
   if (!evidence) throw new SocialError("not_found", "ไม่พบคำขอที่รอตรวจสอบ", 404);
   const timestamp = unixTime();
-  const statements = [env.DB.prepare(`
-    UPDATE identity_verification_requests SET status = ?, reason = ?, reviewed_at = ?, reviewed_by = ?,
-      id_media_id = NULL, selfie_media_id = NULL WHERE user_id = ? AND status = 'pending'
-  `).bind(status, reason, timestamp, session.user_id, target)];
+  const statements = [];
   for (const [mediaId, objectKey] of [[evidence.id_media_id, evidence.id_key], [evidence.selfie_media_id, evidence.selfie_key]]) {
     if (!mediaId || !objectKey) continue;
-    statements.push(env.DB.prepare("UPDATE social_media SET state = 'pending_deletion' WHERE id = ?").bind(mediaId));
     statements.push(env.DB.prepare(`
-      INSERT OR IGNORE INTO media_deletion_queue(object_key, operation_id,next_attempt_at,created_at) VALUES (?,?,?,?)
-    `).bind(objectKey, safeUuid(), timestamp, timestamp));
+      UPDATE social_media SET state = 'pending_deletion' WHERE id = ? AND EXISTS(
+        SELECT 1 FROM identity_verification_requests WHERE user_id = ? AND status = 'pending'
+      )
+    `).bind(mediaId, target));
+    statements.push(env.DB.prepare(`
+      INSERT OR IGNORE INTO media_deletion_queue(object_key,operation_id,next_attempt_at,created_at)
+      SELECT ?,?,?,? WHERE EXISTS(
+        SELECT 1 FROM identity_verification_requests WHERE user_id = ? AND status = 'pending'
+      )
+    `).bind(objectKey, safeUuid(), timestamp, timestamp, target));
   }
-  await env.DB.batch(statements);
-  await auditModeration(env.DB, session.user_id, "verification_decision", "verification", target, `${purpose}; ${status}`.slice(0, 300));
+  statements.push(env.DB.prepare(`
+    INSERT INTO moderation_audit_events(id,actor_user_id,action,subject_type,subject_id,purpose,created_at)
+    SELECT ?,?,'verification_decision','verification',?,?,? WHERE EXISTS(
+      SELECT 1 FROM identity_verification_requests WHERE user_id = ? AND status = 'pending'
+    )
+  `).bind(safeUuid(), session.user_id, target, `${purpose}; ${status}`.slice(0, 300), timestamp, target));
+  statements.push(env.DB.prepare(`
+    UPDATE identity_verification_requests SET status = ?, reason = ?, reviewed_at = ?, reviewed_by = ?,
+      id_media_id = NULL, selfie_media_id = NULL WHERE user_id = ? AND status = 'pending'
+  `).bind(status, reason, timestamp, session.user_id, target));
+  const results = await env.DB.batch(statements);
+  if (!Number(results.at(-1)?.meta?.changes || 0)) throw new SocialError("not_found", "ไม่พบคำขอที่รอตรวจสอบ", 404);
   return json({ ok: true, evidenceDeletionPending: true });
 }
 

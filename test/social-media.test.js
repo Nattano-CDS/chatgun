@@ -80,6 +80,12 @@ test("gallery validates bytes, stores private media, authorizes reads, and queue
   assert.equal(friendRead.headers.get("x-content-type-options"), "nosniff");
   const strangerRead = await onRequest({ env: runtime, request: new Request(`https://chatgun.pages.dev/api/social/media/${id}`, { headers: { cookie: authHeaders(stranger).cookie } }) });
   assert.equal(strangerRead.status, 404);
+  const comment = await jsonCall(runtime, "/api/social/gallery", friend, { action: "comment", id, comment: "เห็นเฉพาะเพื่อนและเจ้าของ" });
+  assert.equal(comment.status, 200);
+  await database.prepare("UPDATE member_profiles SET discovery_visible=1,latitude=13.7563,longitude=100.5018,accuracy=10,located_at=? WHERE user_id='media-owner'").bind(unixTime()).run();
+  const publicGallery = await onRequest({ env: runtime, request: new Request(`https://chatgun.pages.dev/api/social/gallery?user=media-owner&photo=${id}`, { headers: { cookie: authHeaders(stranger).cookie } }) });
+  assert.equal(publicGallery.status, 200);
+  assert.deepEqual((await publicGallery.json()).comments, [], "public discovery viewers never receive comment bodies");
 
   const removed = await jsonCall(runtime, "/api/social/gallery", owner, { action: "delete", id });
   assert.equal(removed.status, 200);

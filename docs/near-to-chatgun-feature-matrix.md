@@ -1,6 +1,6 @@
 # NEAR to ChatGun feature matrix
 
-Status: source-discovery and migration-planning baseline. No NEAR source, production data, or production deployment was modified.
+Status: implementation checkpoint on `codex/near-migration`. No NEAR source, Production data, or Production deployment was modified.
 
 ## Canonical source identification
 
@@ -33,6 +33,24 @@ The source was opened into an audit-only checkout at `/Users/nattano/.codex/work
 Static source inspection and a successful NEAR deployment prove what exists in NEAR. They do not prove ChatGun migration completion. No row below is marked migrated and verified unless the corresponding ChatGun behavior already exists and has tests.
 
 No standalone feed, communities/groups, notification center, or settings route was discovered in v91. The discovery grid, profile gallery, device-notification toggle, and profile tab are the actual NEAR equivalents; this migration must not invent additional products under those names. Email OTP and mobile OTP are also absent from NEAR and remain disabled in ChatGun.
+
+## Current implementation checkpoint
+
+The row-level status/evidence cells below are preserved as the source-discovery baseline that justified the architecture. This checkpoint supersedes those baseline cells for current destination status:
+
+| Current status | Features | Evidence / remaining gate |
+| --- | --- | --- |
+| **Migrated and verified** | Application shell/navigation; optional browser-only demo; responsive/accessibility layout | ChatGun `/app/` implements the five non-game destinations and no game route/import. Desktop/mobile Playwright passes against deployed Preview assets; demo state is isolated in IndexedDB and `DEMO_MODE_ENABLED=false` by default. |
+| **Partially migrated** | Authentication; onboarding; geolocation/presence; discovery/filters; member profile/edit/privacy; gallery/photos/likes/comments; friend workflow/list; text and image chat; unread/device notifications; ratings; blocking; reports; message audit; offline recovery; account deletion | D1/API/UI implementations and automated security tests exist behind fail-closed flags. Real social capability activation is intentionally withheld. Media features additionally require R2, and operational/legal launch gates remain. |
+| **Blocked** | Adult-age eligibility approval; identity verification activation | The 18+ declaration mechanism and a disabled identity-verification prototype exist, but threshold/assurance review is unresolved. Identity evidence also requires necessity/lawful-basis review, an approved notice/reviewer process, and isolated R2 before any test submission. |
+
+Implementation evidence at this checkpoint:
+
+- Migrations `0003_social.sql` and `0004_moderation_audit.sql` were applied only to `chatgun-auth-staging`; three pre-existing staging users were preserved and `PRAGMA foreign_key_check` returned no violations.
+- Production was inspected read-only and still has migrations `0002`–`0004` pending; none were applied.
+- Preview deployment: `https://codex-near-migration-zjaq.chatgun.pages.dev`, with every social, demo, media, moderation, identity-verification, registration, email-OTP, and mobile-OTP flag disabled.
+- Current automated evidence: 44 unit/integration tests pass; social Playwright passes on desktop/mobile with seven passes and one intentional desktop skip for the mobile-only assertion.
+- Cloudflare R2 is not enabled for the ChatGun account (API code `10042`), so private-media live E2E and the scheduled media-deletion Worker remain blocked. No NEAR, PiggyPrice, or Production resource was accessed or mutated.
 
 ## Complete non-game feature inventory
 
@@ -143,11 +161,11 @@ The shared `api-client`, `visible-poll`, `Portrait`, chat, profile, demo-store, 
 - Original NEAR source: **identified confidently**.
 - Last stable implementation: **Sites version 91 / commit `98bb83e`**, active and successfully published.
 - NEAR non-game product features inventoried: **26**, plus **1** destination-required account-deletion integration row.
-- Migrated and verified: **0** (the destination authentication/privacy foundation is not yet a verified migration of a NEAR feature).
-- Partially migrated: **3** (authentication/session foundation, profile/privacy settings foundation, and account deletion).
-- Missing: **7**.
-- Blocked: **17**.
+- Migrated and verified: **3** (application shell/navigation, optional browser-only demo, and responsive/accessibility layout).
+- Partially migrated: **22**, all inactive server-side pending the gates recorded above.
+- Missing: **0** at the architecture/API/UI foundation level; live-provider, media, moderation-operation, and activated social E2E gaps remain partial rather than complete.
+- Blocked: **2** (adult-age eligibility approval and identity-verification activation).
 - Excluded game areas: **11 groups**, covering all current game UI, logic, APIs, tables, assets, dependencies, and tests.
-- Verified migration completion: **0%** of non-game NEAR features. This percentage intentionally counts only fully migrated and evidenced features.
+- Verified migration completion: **11.1%** (3 of 27 rows). This intentionally counts only rows with current deployed-asset browser evidence and no external activation dependency; partial implementations are not counted as complete.
 
-Production activation remains blocked until the data model, 18+ age-assurance, social safety/moderation, location, media, and content-deletion decisions are approved. Development may proceed only behind fail-closed flags on isolated staging data. The next safe engineering step is an additive architecture/migration plan that maps ChatGun `users.id` to new non-game social tables while preserving PR #3/#5 security controls.
+Production activation remains blocked until the 18+ age-assurance decision, social safety/moderation operations, location/media policy, R2 enablement, and identity-verification decision are approved and live staging E2E passes. The architecture and additive D1 model are now implemented; the next safe step is enabling ChatGun-account R2 and then running private-media and authenticated social E2E on the isolated Preview only.

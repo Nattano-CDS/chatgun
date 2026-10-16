@@ -31,6 +31,7 @@
         <img src="../logo.svg" alt="" width="72">
         <h1>ChatGun Social ยังไม่เปิดใช้งาน</h1>
         <p>ระบบอยู่ระหว่างการทดสอบในสภาพแวดล้อม Preview ที่แยกจาก Production</p>
+        <button id="demo-start" class="secondary" type="button" hidden>ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์</button>
         <a class="primary" href="../account.html">กลับไปบัญชี</a>
       </section>
 
@@ -53,6 +54,7 @@
           <h1 id="page-title">หาเพื่อน</h1>
           <div class="toolbar-actions"><button id="refresh" class="icon-button" aria-label="รีเฟรช">↻</button><a class="icon-button" href="../account.html" aria-label="บัญชี">⚙</a></div>
         </header>
+        <div id="demo-banner" class="demo-banner" hidden>โหมดสาธิต · ข้อมูลอยู่เฉพาะในเบราว์เซอร์นี้และไม่ส่งไปยัง D1</div>
 
         <div id="near-tab" class="tab-view">
           <section id="location-banner" class="location-banner">
@@ -86,6 +88,7 @@
             <label class="wide">เกี่ยวกับคุณ<textarea name="bio" maxlength="250"></textarea></label>
             <label class="wide">ความสนใจ<input name="interests" maxlength="100"></label>
             <button class="primary" type="submit">บันทึกโปรไฟล์</button><button id="hide-discovery" class="secondary" type="button">ปิดการหาเพื่อนและลบตำแหน่ง</button>
+            <button id="notification-toggle" class="secondary wide" type="button">เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้</button>
           </form>
           <section class="panel gallery-panel">
             <div class="section-heading"><div><small>รูปโปรไฟล์และแกลเลอรี</small><h2>รูปภาพของคุณ</h2></div><span id="gallery-count">0 / 12</span></div>

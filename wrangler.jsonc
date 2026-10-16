@@ -16,7 +16,8 @@
     "MEDIA_UPLOAD_ENABLED": "false",
     "RATINGS_ENABLED": "false",
     "IDENTITY_VERIFICATION_ENABLED": "false",
-    "MODERATION_TOOLS_ENABLED": "false"
+    "MODERATION_TOOLS_ENABLED": "false",
+    "DEMO_MODE_ENABLED": "false"
   },
   "d1_databases": [
     {
@@ -41,7 +42,8 @@
         "MEDIA_UPLOAD_ENABLED": "false",
         "RATINGS_ENABLED": "false",
         "IDENTITY_VERIFICATION_ENABLED": "false",
-        "MODERATION_TOOLS_ENABLED": "false"
+        "MODERATION_TOOLS_ENABLED": "false",
+        "DEMO_MODE_ENABLED": "false"
       },
       "d1_databases": [
         {

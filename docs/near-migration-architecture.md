@@ -22,6 +22,8 @@ All new capability checks are server-side. UI hiding is secondary.
 | `MEDIA_UPLOAD_ENABLED` | `false` | Gallery and chat R2 writes |
 | `RATINGS_ENABLED` | `false` | Proximity ratings/private reviews |
 | `IDENTITY_VERIFICATION_ENABLED` | `false` | Any ID/selfie verification workflow |
+| `MODERATION_TOOLS_ENABLED` | `false` | Role- and purpose-gated report, message-audit, and identity-review endpoints |
+| `DEMO_MODE_ENABLED` | `false` | Synthetic browser-only IndexedDB demo; never reads or writes D1/R2 |
 
 The existing `NEW_ACCOUNT_REGISTRATION_ENABLED`, `EMAIL_OTP_ENABLED`, and `MOBILE_OTP_ENABLED` controls remain authoritative. Email and mobile OTP remain disabled.
 
@@ -39,6 +41,15 @@ The requested 18+ gate is designed as a versioned adult declaration, not an asse
 6. keep discovery, messaging, media, and ratings independently disabled until their launch gates pass.
 
 Production activation still requires qualified Thai legal review of the threshold, contractual capacity, notice, assurance strength, correction/appeal path, and anti-evasion handling.
+
+## 2026-10-16 staging checkpoint
+
+- The ChatGun Cloudflare account was re-confirmed as `23017b53386fb67fc62a52cdd017454c` before mutation.
+- `0003_social.sql` and `0004_moderation_audit.sql` were applied only to D1 `chatgun-auth-staging` (`5bbfd55d-eb22-4324-8a7d-57bef14110ea`). Existing staging users were preserved and the foreign-key check passed.
+- The repository default Pages binding now points to staging D1; only `[env.production]` points to `chatgun-auth`. This matches the configuration downloaded read-only from Pages.
+- Preview is deployed at `https://codex-near-migration-zjaq.chatgun.pages.dev` with every social capability disabled and `noindex` behavior intact.
+- R2 cannot yet be configured: the ChatGun account API returns `10042` and requires R2 enablement in the Cloudflare Dashboard. Media flags and the cleanup Worker must remain undeployed until that action is complete.
+- Production migrations `0002`–`0004` remain pending and were not applied.
 
 ## Additive D1 model
 

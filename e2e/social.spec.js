@@ -10,6 +10,7 @@ const config = {
   mediaUploadEnabled: false,
   ratingsEnabled: true,
   identityVerificationEnabled: false,
+  demoModeEnabled: false,
   gameEnabled: false,
   emailOtpEnabled: false,
   mobileOtpEnabled: false,
@@ -71,4 +72,14 @@ test("disabled social environment reveals no member features", async ({ page }) 
   await page.goto("/app/");
   await expect(page.getByRole("heading", { name: "ChatGun Social ยังไม่เปิดใช้งาน" })).toBeVisible();
   await expect(page.locator("#social-view")).toBeHidden();
+});
+
+test("optional demo remains browser-only and contains no game", async ({ page }) => {
+  await page.unroute("**/api/**");
+  await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false, demoModeEnabled: true }) }));
+  await page.goto("/app/");
+  await page.getByRole("button", { name: "ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์" }).click();
+  await expect(page.locator("#demo-banner")).toBeVisible();
+  await expect(page.locator("#people-grid").getByText("มิน")).toBeVisible();
+  await expect(page.getByRole("button", { name: "เกม" })).toHaveCount(0);
 });
