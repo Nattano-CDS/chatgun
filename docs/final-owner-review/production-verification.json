@@ -2,7 +2,7 @@
   "ok": true,
   "origin": "https://chatgun.social",
   "release": {
-    "commit": "3e045ca95fdf5ab96d2a7c2eba419f25450227b7",
+    "commit": "5d8fb15a37031c2d150ab39fa60fd473e13e7418",
     "demoBatch": "chatgun-browser-demo-v1"
   },
   "fictionalProfiles": 20,

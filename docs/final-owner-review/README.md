@@ -6,6 +6,8 @@ Owner scope: PR #8 comments [6222016662](https://github.com/Nattano-CDS/chatgun/
 
 The protected fictional-demo canary is deployed at **https://chatgun.social**. Its initial approved `main` merge was **`3e045ca95fdf5ab96d2a7c2eba419f25450227b7`**, whose tree matches tested candidate `b502ed02718da4f3b5b5755172841b60b224ac6b`. PR #8 is merged. The first successful canary deployment is `b941ec2b-fff6-457e-9ad0-57230263b51b`. The exact final runtime SHA is recorded in [production verification](production-verification.json) and the final release comment on PR #8.
 
+**Final deployed SHA: `5d8fb15a37031c2d150ab39fa60fd473e13e7418`.** Successful Production deployment: `50223453-56bf-46d8-ae01-831ac71bb91b`. Finishing PR #9 is merged; its tree matches tested candidate `b1430be8df569ed53a4adc7c44f61730aff8d080`. Final Production HTTP/security smoke and all three responsive browser scenarios passed after this deployment. The profile back/brand/gallery controls follow canonical placement and pass no-overlap assertions at each viewport.
+
 [Production HTTP/security verification](production-verification.json) passed. Production Playwright passed at 390, 768 and 1440px: 3 passed, 0 failed. Actual live captures are in [production/](production/); the 57 Preview/fixture captures remain in [after/](after/). No Production real OAuth, owner Admin or live member workflow pass is claimed: those services are explicitly disabled.
 
 The first Cloudflare publish attempt failed because three old encrypted feature-flag bindings conflicted with reviewed plaintext flags (`EMAIL_OTP_ENABLED`, `MOBILE_OTP_ENABLED`, `LINE_EMAIL_ENABLED`). Only those obsolete flag entries were removed; ten required credential/pepper secret entries were individually verified retained, Preview configuration was unchanged, and the same `main` commit deployed successfully on retry. The flags are now explicitly false in the live Production configuration.
@@ -85,7 +87,7 @@ The audit identified 21 superseded ChatGun Preview deployments containing old sy
 4. Establish a private Production media bucket, dedicated binding, cleanup Worker and authorized quarantine/deletion tests before enabling live media. Staging storage must not be reused.
 5. Confirm emergency escalation, backup moderation, appeals handling, support intake and media-scanning decisions. The owner is primary; coverage is daily 19:00–22:00 Asia/Bangkok, without guaranteed immediate response outside those hours.
 
-Assessment: GO for the protected fictional-demo canary once live smoke checks pass. NO-GO for public registration, Sensitive Content or a real-user social launch. The public canary and the restricted live service have separate readiness conclusions.
+Assessment: GO for the deployed protected fictional-demo canary; live smoke and browser checks passed. NO-GO for public registration, Sensitive Content or a real-user social launch. The public canary and the restricted live service have separate readiness conclusions.
 
 ## Selective cleanup — prepare only
 
