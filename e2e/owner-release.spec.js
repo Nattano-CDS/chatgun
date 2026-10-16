@@ -39,7 +39,7 @@ for (const width of [390,768,1440]) {
     await expect(page.locator("#thread .message")).toHaveCount(13);
     await page.locator('#primary-nav [data-tab="near"]').click();
     await page.locator('#people-grid [data-person="demo-02"]').click();
-    await page.locator('#profile-dialog [data-action="report"]').click();
+    await page.locator('.member-profile-info [data-action="report"]').click();
     await page.locator('#report-form textarea').fill("รายงานสมมติสำหรับทดสอบเฉพาะในเบราว์เซอร์");
     await page.locator('#report-form button').click();
     await expect(page.locator('#toast')).toContainText("บันทึกรายงานตัวอย่างในเบราว์เซอร์แล้ว");
@@ -62,6 +62,8 @@ for (const width of [390,768,1440]) {
     expect(back.x+back.width).toBeLessThanOrEqual(brand.x);
     expect(brand.x+brand.width).toBeLessThanOrEqual(galleryControl.x);
     await page.locator(".member-profile-gallery-top").click();
+    await expect(page.locator('.gallery-summary [data-action="chat"]')).toBeVisible();
+    await expect(page.locator('.member-profile-gallery [data-action="report"]')).toBeVisible();
     await expect(page.locator(".member-profile-gallery")).toBeVisible();await shot("member-gallery");
     await page.locator("#dialog-gallery button").first().click();
     await expect(page.locator(".gallery-post")).toBeVisible();

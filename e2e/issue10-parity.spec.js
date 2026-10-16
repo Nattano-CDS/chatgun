@@ -39,7 +39,7 @@ test('fictional friendship accept/reject/request/block/unblock persists without 
   await page.locator('#requests-grid [data-action=reject]').first().click();await expect(page.locator('#requests-grid .person-card')).toHaveCount(3);
   await page.locator('#primary-nav [data-tab=near]').click();
   await page.locator('[data-person="demo-01"] [data-action=request]').click();await expect(page.locator('[data-person="demo-01"] .discovery-action')).toBeDisabled();
-  await page.locator('#people-grid [data-person="demo-02"]').click();page.once('dialog',d=>d.accept());await page.locator('#profile-dialog [data-action=block]').click();
+  await page.locator('#people-grid [data-person="demo-02"]').click();page.once('dialog',d=>d.accept());await page.locator('.member-profile-info [data-action=block]').click();
   await page.locator('#primary-nav [data-tab=profile]').click();await expect(page.locator('#blocked-list')).toContainText('ต้นน้ำ');
   await page.locator('#blocked-list [data-action=unblock]').click();await expect(page.locator('#blocked-list')).not.toContainText('ต้นน้ำ');
   await page.reload();await page.locator('#primary-nav [data-tab=friends]').click();

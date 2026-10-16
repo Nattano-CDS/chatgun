@@ -32,6 +32,8 @@ Viewports: 390×844, 768×1024, 1440×1100. [Side-by-side comparison and pixel o
 
 The actual product entry loads `app/social.css`, generated `app/near-v91.css`, and the scoped adapters in `app/restoration.css`, in that order. Original component selectors use an ID-scoped boundary so legacy horizontal-card/sidebar declarations cannot silently win. Auth uses `auth-shell.css` plus each page's functional styles. `style.css` (legacy Kanit/marketing gradients) is not loaded by the product entry, acceptance, onboarding, profile or Admin. It remains confined to the explicitly separate `/welcome` marketing surface. The canonical non-game canvas is plain `#f7f7fb`; no reported dot pattern was reproduced in either rendered product entry. Auth intentionally uses the original elliptical lavender canvas.
 
+The historical overlapping Friends headings were already corrected in the Production baseline. This remediation preserves and re-tests that correction; it does not misattribute it as a newly discovered defect. Actual remaining baseline defects were horizontal cards, missing canonical image interactions and divergent shared composition. Direct screenshot review also caught missing Gallery-context action controls, summary counts and background/type metrics; those are included in the consolidated correction.
+
 ## Intentional deviations and non-equivalent surfaces
 
 - ChatGun name/logo retained; Game omitted everywhere in ChatGun, including the footer. Original screenshots still show Game as reference evidence.
