@@ -142,6 +142,8 @@ test("confirmed deletion erases account data, queues owned media, revokes access
     VALUES ('delete-user','age-delete','Delete User',${now},${now});
     INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,created_at)
     VALUES ('media-delete','delete-user','staging/delete-user/photo.webp','gallery','image/webp',100,${now});
+    INSERT INTO media_upload_quota_attempts(user_id,category,idempotency_key,local_day,status,media_id,result_id,reserved_at,completed_at)
+    VALUES ('delete-user','gallery','delete-quota-key-0001','2026-10-16','completed','media-delete','media-delete',${now},${now});
   `);
 
   const requested = await onRequest({
@@ -173,7 +175,7 @@ test("confirmed deletion erases account data, queues owned media, revokes access
   assert.match(confirmed.headers.getSetCookie().join("\n"), /__Host-cg_session=;.*Max-Age=0/u);
   for (const table of [
     "users", "identities", "sessions", "session_auth_evidence", "account_deletion_requests",
-    "age_assurance_events", "beta_enrollments", "member_profiles", "social_media",
+    "age_assurance_events", "beta_enrollments", "member_profiles", "social_media", "media_upload_quota_attempts",
   ]) {
     assert.equal(database.database.prepare(`SELECT COUNT(*) count FROM ${table}`).get().count, 0, table);
   }

@@ -70,6 +70,7 @@ async function upload(request, baseURL, account, path, multipart) {
       cookie: `__Host-cg_session=${account.token}; __Host-cg_csrf=${account.csrf}`,
       origin: baseURL,
       "x-csrf-token": account.csrf,
+      "idempotency-key": crypto.randomUUID(),
     },
     multipart,
   });
@@ -285,14 +286,20 @@ test("desktop and mobile render persisted staging profile, discovery, notificati
   await expect(page.locator("#friends-grid").getByText("อลิซ ทดสอบ")).toBeVisible();
   await page.locator('#primary-nav button[data-tab="chat"]').click();
   await expect(page.locator("#conversation-list").getByText("ส่งรูปภาพ", { exact: true })).toBeVisible();
+  await page.locator("#conversation-list").getByRole("button", { name: /อลิซ ทดสอบ/u }).click();
+  await expect(page.locator("#chat-upload-quota")).toContainText(/แชท: เหลือ \d+\/10 รูปวันนี้ · รีเซ็ต 00:00 น\. เวลาไทย/u);
   await page.locator('#primary-nav button[data-tab="reviews"]').click();
   await expect(page.locator("#reviews-list").getByText("สุภาพและเป็นมิตร")).toBeVisible();
   await page.locator('#primary-nav button[data-tab="profile"]').click();
   await expect(page.locator('#profile-form input[name="name"]')).toHaveValue("บ็อบ ทดสอบ");
+  const galleryQuota = page.locator("#gallery-upload-quota");
+  await expect(galleryQuota).toContainText(/แกลเลอรี: เหลือ \d+\/10 รูปวันนี้ · รีเซ็ต 00:00 น\. เวลาไทย/u);
+  const quotaBeforeUpload = await galleryQuota.textContent();
   await page.locator('#gallery-upload input[type="file"]').setInputFiles({ name: "browser.png", mimeType: "image/png", buffer: PNG });
   await page.locator('#gallery-upload input[name="caption"]').fill("รูปจากเบราว์เซอร์ staging");
   await page.locator("#gallery-upload").getByRole("button", { name: "อัปโหลดรูป" }).click();
   await expect(page.locator("#toast")).toContainText("อัปโหลดรูปแล้ว");
+  await expect(galleryQuota).not.toHaveText(quotaBeforeUpload);
   await expect(page.locator("#my-gallery img")).toHaveCount(0);
   await page.getByRole("button", { name: "เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้" }).click();
   await expect(page.getByRole("button", { name: "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้" })).toBeVisible();

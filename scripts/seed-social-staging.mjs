@@ -33,7 +33,7 @@ const statements = [
   `DELETE FROM rate_limits WHERE scope IN (
     'adult_onboarding_user_hour','profile_write_user_hour','presence_user_10m',
     'discovery_read_user_10m','relationship_write_user_hour','block_write_user_hour',
-    'message_write_user_minute','report_user_day','rating_user_day',
+    'message_write_user_minute','report_user_day','media_report_user_day','media_appeal_user_day','rating_user_day',
     'gallery_upload_user_hour','gallery_like_user_hour','gallery_comment_user_hour',
     'verification_submit_user_day','account_deletion_user_hour'
   );`,

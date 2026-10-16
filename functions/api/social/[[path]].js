@@ -6,6 +6,8 @@ import { acceptanceFlowEnabled, currentAcceptance } from "../../_lib/acceptance.
 import { selfDeclaredAdult } from "../../_lib/age.js";
 
 const LOCATION_FRESH_SECONDS = 120;
+const MEDIA_UPLOAD_DAILY_LIMIT = 10;
+const MEDIA_UPLOAD_RESERVATION_SECONDS = 15 * 60;
 const MODERATION_COVERAGE = Object.freeze({
   timezone: "Asia/Bangkok",
   utcOffset: "+07:00",
@@ -28,6 +30,113 @@ class SocialError extends Error {
 
 function enabled(value) {
   return String(value || "").trim().toLowerCase() === "true";
+}
+
+export function bangkokUploadWindow(timestampMs = Date.now()) {
+  const shifted = new Date(timestampMs + 7 * 60 * 60 * 1000);
+  const localDay = shifted.toISOString().slice(0, 10);
+  const [year, month, day] = localDay.split("-").map(Number);
+  return {
+    localDay,
+    resetsAt: Math.floor((Date.UTC(year, month - 1, day + 1) - 7 * 60 * 60 * 1000) / 1000),
+    timezone: "Asia/Bangkok",
+  };
+}
+
+function uploadIdempotencyKey(request) {
+  const key = String(request.headers.get("idempotency-key") || "").trim();
+  if (!/^[A-Za-z0-9._:-]{16,128}$/u.test(key)) {
+    throw new SocialError("invalid_idempotency_key", "ไม่สามารถยืนยันคำขออัปโหลดได้ กรุณาลองใหม่", 400);
+  }
+  return key;
+}
+
+async function reserveMediaUpload(db, userId, category, idempotencyKey, timestamp = unixTime()) {
+  const window = bangkokUploadWindow(timestamp * 1000);
+  const staleBefore = timestamp - MEDIA_UPLOAD_RESERVATION_SECONDS;
+  const existing = await db.prepare(`
+    SELECT status, local_day, media_id, result_id, reserved_at
+    FROM media_upload_quota_attempts
+    WHERE user_id = ? AND category = ? AND idempotency_key = ?
+  `).bind(userId, category, idempotencyKey).first();
+  if (existing?.status === "completed") return { replay: true, ...existing, ...window };
+  if (existing?.status === "reserved" && Number(existing.reserved_at) > staleBefore) {
+    throw new SocialError("upload_in_progress", "คำขออัปโหลดนี้กำลังดำเนินการ", 409);
+  }
+  const result = await db.prepare(`
+    INSERT INTO media_upload_quota_attempts(
+      user_id, category, idempotency_key, local_day, status, reserved_at
+    )
+    SELECT ?, ?, ?, ?, 'reserved', ?
+    WHERE (
+      SELECT COUNT(*) FROM media_upload_quota_attempts quota
+      WHERE quota.user_id = ? AND quota.category = ? AND quota.local_day = ?
+        AND (quota.status = 'completed'
+          OR (quota.status = 'reserved' AND quota.reserved_at > ?))
+    ) < ?
+    ON CONFLICT(user_id, category, idempotency_key) DO UPDATE SET
+      local_day = excluded.local_day,
+      status = 'reserved',
+      media_id = NULL,
+      result_id = NULL,
+      reserved_at = excluded.reserved_at,
+      completed_at = NULL,
+      released_at = NULL
+    WHERE media_upload_quota_attempts.status = 'released'
+       OR (media_upload_quota_attempts.status = 'reserved'
+         AND media_upload_quota_attempts.reserved_at <= ?)
+  `).bind(
+    userId, category, idempotencyKey, window.localDay, timestamp,
+    userId, category, window.localDay, staleBefore, MEDIA_UPLOAD_DAILY_LIMIT, staleBefore,
+  ).run();
+  if (Number(result.meta?.changes || 0) === 1) return { replay: false, ...window };
+  const conflict = await db.prepare(`
+    SELECT status, media_id, result_id FROM media_upload_quota_attempts
+    WHERE user_id = ? AND category = ? AND idempotency_key = ?
+  `).bind(userId, category, idempotencyKey).first();
+  if (conflict?.status === "completed") return { replay: true, ...conflict, ...window };
+  if (conflict?.status === "reserved") throw new SocialError("upload_in_progress", "คำขออัปโหลดนี้กำลังดำเนินการ", 409);
+  throw new SocialError("daily_upload_limit_reached", `อัปโหลดรูป${category === "chat" ? "ในแชท" : "แกลเลอรี"}ครบ 10 รูปสำหรับวันนี้แล้ว ลองใหม่หลัง 00:00 น.`, 429);
+}
+
+function completeMediaUploadStatement(db, userId, category, idempotencyKey, mediaId, resultId, timestamp) {
+  return db.prepare(`
+    UPDATE media_upload_quota_attempts
+    SET status = 'completed', media_id = ?, result_id = ?, completed_at = ?, released_at = NULL
+    WHERE user_id = ? AND category = ? AND idempotency_key = ? AND status = 'reserved'
+  `).bind(mediaId, resultId, timestamp, userId, category, idempotencyKey);
+}
+
+async function releaseMediaUpload(db, userId, category, idempotencyKey, timestamp = unixTime()) {
+  await db.prepare(`
+    UPDATE media_upload_quota_attempts
+    SET status = 'released', released_at = ?, completed_at = NULL, media_id = NULL, result_id = NULL
+    WHERE user_id = ? AND category = ? AND idempotency_key = ? AND status = 'reserved'
+  `).bind(timestamp, userId, category, idempotencyKey).run();
+}
+
+async function uploadQuotas(request, env) {
+  capability(env, "SOCIAL_APP_ENABLED");
+  const session = await authenticated(request, env);
+  await requireProfile(env.DB, session.user_id);
+  const timestamp = unixTime();
+  const window = bangkokUploadWindow(timestamp * 1000);
+  const staleBefore = timestamp - MEDIA_UPLOAD_RESERVATION_SECONDS;
+  const rows = await env.DB.prepare(`
+    SELECT category,
+      SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) completed,
+      SUM(CASE WHEN status = 'reserved' AND reserved_at > ? THEN 1 ELSE 0 END) reserved
+    FROM media_upload_quota_attempts
+    WHERE user_id = ? AND local_day = ?
+    GROUP BY category
+  `).bind(staleBefore, session.user_id, window.localDay).all();
+  const byCategory = Object.fromEntries((rows.results || []).map((row) => [row.category, row]));
+  const category = (name) => {
+    const completed = Number(byCategory[name]?.completed || 0);
+    const reserved = Number(byCategory[name]?.reserved || 0);
+    return { limit: MEDIA_UPLOAD_DAILY_LIMIT, used: completed, reserved, remaining: Math.max(0, MEDIA_UPLOAD_DAILY_LIMIT - completed - reserved) };
+  };
+  return json({ ...window, chat: category("chat"), gallery: category("gallery") });
 }
 
 export function moderationCoverage(timestampMs = Date.now()) {
@@ -612,6 +721,7 @@ async function messages(request, env) {
   if ((request.headers.get("content-type") || "").startsWith("multipart/form-data")) {
     capability(env, "MEDIA_UPLOAD_ENABLED");
     if (!env.MEDIA) throw new Error("missing_media_binding");
+    const idempotencyKey = uploadIdempotencyKey(request);
     const form = await request.formData();
     const target = String(form.get("target") || "");
     if (!await accepted(env.DB, session.user_id, target) || await isBlocked(env.DB, session.user_id, target)) {
@@ -624,6 +734,10 @@ async function messages(request, env) {
     let image;
     try { image = sanitizeImage(new Uint8Array(await file.arrayBuffer()), file.type); }
     catch { throw new SocialError("invalid_image", "รองรับเฉพาะ JPG, PNG และ WebP ที่ถูกต้อง"); }
+    const reservation = await reserveMediaUpload(env.DB, session.user_id, "chat", idempotencyKey);
+    if (reservation.replay) {
+      return json({ ok: true, messageId: reservation.result_id, reviewStatus: "pending", idempotentReplay: true }, 201);
+    }
     const { bytes, contentType } = image;
     const mediaId = safeUuid();
     const messageId = safeUuid();
@@ -635,7 +749,6 @@ async function messages(request, env) {
         AND (SELECT COUNT(*) FROM social_media WHERE owner_user_id = ? AND purpose = 'chat' AND state = 'active') >= 5
       ORDER BY created_at ASC LIMIT 1
     `).bind(session.user_id, session.user_id).first();
-    await env.MEDIA.put(objectKey, bytes, { httpMetadata: { contentType }, customMetadata: { purpose: "chat" } });
     const statements = [
       env.DB.prepare(`
         INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,created_at)
@@ -649,6 +762,7 @@ async function messages(request, env) {
         INSERT INTO media_safety_reviews(media_id,status,source,created_at)
         VALUES (?, 'pending', 'manual', ?)
       `).bind(mediaId, timestamp),
+      completeMediaUploadStatement(env.DB, session.user_id, "chat", idempotencyKey, mediaId, messageId, timestamp),
     ];
     if (oldest) {
       statements.push(env.DB.prepare("UPDATE social_media SET state = 'pending_deletion' WHERE id = ?").bind(oldest.id));
@@ -656,8 +770,14 @@ async function messages(request, env) {
         INSERT OR IGNORE INTO media_deletion_queue(object_key,operation_id,next_attempt_at,created_at) VALUES (?,?,?,?)
       `).bind(oldest.object_key, safeUuid(), timestamp, timestamp));
     }
-    try { await env.DB.batch(statements); }
-    catch (error) { await env.MEDIA.delete(objectKey).catch(() => {}); throw error; }
+    try {
+      await env.MEDIA.put(objectKey, bytes, { httpMetadata: { contentType }, customMetadata: { purpose: "chat" } });
+      await env.DB.batch(statements);
+    } catch (error) {
+      await env.MEDIA.delete(objectKey).catch(() => {});
+      await releaseMediaUpload(env.DB, session.user_id, "chat", idempotencyKey).catch(() => {});
+      throw error;
+    }
     return json({ ok: true, messageId, reviewStatus: "pending" }, 201);
   }
   const body = await readJson(request);
@@ -1548,7 +1668,7 @@ async function gallery(request, env) {
   if (contentType.startsWith("multipart/form-data")) {
     capability(env, "MEDIA_UPLOAD_ENABLED");
     if (!env.MEDIA) throw new Error("missing_media_binding");
-    await limited(env, "gallery_upload_user_hour", session.user_id, 12, 3600);
+    const idempotencyKey = uploadIdempotencyKey(request);
     const form = await request.formData();
     const file = form.get("file");
     if (!(file instanceof File)) throw new SocialError("invalid_file", "กรุณาเลือกรูปภาพ");
@@ -1560,12 +1680,16 @@ async function gallery(request, env) {
     let image;
     try { image = sanitizeImage(new Uint8Array(await file.arrayBuffer()), file.type); }
     catch { throw new SocialError("invalid_image", "รองรับเฉพาะ JPG, PNG และ WebP ที่ถูกต้อง"); }
+    const reservation = await reserveMediaUpload(env.DB, session.user_id, "gallery", idempotencyKey);
+    if (reservation.replay) {
+      return json({ id: reservation.result_id, reviewStatus: "pending", idempotentReplay: true }, 201);
+    }
     const { bytes, contentType: detectedType } = image;
     const id = safeUuid();
     const objectKey = `gallery/${safeUuid()}`;
     const timestamp = unixTime();
-    await env.MEDIA.put(objectKey, bytes, { httpMetadata: { contentType: detectedType }, customMetadata: { purpose: "gallery" } });
     try {
+      await env.MEDIA.put(objectKey, bytes, { httpMetadata: { contentType: detectedType }, customMetadata: { purpose: "gallery" } });
       await env.DB.batch([
         env.DB.prepare(`
           INSERT INTO social_media(id, owner_user_id, object_key, purpose, content_type, byte_size, created_at)
@@ -1578,9 +1702,11 @@ async function gallery(request, env) {
           INSERT INTO media_safety_reviews(media_id,status,source,created_at)
           VALUES (?, 'pending', 'manual', ?)
         `).bind(id, timestamp),
+        completeMediaUploadStatement(env.DB, session.user_id, "gallery", idempotencyKey, id, id, timestamp),
       ]);
     } catch (error) {
       await env.MEDIA.delete(objectKey).catch(() => {});
+      await releaseMediaUpload(env.DB, session.user_id, "gallery", idempotencyKey).catch(() => {});
       throw error;
     }
     return json({ id, reviewStatus: "pending" }, 201);
@@ -1821,6 +1947,7 @@ export async function onRequest({ request, env }) {
     if (path === "/api/social/blocks" && ["GET", "POST"].includes(request.method)) return await blocks(request, env);
     if (path === "/api/social/messages" && ["GET", "POST"].includes(request.method)) return await messages(request, env);
     if (request.method === "GET" && path === "/api/social/chat-assets") return await chatAssets(request, env);
+    if (request.method === "GET" && path === "/api/social/upload-quotas") return await uploadQuotas(request, env);
     if (request.method === "GET" && path.startsWith("/api/social/chat/media/")) {
       return await chatMedia(request, env, decodeURIComponent(path.slice("/api/social/chat/media/".length)));
     }

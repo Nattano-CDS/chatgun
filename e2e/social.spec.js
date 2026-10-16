@@ -142,3 +142,32 @@ test("social shell reports offline state and recovers when connectivity returns"
   await page.evaluate(() => window.dispatchEvent(new Event("online")));
   await expect(page.locator("#toast")).toHaveText("กลับมาออนไลน์แล้ว");
 });
+
+test("daily image quota disables only the exhausted category while chat text remains available", async ({ page }) => {
+  await page.route("**/api/social/config", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ ...config, mediaUploadEnabled: true }),
+  }));
+  await page.route("**/api/social/upload-quotas", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({
+      timezone: "Asia/Bangkok",
+      localDay: "2026-10-16",
+      resetsAt: 1_797_353_200,
+      chat: { limit: 10, used: 10, reserved: 0, remaining: 0 },
+      gallery: { limit: 10, used: 10, reserved: 0, remaining: 0 },
+    }),
+  }));
+  await page.goto("/app/");
+  await page.locator('#primary-nav button[data-tab="profile"]').click();
+  await expect(page.locator("#gallery-upload-quota")).toContainText("อัปโหลดรูปแกลเลอรีครบขีดจำกัดรายวันแล้ว");
+  await expect(page.locator('#gallery-upload input[type="file"]')).toBeDisabled();
+  await page.locator('#primary-nav button[data-tab="chat"]').click();
+  await page.getByRole("button", { name: /พลอย/u }).click();
+  await expect(page.locator("#chat-upload-quota")).toContainText("ยังส่งข้อความได้");
+  await expect(page.locator('#thread input[name="file"]')).toBeDisabled();
+  await expect(page.locator('#thread input[name="body"]')).toBeEnabled();
+  await expect(page.locator("#thread .composer").getByRole("button", { name: "ส่ง", exact: true })).toBeEnabled();
+});

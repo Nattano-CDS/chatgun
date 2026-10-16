@@ -28,6 +28,11 @@ const state = {
   demoGallery: [],
   demoAssets: [],
   demoReports: [],
+  uploadQuotas: {
+    timezone: "Asia/Bangkok",
+    chat: { limit: 10, used: 0, reserved: 0, remaining: 10 },
+    gallery: { limit: 10, used: 0, reserved: 0, remaining: 10 },
+  },
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -49,7 +54,7 @@ async function api(path, options = {}) {
   const response = await fetch(path, { credentials: "same-origin", ...options, method, headers });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const error = new Error(payload.error || "ไม่สามารถดำเนินการได้");
+    const error = new Error(payload.message || payload.error || "ไม่สามารถดำเนินการได้");
     error.code = payload.code || "request_failed";
     error.status = response.status;
     throw error;
@@ -128,6 +133,7 @@ async function demoApi(path, options = {}) {
     await demoSave(); return { ok: true };
   }
   if (url.pathname === "/api/social/chat-assets") return { assets: state.demoAssets.map(({ id, created_at }) => ({ id, created_at })) };
+  if (url.pathname === "/api/social/upload-quotas") return state.uploadQuotas;
   if (url.pathname === "/api/social/ratings") {
     if (method === "GET") return { ratings: state.ratings };
     state.ratings.unshift({ id: crypto.randomUUID(), score: body.score, comment: body.comment, sender_name: "สมาชิกสาธิต", created_at: Math.floor(Date.now() / 1000) });
@@ -389,7 +395,34 @@ function renderOwnGallery() {
   $("#gallery-count").textContent = `${state.myGallery.length} / 12`;
   $("#gallery-upload").hidden = !state.config.mediaUploadEnabled;
   $("#gallery-disabled").hidden = state.config.mediaUploadEnabled;
+  renderUploadQuotas();
   $("#my-gallery").innerHTML = state.myGallery.length ? state.myGallery.map((photo) => `<article class="gallery-item ${photo.selected ? "selected" : ""}"><img src="${escapeHtml(galleryMediaUrl(photo.id))}" alt="${escapeHtml(photo.caption || "รูปในแกลเลอรี")}" loading="lazy"><div class="gallery-actions">${photo.selected ? "" : `<button data-gallery-action="select" data-photo="${escapeHtml(photo.id)}">ตั้งเป็นรูปหลัก</button>`}<button data-gallery-action="delete" data-photo="${escapeHtml(photo.id)}">ลบ</button></div></article>`).join("") : `<p class="subtitle">ยังไม่มีรูปภาพ</p>`;
+}
+
+function renderUploadQuotas() {
+  const gallery = state.uploadQuotas?.gallery;
+  const chat = state.uploadQuotas?.chat;
+  const reset = "รีเซ็ต 00:00 น. เวลาไทย";
+  if (gallery && $("#gallery-upload-quota")) {
+    $("#gallery-upload-quota").textContent = `แกลเลอรี: เหลือ ${gallery.remaining}/${gallery.limit} รูปวันนี้ · ${reset}${gallery.remaining <= 0 ? " · อัปโหลดรูปแกลเลอรีครบขีดจำกัดรายวันแล้ว" : ""}`;
+    const form = $("#gallery-upload");
+    const reached = gallery.remaining <= 0;
+    form?.querySelectorAll("input, button").forEach((control) => { control.disabled = reached; });
+    form?.classList.toggle("quota-reached", reached);
+  }
+  const chatQuota = $("#chat-upload-quota");
+  if (chat && chatQuota) {
+    chatQuota.textContent = `แชท: เหลือ ${chat.remaining}/${chat.limit} รูปวันนี้ · ${reset}${chat.remaining <= 0 ? " · อัปโหลดรูปในแชทครบขีดจำกัดรายวันแล้ว แต่ยังส่งข้อความได้" : ""}`;
+    const file = $("#thread input[name=file]");
+    if (file) file.disabled = chat.remaining <= 0;
+    file?.closest("label")?.classList.toggle("disabled", chat.remaining <= 0);
+  }
+}
+
+async function loadUploadQuotas() {
+  if (!state.config.mediaUploadEnabled || state.demo) return renderUploadQuotas();
+  state.uploadQuotas = await api("/api/social/upload-quotas");
+  renderUploadQuotas();
 }
 
 async function loadOwnGallery() {
@@ -605,7 +638,8 @@ async function openChat(id) {
   $(".chat-layout").classList.add("open");
   renderConversations();
   const thread = $("#thread");
-  thread.innerHTML = `<header class="thread-head"><button class="icon-button chat-back" aria-label="กลับ">←</button><span class="avatar">${escapeHtml(initials(person.name))}</span><strong>${escapeHtml(person.name)}</strong></header><details class="chat-safety"><summary>⚠ ระวังการหลอกโอนเงินและขอข้อมูลส่วนตัว</summary><p>อย่าโอนเงินหรือส่งรหัส OTP รหัสผ่าน ข้อมูลบัญชีธนาคาร หรือรูปเอกสารยืนยันตัวตนให้คู่สนทนา</p><p>${person.identity_verified ? "บัญชีนี้ยืนยันตัวตนแล้ว แต่ตรายืนยันไม่รับรองพฤติกรรมหรือความปลอดภัยในการทำธุรกรรม" : "บัญชีนี้ยังไม่ยืนยันตัวตน โปรดระมัดระวังเป็นพิเศษ"}</p></details><div class="messages"><p>กำลังโหลด…</p></div><form class="composer">${state.config.mediaUploadEnabled ? `<label class="icon-button" title="ส่งรูป">▧<input type="file" name="file" accept="image/jpeg,image/png,image/webp" aria-label="ส่งรูป" hidden></label><button class="icon-button asset-library" type="button" title="รูปที่ส่งล่าสุด" aria-label="รูปที่ส่งล่าสุด">▦</button>` : ""}<input name="body" maxlength="2000" placeholder="พิมพ์ข้อความ…"><button class="primary">ส่ง</button></form>`;
+  thread.innerHTML = `<header class="thread-head"><button class="icon-button chat-back" aria-label="กลับ">←</button><span class="avatar">${escapeHtml(initials(person.name))}</span><strong>${escapeHtml(person.name)}</strong></header><details class="chat-safety"><summary>⚠ ระวังการหลอกโอนเงินและขอข้อมูลส่วนตัว</summary><p>อย่าโอนเงินหรือส่งรหัส OTP รหัสผ่าน ข้อมูลบัญชีธนาคาร หรือรูปเอกสารยืนยันตัวตนให้คู่สนทนา</p><p>${person.identity_verified ? "บัญชีนี้ยืนยันตัวตนแล้ว แต่ตรายืนยันไม่รับรองพฤติกรรมหรือความปลอดภัยในการทำธุรกรรม" : "บัญชีนี้ยังไม่ยืนยันตัวตน โปรดระมัดระวังเป็นพิเศษ"}</p></details><div class="messages"><p>กำลังโหลด…</p></div>${state.config.mediaUploadEnabled ? `<p id="chat-upload-quota" class="upload-quota" aria-live="polite"></p>` : ""}<form class="composer">${state.config.mediaUploadEnabled ? `<label class="icon-button" title="ส่งรูป">▧<input type="file" name="file" accept="image/jpeg,image/png,image/webp" aria-label="ส่งรูป" hidden></label><button class="icon-button asset-library" type="button" title="รูปที่ส่งล่าสุด" aria-label="รูปที่ส่งล่าสุด">▦</button>` : ""}<input name="body" maxlength="2000" placeholder="พิมพ์ข้อความ…"><button class="primary">ส่ง</button></form>`;
+  renderUploadQuotas();
   try {
     await loadMessagePage(id);
     await api("/api/social/messages", { method: "POST", body: { action: "read", target: id } });
@@ -657,7 +691,7 @@ async function initialize() {
     $("#social-view").hidden = false;
     if (localStorage.getItem("chatgun-notifications") === "enabled") $("#notification-toggle").textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้";
     fillProfile();
-    await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked(), loadOwnGallery(), loadVerification(), loadMediaSafety()]);
+    await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked(), loadOwnGallery(), loadUploadQuotas(), loadVerification(), loadMediaSafety()]);
     await monitorLocationPermission();
     if (location.pathname === "/app/photos") switchTab("profile");
     const route = routedProfile();
@@ -740,11 +774,16 @@ $("#gallery-upload").addEventListener("submit", async (event) => {
       await demoSave(); form.reset(); renderOwnGallery(); toast("เพิ่มรูปตัวอย่างแล้ว"); return;
     }
     const headers = { "x-csrf-token": decodeURIComponent(cookie("__Host-cg_csrf")), accept: "application/json" };
+    headers["idempotency-key"] = form.dataset.idempotencyKey ||= crypto.randomUUID();
     const response = await fetch("/api/social/gallery", { method: "POST", credentials: "same-origin", headers, body: data });
     const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(payload.error || "อัปโหลดไม่สำเร็จ");
+    if (!response.ok) {
+      if (payload.code === "daily_upload_limit_reached") await loadUploadQuotas();
+      throw new Error(payload.message || payload.error || "อัปโหลดไม่สำเร็จ");
+    }
+    delete form.dataset.idempotencyKey;
     form.reset();
-    await loadOwnGallery();
+    await Promise.all([loadOwnGallery(), loadUploadQuotas()]);
     toast("อัปโหลดรูปแล้ว");
   } catch (error) { toast(error.message, true); } finally { setBusy(button, false); }
 });
@@ -909,9 +948,15 @@ $("#thread").addEventListener("submit", async (event) => {
         await demoSave();
       } else {
       const data = new FormData(); data.set("target", state.selectedChat); data.set("file", optimized);
-      const response = await fetch("/api/social/messages", { method: "POST", credentials: "same-origin", headers: { "x-csrf-token": decodeURIComponent(cookie("__Host-cg_csrf")), accept: "application/json" }, body: data });
+      const idempotencyKey = event.target.dataset.idempotencyKey ||= crypto.randomUUID();
+      const response = await fetch("/api/social/messages", { method: "POST", credentials: "same-origin", headers: { "x-csrf-token": decodeURIComponent(cookie("__Host-cg_csrf")), "idempotency-key": idempotencyKey, accept: "application/json" }, body: data });
       const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error || "ส่งรูปไม่สำเร็จ");
+      if (!response.ok) {
+        if (payload.code === "daily_upload_limit_reached") await loadUploadQuotas();
+        throw new Error(payload.message || payload.error || "ส่งรูปไม่สำเร็จ");
+      }
+      delete event.target.dataset.idempotencyKey;
+      await loadUploadQuotas();
       }
     } else await api("/api/social/messages", { method: "POST", body: { action: "send", target: state.selectedChat, body } });
     input.value = ""; event.target.reset(); await openChat(state.selectedChat);

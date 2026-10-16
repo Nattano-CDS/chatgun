@@ -37,6 +37,13 @@ test("social client uses same-origin APIs, CSRF, escaped rendering, and fail-clo
   assert.match(script, /fileDataUrl/u);
   assert.match(script, /demoGallery/u);
   assert.match(script, /demoAssets/u);
+  assert.match(script, /\/api\/social\/upload-quotas/u);
+  assert.match(script, /"idempotency-key"/u);
+  assert.match(script, /รีเซ็ต 00:00 น\. เวลาไทย/u);
+  assert.match(script, /gallery\.remaining <= 0/u);
+  assert.match(script, /chat\.remaining <= 0/u);
+  assert.match(html, /id="gallery-upload-quota"/u);
+  assert.match(styles, /\.upload-quota/u);
   assert.doesNotMatch(script, /innerHTML\s*=\s*(?:location|document\.cookie)/u);
 });
 
