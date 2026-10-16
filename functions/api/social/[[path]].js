@@ -806,12 +806,132 @@ async function moderationAccess(request, env, roles) {
   catch { throw new SocialError("purpose_required", "วัตถุประสงค์การเข้าถึงไม่ถูกต้อง"); }
   const purpose = cleanText(decodedPurpose, 300, { required: true });
   if (purpose.length < 10) throw new SocialError("purpose_required", "กรุณาระบุวัตถุประสงค์การเข้าถึงอย่างน้อย 10 ตัวอักษร");
+  if (!hasRecentAuthentication(session)) {
+    throw new SocialError("recent_authentication_required", "กรุณาเข้าสู่ระบบอีกครั้งก่อนใช้เครื่องมือดูแล", 403);
+  }
   const placeholders = roles.map(() => "?").join(",");
   const role = await env.DB.prepare(`
-    SELECT role FROM moderation_roles WHERE user_id = ? AND role IN (${placeholders}) LIMIT 1
-  `).bind(session.user_id, ...roles).first();
+    SELECT role FROM (
+      SELECT grant_record.role
+      FROM moderation_access_grants grant_record
+      WHERE grant_record.user_id = ?
+        AND grant_record.revoked_at IS NULL
+        AND (grant_record.expires_at IS NULL OR grant_record.expires_at > ?)
+      UNION ALL
+      SELECT legacy.role
+      FROM moderation_roles legacy
+      WHERE legacy.user_id = ?
+        AND NOT EXISTS (
+          SELECT 1 FROM moderation_access_grants recorded
+          WHERE recorded.user_id = legacy.user_id AND recorded.role = legacy.role
+        )
+    ) WHERE role IN (${placeholders}) LIMIT 1
+  `).bind(session.user_id, unixTime(), session.user_id, ...roles).first();
   if (!role) throw new SocialError("forbidden", "ไม่มีสิทธิ์เข้าถึงเครื่องมือดูแล", 403);
   return { session, purpose, role: role.role };
+}
+
+const MODERATION_ROLES = new Set(["moderation_admin", "report_reviewer", "identity_reviewer", "safety_admin"]);
+const MAX_ROLE_GRANT_SECONDS = 90 * 24 * 60 * 60;
+
+async function moderationRoleManagement(request, env) {
+  const { session, purpose } = await moderationAccess(request, env, ["moderation_admin"]);
+  const timestamp = unixTime();
+  if (request.method === "GET") {
+    const grants = await env.DB.prepare(`
+      SELECT grant_record.id, grant_record.user_id, user.display_name, grant_record.role,
+             grant_record.granted_at, grant_record.expires_at, grant_record.revoked_at
+      FROM moderation_access_grants grant_record
+      JOIN users user ON user.id = grant_record.user_id
+      WHERE grant_record.revoked_at IS NULL
+        AND (grant_record.expires_at IS NULL OR grant_record.expires_at > ?)
+      ORDER BY grant_record.role, grant_record.granted_at, grant_record.id
+      LIMIT 200
+    `).bind(timestamp).all();
+    const events = await env.DB.prepare(`
+      SELECT id, grant_id, actor_user_id, target_user_id, role, action, reason, created_at
+      FROM moderation_role_events ORDER BY created_at DESC, id DESC LIMIT 100
+    `).all();
+    await env.DB.prepare(`
+      INSERT INTO moderation_role_events(
+        id, grant_id, actor_user_id, target_user_id, role, action, reason, created_at
+      ) VALUES (?, NULL, ?, NULL, 'moderation_admin', 'inspect', ?, ?)
+    `).bind(safeUuid(), session.user_id, purpose, timestamp).run();
+    return json({ grants: grants.results || [], events: events.results || [] });
+  }
+
+  await limited(env, "moderation_role_change_hour", session.user_id, 20, 3600);
+  const body = await readJson(request);
+  const action = String(body.action || "");
+  const reason = cleanText(body.reason, 300, { required: true });
+  if (reason.length < 10) throw new SocialError("invalid_reason", "กรุณาระบุเหตุผลอย่างน้อย 10 ตัวอักษร");
+
+  if (action === "grant") {
+    const targetUserId = identifier(body.userId, "ไม่พบบัญชีผู้รับสิทธิ์");
+    const role = String(body.role || "");
+    const expiresAt = Number(body.expiresAt);
+    if (!MODERATION_ROLES.has(role)) throw new SocialError("invalid_role", "บทบาทไม่ถูกต้อง");
+    if (targetUserId === session.user_id) throw new SocialError("self_grant_forbidden", "ไม่สามารถเพิ่มสิทธิ์ให้บัญชีของตนเอง", 403);
+    if (!Number.isInteger(expiresAt) || expiresAt < timestamp + 3600 || expiresAt > timestamp + MAX_ROLE_GRANT_SECONDS) {
+      throw new SocialError("invalid_expiry", "สิทธิ์ต้องมีอายุระหว่าง 1 ชั่วโมงถึง 90 วัน");
+    }
+    const target = await env.DB.prepare(
+      "SELECT id FROM users WHERE id=? AND status='active' AND account_state='active'",
+    ).bind(targetUserId).first();
+    if (!target) throw new SocialError("not_found", "ไม่พบบัญชีผู้รับสิทธิ์", 404);
+    const grantId = safeUuid();
+    try {
+      await env.DB.batch([
+        env.DB.prepare(`
+          INSERT INTO moderation_access_grants(
+            id,user_id,role,granted_by,grant_reason,granted_at,expires_at
+          ) VALUES (?,?,?,?,?,?,?)
+        `).bind(grantId, targetUserId, role, session.user_id, reason, timestamp, expiresAt),
+        env.DB.prepare(`
+          INSERT INTO moderation_role_events(
+            id,grant_id,actor_user_id,target_user_id,role,action,reason,created_at
+          ) VALUES (?,?,?,?,?,'grant',?,?)
+        `).bind(safeUuid(), grantId, session.user_id, targetUserId, role, `${purpose}; ${reason}`.slice(0, 300), timestamp),
+      ]);
+    } catch (error) {
+      if (String(error?.message || "").includes("UNIQUE")) {
+        throw new SocialError("role_already_active", "บัญชีนี้มีบทบาทดังกล่าวอยู่แล้ว", 409);
+      }
+      throw error;
+    }
+    return json({ ok: true, grantId }, 201);
+  }
+
+  if (action === "revoke") {
+    const grantId = identifier(body.grantId, "ไม่พบสิทธิ์ที่ต้องการยกเลิก");
+    const grant = await env.DB.prepare(`
+      SELECT id,user_id,role FROM moderation_access_grants
+      WHERE id=? AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at > ?)
+    `).bind(grantId, timestamp).first();
+    if (!grant) throw new SocialError("not_found", "ไม่พบสิทธิ์ที่ต้องการยกเลิก", 404);
+    const results = await env.DB.batch([
+      env.DB.prepare(`
+        UPDATE moderation_access_grants
+        SET revoked_at=?,revoked_by=?,revocation_reason=?
+        WHERE id=? AND revoked_at IS NULL
+      `).bind(timestamp, session.user_id, reason, grantId),
+      env.DB.prepare("DELETE FROM moderation_roles WHERE user_id=? AND role=?").bind(grant.user_id, grant.role),
+      env.DB.prepare(`
+        INSERT INTO moderation_role_events(
+          id,grant_id,actor_user_id,target_user_id,role,action,reason,created_at
+        )
+        SELECT ?,?,?,?,?, 'revoke',?,?
+        FROM moderation_access_grants
+        WHERE id=? AND revoked_at=? AND revoked_by=?
+      `).bind(safeUuid(), grantId, session.user_id, grant.user_id, grant.role, `${purpose}; ${reason}`.slice(0, 300), timestamp, grantId, timestamp, session.user_id),
+    ]);
+    if (!Number(results[0]?.meta?.changes || 0)) {
+      throw new SocialError("decision_conflict", "สิทธิ์นี้ถูกแก้ไขแล้ว", 409);
+    }
+    return json({ ok: true });
+  }
+
+  throw new SocialError("invalid_action", "คำสั่งไม่ถูกต้อง");
 }
 
 async function auditModeration(db, actor, action, subjectType, subjectId, purpose) {
@@ -1634,6 +1754,7 @@ export async function onRequest({ request, env }) {
     if (path === "/api/social/media/appeals" && ["GET", "POST"].includes(request.method)) return await mediaAppeals(request, env);
     if (path === "/api/social/moderation/notifications" && ["GET", "POST"].includes(request.method)) return await moderationNotifications(request, env);
     if (request.method === "GET" && path === "/api/social/moderation/overview") return await moderationOverview(request, env);
+    if (path === "/api/social/moderation/roles" && ["GET", "POST"].includes(request.method)) return await moderationRoleManagement(request, env);
     if (path === "/api/social/moderation/reports" && ["GET", "POST"].includes(request.method)) return await moderationReports(request, env);
     if (path === "/api/social/moderation/media-reports" && ["GET", "POST"].includes(request.method)) return await moderationMediaReports(request, env);
     if (path === "/api/social/moderation/appeals" && ["GET", "POST"].includes(request.method)) return await moderationAppeals(request, env);

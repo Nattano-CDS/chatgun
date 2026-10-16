@@ -11,6 +11,10 @@ function retryDelay(attempts) {
 
 export async function drainMediaDeletionQueue(env, timestamp = unixTime()) {
   if (!env.DB || !env.MEDIA) throw new Error("missing_staging_bindings");
+  const exhaustedBefore = await env.DB.prepare(`
+    SELECT COUNT(*) count FROM media_deletion_queue
+    WHERE completed_at IS NULL AND attempts >= ?
+  `).bind(MAX_ATTEMPTS).first();
   const due = await env.DB.prepare(`
     SELECT object_key, attempts FROM media_deletion_queue
     WHERE completed_at IS NULL AND next_attempt_at <= ? AND attempts < ?
@@ -42,7 +46,16 @@ export async function drainMediaDeletionQueue(env, timestamp = unixTime()) {
       failed += 1;
     }
   }
-  return { selected: (due.results || []).length, completed, failed };
+  const exhaustedAfter = await env.DB.prepare(`
+    SELECT COUNT(*) count FROM media_deletion_queue
+    WHERE completed_at IS NULL AND attempts >= ?
+  `).bind(MAX_ATTEMPTS).first();
+  return {
+    selected: (due.results || []).length,
+    completed,
+    failed,
+    exhausted: Number(exhaustedAfter?.count || exhaustedBefore?.count || 0),
+  };
 }
 
 export default {

@@ -14,8 +14,11 @@ This document does not authorize Production deployment or activation of Sensitiv
   media, decide appeals, or inspect decision history. Report reviewers can inspect report queues and
   overview counts but cannot retrieve media objects.
 - Moderator access requires an authenticated active account, completed acceptance/onboarding,
-  an allowed role, a case-specific purpose of at least ten characters, same-origin CSRF on writes,
-  and immutable audit records.
+  an unexpired/unrevoked role, authentication within ten minutes, a case-specific purpose of at
+  least ten characters, same-origin CSRF on writes, and immutable audit records.
+- `moderation_admin` is separate from reviewer roles. It can grant/revoke time-bounded access but
+  cannot inspect reports or private media unless separately assigned the least-privilege reviewer
+  role. Self-grants are rejected and every access change is audited.
 - The feature branch enables the moderation API only in Preview. It does not grant any staging user
   a moderation role; role provisioning requires an owner-approved named reviewer. Production keeps
   the moderation feature flag disabled.
@@ -69,6 +72,11 @@ registration. Dormant invitation tables remain for migration compatibility but a
 
 Existing released records are classified `general`; existing rejected records are classified
 `prohibited`; pending records remain unclassified. No user or R2 object is deleted by the migration.
+
+Migration `0010_moderation_access_management.sql` adds time-bounded access grants and role-change
+audit events, and safely imports any explicit legacy roles. It does not assign a person to a new
+role. Bootstrap, grant, review, expiry and revocation procedures are documented in
+`admin-access-role-management.md`.
 
 Before any future Production migration: create a D1 Time Travel bookmark/export, record aggregate
 counts, run the migration once, validate `PRAGMA foreign_key_check`, validate category/status
