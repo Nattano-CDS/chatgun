@@ -25,5 +25,15 @@
   "realOauthCallbacks": "not repeated; backend/providers unchanged; not claimed as newly tested",
   "productionRealFeatures": "remain disabled",
   "stagingDataMutations": "none",
-  "nativeIosKeyboardAndAssistiveTechnology": "not certified by Chromium emulation"
+  "nativeIosKeyboardAndAssistiveTechnology": "not certified by Chromium emulation",
+  "production": {
+    "sha": "1873fd3c9aae5a0efc26fef47b98753d8fa31308",
+    "canonicalDeployment": "2178dada-7508-4f4f-9c7c-1001150cef48",
+    "liveSmoke": "PASS",
+    "browserViewports": [390, 768, 1440],
+    "browserPassed": 3,
+    "browserFailed": 0,
+    "comparisonPairs": 63,
+    "captureErrors": 0
+  }
 }

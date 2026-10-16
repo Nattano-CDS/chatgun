@@ -1,0 +1,15 @@
+{
+  "verifiedAt": "2026-10-16T19:53:27.154Z",
+  "origin": "https://chatgun.social",
+  "sha": "1873fd3c9aae5a0efc26fef47b98753d8fa31308",
+  "canonicalDeploymentId": "2178dada-7508-4f4f-9c7c-1001150cef48",
+  "status": "success",
+  "servedRelease": {
+    "commit": "1873fd3c9aae5a0efc26fef47b98753d8fa31308",
+    "demoBatch": "chatgun-browser-demo-v1"
+  },
+  "productionD1": "9738a051-d914-42d0-8e7b-8098ef2b959d",
+  "productionR2Bindings": 0,
+  "realFeaturesRemainDisabled": true,
+  "validatedRuntime": "a1e5463aa9681cb1d01acba207e0f5433457f475"
+}

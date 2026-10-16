@@ -1,6 +1,6 @@
 {
-  "target": "https://codex-chatgun-release-candid.chatgun.pages.dev",
-  "commit": "a1e5463aa9681cb1d01acba207e0f5433457f475",
+  "target": "https://chatgun.social",
+  "commit": "1873fd3c9aae5a0efc26fef47b98753d8fa31308",
   "kind": "live-site",
   "fixture": "chatgun-browser-demo-v1; browser-only adapter and empty-state variations",
   "viewports": [

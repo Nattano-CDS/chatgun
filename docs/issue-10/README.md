@@ -1,6 +1,6 @@
 # Issue #10 — consolidated parity remediation
 
-Status: release-candidate validation passed for the fictional demonstration; not a claim of pixel identity or real-user launch readiness. Actual Production publication is verified separately.
+Status: **Production fictional-demonstration release verified**. This is not a claim of literal pixel identity or real-user launch readiness.
 
 ## Reference and evidence
 
@@ -83,3 +83,19 @@ The 26 browser skips comprise 16 live-session/D1/R2 suites deliberately not enab
 Decision: **GO for the corrected fictional demonstration release**, subject to actual Production smoke/SHA verification. **NO-GO for real-user Beta or enabling live Production features**. Native iOS keyboard/assistive-technology behavior, a new real OAuth callback run, live media/deletion mutations and human moderation operations are not newly certified by these browser captures.
 
 Production publication results and the exact served SHA are recorded in the release comment on PR #11 and the final owner-review package; they must not be inferred from a successful Preview build alone.
+
+## Verified Production result
+
+- Live application: [https://chatgun.social](https://chatgun.social)
+- Merged implementation: [PR #11](https://github.com/Nattano-CDS/chatgun/pull/11)
+- Actual Production SHA: **`1873fd3c9aae5a0efc26fef47b98753d8fa31308`**
+- Cloudflare canonical deployment: `2178dada-7508-4f4f-9c7c-1001150cef48`, environment Production, deployment status **success**.
+- Independently verified the canonical deployment SHA and the SHA returned by the live custom domain's `/release.json`; both match the merge commit. The public runtime is identical to validated runtime `a1e5463aa9681cb1d01acba207e0f5433457f475`.
+- Actual live Production HTTP smoke: **PASS**. Fictional 20-member/120-message dataset, real-feature denials, private-artifact paths, disabled OAuth starts and factual legal notices passed the smoke assertions.
+- Actual Production browser journeys at **390, 768 and 1440px: 3 passed, 0 failed**. These exercise browser-only fiction with the real Production configuration, including persistence, messaging, gallery likes/comments, reporting, navigation and anonymous Admin denial. They do not create real accounts or perform server-side member writes.
+- The comparison's `after/` images were recaptured from **Production**, with the deployment SHA checked before and after capture; capture errors **0**. `near/` is the rendered canonical source, errors **0**. All **63** paired comparisons have diagnostic overlays and pixel differences.
+- Production D1 remains `chatgun-auth`; Production R2 remains unbound; all real authentication/social/media/Admin/public-registration/Sensitive Content gates remain disabled. No migrations or data mutations were performed.
+
+Final assessment: **GO for this corrected fictional demonstration release; NO-GO for real-user Beta activation** until the separately listed operational, legal and provider requirements are resolved. The report deliberately lists intentional differences and untested live scenarios instead of equating green tests with 100% visual acceptance. Issue #10 remains available for final owner review of the complete package.
+
+Post-release screenshots and verification metadata are evidence-only additions on the remediation branch and linked from the PR's release comment. They do not trigger another Production deployment.

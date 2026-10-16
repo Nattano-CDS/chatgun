@@ -75,7 +75,7 @@
     "name": "login",
     "width": 390,
     "height": 844,
-    "rawChangedPercent": 12.84,
+    "rawChangedPercent": 13.21,
     "threshold": 20,
     "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
   },
@@ -83,7 +83,7 @@
     "name": "register",
     "width": 390,
     "height": 844,
-    "rawChangedPercent": 13.47,
+    "rawChangedPercent": 12.84,
     "threshold": 20,
     "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
   },
@@ -155,7 +155,7 @@
     "name": "image-picker",
     "width": 390,
     "height": 844,
-    "rawChangedPercent": 23.08,
+    "rawChangedPercent": 23.09,
     "threshold": 20,
     "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
   },
@@ -243,7 +243,7 @@
     "name": "login",
     "width": 768,
     "height": 1024,
-    "rawChangedPercent": 7.23,
+    "rawChangedPercent": 7.07,
     "threshold": 20,
     "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
   },
@@ -251,7 +251,7 @@
     "name": "register",
     "width": 768,
     "height": 1024,
-    "rawChangedPercent": 7.24,
+    "rawChangedPercent": 6.82,
     "threshold": 20,
     "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
   },
@@ -411,7 +411,7 @@
     "name": "login",
     "width": 1440,
     "height": 1100,
-    "rawChangedPercent": 3.97,
+    "rawChangedPercent": 3.89,
     "threshold": 20,
     "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
   },
@@ -419,7 +419,7 @@
     "name": "register",
     "width": 1440,
     "height": 1100,
-    "rawChangedPercent": 3.97,
+    "rawChangedPercent": 3.77,
     "threshold": 20,
     "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
   },
