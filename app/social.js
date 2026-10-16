@@ -696,7 +696,7 @@ function renderGalleryPost() {
     const notice = document.createElement("p");
     notice.className = "demo-post-notice";
     notice.textContent = "โหมดตัวอย่าง · ไม่มีการเผยแพร่ไปยังสมาชิกจริง";
-    $(".gallery-post").prepend(notice);
+    $(".gallery-post .post-social").prepend(notice);
   }
 }
 
