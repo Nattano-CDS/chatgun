@@ -6,7 +6,7 @@ Status: validation in progress; not a claim of pixel identity or real-user launc
 
 Canonical NEAR v91: `98bb83e44bf88eddb9822d7875f18cd4fe833ee2`. The original read-only checkout was archived into an isolated temporary directory and its actual React application rendered using its declared dependencies. No original NEAR files were edited. `scripts/extract-near-v91.mjs` extracts ordered non-game component rules from that running application's CSSOM; the generated stylesheet is scoped to ChatGun.
 
-`near/` contains rendered canonical screenshots using the same approved **public** fictional dataset through a browser-only IndexedDB adapter. This is not a reconstruction of NEAR markup and not a staging database copy. `before/` contains actual pre-remediation Production screenshots at main `5d8fb15a37031c2d150ab39fa60fd473e13e7418`. `after/` contains corrected browser screenshots. `fixtures/` contains explicitly mocked, protected acceptance/onboarding/account/Admin states; these are NOT authenticated Production evidence.
+`near/` contains rendered canonical screenshots using the same approved **public** fictional dataset through a browser-only IndexedDB adapter. One approved public portrait also illustrates the recent-chat-image library in that isolated browser. This is not a reconstruction of NEAR markup and not a staging database copy. `before/` contains actual pre-remediation Production screenshots at main `5d8fb15a37031c2d150ab39fa60fd473e13e7418`. `after/` contains corrected browser screenshots. `fixtures/` contains explicitly mocked, protected acceptance/onboarding/account/Admin states; these are NOT authenticated Production evidence.
 
 Viewports: 390×844, 768×1024, 1440×1100. [Side-by-side comparison and pixel overlays](comparison.html). Raw difference percentages include branding, removed Game, timestamps and required safety controls; they are diagnostics, not acceptance scores.
 
@@ -20,10 +20,17 @@ Viewports: 390×844, 768×1024, 1440×1100. [Side-by-side comparison and pixel o
 | Search/filters | Inline flyout rather than original modal; unhelpful search empty state | Centred native dialog, focus containment/Escape, clear-filters recovery |
 | Friends/requests | Horizontal compact cards instead of original portraits | Original portrait grids, separate request decision strip, counts, non-overlapping headings |
 | Chat | Two-pane dashboard instead of inbox/thread; composer and header composition | Inbox-or-thread layout, circular avatars, full-height conversation, original safety band and composer above footer |
+| Chat images | Missing inline recent-image picker and explicit forwarding destination | Source carousel and friend-choice library restored; reuse/forwarding does not consume another upload slot |
 | Member profile | Mixed primary/safety actions, absent persistent navigation | Separate action hierarchy, original image/shade/facts, persistent non-game navigation; safe bottom clearance |
 | Gallery/post | Missing owner summary and original two-column post hierarchy | Summary/facts/interests, three-column tiles, owner header, image/social columns, like/comment/navigation controls |
+| Own images | `/app/photos` did not restore dedicated image management in demo | Separate profile-image management route, working settings/back navigation; quotas/quarantine preserved |
 | Auth/acceptance/account | Canvas/type mismatch and absent persistent navigation | Original auth canvas/type metrics and five-destination footer; existing secure workflows retained |
 | Recovery/accessibility | Unbounded broken portraits and inconsistent reduced-motion handling | Labelled bounded image fallback, keyboard activation, Escape, reduced-motion override |
+| Routed actions | Closing a profile through reporting/blocking/chat could reopen it on reload | Profile route is cleared on every modal close; friendship/blocking persistence covered by browser regressions |
+
+## Cascade audit
+
+The actual product entry loads `app/social.css`, generated `app/near-v91.css`, and the scoped adapters in `app/restoration.css`, in that order. Original component selectors use an ID-scoped boundary so legacy horizontal-card/sidebar declarations cannot silently win. Auth uses `auth-shell.css` plus each page's functional styles. `style.css` (legacy Kanit/marketing gradients) is not loaded by the product entry, acceptance, onboarding, profile or Admin. It remains confined to the explicitly separate `/welcome` marketing surface. The canonical non-game canvas is plain `#f7f7fb`; no reported dot pattern was reproduced in either rendered product entry. Auth intentionally uses the original elliptical lavender canvas.
 
 ## Intentional deviations and non-equivalent surfaces
 
@@ -47,6 +54,7 @@ Build uses the explicit `dist` public-asset boundary. Credentials, tests, docume
 - New measured-layout/keyboard/pagination/image-failure suite: 4 passed at all three explicit widths.
 - Initial local full browser run: 33 passed, 8 failed, 23 skipped. Six failures required configured Preview auth settings; two exposed the duplicate close-selector regression, subsequently fixed. This failed run is retained honestly; it is not release approval.
 - Full configured Preview rerun, final screenshot review, release guardrails and actual Production deployment verification: pending below.
+- A temporary immutable Preview hostname produced a real Turnstile hostname-denial message in one mobile check. This is not treated as a CAPTCHA success. The final configured suite uses the existing authorized stable alias; its mobile widget-initialization check passed separately. No allowlist, key, secret, provider application or server verification was changed.
 
 ## Remaining non-visual launch constraints
 
