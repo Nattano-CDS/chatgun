@@ -1,12 +1,29 @@
 export const DELETION_RECEIPT_TTL_SECONDS = 7 * 24 * 60 * 60;
 export const REVOKED_SESSION_GRACE_SECONDS = 24 * 60 * 60;
 export const STALE_PRESENCE_GRACE_SECONDS = 24 * 60 * 60;
+export const BETA_INVITATION_AUDIT_SECONDS = 7 * 24 * 60 * 60;
 
 const CLEANUP_TARGETS = [
   {
     name: "oauthFlows",
     sql: "DELETE FROM oauth_flows WHERE rowid IN (SELECT rowid FROM oauth_flows WHERE expires_at <= ? LIMIT ?)",
     values: (now, limit) => [now, limit],
+  },
+  {
+    name: "betaInvitations",
+    sql: `DELETE FROM beta_invitations WHERE rowid IN (
+      SELECT rowid FROM beta_invitations
+      WHERE expires_at <= ?
+         OR (consumed_at IS NOT NULL AND consumed_at <= ?)
+         OR (revoked_at IS NOT NULL AND revoked_at <= ?)
+      LIMIT ?
+    )`,
+    values: (now, limit) => [
+      now - BETA_INVITATION_AUDIT_SECONDS,
+      now - BETA_INVITATION_AUDIT_SECONDS,
+      now - BETA_INVITATION_AUDIT_SECONDS,
+      limit,
+    ],
   },
   {
     name: "sessions",

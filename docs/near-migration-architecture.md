@@ -15,7 +15,8 @@ All new capability checks are server-side. UI hiding is secondary.
 | Variable | Default | Controls |
 | --- | --- | --- |
 | `SOCIAL_APP_ENABLED` | `false` in Production; `true` in isolated Preview | Read access to the migrated application shell |
-| `ADULT_ONBOARDING_ENABLED` | `false` | 18+ declaration and member-profile creation |
+| `BETA_INVITATION_REGISTRATION_ENABLED` | `false` in Production; `true` in controlled Preview | One-use invitation path for new OAuth accounts |
+| `ADULT_ONBOARDING_ENABLED` | `false` in Production; `true` in controlled Preview | Server-side 18+ declaration and member-profile creation |
 | `PUBLIC_DISCOVERY_ENABLED` | `false` in Production; `true` in isolated Preview | Presence publication and nearby discovery |
 | `FRIEND_REQUESTS_ENABLED` | `false` in Production; `true` in isolated Preview | Relationship requests and decisions |
 | `MESSAGING_ENABLED` | `false` in Production; `true` in isolated Preview | Text messaging and unread state; image paths remain separately gated |
@@ -37,7 +38,7 @@ The requested 18+ gate is designed as a versioned adult declaration, not an asse
 2. display the owner/legal-approved adult notice;
 3. require an explicit 18+ declaration with CSRF and recent authentication;
 4. store an age-band event (`adult_18_plus`), notice version, assurance method, and timestamp without storing a birth date;
-5. create the member profile only when both registration and adult onboarding flags are enabled;
+5. create the member profile only when adult onboarding is enabled and either public registration is enabled or the account has a pending invitation enrollment;
 6. keep discovery, messaging, media, and ratings independently disabled until their launch gates pass.
 
 Production activation still requires qualified Thai legal review of the threshold, contractual capacity, notice, assurance strength, correction/appeal path, and anti-evasion handling.
@@ -49,9 +50,9 @@ Production activation still requires qualified Thai legal review of the threshol
 - The repository default Pages binding now points to staging D1; only `[env.production]` points to `chatgun-auth`. This matches the configuration downloaded read-only from Pages.
 - Private R2 bucket `chatgun-media-staging` is bound as `MEDIA` only in Preview. Production explicitly has an empty R2 binding list and keeps `MEDIA_UPLOAD_ENABLED=false`.
 - `chatgun-media-cleanup-staging` runs daily against staging D1/R2. Live scheduled-event validation deleted queued binaries, removed pending media metadata, recorded idempotent completion, and left no pending objects.
-- Preview private gallery/chat media is enabled only for authenticated synthetic members. Registration and high-risk capabilities remain disabled and `noindex` behavior is intact. Immutable validation URLs are recorded in PR #6.
+- Preview private gallery/chat media is enabled only for authorized staging tests. Public registration remains disabled; one-use invitation onboarding is Preview-only and `noindex` behavior is intact. Immutable validation URLs are recorded in PR #6.
 - Live staging evidence uses three `cg-stage-*` users with 24-hour sessions. Positive/negative API flows and desktop/mobile UI persist only to `chatgun-auth-staging`; no provider identity is fabricated or linked.
-- Production migrations `0002`–`0004` remain pending and were not applied.
+- Production migrations `0002`–`0007` remain pending and were not applied.
 
 ## Additive D1 model
 

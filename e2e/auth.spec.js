@@ -6,11 +6,12 @@ const screenshotDirectory = resolve("test-results/screenshots");
 
 test.beforeAll(() => mkdirSync(screenshotDirectory, { recursive: true }));
 
-test("signup renders existing-account auth controls with Preview Turnstile", async ({ page }, testInfo) => {
+test("signup renders invitation-only Beta auth controls with Preview Turnstile", async ({ page }, testInfo) => {
   await page.goto("/signup.html");
   await expect(page).toHaveTitle("สมัครสมาชิก | ChatGun");
-  await expect(page.getByRole("heading", { name: "เข้าสู่ระบบด้วยบัญชีเดิม" })).toBeVisible();
-  await expect(page.getByText(/การสมัครบัญชีใหม่ปิดไว้/u)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "เข้าสู่ระบบ หรือเข้าร่วม Beta" })).toBeVisible();
+  await expect(page.getByText(/Beta จำกัดเฉพาะผู้ได้รับเชิญอายุ 18 ปีขึ้นไป/u)).toBeVisible();
+  await expect(page.getByLabel("รหัสเชิญสำหรับ Beta 18+")).toBeVisible();
   await expect(page.getByRole("button", { name: "ดำเนินการต่อด้วย Google" })).toBeVisible();
   await expect(page.getByRole("button", { name: "ดำเนินการต่อด้วย Facebook" })).toBeVisible();
   await expect(page.getByRole("button", { name: "ดำเนินการต่อด้วย LINE" })).toBeVisible();
@@ -49,7 +50,7 @@ test("legal review pages disclose unresolved owner decisions", async ({ page }) 
 test("account page redirects unauthenticated users to signup", async ({ page }) => {
   await page.goto("/account.html");
   await expect(page).toHaveURL(/\/signup(?:\.html)?$/u);
-  await expect(page.getByRole("heading", { name: "เข้าสู่ระบบด้วยบัญชีเดิม" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "เข้าสู่ระบบ หรือเข้าร่วม Beta" })).toBeVisible();
 });
 
 test("Pages Functions expose secure config and reject cross-origin mutations", async ({ request, baseURL }) => {
@@ -63,6 +64,7 @@ test("Pages Functions expose secure config and reject cross-origin mutations", a
   expect(config.mobileOtpEnabled).toBe(false);
   expect(config.smsEnabled).toBe(false);
   expect(config.newAccountRegistrationEnabled).toBe(false);
+  expect(config.invitationOnlyRegistrationEnabled).toBe(true);
   expect(config.safety).toEqual({
     publicDiscoveryEnabled: false,
     unsolicitedMessagingEnabled: false,

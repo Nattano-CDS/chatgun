@@ -28,6 +28,12 @@ function capability(env, name) {
 async function authenticated(request, env, { csrf = false } = {}) {
   const session = await getSession(request, env.DB);
   if (!session) throw new SocialError("unauthorized", "กรุณาเข้าสู่ระบบ", 401);
+  const betaEnrollment = await env.DB.prepare(
+    "SELECT status FROM beta_enrollments WHERE user_id = ?",
+  ).bind(session.user_id).first();
+  if (betaEnrollment?.status === "revoked") {
+    throw new SocialError("beta_access_revoked", "สิทธิ์เข้าร่วม Beta ถูกระงับ", 403);
+  }
   if (csrf) {
     requireSameOrigin(request);
     if (!await requireCsrf(request, session)) {
@@ -135,9 +141,9 @@ function distanceMetres(a, b) {
 }
 
 function privateDistance(metres) {
-  if (metres < 100) return { distance: 100, distance_min: 0, distance_max: 100, distance_label: "ใกล้กว่า 100 ม." };
-  const maximum = Math.ceil(metres / 100) * 100;
-  return { distance: maximum, distance_min: maximum - 100, distance_max: maximum, distance_label: `ประมาณ ${maximum} ม.` };
+  if (metres < 250) return { distance: 250, distance_min: 0, distance_max: 250, distance_label: "ใกล้กว่า 250 ม." };
+  const maximum = Math.ceil(metres / 250) * 250;
+  return { distance: maximum, distance_min: maximum - 250, distance_max: maximum, distance_label: `ประมาณ ${maximum} ม.` };
 }
 
 async function config(env) {
@@ -165,10 +171,15 @@ async function config(env) {
 async function adultOnboarding(request, env) {
   capability(env, "SOCIAL_APP_ENABLED");
   capability(env, "ADULT_ONBOARDING_ENABLED");
-  if (!enabled(env.NEW_ACCOUNT_REGISTRATION_ENABLED)) {
+  const session = await authenticated(request, env, { csrf: true });
+  const betaEnrollment = enabled(env.BETA_INVITATION_REGISTRATION_ENABLED)
+    ? await env.DB.prepare(
+      "SELECT status FROM beta_enrollments WHERE user_id = ?",
+    ).bind(session.user_id).first()
+    : null;
+  if (!enabled(env.NEW_ACCOUNT_REGISTRATION_ENABLED) && betaEnrollment?.status !== "pending_age") {
     throw new SocialError("registration_closed", "ขณะนี้ยังไม่เปิดรับสมัครบัญชีใหม่", 403);
   }
-  const session = await authenticated(request, env, { csrf: true });
   if (!hasRecentAuthentication(session)) {
     throw new SocialError("recent_auth_required", "กรุณายืนยันตัวตนอีกครั้ง", 428);
   }
@@ -207,6 +218,10 @@ async function adultOnboarding(request, env) {
         interests = excluded.interests,
         updated_at = excluded.updated_at
     `).bind(session.user_id, eventId, name, gender, bio, interests, timestamp, timestamp),
+    env.DB.prepare(`
+      UPDATE beta_enrollments SET status = 'active', activated_at = ?
+      WHERE user_id = ? AND status = 'pending_age'
+    `).bind(timestamp, session.user_id),
   ]);
   return json({ profile: await profileFor(env.DB, session.user_id) }, 201);
 }
@@ -313,7 +328,7 @@ async function discovery(request, env) {
     }
     return json({ profile: await profileFor(env.DB, session.user_id) });
   }
-  await limited(env, "discovery_read_user_10m", session.user_id, 60, 600);
+  await limited(env, "discovery_read_user_10m", session.user_id, 30, 600);
   if (!me.discovery_visible || !me.located_at || Number(me.located_at) <= timestamp - LOCATION_FRESH_SECONDS) {
     return json({ people: [], locationFresh: false });
   }
@@ -348,7 +363,8 @@ async function discovery(request, env) {
     const metres = distanceMetres(ownLocation, person);
     const { latitude, longitude, ...safe } = person;
     return { ...safe, _distance: metres, ...privateDistance(metres) };
-  }).filter((person) => person._distance <= 5000).sort((a, b) => a._distance - b._distance)
+  }).filter((person) => person._distance <= 5000)
+    .sort((a, b) => a.distance - b.distance || String(a.user_id).localeCompare(String(b.user_id)))
     .map(({ _distance, ...person }) => person);
   return json({ people, locationFresh: true });
 }

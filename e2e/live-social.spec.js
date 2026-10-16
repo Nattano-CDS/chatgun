@@ -67,7 +67,7 @@ test("staging social APIs persist positive and negative non-media workflows", as
   const config = await (await request.get(`${baseURL}/api/social/config`)).json();
   expect(config).toMatchObject({ socialAppEnabled: true, publicDiscoveryEnabled: true, friendRequestsEnabled: true, messagingEnabled: true, mediaUploadEnabled: true, ratingsEnabled: true, identityVerificationEnabled: false, gameEnabled: false, emailOtpEnabled: false, mobileOtpEnabled: false });
 
-  for (const [account, latitude, longitude] of [[alice, 13.75630, 100.50180], [bob, 13.75655, 100.50195], [charlie, 13.75800, 100.50300]]) {
+  for (const [account, latitude, longitude] of [[alice, 13.75630, 100.50180], [bob, 13.75655, 100.50195], [charlie, 13.76000, 100.50400]]) {
     const refreshLocation = await mutate(request, baseURL, account, "/api/social/discovery", { action: "location", latitude, longitude, accuracy: 5 });
     expect(refreshLocation.status()).toBe(200);
   }
@@ -214,7 +214,7 @@ test("desktop and mobile render persisted staging profile, discovery, notificati
   await page.locator("#people-search").fill("อลิซ");
   await expect(page.locator("#people-grid").getByText("ชาร์ลี ทดสอบ")).toHaveCount(0);
   await page.locator("#people-search").fill("");
-  await page.locator("#radius-filter").selectOption("100");
+  await page.locator("#radius-filter").selectOption("250");
   await expect(page.locator("#people-grid").getByText("อลิซ ทดสอบ")).toBeVisible();
   await expect(page.locator("#people-grid").getByText("ชาร์ลี ทดสอบ")).toHaveCount(0);
   await page.locator("#radius-filter").selectOption("5000");

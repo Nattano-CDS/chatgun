@@ -65,6 +65,8 @@ test("retention cleanup removes only expired or aged security records", async ()
            ('expired-otp','b@example.test','h','i',?,?,0,NULL)
   `).run(now + 100, now - 10, now - 1, now - 400);
   database.exec(`
+    INSERT INTO beta_invitations(id,token_hash,label,expires_at,created_at)
+    VALUES ('expired-invite','invite-hash','cleanup-test',${now - 700000},${now - 800000});
     INSERT INTO age_assurance_events(id,user_id,age_band,method,notice_version,declared_at,revoked_at)
     VALUES ('current-age','cleanup-user','adult_18_plus','self_declaration','test',${now - 200},NULL),
            ('old-age','cleanup-user','adult_18_plus','self_declaration','test',${now - 100000},${now - 90000});
@@ -78,6 +80,7 @@ test("retention cleanup removes only expired or aged security records", async ()
   const deleted = await runRetentionCleanup(database, now);
   assert.deepEqual(deleted, {
     oauthFlows: 1,
+    betaInvitations: 1,
     sessions: 1,
     rateLimits: 1,
     otpChallenges: 1,
@@ -129,6 +132,10 @@ test("confirmed deletion erases account data, queues owned media, revokes access
   seedUser(database, "delete-user", now);
   const session = await issueSession(database, "delete-user", now);
   database.exec(`
+    INSERT INTO beta_invitations(id,token_hash,label,max_uses,use_count,expires_at,created_at,consumed_at)
+    VALUES ('delete-invite','delete-invite-hash','deletion-test',1,1,${now + 3600},${now - 60},${now});
+    INSERT INTO beta_enrollments(user_id,invitation_id,status,created_at,activated_at)
+    VALUES ('delete-user','delete-invite','active',${now - 60},${now});
     INSERT INTO age_assurance_events(id,user_id,age_band,method,notice_version,declared_at)
     VALUES ('age-delete','delete-user','adult_18_plus','self_declaration','test',${now});
     INSERT INTO member_profiles(user_id,age_assurance_id,name,created_at,updated_at)
@@ -166,10 +173,11 @@ test("confirmed deletion erases account data, queues owned media, revokes access
   assert.match(confirmed.headers.getSetCookie().join("\n"), /__Host-cg_session=;.*Max-Age=0/u);
   for (const table of [
     "users", "identities", "sessions", "session_auth_evidence", "account_deletion_requests",
-    "age_assurance_events", "member_profiles", "social_media",
+    "age_assurance_events", "beta_enrollments", "member_profiles", "social_media",
   ]) {
     assert.equal(database.database.prepare(`SELECT COUNT(*) count FROM ${table}`).get().count, 0, table);
   }
+  assert.equal(database.database.prepare("SELECT COUNT(*) count FROM beta_invitations WHERE id='delete-invite'").get().count, 1);
   assert.deepEqual({ ...database.database.prepare(
     "SELECT object_key, attempts, completed_at FROM media_deletion_queue",
   ).get() }, {

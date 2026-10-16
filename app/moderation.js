@@ -102,12 +102,31 @@ function renderVerification(requests) {
   }
 }
 
+function renderMediaQueue(media) {
+  const results = $("#moderation-results");
+  results.replaceChildren();
+  if (!media.length) return results.append(node("p", "ไม่มีรูปภาพที่รอตรวจสอบ", "empty"));
+  for (const item of media) {
+    const card = node("article", null, "moderation-card");
+    card.dataset.media = item.media_id;
+    card.append(
+      cardHeader(`${item.media_purpose} · ${item.content_type}`, new Date(Number(item.created_at) * 1000).toLocaleString("th-TH")),
+      node("p", `ขนาด ${Number(item.byte_size).toLocaleString("th-TH")} ไบต์ · แหล่งคิว ${item.source}`),
+    );
+    const actions = node("div", null, "dialog-actions");
+    actions.append(button("เปิดรูปเพื่อตรวจ", "media-view"), button("อนุมัติ", "media", "released", "primary"), button("ปฏิเสธและลบ", "media", "rejected", "danger"));
+    card.append(actions);
+    results.append(card);
+  }
+}
+
 async function load(kind) {
   setStatus("กำลังโหลด…");
-  const endpoints = { reports: "/api/social/moderation/reports", messages: "/api/social/moderation/messages", verification: "/api/social/moderation/verification" };
+  const endpoints = { reports: "/api/social/moderation/reports", messages: "/api/social/moderation/messages", media: "/api/social/moderation/media", verification: "/api/social/moderation/verification" };
   const payload = await api(endpoints[kind]);
   if (kind === "reports") renderReports(payload.reports || []);
   if (kind === "messages") renderMessages(payload.messages || []);
+  if (kind === "media") renderMediaQueue(payload.media || []);
   if (kind === "verification") renderVerification(payload.requests || []);
   setStatus(`โหลดข้อมูล ${kind} แล้ว`);
 }
@@ -167,6 +186,21 @@ document.addEventListener("click", async (event) => {
       detail.replaceChildren(node("h2", "รูปที่แนบในข้อความ"), image);
       $("#moderation-dialog").showModal();
       $("#moderation-dialog").addEventListener("close", () => URL.revokeObjectURL(url), { once: true });
+    }
+    if (action.dataset.action === "media-view") {
+      const id = action.closest("[data-media]").dataset.media;
+      const url = await authenticatedImage(`/api/social/moderation/media/${encodeURIComponent(id)}`);
+      const detail = $("#moderation-detail");
+      const image = node("img"); image.src = url; image.alt = "รูปภาพที่กักกันเพื่อตรวจสอบ"; image.className = "moderation-media";
+      detail.replaceChildren(node("h2", "ตรวจรูปภาพที่กักกัน"), image);
+      $("#moderation-dialog").showModal();
+      $("#moderation-dialog").addEventListener("close", () => URL.revokeObjectURL(url), { once: true });
+    }
+    if (action.dataset.action === "media") {
+      const reason = prompt(action.dataset.value === "released" ? "บันทึกเหตุผลที่อนุมัติ (จำเป็น)" : "บันทึกเหตุผลที่ปฏิเสธและลบ (จำเป็น)");
+      if (!reason?.trim()) return;
+      await api("/api/social/moderation/media", { method: "POST", body: { id: action.closest("[data-media]").dataset.media, status: action.dataset.value, reason } });
+      await load("media");
     }
     if (action.dataset.action === "verification-evidence") await showEvidence(action.closest("[data-user]"));
     if (action.dataset.action === "verification") {

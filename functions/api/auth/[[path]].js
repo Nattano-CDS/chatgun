@@ -35,6 +35,7 @@ const OTP_TTL_SECONDS = 300;
 const OTP_COOLDOWN_SECONDS = 60;
 const DELETE_REAUTH_PURPOSE = "account_deletion";
 const GENERIC_ERROR = "ไม่สามารถเข้าสู่ระบบได้ กรุณาลองใหม่อีกครั้ง";
+const INVITATION_PATTERN = /^[A-Za-z0-9_-]{43}$/u;
 
 function featureEnabled(value) {
   return String(value || "").trim().toLowerCase() === "true";
@@ -229,14 +230,42 @@ async function startOauth(request, env, provider) {
     }
   }
 
+  let invitationId = null;
+  if (!linkUserId && typeof body.invitationCode === "string" && body.invitationCode.trim()) {
+    if (!featureEnabled(env.BETA_INVITATION_REGISTRATION_ENABLED)) {
+      return failure("รหัสเชิญไม่ถูกต้องหรือหมดอายุ", 403, "invitation_invalid");
+    }
+    const invitationCode = body.invitationCode.trim();
+    const invitationAllowed = await rateLimit(
+      env.DB,
+      "beta_invitation_ip_10m",
+      clientIp(request),
+      10,
+      600,
+      env.RATE_LIMIT_PEPPER,
+    );
+    if (!invitationAllowed) return failure("ลองรหัสเชิญบ่อยเกินไป กรุณารอสักครู่", 429, "rate_limited");
+    if (!INVITATION_PATTERN.test(invitationCode)) {
+      return failure("รหัสเชิญไม่ถูกต้องหรือหมดอายุ", 403, "invitation_invalid");
+    }
+    const invitation = await env.DB.prepare(`
+      SELECT id FROM beta_invitations
+      WHERE token_hash = ? AND status = 'active' AND max_uses = 1
+        AND expires_at > ? AND use_count < max_uses
+    `).bind(await sha256(invitationCode), unixTime()).first();
+    if (!invitation) return failure("รหัสเชิญไม่ถูกต้องหรือหมดอายุ", 403, "invitation_invalid");
+    invitationId = invitation.id;
+  }
+
   const configuration = providerConfiguration(provider, env);
   const state = randomToken();
   const verifier = randomToken(48);
   const nonce = randomToken();
   const timestamp = unixTime();
   const flowStatement = env.DB.prepare(`
-    INSERT INTO oauth_flows(state_hash, provider, pkce_verifier, nonce, ip_hash, link_user_id, created_at, expires_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO oauth_flows(
+      state_hash, provider, pkce_verifier, nonce, ip_hash, link_user_id, invitation_id, created_at, expires_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     await sha256(state),
     provider,
@@ -244,6 +273,7 @@ async function startOauth(request, env, provider) {
     nonce,
     await hmac(env.RATE_LIMIT_PEPPER, clientIp(request)),
     linkUserId,
+    invitationId,
     timestamp,
     timestamp + OAUTH_TTL_SECONDS,
   );
@@ -296,7 +326,7 @@ async function oauthCallback(request, env, provider) {
   }
   const stateHash = await sha256(state);
   const flow = await env.DB.prepare(`
-    SELECT f.provider, f.pkce_verifier, f.nonce, f.link_user_id, f.expires_at,
+    SELECT f.provider, f.pkce_verifier, f.nonce, f.link_user_id, f.invitation_id, f.expires_at,
            r.session_token_hash, r.user_id AS reauth_user_id, r.purpose AS reauth_purpose
     FROM oauth_flows f
     LEFT JOIN oauth_reauth_contexts r ON r.state_hash = f.state_hash
@@ -338,7 +368,11 @@ async function oauthCallback(request, env, provider) {
       profile,
       flow.link_user_id,
       timestamp,
-      { allowRegistration: featureEnabled(env.NEW_ACCOUNT_REGISTRATION_ENABLED) },
+      {
+        allowRegistration: featureEnabled(env.NEW_ACCOUNT_REGISTRATION_ENABLED),
+        allowInvitationRegistration: featureEnabled(env.BETA_INVITATION_REGISTRATION_ENABLED),
+        invitationId: flow.invitation_id,
+      },
     );
     const session = await issueSession(env.DB, userId, timestamp);
     return redirect("/account.html", [cookie(OAUTH_COOKIE, "", 0), ...session.cookies]);
@@ -346,7 +380,8 @@ async function oauthCallback(request, env, provider) {
     console.error(JSON.stringify({ event: "oauth_callback_failed", provider, reason: error?.message || "unknown" }));
     const redirectCode = error?.message === "identity_already_linked"
       ? "identity_linked"
-      : error?.message === "registration_closed" ? "registration_closed" : "oauth_failed";
+      : error?.message === "registration_closed" ? "registration_closed"
+        : error?.message === "invitation_unavailable" ? "invitation_unavailable" : "oauth_failed";
     return authErrorRedirect(request, redirectCode);
   }
 }
@@ -463,6 +498,7 @@ export async function onRequest({ request, env }) {
         mobileOtpEnabled,
         smsEnabled: mobileOtpEnabled,
         newAccountRegistrationEnabled: featureEnabled(env.NEW_ACCOUNT_REGISTRATION_ENABLED),
+        invitationOnlyRegistrationEnabled: featureEnabled(env.BETA_INVITATION_REGISTRATION_ENABLED),
         safety: {
           publicDiscoveryEnabled: false,
           unsolicitedMessagingEnabled: false,

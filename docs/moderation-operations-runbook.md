@@ -16,6 +16,18 @@ For every case: acknowledge, preserve only necessary evidence, assess urgency, a
 least intrusive effective action, record reason and decision, notify affected users when
 safe/lawful, offer an appeal, and schedule evidence deletion under the approved policy.
 
+The current tools provide report, message, identity-evidence, and quarantined-media queues.
+Every queue/object view and decision requires a case-specific purpose and is audited. The
+technical capability must remain disabled until named people are assigned the roles below:
+
+| Duty | Minimum assignment before real Beta |
+| --- | --- |
+| Intake/reports | Named primary and backup; published coverage hours |
+| High-risk escalation | Named safety owner with a reachable escalation channel |
+| Media review | Trained `safety_admin`; no reviewer may use a shared account |
+| Privacy/security incident | Named technical owner for location, access, and deletion failures |
+| Appeals | Different reviewer from the original decision where possible |
+
 ## Triage
 
 | Report | Immediate action | Escalation |

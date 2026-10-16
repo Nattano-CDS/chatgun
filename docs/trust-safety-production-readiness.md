@@ -15,8 +15,8 @@ changes in this branch on 16 October 2026.
   `age_independently_verified`. ChatGun has no independent age verification today.
 - Cross-user profile responses no longer disclose location accuracy, location timestamp,
   discovery state, or age-assurance state.
-- Discovery discloses only 100-metre bands (including “under 100 m”), never coordinates,
-  and is limited to 60 reads per user per ten minutes. Coordinates require reported
+- Discovery discloses only 250-metre bands (including “under 250 m”), never coordinates,
+  does not exact-distance-sort people inside a band, and is limited to 30 reads per user per ten minutes. Coordinates require reported
   accuracy of 50 m or better, expire after two minutes, and are erased when discovery is
   hidden, permission is revoked, or retention cleanup runs.
 - Reports now preserve specific reason codes for threats, non-consensual intimate images,
@@ -56,9 +56,9 @@ closed until those decisions are approved and implemented.
 
 | Area | Technical state | Launch state |
 | --- | --- | --- |
-| Registration | Server flag false in Preview and Production | Closed |
+| Registration | Public flag false; one-use hashed invitations enabled only in Preview; Production Beta flag false | Controlled staging only |
 | Age | DOB calculation; age band only; self-declared | Insufficient for high-risk public launch |
-| Location | Private coordinates, 50 m accuracy ceiling, 2-minute expiry, 100 m output bands, read throttling | Needs independent abuse test and policy approval |
+| Location | Private coordinates, 50 m accuracy ceiling, 2-minute expiry, 250 m output bands, no exact ordering, read throttling | Needs independent abuse test and policy approval |
 | Messaging | Accepted-friend and block checks; CSRF/rate limits | Needs staffed response and retention decision |
 | Media | Private R2, signatures, 8 MB limit, metadata stripping, quarantine workflow | Scanner/staffing and SLA unresolved |
 | Reports/blocking | Immediate block; expanded reasons; role/purpose/audit controls | No confirmed moderation staffing |
@@ -73,8 +73,8 @@ documents, provider publishing, and an approved Production deployment/smoke test
 
 ## Validation evidence
 
-- Immutable Preview: `https://3e548a7a.chatgun.pages.dev` (Preview only).
-- Node unit/integration/security: **57 passed, 0 failed, 0 skipped**.
+- Immutable Preview: `https://f0b0f206.chatgun.pages.dev` (Preview only).
+- Node unit/integration/security: **63 passed, 0 failed, 0 skipped**.
 - Final Playwright: **30 passed, 0 failed, 4 intentional project-specific skips** across
   desktop and mobile Chromium. Stateful live mutations run once on desktop; the mobile
   project skips those three duplicate mutations and the desktop project skips the
@@ -85,11 +85,11 @@ documents, provider publishing, and an approved Production deployment/smoke test
   limiter. The harness was fixed to one worker and the synthetic seed now resets only named
   social/account-deletion test scopes. The complete post-fix rerun above passed; failures
   were not hidden.
-- Staging migrations 0005–0006: applied; none pending; two new tables present;
+- Staging migrations 0005–0007: applied; none pending; controlled-Beta tables/indexes present;
   report reason-code backfill count missing = 0; `PRAGMA foreign_key_check` empty.
-- Post-test staging cleanup: eight queued R2 operations selected/completed, zero failed;
+- Post-test staging cleanup: six queued R2 operations selected/completed across two drains, zero failed;
   0 `social_media` rows, 0 pending media operations, 0 review rows, R2 0 objects/0 B.
 - Production read-only check: no FK violations, but only migration 0001 is applied. Migrations
-  0002–0006 remain pending and were not applied.
+  0002–0007 remain pending and were not applied.
 - Real Google/Facebook/LINE public-user login was **not tested** in this pass because the
   provider apps remain unpublished/development and no Production application was deployed.

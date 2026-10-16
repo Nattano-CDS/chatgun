@@ -24,7 +24,8 @@ and release or reject it. Every queue view, object view, and decision is audited
 immediately revokes access and adds an idempotent deletion-queue entry.
 
 Preview uses `staging_bypass` for synthetic fixtures so parity tests remain usable. This
-bypass is unacceptable for public accounts. Production has quarantine enabled but
+bypass is unacceptable for invited real-person Beta accounts. Until a scanner and staffed
+review path exist, keep real-person uploads disabled and use synthetic media only. Production has quarantine enabled but
 `MEDIA_UPLOAD_ENABLED=false` and no R2 binding, so uploads fail closed.
 
 ## Scanner options and launch gate
@@ -38,7 +39,14 @@ general UGC scanner without a separate privacy review.
 A launch design should use automated quarantine, a short decision SLA, human escalation for
 ambiguous/high-severity matches, hash-only blocking where lawful, an appeal channel, and
 metrics that contain no image bytes or unnecessary personal data. There is no assumed human
-review team; until a responsible team/vendor and on-call path are named, media is **NO-GO**.
+review team; until a responsible team/vendor and on-call path are named, real-person media is **NO-GO**.
+
+The moderator UI now exposes the audited pending-media queue, private object viewer, and
+single-winner release/reject actions. Tool availability still does not establish staffing,
+training, response times, or lawful scanning. A scanner integration should write only a
+vendor result/reference and risk categories to the review record, keep media pending on
+timeouts or errors, verify callback signatures and replay IDs, and never auto-release on a
+scanner failure. Vendor credentials must be environment-specific encrypted secrets.
 
 ## Failure and retention requirements
 

@@ -13,7 +13,7 @@ const expiresAt = now + 24 * 60 * 60;
 const members = [
   { id: "cg-stage-alice", name: "อลิซ ทดสอบ", email: "alice.social@example.test", latitude: 13.75630, longitude: 100.50180 },
   { id: "cg-stage-bob", name: "บ็อบ ทดสอบ", email: "bob.social@example.test", latitude: 13.75655, longitude: 100.50195 },
-  { id: "cg-stage-charlie", name: "ชาร์ลี ทดสอบ", email: "charlie.social@example.test", latitude: 13.75800, longitude: 100.50300 },
+  { id: "cg-stage-charlie", name: "ชาร์ลี ทดสอบ", email: "charlie.social@example.test", latitude: 13.76000, longitude: 100.50400 },
 ].map((member) => ({ ...member, token: randomBytes(32).toString("base64url"), csrf: randomBytes(32).toString("base64url") }));
 
 function hash(value) {

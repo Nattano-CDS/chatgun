@@ -54,6 +54,8 @@ test("moderation UI requires a recorded purpose and renders untrusted data as te
   assert.match(moderationScript, /element\.textContent = String\(text\)/u);
   assert.doesNotMatch(moderationScript, /innerHTML|insertAdjacentHTML|document\.write/u);
   assert.match(moderationScript, /__Host-cg_csrf/u);
+  assert.match(moderationScript, /\/api\/social\/moderation\/media/u);
+  assert.match(moderationScript, /media-view/u);
 });
 
 test("staging social and private media activation remain isolated from production", () => {
@@ -66,8 +68,12 @@ test("staging social and private media activation remain isolated from productio
   assert.match(wrangler, /"MEDIA_QUARANTINE_ENABLED": "false"/u);
   assert.match(production, /"MEDIA_UPLOAD_ENABLED": "false"/u);
   assert.match(production, /"MEDIA_QUARANTINE_ENABLED": "true"/u);
-  for (const capability of ["NEW_ACCOUNT_REGISTRATION_ENABLED", "ADULT_ONBOARDING_ENABLED", "IDENTITY_VERIFICATION_ENABLED", "MODERATION_TOOLS_ENABLED", "DEMO_MODE_ENABLED"]) {
+  for (const capability of ["NEW_ACCOUNT_REGISTRATION_ENABLED", "IDENTITY_VERIFICATION_ENABLED", "MODERATION_TOOLS_ENABLED", "DEMO_MODE_ENABLED"]) {
     assert.match(wrangler, new RegExp(`"${capability}": "false"`, "u"));
+    assert.match(production, new RegExp(`"${capability}": "false"`, "u"));
+  }
+  for (const capability of ["BETA_INVITATION_REGISTRATION_ENABLED", "ADULT_ONBOARDING_ENABLED"]) {
+    assert.match(wrangler, new RegExp(`"${capability}": "true"`, "u"));
     assert.match(production, new RegExp(`"${capability}": "false"`, "u"));
   }
   assert.match(wrangler, /"database_name": "chatgun-auth-staging"/u);

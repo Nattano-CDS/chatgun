@@ -84,7 +84,7 @@ launch.
 
 Location is opt-in, foreground-oriented, and used to calculate nearby discovery. ChatGun
 accepts positions reporting 50 m accuracy or better, expires them after two minutes, and
-shows only coarse 100 m bands up to 5 km. It never gives members raw coordinates, accuracy,
+shows only coarse 250 m bands up to 5 km. It never gives members raw coordinates, accuracy,
 or location timestamps. Turning discovery off or revoking permission clears publication.
 Repeated probing, triangulation, stalking, or attempts to defeat distance protection are
 prohibited. The final minimum band may be increased after field-risk review.

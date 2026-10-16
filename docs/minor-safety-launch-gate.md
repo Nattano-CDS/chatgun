@@ -34,8 +34,9 @@ its tests pass.
   stored; D1 records only `adult_18_plus`, method `self_declaration`, notice version, and time.
 - This control is easy to evade by entering a false date and must never be represented as
   independently verified age.
-- `NEW_ACCOUNT_REGISTRATION_ENABLED` and `ADULT_ONBOARDING_ENABLED` remain false in deployed
-  configuration. The implementation therefore does not open registration.
+- `NEW_ACCOUNT_REGISTRATION_ENABLED` remains false everywhere. Preview may enable the
+  invitation-only 18+ onboarding path for controlled testers; Production keeps both Beta
+  invitations and adult onboarding false. The implementation does not open public registration.
 
 ## Additional age-assurance design requiring approval
 
