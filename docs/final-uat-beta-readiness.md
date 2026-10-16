@@ -2,11 +2,11 @@
 
 Date: 2026-10-16 (Asia/Bangkok)  
 Branch: `codex/near-migration`  
-Candidate tested: `9cc0b114562f8ebec5ff25fda7008b160785c84c`
+Candidate tested: `b1510c728daad06e64581e352be984ee4d8781a9`
 
 Stable Preview: `https://codex-near-migration.chatgun.pages.dev`
 
-Exact deployment: `https://36a1d4b7.chatgun.pages.dev`
+Exact deployment: `https://135cd46a.chatgun.pages.dev`
 Scope: ChatGun Preview, `chatgun-auth-staging`, and `chatgun-media-staging` only
 
 ## Release decision
@@ -29,7 +29,7 @@ Scope: ChatGun Preview, `chatgun-auth-staging`, and `chatgun-media-staging` only
 | Git | Local and `origin/codex/near-migration` were clean at the requested candidate before this evidence-only update |
 | Pull request | PR #6 open and draft; base `codex/privacy-safety`; Cloudflare Pages check passed; not merged |
 | Cloudflare identity | Wrangler 4.151.0 confirmed ChatGun account `23017b53386fb67fc62a52cdd017454c` |
-| Preview deployment | Deployment `36a1d4b7-46e8-48f8-ade1-454d782d63ef`, source `9cc0b11`; stable branch alias and exact deployment both responded successfully |
+| Preview deployment | Deployment `135cd46a-7834-4f7b-9704-a5939c9401d7`, source `b1510c7`; stable branch alias and exact deployment both responded successfully after the LINE Preview secret rotation |
 | Preview D1 | `DB` maps to `chatgun-auth-staging` (`5bbfd55d-eb22-4324-8a7d-57bef14110ea`); migrations 0001–0007 applied; none pending |
 | Preview R2 | `MEDIA` maps to private `chatgun-media-staging`; final object count 0 and size 0 B |
 | Production isolation | Production config keeps registration/Beta/social/media/moderation flags false, binds `DB` to `chatgun-auth`, has no `MEDIA` binding, and was not mutated |
@@ -94,7 +94,7 @@ callback was added to the actual Preview channel, not the separate Production ch
 | --- | --- | --- | --- |
 | Google | **PASS** — real account selection returned to `/account` | **PASS** — issued-state denial returned the Thai cancellation message | Existing identity reused; newest session revoked on logout; `/account` redirected to signup afterward |
 | Facebook | **PASS** — real provider consent returned to `/account` | **PASS** — provider **Cancel** returned the Thai cancellation message | Existing identity reused; newest session revoked on logout |
-| LINE | **PASS** — real **Continue as Nat** login returned to `/account` | **PASS** — issued-state denial returned the Thai cancellation message | Existing identity reused; newest session revoked on logout |
+| LINE | **PASS** — real **Continue as Nat** login returned to `/account` after Preview secret rotation | **PASS** — issued-state denial returned the Thai cancellation message | Existing identity reused; newest session revoked on logout; `/account` redirected to signup afterward |
 
 Read-only D1 verification after the journeys found six users, one identity per provider, zero
 invitations, zero enrollments, and no foreign-key violations. The three newly created sessions
@@ -198,7 +198,24 @@ The required callbacks are:
 - `https://codex-near-migration.chatgun.pages.dev/api/auth/oauth/facebook/callback`
 - `https://codex-near-migration.chatgun.pages.dev/api/auth/oauth/line/callback`
 
-The stable alias served source `9cc0b11` during the final checks. The first Playwright command
+During the final readback, the LINE Developers accessibility surface unexpectedly exposed the
+Preview channel secret. It was immediately treated as compromised. With owner confirmation,
+only the dedicated LINE Preview channel secret was rotated and only Cloudflare Pages Preview
+`LINE_CLIENT_SECRET` was replaced as an encrypted secret. LINE issued the final replacement a
+few minutes after the rotation request; the first redeployment therefore failed the token
+exchange closed while the old value was still visible. After the console exposed the final
+issued value, the Preview secret was replaced again and deployment
+`135cd46a-7834-4f7b-9704-a5939c9401d7` succeeded. No Production or PiggyPrice credential was
+read, changed, reused, or deployed.
+
+The post-rotation LINE rerun passed authorization, callback, session creation, authenticated
+account access, logout, session invalidation, unauthenticated `/account` redirect, and
+issued-state cancellation handling. Read-only D1 checks retained one identity for each provider,
+zero invitations, zero enrollments, and no foreign-key violations; the newest LINE session had a
+non-null `revoked_at`. The stable-Preview regression rerun again passed 63/63 Node tests and
+25/25 executed Playwright tests, with the same 9 intentional skips.
+
+The stable alias served source `b1510c7` during the final checks. The first Playwright command
 accidentally used the suite's older default branch hostname and was stopped after reproducing
 stale-host failures; the correctly targeted stable-Preview rerun passed 25 tests with 9
 documented skips. No Production deployment, provider publishing, invitation issuance, or
