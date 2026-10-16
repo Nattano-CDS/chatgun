@@ -14,7 +14,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
   ).all().map(({ name }) => name);
   assert.deepEqual(tables, [
     "account_deletion_requests", "age_assurance_events", "deletion_receipts", "identities",
-    "identity_verification_requests", "media_deletion_queue", "member_profiles", "moderation_audit_events",
+    "identity_verification_requests", "media_deletion_queue", "media_safety_audit_events", "media_safety_reviews", "member_profiles", "moderation_audit_events",
     "moderation_roles", "oauth_flows", "oauth_reauth_contexts", "otp_challenges",
     "photo_comments", "photo_likes", "profile_photos", "proximity_ratings", "rate_limits",
     "session_auth_evidence", "sessions", "social_blocks", "social_media", "social_messages",
@@ -26,11 +26,13 @@ test("migration is idempotent and creates required tables and indexes", () => {
   assert.deepEqual(indexes, [
     "idx_age_assurance_user", "idx_blocks_blocked", "idx_deletion_receipts_expiry",
     "idx_deletion_requests_expiry", "idx_identities_user", "idx_media_deletion_due",
-    "idx_media_owner_created", "idx_messages_receiver_unread", "idx_messages_sender_receiver", "idx_moderation_audit_created",
+    "idx_media_owner_created", "idx_media_safety_audit_created", "idx_media_safety_decision_nonce",
+    "idx_media_safety_queue",
+    "idx_messages_receiver_unread", "idx_messages_sender_receiver", "idx_moderation_audit_created",
     "idx_oauth_expiry", "idx_oauth_reauth_expiry", "idx_otp_email_created", "idx_otp_expiry",
     "idx_otp_ip_created", "idx_photo_comments_created", "idx_profile_photos_owner",
     "idx_profiles_discovery", "idx_rate_limits_expiry", "idx_ratings_receiver",
-    "idx_relationships_high_status", "idx_relationships_low_status", "idx_reports_status",
+    "idx_relationships_high_status", "idx_relationships_low_status", "idx_reports_reason_status", "idx_reports_status",
     "idx_session_auth_evidence_expiry", "idx_sessions_expiry", "idx_sessions_user",
   ]);
   assert.throws(() => database.database.prepare(

@@ -2,6 +2,7 @@ import { safeUuid } from "../../_lib/crypto.js";
 import { getSession, hasRecentAuthentication, rateLimit, requireCsrf, unixTime } from "../../_lib/db.js";
 import { RequestError, failure, json, readJson, requireSameOrigin } from "../../_lib/http.js";
 import { sanitizeImage } from "../../_lib/image.js";
+import { selfDeclaredAdult } from "../../_lib/age.js";
 
 const LOCATION_FRESH_SECONDS = 120;
 const ALLOWED_GENDERS = new Set([
@@ -68,7 +69,8 @@ async function profileFor(db, userId) {
              SELECT 1 FROM age_assurance_events a
              WHERE a.id = p.age_assurance_id AND a.user_id = p.user_id
                AND a.age_band = 'adult_18_plus' AND a.revoked_at IS NULL
-           ) AS adult_confirmed,
+           ) AS adult_self_declared,
+           0 AS age_independently_verified,
            EXISTS(
              SELECT 1 FROM identity_verification_requests v
              WHERE v.user_id = p.user_id AND v.status = 'approved'
@@ -81,6 +83,19 @@ async function requireProfile(db, userId) {
   const profile = await profileFor(db, userId);
   if (!profile) throw new SocialError("onboarding_required", "กรุณาสร้างโปรไฟล์ก่อน", 403);
   return profile;
+}
+
+function visibleProfile(profile, own) {
+  if (own) return profile;
+  const {
+    accuracy: _accuracy,
+    located_at: _locatedAt,
+    discovery_visible: _discoveryVisible,
+    adult_self_declared: _adultSelfDeclared,
+    age_independently_verified: _ageVerified,
+    ...visible
+  } = profile;
+  return visible;
 }
 
 async function targetExists(db, target) {
@@ -119,17 +134,25 @@ function distanceMetres(a, b) {
   return Math.round(6371000 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)));
 }
 
+function privateDistance(metres) {
+  if (metres < 100) return { distance: 100, distance_min: 0, distance_max: 100, distance_label: "ใกล้กว่า 100 ม." };
+  const maximum = Math.ceil(metres / 100) * 100;
+  return { distance: maximum, distance_min: maximum - 100, distance_max: maximum, distance_label: `ประมาณ ${maximum} ม.` };
+}
+
 async function config(env) {
   const socialAppEnabled = enabled(env.SOCIAL_APP_ENABLED);
   const adultOnboardingEnabled = socialAppEnabled && enabled(env.ADULT_ONBOARDING_ENABLED);
   return json({
     socialAppEnabled,
     adultOnboardingEnabled,
+    ageAssuranceModel: adultOnboardingEnabled ? "date_of_birth_self_declaration" : null,
     adultNoticeVersion: adultOnboardingEnabled ? String(env.ADULT_NOTICE_VERSION || "") || null : null,
     publicDiscoveryEnabled: enabled(env.PUBLIC_DISCOVERY_ENABLED),
     friendRequestsEnabled: enabled(env.FRIEND_REQUESTS_ENABLED),
     messagingEnabled: enabled(env.MESSAGING_ENABLED),
     mediaUploadEnabled: enabled(env.MEDIA_UPLOAD_ENABLED),
+    mediaQuarantineEnabled: enabled(env.MEDIA_QUARANTINE_ENABLED),
     ratingsEnabled: enabled(env.RATINGS_ENABLED),
     identityVerificationEnabled: enabled(env.IDENTITY_VERIFICATION_ENABLED),
     demoModeEnabled: enabled(env.DEMO_MODE_ENABLED),
@@ -152,7 +175,9 @@ async function adultOnboarding(request, env) {
   await limited(env, "adult_onboarding_user_hour", session.user_id, 5, 3600);
   const body = await readJson(request);
   const noticeVersion = String(env.ADULT_NOTICE_VERSION || "");
-  if (!noticeVersion || body.confirmedAdult !== true || body.noticeVersion !== noticeVersion) {
+  const declaredAge = selfDeclaredAdult(body.dateOfBirth);
+  if (!noticeVersion || body.confirmedAdult !== true || body.noticeVersion !== noticeVersion
+    || !declaredAge.valid || !declaredAge.adult) {
     throw new SocialError("adult_confirmation_required", "กรุณายืนยันว่าคุณมีอายุ 18 ปีขึ้นไป", 400);
   }
   const name = cleanText(body.name || session.display_name, 50, { required: true });
@@ -204,7 +229,7 @@ async function getProfile(request, env) {
   }
   const profile = await profileFor(env.DB, target);
   if (!profile) throw new SocialError("not_found", "ไม่พบโปรไฟล์", 404);
-  return json({ profile });
+  return json({ profile: visibleProfile(profile, target === session.user_id) });
 }
 
 async function updateProfile(request, env) {
@@ -288,6 +313,7 @@ async function discovery(request, env) {
     }
     return json({ profile: await profileFor(env.DB, session.user_id) });
   }
+  await limited(env, "discovery_read_user_10m", session.user_id, 60, 600);
   if (!me.discovery_visible || !me.located_at || Number(me.located_at) <= timestamp - LOCATION_FRESH_SECONDS) {
     return json({ people: [], locationFresh: false });
   }
@@ -321,8 +347,9 @@ async function discovery(request, env) {
   const people = (rows.results || []).map((person) => {
     const metres = distanceMetres(ownLocation, person);
     const { latitude, longitude, ...safe } = person;
-    return { ...safe, distance: metres };
-  }).filter((person) => person.distance <= 5000).sort((a, b) => a.distance - b.distance);
+    return { ...safe, _distance: metres, ...privateDistance(metres) };
+  }).filter((person) => person._distance <= 5000).sort((a, b) => a._distance - b._distance)
+    .map(({ _distance, ...person }) => person);
   return json({ people, locationFresh: true });
 }
 
@@ -519,6 +546,10 @@ async function messages(request, env) {
         INSERT INTO social_messages(id,sender_user_id,receiver_user_id,body,media_id,created_at)
         VALUES (?,?,?,'',?,?)
       `).bind(messageId, session.user_id, target, mediaId, timestamp),
+      env.DB.prepare(`
+        INSERT INTO media_safety_reviews(media_id,status,source,created_at)
+        VALUES (?, ?, ?, ?)
+      `).bind(mediaId, enabled(env.MEDIA_QUARANTINE_ENABLED) ? "pending" : "released", enabled(env.MEDIA_QUARANTINE_ENABLED) ? "manual" : "staging_bypass", timestamp),
     ];
     if (oldest) {
       statements.push(env.DB.prepare("UPDATE social_media SET state = 'pending_deletion' WHERE id = ?").bind(oldest.id));
@@ -528,7 +559,7 @@ async function messages(request, env) {
     }
     try { await env.DB.batch(statements); }
     catch (error) { await env.MEDIA.delete(objectKey).catch(() => {}); throw error; }
-    return json({ ok: true, messageId }, 201);
+    return json({ ok: true, messageId, reviewStatus: enabled(env.MEDIA_QUARANTINE_ENABLED) ? "pending" : "released" }, 201);
   }
   const body = await readJson(request);
   if (body.action === "unsend") {
@@ -553,7 +584,7 @@ async function messages(request, env) {
     const mediaId = String(body.mediaId || "") || null;
     const text = cleanText(body.body, 2000, { required: !mediaId });
     if (mediaId) {
-      const reusable = await accessibleChatAsset(env.DB, mediaId, session.user_id);
+      const reusable = await accessibleChatAsset(env, mediaId, session.user_id);
       if (!reusable) throw new SocialError("media_not_found", "ไม่พบรูปภาพที่ส่งได้", 404);
     }
     await env.DB.prepare(`
@@ -566,11 +597,13 @@ async function messages(request, env) {
   return json({ ok: true });
 }
 
-async function accessibleChatAsset(db, mediaId, userId) {
-  return db.prepare(`
+async function accessibleChatAsset(env, mediaId, userId) {
+  return env.DB.prepare(`
     SELECT media.id, media.object_key, media.content_type, media.byte_size, media.created_at
     FROM social_media media
-    WHERE media.id = ? AND media.purpose = 'chat' AND media.state = 'active' AND (
+    WHERE media.id = ? AND media.purpose = 'chat' AND media.state = 'active'
+      AND (? = 0 OR EXISTS (SELECT 1 FROM media_safety_reviews review WHERE review.media_id = media.id AND review.status = 'released'))
+      AND (
       media.owner_user_id = ? OR EXISTS (
         SELECT 1 FROM social_messages message
         WHERE message.media_id = media.id AND message.unsent_at IS NULL
@@ -590,7 +623,7 @@ async function accessibleChatAsset(db, mediaId, userId) {
       )
     )
     LIMIT 1
-  `).bind(mediaId, userId, userId, userId).first();
+  `).bind(mediaId, enabled(env.MEDIA_QUARANTINE_ENABLED) ? 1 : 0, userId, userId, userId).first();
 }
 
 async function chatAssets(request, env) {
@@ -600,7 +633,9 @@ async function chatAssets(request, env) {
   await requireProfile(env.DB, session.user_id);
   const rows = await env.DB.prepare(`
     SELECT media.id, media.content_type, media.byte_size, media.created_at FROM social_media media
-    WHERE media.purpose = 'chat' AND media.state = 'active' AND (
+    WHERE media.purpose = 'chat' AND media.state = 'active'
+      AND (? = 0 OR EXISTS (SELECT 1 FROM media_safety_reviews review WHERE review.media_id = media.id AND review.status = 'released'))
+      AND (
       media.owner_user_id = ? OR EXISTS (
         SELECT 1 FROM social_messages message
         WHERE message.media_id = media.id AND message.unsent_at IS NULL
@@ -620,7 +655,7 @@ async function chatAssets(request, env) {
       )
     )
     ORDER BY media.created_at DESC, media.id DESC LIMIT 5
-  `).bind(session.user_id, session.user_id, session.user_id).all();
+  `).bind(enabled(env.MEDIA_QUARANTINE_ENABLED) ? 1 : 0, session.user_id, session.user_id, session.user_id).all();
   return json({ assets: rows.results || [] });
 }
 
@@ -628,7 +663,7 @@ async function chatMedia(request, env, id) {
   capability(env, "SOCIAL_APP_ENABLED");
   capability(env, "MESSAGING_ENABLED");
   const session = await authenticated(request, env);
-  const media = await accessibleChatAsset(env.DB, id, session.user_id);
+  const media = await accessibleChatAsset(env, id, session.user_id);
   if (!media || !env.MEDIA) {
     throw new SocialError("not_found", "ไม่พบรูปภาพ", 404);
   }
@@ -653,12 +688,13 @@ async function reports(request, env) {
   if (!await targetExists(env.DB, target) || target === session.user_id) {
     throw new SocialError("invalid_target", "ไม่พบผู้ใช้", 404);
   }
-  const categories = new Set(["harassment", "spam", "impersonation", "sexual_content", "violence", "privacy", "other"]);
+  const categories = new Set(["harassment", "threat", "ncii", "child_safety", "spam", "impersonation", "sexual_content", "violence", "privacy", "other"]);
   if (!categories.has(body.category)) throw new SocialError("invalid_category", "กรุณาเลือกประเภทการรายงาน");
+  const legacyCategory = { threat: "violence", ncii: "sexual_content", child_safety: "sexual_content" }[body.category] || body.category;
   await env.DB.prepare(`
-    INSERT INTO social_reports(id, reporter_user_id, subject_user_id, category, details, created_at)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).bind(safeUuid(), session.user_id, target, body.category, cleanText(body.details, 1000, { required: true }), unixTime()).run();
+    INSERT INTO social_reports(id, reporter_user_id, subject_user_id, category, reason_code, details, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).bind(safeUuid(), session.user_id, target, legacyCategory, body.category, cleanText(body.details, 1000, { required: true }), unixTime()).run();
   return json({ ok: true }, 201);
 }
 
@@ -694,7 +730,7 @@ async function moderationReports(request, env) {
     const status = new URL(request.url).searchParams.get("status") || "pending";
     if (!["pending", "reviewed", "escalated", "closed"].includes(status)) throw new SocialError("invalid_status", "สถานะไม่ถูกต้อง");
     const rows = await env.DB.prepare(`
-      SELECT r.id, r.category, r.details, r.status, r.created_at, r.reviewed_at,
+      SELECT r.id, r.category, r.reason_code, r.details, r.status, r.created_at, r.reviewed_at,
              reporter.name reporter_name, subject.name subject_name, r.subject_user_id
       FROM social_reports r
       JOIN member_profiles reporter ON reporter.user_id = r.reporter_user_id
@@ -755,6 +791,87 @@ async function moderationMessageMedia(request, env, id) {
   const object = await env.MEDIA.get(media.object_key);
   if (!object) throw new SocialError("not_found", "ไม่พบรูปในข้อความ", 404);
   await auditModeration(env.DB, session.user_id, "message_audit_view", "message_audit", media.message_id, purpose);
+  return new Response(object.body, { headers: {
+    "content-type": media.content_type,
+    "cache-control": "private, no-store, max-age=0",
+    "x-content-type-options": "nosniff",
+    "content-security-policy": "default-src 'none'; sandbox",
+    "content-disposition": "inline",
+  } });
+}
+
+async function auditMediaSafety(db, actor, action, mediaId, purpose) {
+  await db.prepare(`
+    INSERT INTO media_safety_audit_events(id,actor_user_id,action,media_id,purpose,created_at)
+    VALUES (?,?,?,?,?,?)
+  `).bind(safeUuid(), actor, action, mediaId, purpose, unixTime()).run();
+}
+
+async function moderationMedia(request, env) {
+  const { session, purpose } = await moderationAccess(request, env, ["safety_admin"]);
+  if (request.method === "GET") {
+    const rows = await env.DB.prepare(`
+      SELECT review.media_id, review.status, review.source, review.created_at,
+             media.purpose media_purpose, media.content_type, media.byte_size
+      FROM media_safety_reviews review JOIN social_media media ON media.id = review.media_id
+      WHERE review.status = 'pending' AND media.state = 'active'
+      ORDER BY review.created_at ASC LIMIT 100
+    `).all();
+    await auditMediaSafety(env.DB, session.user_id, "queue_view", "queue:pending", purpose);
+    return json({ media: rows.results || [] });
+  }
+  const body = await readJson(request);
+  const mediaId = identifier(body.id, "ไม่พบรูปภาพ");
+  const status = String(body.status || "");
+  if (!["released", "rejected"].includes(status)) throw new SocialError("invalid_status", "สถานะไม่ถูกต้อง");
+  const reason = cleanText(body.reason, 300, { required: true });
+  const timestamp = unixTime();
+  const media = await env.DB.prepare(`
+    SELECT media.object_key FROM social_media media JOIN media_safety_reviews review ON review.media_id = media.id
+    WHERE media.id = ? AND media.state = 'active' AND review.status = 'pending'
+  `).bind(mediaId).first();
+  if (!media) throw new SocialError("not_found", "ไม่พบรูปภาพที่รอตรวจ", 404);
+  const decisionNonce = safeUuid();
+  const auditId = safeUuid();
+  const statements = [
+    env.DB.prepare(`
+      UPDATE media_safety_reviews SET status=?,reason=?,reviewed_at=?,reviewed_by=?,decision_nonce=?
+      WHERE media_id=? AND status='pending'
+    `).bind(status, reason, timestamp, session.user_id, decisionNonce, mediaId),
+    env.DB.prepare(`
+      INSERT INTO media_safety_audit_events(id,actor_user_id,action,media_id,purpose,created_at)
+      SELECT ?,?,'decision',?,?,? FROM media_safety_reviews
+      WHERE media_id=? AND decision_nonce=?
+    `).bind(auditId, session.user_id, mediaId, `${purpose}; ${reason}`.slice(0, 300), timestamp, mediaId, decisionNonce),
+  ];
+  if (status === "rejected") {
+    statements.push(env.DB.prepare(`
+      UPDATE social_media SET state='pending_deletion' WHERE id=? AND EXISTS(
+        SELECT 1 FROM media_safety_reviews WHERE media_id=? AND decision_nonce=?
+      )
+    `).bind(mediaId, mediaId, decisionNonce));
+    statements.push(env.DB.prepare(`
+      INSERT OR IGNORE INTO media_deletion_queue(object_key,operation_id,next_attempt_at,created_at)
+      SELECT ?,?,?,? FROM media_safety_reviews WHERE media_id=? AND decision_nonce=?
+    `).bind(media.object_key, safeUuid(), timestamp, timestamp, mediaId, decisionNonce));
+  }
+  const results = await env.DB.batch(statements);
+  if (!Number(results[0]?.meta?.changes || 0)) throw new SocialError("not_found", "รายการนี้ได้รับการตัดสินแล้ว", 404);
+  return json({ ok: true });
+}
+
+async function moderationMediaObject(request, env, id) {
+  const { session, purpose } = await moderationAccess(request, env, ["safety_admin"]);
+  const mediaId = identifier(id, "ไม่พบรูปภาพ");
+  const media = await env.DB.prepare(`
+    SELECT media.object_key,media.content_type FROM social_media media
+    JOIN media_safety_reviews review ON review.media_id=media.id
+    WHERE media.id=? AND media.state='active' AND review.status='pending'
+  `).bind(mediaId).first();
+  if (!media || !env.MEDIA) throw new SocialError("not_found", "ไม่พบรูปภาพ", 404);
+  const object = await env.MEDIA.get(media.object_key);
+  if (!object) throw new SocialError("not_found", "ไม่พบรูปภาพ", 404);
+  await auditMediaSafety(env.DB, session.user_id, "object_view", mediaId, purpose);
   return new Response(object.body, { headers: {
     "content-type": media.content_type,
     "cache-control": "private, no-store, max-age=0",
@@ -842,8 +959,10 @@ async function gallery(request, env) {
       FROM profile_photos p
       JOIN social_media m ON m.id = p.media_id AND m.state = 'active'
       JOIN member_profiles mp ON mp.user_id = p.owner_user_id
-      WHERE p.owner_user_id = ? ORDER BY p.created_at DESC LIMIT 12
-    `).bind(session.user_id, owner).all();
+      WHERE p.owner_user_id = ?
+        AND (? = 0 OR EXISTS (SELECT 1 FROM media_safety_reviews review WHERE review.media_id = m.id AND review.status = 'released'))
+      ORDER BY p.created_at DESC LIMIT 12
+    `).bind(session.user_id, owner, enabled(env.MEDIA_QUARANTINE_ENABLED) ? 1 : 0).all();
     const photos = rows.results || [];
     if (url.searchParams.get("photo")) {
       const id = String(url.searchParams.get("photo"));
@@ -890,12 +1009,16 @@ async function gallery(request, env) {
         env.DB.prepare(`
           INSERT INTO profile_photos(media_id, owner_user_id, caption, created_at) VALUES (?, ?, ?, ?)
         `).bind(id, session.user_id, cleanText(form.get("caption"), 300), timestamp),
+        env.DB.prepare(`
+          INSERT INTO media_safety_reviews(media_id,status,source,created_at)
+          VALUES (?, ?, ?, ?)
+        `).bind(id, enabled(env.MEDIA_QUARANTINE_ENABLED) ? "pending" : "released", enabled(env.MEDIA_QUARANTINE_ENABLED) ? "manual" : "staging_bypass", timestamp),
       ]);
     } catch (error) {
       await env.MEDIA.delete(objectKey).catch(() => {});
       throw error;
     }
-    return json({ id }, 201);
+    return json({ id, reviewStatus: enabled(env.MEDIA_QUARANTINE_ENABLED) ? "pending" : "released" }, 201);
   }
 
   const body = await readJson(request);
@@ -948,11 +1071,14 @@ async function mediaFile(request, env, id) {
   capability(env, "SOCIAL_APP_ENABLED");
   const session = await authenticated(request, env);
   const media = await env.DB.prepare(`
-    SELECT m.object_key, m.content_type, m.owner_user_id, m.state
+    SELECT m.object_key, m.content_type, m.owner_user_id, m.state, review.status review_status
     FROM social_media m JOIN profile_photos p ON p.media_id = m.id
+    LEFT JOIN media_safety_reviews review ON review.media_id = m.id
     WHERE m.id = ?
   `).bind(id).first();
-  if (!media || media.state !== "active" || !await mayViewProfile(env.DB, env, session.user_id, media.owner_user_id)) {
+  if (!media || media.state !== "active"
+    || (enabled(env.MEDIA_QUARANTINE_ENABLED) && media.review_status !== "released")
+    || !await mayViewProfile(env.DB, env, session.user_id, media.owner_user_id)) {
     throw new SocialError("not_found", "ไม่พบรูปภาพ", 404);
   }
   if (!env.MEDIA) throw new Error("missing_media_binding");
@@ -1131,6 +1257,10 @@ export async function onRequest({ request, env }) {
     if (request.method === "GET" && path === "/api/social/moderation/messages") return await moderationMessages(request, env);
     if (request.method === "GET" && path.startsWith("/api/social/moderation/messages/media/")) {
       return await moderationMessageMedia(request, env, decodeURIComponent(path.slice("/api/social/moderation/messages/media/".length)));
+    }
+    if (path === "/api/social/moderation/media" && ["GET", "POST"].includes(request.method)) return await moderationMedia(request, env);
+    if (request.method === "GET" && path.startsWith("/api/social/moderation/media/")) {
+      return await moderationMediaObject(request, env, decodeURIComponent(path.slice("/api/social/moderation/media/".length)));
     }
     if (path === "/api/social/ratings" && ["GET", "POST"].includes(request.method)) return await ratings(request, env);
     if (path === "/api/social/gallery" && ["GET", "POST"].includes(request.method)) return await gallery(request, env);

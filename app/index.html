@@ -37,10 +37,11 @@
 
       <section id="onboarding-view" class="onboarding panel" hidden>
         <div class="section-heading"><div><small>สมาชิกใหม่</small><h1>สร้างโปรไฟล์ ChatGun</h1></div><img src="/logo.svg" alt="" width="64"></div>
-        <p>โปรดยืนยันว่าคุณมีอายุ 18 ปีขึ้นไปก่อนสร้างโปรไฟล์ ข้อมูลนี้เป็นการยืนยันด้วยตนเองและไม่แสดงต่อสมาชิกอื่น</p>
+        <p>โปรดกรอกวันเกิดเพื่อให้ระบบตรวจว่าอายุครบ 18 ปี ข้อมูลนี้เป็นการยืนยันด้วยตนเอง ไม่ใช่การตรวจสอบโดยบุคคลที่สาม และระบบจะไม่บันทึกวันเกิด</p>
         <form id="onboarding-form" class="form-grid">
           <label>ชื่อที่แสดง<input name="name" maxlength="50" required autocomplete="nickname"></label>
           <label>เพศ<select name="gender"><option>ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option></select></label>
+          <label class="wide">วันเกิด (ใช้คำนวณอายุเท่านั้น)<input type="date" name="dateOfBirth" required autocomplete="bday"></label>
           <label class="wide">เกี่ยวกับคุณ<textarea name="bio" maxlength="250"></textarea></label>
           <label class="wide">ความสนใจ<input name="interests" maxlength="100" placeholder="กาแฟ, เทคโนโลยี, ท่องเที่ยว"></label>
           <label class="adult-check wide"><input type="checkbox" name="adult" required> ฉันยืนยันว่ามีอายุ 18 ปีขึ้นไป และได้อ่านประกาศสำหรับการทดสอบนี้แล้ว</label>
@@ -118,7 +119,7 @@
 
   <dialog id="profile-dialog"><button class="dialog-close" aria-label="ปิด">×</button><div id="profile-dialog-content"></div></dialog>
   <dialog id="rating-dialog"><button class="dialog-close" aria-label="ปิด">×</button><form id="rating-form"><h2>ให้คะแนน</h2><input type="hidden" name="target"><label>คะแนน<select name="score"><option value="5">5 ดาว</option><option value="4">4 ดาว</option><option value="3">3 ดาว</option><option value="2">2 ดาว</option><option value="1">1 ดาว</option></select></label><label>ความคิดเห็น<textarea name="comment" maxlength="500"></textarea></label><button class="primary">ส่งความคิดเห็น</button></form></dialog>
-  <dialog id="report-dialog"><button class="dialog-close" aria-label="ปิด">×</button><form id="report-form"><h2>รายงานผู้ใช้</h2><input type="hidden" name="target"><label>ประเภท<select name="category"><option value="harassment">การคุกคาม</option><option value="spam">สแปม</option><option value="impersonation">แอบอ้างตัวตน</option><option value="sexual_content">เนื้อหาทางเพศ</option><option value="violence">ความรุนแรง</option><option value="privacy">ละเมิดความเป็นส่วนตัว</option><option value="other">อื่น ๆ</option></select></label><label>รายละเอียด<textarea name="details" maxlength="1000" required></textarea></label><p class="subtitle">ข้อมูลนี้ส่งให้ผู้ดูแลที่มีสิทธิ์เท่านั้น</p><button class="primary">ส่งรายงาน</button></form></dialog>
+  <dialog id="report-dialog"><button class="dialog-close" aria-label="ปิด">×</button><form id="report-form"><h2>รายงานผู้ใช้</h2><input type="hidden" name="target"><label>ประเภท<select name="category"><option value="harassment">การคุกคาม</option><option value="threat">การข่มขู่หรืออันตรายเร่งด่วน</option><option value="ncii">ภาพส่วนตัวที่เผยแพร่โดยไม่ยินยอม</option><option value="child_safety">ความปลอดภัยของเด็ก</option><option value="spam">สแปม</option><option value="impersonation">แอบอ้างตัวตน</option><option value="sexual_content">เนื้อหาทางเพศ</option><option value="violence">ความรุนแรง</option><option value="privacy">ละเมิดความเป็นส่วนตัว</option><option value="other">อื่น ๆ</option></select></label><label>รายละเอียด<textarea name="details" maxlength="1000" required></textarea></label><p class="subtitle">ข้อมูลนี้ส่งให้ผู้ดูแลที่มีสิทธิ์เท่านั้น หากมีอันตรายเร่งด่วน โปรดติดต่อบริการฉุกเฉินในพื้นที่ก่อน</p><button class="primary">ส่งรายงาน</button></form></dialog>
   <dialog id="asset-dialog"><button class="dialog-close" aria-label="ปิด">×</button><h2>รูปที่ส่งล่าสุด</h2><p class="subtitle">เลือกส่งซ้ำได้สูงสุดจาก 5 รูปล่าสุด</p><div id="asset-grid" class="gallery-grid"></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </body>

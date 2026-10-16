@@ -1,6 +1,6 @@
 # Provider publishing readiness
 
-Reviewed on 16 October 2026 from branch `feature/cloudflare-auth`.
+Reviewed on 16 October 2026 and rechecked during PR #6 trust-and-safety preparation.
 
 ## Release decision
 
@@ -82,6 +82,11 @@ Outstanding work:
 8. Run a real Production login/callback/session/logout test after an independently
    approved Production deployment.
 
+Current official Google guidance says apps using only non-sensitive scopes do not require
+full sensitive-scope verification, but displaying a public app name/logo can require brand
+verification. Confirm the console's scope classification immediately before publishing:
+<https://support.google.com/cloud/answer/13463073>.
+
 ## Facebook / Meta — NO-GO
 
 Verified configuration:
@@ -142,6 +147,10 @@ Outstanding work:
    deleting and recreating the channel.
 6. Run real Production positive, cancellation, invalid-state, replay, session, and logout
    tests after an independently approved Production deployment.
+
+LINE's current documentation confirms that Developing channels are limited to Admin/Tester
+roles and cannot be returned to Developing after publication. Treat Publish as irreversible:
+<https://developers.line.biz/en/docs/line-login/getting-started/>.
 
 ## Test evidence
 

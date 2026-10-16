@@ -244,7 +244,8 @@ function initials(name) {
   return [...String(name || "?").trim()].slice(0, 2).join("").toUpperCase();
 }
 
-function formatDistance(metres) {
+function formatDistance(metres, label = "") {
+  if (label) return label;
   if (!Number.isFinite(Number(metres))) return "";
   return metres < 1000 ? `${Math.round(metres)} ม.` : `${(metres / 1000).toFixed(1)} กม.`;
 }
@@ -296,7 +297,7 @@ function portrait(person, distance = true) {
   const image = selectedUrl
     ? `<img src="${escapeHtml(selectedUrl)}" alt="รูปของ ${escapeHtml(person.name)}" loading="lazy">`
     : escapeHtml(initials(person.name));
-  return `<div class="portrait">${image}${distance && person.distance !== undefined ? `<span class="distance-pill">${escapeHtml(formatDistance(person.distance))}</span>` : ""}</div>`;
+  return `<div class="portrait">${image}${distance && person.distance !== undefined ? `<span class="distance-pill">${escapeHtml(formatDistance(person.distance, person.distance_label))}</span>` : ""}</div>`;
 }
 
 function personCard(person, context = "near") {
@@ -534,7 +535,7 @@ async function showPerson(id, { historyMode = "push", photo = null } = {}) {
   state.selectedPerson = person;
   const relation = relationshipFor(id);
   const friendAction = own ? "" : !relation && state.config.friendRequestsEnabled ? `<button class="primary" data-action="request" data-user="${escapeHtml(id)}">ขอเป็นเพื่อน</button>` : relation?.status === "accepted" && state.config.messagingEnabled ? `<button class="primary" data-action="chat" data-user="${escapeHtml(id)}">แชท</button><button class="secondary" data-action="unfriend" data-user="${escapeHtml(id)}">เลิกเป็นเพื่อน</button>` : "";
-  $("#profile-dialog-content").innerHTML = `<div class="dialog-profile">${portrait(person, false)}<h2>${escapeHtml(person.name)}${person.identity_verified ? " ✓" : ""}</h2><p>${escapeHtml(person.gender || "ไม่ระบุ")} ${person.distance !== undefined ? `· ${escapeHtml(formatDistance(person.distance))}` : ""}</p><p>${escapeHtml(person.bio || "ยังไม่ได้แนะนำตัว")}</p><p><small>${escapeHtml(person.interests || "")}</small></p><div id="dialog-gallery" class="gallery-grid"></div><div class="dialog-actions">${friendAction}${!own && state.config.ratingsEnabled && Number(person.distance) <= 100 ? `<button class="secondary" data-action="rate" data-user="${escapeHtml(id)}">ให้คะแนน</button>` : ""}${own ? "" : `<button class="danger" data-action="block" data-user="${escapeHtml(id)}">บล็อก</button><button class="secondary" data-action="report" data-user="${escapeHtml(id)}">รายงาน</button>`}</div></div>`;
+  $("#profile-dialog-content").innerHTML = `<div class="dialog-profile">${portrait(person, false)}<h2>${escapeHtml(person.name)}${person.identity_verified ? " ✓" : ""}</h2><p>${escapeHtml(person.gender || "ไม่ระบุ")} ${person.distance !== undefined ? `· ${escapeHtml(formatDistance(person.distance, person.distance_label))}` : ""}</p><p>${escapeHtml(person.bio || "ยังไม่ได้แนะนำตัว")}</p><p><small>${escapeHtml(person.interests || "")}</small></p><div id="dialog-gallery" class="gallery-grid"></div><div class="dialog-actions">${friendAction}${!own && state.config.ratingsEnabled && Number(person.distance) <= 100 ? `<button class="secondary" data-action="rate" data-user="${escapeHtml(id)}">ให้คะแนน</button>` : ""}${own ? "" : `<button class="danger" data-action="block" data-user="${escapeHtml(id)}">บล็อก</button><button class="secondary" data-action="report" data-user="${escapeHtml(id)}">รายงาน</button>`}</div></div>`;
   $("#profile-dialog").showModal();
   try {
     const gallery = (await api(`/api/social/gallery?user=${encodeURIComponent(id)}`)).photos;
@@ -651,7 +652,7 @@ $("#onboarding-form").addEventListener("submit", async (event) => {
   const data = new FormData(event.currentTarget);
   setBusy(button, true);
   try {
-    const result = await api("/api/social/onboarding/adult", { method: "POST", body: { name: data.get("name"), gender: data.get("gender"), bio: data.get("bio"), interests: data.get("interests"), confirmedAdult: data.get("adult") === "on", noticeVersion: state.config.adultNoticeVersion } });
+    const result = await api("/api/social/onboarding/adult", { method: "POST", body: { name: data.get("name"), gender: data.get("gender"), bio: data.get("bio"), interests: data.get("interests"), dateOfBirth: data.get("dateOfBirth"), confirmedAdult: data.get("adult") === "on", noticeVersion: state.config.adultNoticeVersion } });
     state.profile = result.profile;
     location.reload();
   } catch (error) { toast(error.message, true); } finally { setBusy(button, false); }

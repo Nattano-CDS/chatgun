@@ -5,6 +5,9 @@ export default defineConfig({
   timeout: 30_000,
   expect: { timeout: 10_000 },
   fullyParallel: false,
+  // Live Preview tests share three explicitly synthetic D1 accounts. A single worker keeps
+  // desktop/mobile projects from racing relationship and deletion mutations.
+  workers: 1,
   forbidOnly: true,
   retries: 0,
   reporter: [["list"], ["html", { open: "never" }]],

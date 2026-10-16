@@ -29,6 +29,13 @@ if (!identity.includes(ACCOUNT_ID)) throw new Error(`Refusing to seed: active Cl
 
 const statements = [
   "PRAGMA foreign_keys = ON;",
+  `DELETE FROM rate_limits WHERE scope IN (
+    'adult_onboarding_user_hour','profile_write_user_hour','presence_user_10m',
+    'discovery_read_user_10m','relationship_write_user_hour','block_write_user_hour',
+    'message_write_user_minute','report_user_day','rating_user_day',
+    'gallery_upload_user_hour','gallery_like_user_hour','gallery_comment_user_hour',
+    'verification_submit_user_day','account_deletion_user_hour'
+  );`,
   `INSERT OR IGNORE INTO media_deletion_queue(object_key,operation_id,next_attempt_at,created_at)
    SELECT object_key,'synthetic-reseed-' || id,${now},${now} FROM social_media
    WHERE owner_user_id IN (${members.map((member) => sql(member.id)).join(",")});`,

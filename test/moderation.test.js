@@ -117,3 +117,39 @@ test("moderation purpose safely decodes non-Latin text for the audit trail", asy
   assert.equal((await database.prepare("SELECT purpose FROM moderation_audit_events").first()).purpose, thaiPurpose);
   database.close();
 });
+
+test("media quarantine hides pending objects and requires an audited safety-admin release", async () => {
+  const database = new TestD1();
+  const media = new TestR2();
+  const admin = await member(database, "quarantine-admin");
+  const ownerSession = await member(database, "quarantine-owner");
+  const now = unixTime();
+  await database.prepare("INSERT INTO moderation_roles(user_id,role,created_at) VALUES ('quarantine-admin','safety_admin',?)").bind(now).run();
+  await database.prepare(`INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,created_at) VALUES ('quarantine-media','quarantine-owner','gallery/quarantine','gallery','image/png',4,?)`).bind(now).run();
+  await database.prepare("INSERT INTO profile_photos(media_id,owner_user_id,created_at) VALUES ('quarantine-media','quarantine-owner',?)").bind(now).run();
+  await database.prepare("INSERT INTO media_safety_reviews(media_id,status,source,created_at) VALUES ('quarantine-media','pending','manual',?)").bind(now).run();
+  media.objects.set("gallery/quarantine", new Uint8Array([1, 2, 3, 4]));
+  const runtime = { ...environment(database), MEDIA: media, SOCIAL_APP_ENABLED: "true", PUBLIC_DISCOVERY_ENABLED: "false", MEDIA_QUARANTINE_ENABLED: "true", MODERATION_TOOLS_ENABLED: "true" };
+
+  const hidden = await onRequest({ env: runtime, request: request("/api/social/media/quarantine-media", ownerSession) });
+  assert.equal(hidden.status, 404);
+  const queue = await onRequest({ env: runtime, request: request("/api/social/moderation/media", admin) });
+  assert.equal(queue.status, 200);
+  assert.equal((await queue.json()).media[0].media_id, "quarantine-media");
+  const object = await onRequest({ env: runtime, request: request("/api/social/moderation/media/quarantine-media", admin) });
+  assert.equal(object.status, 200);
+  const released = await onRequest({ env: runtime, request: request("/api/social/moderation/media", admin, {
+    method: "POST", body: { id: "quarantine-media", status: "released", reason: "ผ่านการตรวจสอบสำหรับการทดสอบ" },
+  }) });
+  assert.equal(released.status, 200);
+  assert.equal((await database.prepare("SELECT status FROM media_safety_reviews WHERE media_id='quarantine-media'").first()).status, "released");
+  const visible = await onRequest({ env: runtime, request: request("/api/social/media/quarantine-media", ownerSession) });
+  assert.equal(visible.status, 200);
+  const duplicate = await onRequest({ env: runtime, request: request("/api/social/moderation/media", admin, {
+    method: "POST", body: { id: "quarantine-media", status: "rejected", reason: "ต้องไม่เขียนทับผลเดิม" },
+  }) });
+  assert.equal(duplicate.status, 404);
+  const audits = await database.prepare("SELECT action FROM media_safety_audit_events ORDER BY created_at,action").all();
+  assert.deepEqual(audits.results.map((row) => row.action).sort(), ["decision", "object_view", "queue_view"]);
+  database.close();
+});

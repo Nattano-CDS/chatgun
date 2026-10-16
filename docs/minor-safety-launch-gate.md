@@ -26,7 +26,18 @@ Choose one launch model after qualified Thai legal review:
 The code must not set `NEW_ACCOUNT_REGISTRATION_ENABLED=true` until a model is approved and
 its tests pass.
 
-## Proposed age-assurance design (not implemented)
+## Implemented adult self-declaration (not independent verification)
+
+- The gated onboarding UI asks for a date of birth and the server calculates age against the
+  `Asia/Bangkok` calendar date, including leap-day and birthday boundaries.
+- Impossible, future, implausibly old, and under-18 dates are rejected. The full date is not
+  stored; D1 records only `adult_18_plus`, method `self_declaration`, notice version, and time.
+- This control is easy to evade by entering a false date and must never be represented as
+  independently verified age.
+- `NEW_ACCOUNT_REGISTRATION_ENABLED` and `ADULT_ONBOARDING_ENABLED` remain false in deployed
+  configuration. The implementation therefore does not open registration.
+
+## Additional age-assurance design requiring approval
 
 - Ask for the minimum information needed to assign an age band before starting OAuth.
 - Do not infer age from a provider photo, name or profile.

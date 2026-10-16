@@ -53,6 +53,7 @@ async function onboard(env, session, name) {
     method: "POST",
     body: {
       confirmedAdult: true,
+      dateOfBirth: "1990-01-01",
       noticeVersion: "adult-preview-v1",
       name,
       gender: "ไม่ระบุ",
@@ -70,11 +71,13 @@ test("social capabilities fail closed and never expose a game capability", async
   assert.deepEqual(await config.json(), {
     socialAppEnabled: false,
     adultOnboardingEnabled: false,
+    ageAssuranceModel: null,
     adultNoticeVersion: null,
     publicDiscoveryEnabled: false,
     friendRequestsEnabled: false,
     messagingEnabled: false,
     mediaUploadEnabled: false,
+    mediaQuarantineEnabled: false,
     ratingsEnabled: false,
     identityVerificationEnabled: false,
     demoModeEnabled: false,
@@ -97,16 +100,23 @@ test("adult onboarding requires CSRF, recent auth, registration flag, and matchi
   const missingCsrf = await call(env, request("/api/social/onboarding/adult", session, {
     method: "POST",
     csrf: false,
-    body: { confirmedAdult: true, noticeVersion: "adult-preview-v1", name: "Adult User" },
+    body: { confirmedAdult: true, dateOfBirth: "1990-01-01", noticeVersion: "adult-preview-v1", name: "Adult User" },
   }));
   assert.equal(missingCsrf.status, 403);
 
   const wrongNotice = await call(env, request("/api/social/onboarding/adult", session, {
     method: "POST",
-    body: { confirmedAdult: true, noticeVersion: "wrong", name: "Adult User" },
+    body: { confirmedAdult: true, dateOfBirth: "1990-01-01", noticeVersion: "wrong", name: "Adult User" },
   }));
   assert.equal(wrongNotice.status, 400);
   assert.equal((await wrongNotice.json()).code, "adult_confirmation_required");
+
+  const underage = await call(env, request("/api/social/onboarding/adult", session, {
+    method: "POST",
+    body: { confirmedAdult: true, dateOfBirth: "2010-01-01", noticeVersion: "adult-preview-v1", name: "Adult User" },
+  }));
+  assert.equal(underage.status, 400);
+  assert.equal((await underage.json()).code, "adult_confirmation_required");
 
   await onboard(env, session, "Adult User");
   const profile = await database.prepare("SELECT * FROM member_profiles WHERE user_id = ?").bind("adult-user").first();
@@ -145,9 +155,18 @@ test("discovery preserves proximity behavior without returning precise coordinat
   assert.equal(result.locationFresh, true);
   assert.equal(result.people.length, 1);
   assert.equal(result.people[0].user_id, "bob");
-  assert.ok(result.people[0].distance > 0 && result.people[0].distance < 100);
+  assert.equal(result.people[0].distance, 100);
+  assert.equal(result.people[0].distance_min, 0);
+  assert.equal(result.people[0].distance_max, 100);
+  assert.equal(result.people[0].distance_label, "ใกล้กว่า 100 ม.");
   assert.equal("latitude" in result.people[0], false);
   assert.equal("longitude" in result.people[0], false);
+
+  const publicProfile = await call(env, request("/api/social/profile?user=bob", alice));
+  const publicData = (await publicProfile.json()).profile;
+  assert.equal("accuracy" in publicData, false);
+  assert.equal("located_at" in publicData, false);
+  assert.equal("adult_self_declared" in publicData, false);
 
   const hidden = await call(env, request("/api/social/discovery", bob, {
     method: "POST", body: { action: "hide" },
@@ -155,6 +174,21 @@ test("discovery preserves proximity behavior without returning precise coordinat
   assert.equal(hidden.status, 200);
   const after = await call(env, request("/api/social/discovery", alice));
   assert.equal((await after.json()).people.length, 0);
+  database.close();
+});
+
+test("discovery throttles repeated reads used for location inference", async () => {
+  const database = new TestD1();
+  const env = socialEnvironment(database);
+  const session = await addUser(database, "location-prober", "Location Prober");
+  await onboard(env, session, "Location Prober");
+  for (let index = 0; index < 60; index += 1) {
+    const response = await call(env, request("/api/social/discovery", session));
+    assert.equal(response.status, 200, `read ${index + 1}`);
+  }
+  const throttled = await call(env, request("/api/social/discovery", session));
+  assert.equal(throttled.status, 429);
+  assert.equal((await throttled.json()).code, "rate_limited");
   database.close();
 });
 
