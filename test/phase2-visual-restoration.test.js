@@ -7,7 +7,7 @@ const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 test("Phase 2 auth and acceptance use the canonical compact NEAR shell", async () => {
   const [shell, signup, acceptance] = await Promise.all([read("auth-shell.css"), read("signup.html"), read("acceptance.html")]);
   assert.match(shell, /Noto Sans Thai/u);
-  assert.match(shell, /--near-violet:#6f3cff/u);
+  assert.match(shell, /--near-violet:#6d42e5/u);
   assert.match(shell, /--near-lime:#d0f17b/u);
   assert.match(shell, /width:min\(100%,560px\)/u);
   assert.match(signup, /class="auth-panel signup-panel"/u);

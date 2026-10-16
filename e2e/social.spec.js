@@ -124,8 +124,10 @@ test("profile names cannot break out of text or media attributes", async ({ page
   await page.goto("/app/");
   await page.getByRole("button",{name:"ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์"}).click();
   await page.locator('#primary-nav [data-tab="profile"]').click();
+  await page.locator('#manage-gallery').click();
   await page.locator('#my-gallery button[data-gallery-action="select"]').first().click();
   await expect(page.locator('#my-gallery .selected')).toHaveCount(1);
+  await page.locator('#gallery-settings-back').click();
   const payload='x" onerror="alert(1)';
   await page.locator('#profile-form input[name="name"]').fill(payload);
   await page.getByRole("button",{name:"บันทึกโปรไฟล์",exact:true}).click();
@@ -145,6 +147,7 @@ test("browser-only demo supports local gallery and chat image workflows", async 
   const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Z0ioAAAAASUVORK5CYII=", "base64");
 
   await page.locator('#primary-nav button[data-tab="profile"]').click();
+  await page.locator('#manage-gallery').click();
   await page.locator('#gallery-upload input[type="file"]').setInputFiles({ name: "demo.png", mimeType: "image/png", buffer: png });
   await page.locator('#gallery-upload input[name="caption"]').fill("รูปตัวอย่างในเครื่อง");
   await page.getByRole("button", { name: "อัปโหลดรูป" }).click();
@@ -154,10 +157,18 @@ test("browser-only demo supports local gallery and chat image workflows", async 
   await page.locator('#primary-nav button[data-tab="chat"]').click();
   await page.getByRole("button", { name: /ต้นน้ำ/u }).click();
   await page.locator('#thread input[type="file"]').setInputFiles({ name: "chat.png", mimeType: "image/png", buffer: png });
-  await page.locator("#thread .composer").getByRole("button", { name: "ส่ง", exact: true }).click();
   await expect(page.locator("#thread .chat-image")).toHaveAttribute("src", /^data:image\//u);
   await page.getByRole("button", { name: "รูปที่ส่งล่าสุด" }).click();
   await expect(page.locator("#asset-grid img")).toHaveAttribute("src", /^data:image\//u);
+  await page.locator('#asset-grid [data-asset]').first().click();
+  await page.locator('[data-forward-user="demo-03"]').click();
+  await expect(page.locator('#thread .chat-image')).toHaveAttribute('src',/^data:image\//u);
+  await expect(page.locator('#chat-upload-quota')).toContainText('9/10');
+  await page.getByRole('button',{name:'เลือกรูปแชท',exact:true}).click();
+  await page.locator('[data-picker-asset]').first().click();
+  await page.locator('#thread .composer').getByRole('button',{name:'ส่ง',exact:true}).click();
+  await expect(page.locator('#thread .chat-image')).toHaveCount(2);
+  await expect(page.locator('#chat-upload-quota')).toContainText('9/10');
 });
 
 test("social shell reports offline state and recovers when connectivity returns", async ({ page, context }) => {

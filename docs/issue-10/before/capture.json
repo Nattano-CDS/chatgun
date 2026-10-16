@@ -1,0 +1,40 @@
+{
+  "target": "https://chatgun.social",
+  "commit": "5d8fb15a37031c2d150ab39fa60fd473e13e7418",
+  "kind": "live-site",
+  "fixture": "chatgun-browser-demo-v1; browser-only adapter and empty-state variations",
+  "viewports": [
+    [
+      390,
+      844
+    ],
+    [
+      768,
+      1024
+    ],
+    [
+      1440,
+      1100
+    ]
+  ],
+  "failures": [
+    {
+      "width": 390,
+      "name": "image-picker",
+      "missing": true,
+      "note": "Baseline lacks canonical inline image picker"
+    },
+    {
+      "width": 768,
+      "name": "image-picker",
+      "missing": true,
+      "note": "Baseline lacks canonical inline image picker"
+    },
+    {
+      "width": 1440,
+      "name": "image-picker",
+      "missing": true,
+      "note": "Baseline lacks canonical inline image picker"
+    }
+  ]
+}

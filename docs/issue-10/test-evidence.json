@@ -1,0 +1,29 @@
+{
+  "validatedRuntimeCommit": "a1e5463aa9681cb1d01acba207e0f5433457f475",
+  "preview": "https://codex-chatgun-release-candid.chatgun.pages.dev",
+  "unit": {
+    "passed": 96,
+    "failed": 0,
+    "skipped": 0
+  },
+  "playwright": {
+    "total": 74,
+    "passed": 48,
+    "failed": 0,
+    "skipped": 26,
+    "skipReasons": {
+      "liveSessionOrDatabaseMediaSuites": 16,
+      "duplicateExplicitWidths": 9,
+      "desktopInapplicable": 1
+    },
+    "durationSeconds": 56.5
+  },
+  "foreignKeys": {
+    "violations": 0,
+    "rowsWritten": 0
+  },
+  "realOauthCallbacks": "not repeated; backend/providers unchanged; not claimed as newly tested",
+  "productionRealFeatures": "remain disabled",
+  "stagingDataMutations": "none",
+  "nativeIosKeyboardAndAssistiveTechnology": "not certified by Chromium emulation"
+}

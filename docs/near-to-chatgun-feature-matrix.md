@@ -221,3 +221,6 @@ Production activation remains blocked until the 18+ age-assurance decision, staf
   safety operations, location/media policy approval, production scanner decision, provider
   publishing, Production migrations 0002–0010, and identity-verification decision are approved.
 Staging R2 and real private-media authorization/deletion E2E pass; public media remains off.
+# Issue #10 rendered Production parity follow-up
+
+See [the consolidated remediation and evidence](issue-10/README.md) and [three-width side-by-side comparison](issue-10/comparison.html). This follow-up supersedes earlier visual-completion claims: passing functional tests is not proof of literal pixel identity. Canonical source `98bb83e44bf88eddb9822d7875f18cd4fe833ee2` is rendered, not recreated. Production-before, canonical shared-fiction, corrected browser captures and protected API fixtures are labelled separately. Game remains excluded. No staging fixture records or original NEAR resources are modified.

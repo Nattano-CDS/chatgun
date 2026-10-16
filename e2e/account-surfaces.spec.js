@@ -5,7 +5,7 @@ const config={socialAppEnabled:true,adultOnboardingEnabled:true,demoModeEnabled:
 for(const width of [390,768,1440])test(`account and protected Admin visual fixtures at ${width}px`,async({page},info)=>{
   test.skip(info.project.name!=="desktop-chromium","explicit viewports run once");test.setTimeout(60000);
   await page.setViewportSize({width,height:width===390?844:width===768?1024:1100});
-  const directory=resolve("docs/final-owner-review/after");mkdirSync(directory,{recursive:true});
+  const directory=resolve(process.env.ACCOUNT_EVIDENCE_DIR||"docs/final-owner-review/after");mkdirSync(directory,{recursive:true});
   const shot=async(name)=>{await page.screenshot({path:resolve(directory,`${name}-${width}.png`),fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);};
   await page.goto("/signup");await expect(page.locator(".providers button")).toHaveCount(3);await shot("login");
   for(const legal of ["privacy","terms","data-deletion"]){await page.goto(`/${legal}`);await expect(page.locator("h1")).toBeVisible();await shot(`legal-${legal}-draft`);}
