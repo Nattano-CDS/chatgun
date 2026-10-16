@@ -15,7 +15,8 @@
     "MESSAGING_ENABLED": "false",
     "MEDIA_UPLOAD_ENABLED": "false",
     "RATINGS_ENABLED": "false",
-    "IDENTITY_VERIFICATION_ENABLED": "false"
+    "IDENTITY_VERIFICATION_ENABLED": "false",
+    "MODERATION_TOOLS_ENABLED": "false"
   },
   "d1_databases": [
     {
@@ -40,7 +41,8 @@
         "MESSAGING_ENABLED": "false",
         "MEDIA_UPLOAD_ENABLED": "false",
         "RATINGS_ENABLED": "false",
-        "IDENTITY_VERIFICATION_ENABLED": "false"
+        "IDENTITY_VERIFICATION_ENABLED": "false",
+        "MODERATION_TOOLS_ENABLED": "false"
       },
       "d1_databases": [
         {
@@ -65,7 +67,8 @@
         "MESSAGING_ENABLED": "false",
         "MEDIA_UPLOAD_ENABLED": "false",
         "RATINGS_ENABLED": "false",
-        "IDENTITY_VERIFICATION_ENABLED": "false"
+        "IDENTITY_VERIFICATION_ENABLED": "false",
+        "MODERATION_TOOLS_ENABLED": "false"
       },
       "d1_databases": [
         {

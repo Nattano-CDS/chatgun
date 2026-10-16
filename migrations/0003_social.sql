@@ -132,8 +132,8 @@ CREATE TABLE IF NOT EXISTS moderation_roles (
 
 CREATE TABLE IF NOT EXISTS identity_verification_requests (
   user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-  id_media_id TEXT NOT NULL REFERENCES social_media(id) ON DELETE CASCADE,
-  selfie_media_id TEXT NOT NULL REFERENCES social_media(id) ON DELETE CASCADE,
+  id_media_id TEXT REFERENCES social_media(id) ON DELETE SET NULL,
+  selfie_media_id TEXT REFERENCES social_media(id) ON DELETE SET NULL,
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   reason TEXT NOT NULL DEFAULT '' CHECK (length(reason) <= 300),
   created_at INTEGER NOT NULL,

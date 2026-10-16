@@ -6,10 +6,14 @@ const state = {
   relationships: [],
   ratings: [],
   blocked: [],
+  myGallery: [],
+  verification: null,
   activeTab: "near",
   selectedPerson: null,
   selectedChat: null,
   locationFresh: false,
+  locationWatch: null,
+  lastLocationPost: 0,
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -78,6 +82,13 @@ function relationshipFor(userId) {
   return state.relationships.find((item) => item.other_user_id === userId);
 }
 
+function portrait(person, distance = true) {
+  const image = person.selected_photo_id
+    ? `<img src="/api/social/media/${encodeURIComponent(person.selected_photo_id)}" alt="รูปของ ${escapeHtml(person.name)}" loading="lazy">`
+    : escapeHtml(initials(person.name));
+  return `<div class="portrait">${image}${distance && person.distance !== undefined ? `<span class="distance-pill">${escapeHtml(formatDistance(person.distance))}</span>` : ""}</div>`;
+}
+
 function personCard(person, context = "near") {
   const relation = relationshipFor(person.user_id || person.other_user_id);
   const id = person.user_id || person.other_user_id;
@@ -94,8 +105,8 @@ function personCard(person, context = "near") {
     action = `<div class="card-actions"><button class="secondary" disabled>ส่งคำขอแล้ว</button></div>`;
   }
   return `<article class="person-card" data-person="${escapeHtml(id)}" tabindex="0">
-    <div class="portrait">${escapeHtml(initials(person.name))}${person.distance !== undefined ? `<span class="distance-pill">${escapeHtml(formatDistance(person.distance))}</span>` : ""}</div>
-    <div class="person-info"><strong>${escapeHtml(person.name)}</strong><p>${escapeHtml(person.bio || person.interests || "ยังไม่ได้แนะนำตัว")}</p><div class="person-meta"><span>${escapeHtml(person.gender || "ไม่ระบุ")}</span><span>${person.rating ? `★ ${Number(person.rating).toFixed(1)} (${Number(person.rating_count || 0)})` : ""}</span></div></div>${action}
+    ${portrait(person)}
+    <div class="person-info"><strong>${escapeHtml(person.name)}${person.identity_verified ? " <span title=\"ยืนยันตัวตนแล้ว\">✓</span>" : ""}</strong><p>${escapeHtml(person.bio || person.interests || "ยังไม่ได้แนะนำตัว")}</p><div class="person-meta"><span>${escapeHtml(person.gender || "ไม่ระบุ")}</span><span>${person.rating ? `★ ${Number(person.rating).toFixed(1)} (${Number(person.rating_count || 0)})` : ""}</span></div></div>${action}
   </article>`;
 }
 
@@ -118,7 +129,9 @@ function renderRelationships() {
   const incoming = state.relationships.filter((item) => item.status === "pending" && item.requested_by !== state.account.user.id);
   const sent = state.relationships.filter((item) => item.status === "pending" && item.requested_by === state.account.user.id);
   const friends = state.relationships.filter((item) => item.status === "accepted");
+  const unread = friends.reduce((total, item) => total + Number(item.unread_count || 0), 0);
   $("#request-badge").hidden = incoming.length === 0;
+  $("#message-badge").hidden = unread === 0;
   $("#requests-grid").innerHTML = [...incoming.map((item) => personCard(item, "request")), ...sent.map((item) => personCard(item, "sent"))].join("") || `<p class="subtitle">ไม่มีคำขอที่รอดำเนินการ</p>`;
   $("#friends-grid").innerHTML = friends.map((item) => personCard(item, "friend")).join("") || `<div class="empty"><h2>ยังไม่มีเพื่อน</h2><p>ส่งคำขอและรออีกฝ่ายยอมรับก่อนเริ่มแชท</p></div>`;
   renderConversations(friends);
@@ -126,7 +139,7 @@ function renderRelationships() {
 
 function renderConversations(friends = state.relationships.filter((item) => item.status === "accepted")) {
   const list = $("#conversation-list");
-  list.innerHTML = friends.length ? friends.map((person) => `<button class="conversation ${state.selectedChat === person.other_user_id ? "active" : ""}" data-chat="${escapeHtml(person.other_user_id)}"><span class="avatar">${escapeHtml(initials(person.name))}</span><span><strong>${escapeHtml(person.name)}</strong><br><small>เปิดบทสนทนา</small></span></button>`).join("") : `<div class="empty"><p>ต้องเป็นเพื่อนกันก่อนจึงจะแชทได้</p></div>`;
+  list.innerHTML = friends.length ? friends.sort((a, b) => Number(b.last_message_at || b.updated_at) - Number(a.last_message_at || a.updated_at)).map((person) => `<button class="conversation ${state.selectedChat === person.other_user_id ? "active" : ""}" data-chat="${escapeHtml(person.other_user_id)}"><span class="avatar">${escapeHtml(initials(person.name))}</span><span><strong>${escapeHtml(person.name)}</strong><br><small>${Number(person.unread_count || 0) ? `${Number(person.unread_count)} ข้อความใหม่` : "เปิดบทสนทนา"}</small></span></button>`).join("") : `<div class="empty"><p>ต้องเป็นเพื่อนกันก่อนจึงจะแชทได้</p></div>`;
 }
 
 function renderRatings() {
@@ -144,6 +157,27 @@ function fillProfile() {
 
 function renderBlocked() {
   $("#blocked-list").innerHTML = state.blocked.length ? state.blocked.map((person) => `<div class="blocked-row"><span>${escapeHtml(person.name)}</span><button class="secondary" data-action="unblock" data-user="${escapeHtml(person.user_id)}">เลิกบล็อก</button></div>`).join("") : `<p>ยังไม่มีผู้ใช้ที่บล็อก</p>`;
+}
+
+function renderOwnGallery() {
+  $("#gallery-count").textContent = `${state.myGallery.length} / 12`;
+  $("#gallery-upload").hidden = !state.config.mediaUploadEnabled;
+  $("#gallery-disabled").hidden = state.config.mediaUploadEnabled;
+  $("#my-gallery").innerHTML = state.myGallery.length ? state.myGallery.map((photo) => `<article class="gallery-item ${photo.selected ? "selected" : ""}"><img src="/api/social/media/${encodeURIComponent(photo.id)}" alt="${escapeHtml(photo.caption || "รูปในแกลเลอรี")}" loading="lazy"><div class="gallery-actions">${photo.selected ? "" : `<button data-gallery-action="select" data-photo="${escapeHtml(photo.id)}">ตั้งเป็นรูปหลัก</button>`}<button data-gallery-action="delete" data-photo="${escapeHtml(photo.id)}">ลบ</button></div></article>`).join("") : `<p class="subtitle">ยังไม่มีรูปภาพ</p>`;
+}
+
+async function loadOwnGallery() {
+  state.myGallery = (await api(`/api/social/gallery?user=${encodeURIComponent(state.account.user.id)}`)).photos;
+  renderOwnGallery();
+}
+
+async function loadVerification() {
+  if (!state.config.identityVerificationEnabled) return;
+  state.verification = (await api("/api/social/verification")).verification;
+  $("#verification-panel").hidden = false;
+  const labels = { pending: "กำลังตรวจสอบ", approved: "ยืนยันแล้ว", rejected: "ไม่ผ่านการตรวจสอบ" };
+  $("#verification-status").textContent = state.verification ? labels[state.verification.status] : "ยังไม่ส่ง";
+  $("#verification-form").hidden = ["pending", "approved"].includes(state.verification?.status);
 }
 
 async function loadRelationships() {
@@ -189,6 +223,8 @@ async function updateLocation() {
     setBusy(button, true);
     try {
       await api("/api/social/discovery", { method: "POST", body: { action: "hide" } });
+      if (state.locationWatch !== null) navigator.geolocation.clearWatch(state.locationWatch);
+      state.locationWatch = null;
       state.people = [];
       state.locationFresh = false;
       renderPeople();
@@ -199,29 +235,37 @@ async function updateLocation() {
   }
   if (!navigator.geolocation) return toast("อุปกรณ์นี้ไม่รองรับตำแหน่ง", true);
   setBusy(button, true, "กำลังหาตำแหน่ง…");
-  navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+  const publish = async ({ coords }) => {
+    if (document.visibilityState !== "visible" || Date.now() - state.lastLocationPost < 55_000) return;
+    state.lastLocationPost = Date.now();
     try {
       await api("/api/social/discovery", { method: "POST", body: { action: "location", latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy } });
       await loadPeople();
       toast("เปิดการค้นหาคนใกล้คุณแล้ว");
     } catch (error) { toast(error.message, true); }
     finally { button.disabled = false; delete button.dataset.label; }
-  }, (error) => {
+  };
+  const failed = (error) => {
     button.disabled = false;
     button.textContent = "เปิดตำแหน่ง";
     delete button.dataset.label;
     toast(error.code === 1 ? "กรุณาอนุญาตตำแหน่งเพื่อค้นหาคนใกล้คุณ" : "ไม่สามารถอ่านตำแหน่งได้", true);
-  }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 });
+  };
+  state.locationWatch = navigator.geolocation.watchPosition(publish, failed, { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 });
 }
 
-function showPerson(id) {
+async function showPerson(id) {
   const person = state.people.find((item) => item.user_id === id) || state.relationships.find((item) => item.other_user_id === id);
   if (!person) return;
   state.selectedPerson = person;
   const relation = relationshipFor(id);
   const friendAction = !relation && state.config.friendRequestsEnabled ? `<button class="primary" data-action="request" data-user="${escapeHtml(id)}">ขอเป็นเพื่อน</button>` : relation?.status === "accepted" && state.config.messagingEnabled ? `<button class="primary" data-action="chat" data-user="${escapeHtml(id)}">แชท</button><button class="secondary" data-action="unfriend" data-user="${escapeHtml(id)}">เลิกเป็นเพื่อน</button>` : "";
-  $("#profile-dialog-content").innerHTML = `<div class="dialog-profile"><div class="portrait">${escapeHtml(initials(person.name))}</div><h2>${escapeHtml(person.name)}</h2><p>${escapeHtml(person.gender || "ไม่ระบุ")} ${person.distance !== undefined ? `· ${escapeHtml(formatDistance(person.distance))}` : ""}</p><p>${escapeHtml(person.bio || "ยังไม่ได้แนะนำตัว")}</p><p><small>${escapeHtml(person.interests || "")}</small></p><div class="dialog-actions">${friendAction}${state.config.ratingsEnabled && Number(person.distance) <= 100 ? `<button class="secondary" data-action="rate" data-user="${escapeHtml(id)}">ให้คะแนน</button>` : ""}<button class="danger" data-action="block" data-user="${escapeHtml(id)}">บล็อก</button><button class="secondary" data-action="report" data-user="${escapeHtml(id)}">รายงาน</button></div></div>`;
+  $("#profile-dialog-content").innerHTML = `<div class="dialog-profile">${portrait(person, false)}<h2>${escapeHtml(person.name)}${person.identity_verified ? " ✓" : ""}</h2><p>${escapeHtml(person.gender || "ไม่ระบุ")} ${person.distance !== undefined ? `· ${escapeHtml(formatDistance(person.distance))}` : ""}</p><p>${escapeHtml(person.bio || "ยังไม่ได้แนะนำตัว")}</p><p><small>${escapeHtml(person.interests || "")}</small></p><div id="dialog-gallery" class="gallery-grid"></div><div class="dialog-actions">${friendAction}${state.config.ratingsEnabled && Number(person.distance) <= 100 ? `<button class="secondary" data-action="rate" data-user="${escapeHtml(id)}">ให้คะแนน</button>` : ""}<button class="danger" data-action="block" data-user="${escapeHtml(id)}">บล็อก</button><button class="secondary" data-action="report" data-user="${escapeHtml(id)}">รายงาน</button></div></div>`;
   $("#profile-dialog").showModal();
+  try {
+    const gallery = (await api(`/api/social/gallery?user=${encodeURIComponent(id)}`)).photos;
+    $("#dialog-gallery").innerHTML = gallery.map((photo) => `<button class="gallery-item" data-gallery-action="view" data-user="${escapeHtml(id)}" data-photo="${escapeHtml(photo.id)}"><img src="/api/social/media/${encodeURIComponent(photo.id)}" alt="${escapeHtml(photo.caption || "รูปในแกลเลอรี")}" loading="lazy"></button>`).join("");
+  } catch { /* The profile remains usable if its gallery is unavailable. */ }
 }
 
 async function openChat(id) {
@@ -232,11 +276,11 @@ async function openChat(id) {
   $(".chat-layout").classList.add("open");
   renderConversations();
   const thread = $("#thread");
-  thread.innerHTML = `<header class="thread-head"><button class="icon-button chat-back" aria-label="กลับ">←</button><span class="avatar">${escapeHtml(initials(person.name))}</span><strong>${escapeHtml(person.name)}</strong></header><div class="messages"><p>กำลังโหลด…</p></div><form class="composer"><input maxlength="2000" required placeholder="พิมพ์ข้อความ…"><button class="primary">ส่ง</button></form>`;
+  thread.innerHTML = `<header class="thread-head"><button class="icon-button chat-back" aria-label="กลับ">←</button><span class="avatar">${escapeHtml(initials(person.name))}</span><strong>${escapeHtml(person.name)}</strong></header><div class="messages"><p>กำลังโหลด…</p></div><form class="composer">${state.config.mediaUploadEnabled ? `<label class="icon-button" title="ส่งรูป">▧<input type="file" name="file" accept="image/jpeg,image/png,image/webp" hidden></label>` : ""}<input name="body" maxlength="2000" placeholder="พิมพ์ข้อความ…"><button class="primary">ส่ง</button></form>`;
   try {
     const result = await api(`/api/social/messages?target=${encodeURIComponent(id)}`);
     const messages = $(".messages", thread);
-    messages.innerHTML = result.messages.length ? result.messages.map((message) => `<div class="message ${message.sender_user_id === state.account.user.id ? "mine" : ""} ${message.unsent_at ? "unsent" : ""}">${escapeHtml(message.unsent_at ? "ยกเลิกข้อความแล้ว" : message.body)}<time>${new Date(Number(message.created_at) * 1000).toLocaleString("th-TH")}</time></div>`).join("") : `<div class="empty"><p>เริ่มบทสนทนาด้วยความสุภาพ</p></div>`;
+    messages.innerHTML = result.messages.length ? result.messages.map((message) => `<div class="message ${message.sender_user_id === state.account.user.id ? "mine" : ""} ${message.unsent_at ? "unsent" : ""}">${message.media_id && !message.unsent_at ? `<img class="chat-image" src="/api/social/chat/media/${encodeURIComponent(message.media_id)}" alt="รูปในแชท" loading="lazy">` : ""}${escapeHtml(message.unsent_at ? "ยกเลิกข้อความแล้ว" : message.body)}<time>${new Date(Number(message.created_at) * 1000).toLocaleString("th-TH")}</time></div>`).join("") : `<div class="empty"><p>เริ่มบทสนทนาด้วยความสุภาพ</p></div>`;
     await api("/api/social/messages", { method: "POST", body: { action: "read", target: id } });
   } catch (error) { toast(error.message, true); }
 }
@@ -275,7 +319,7 @@ async function initialize() {
     $("#global-status").textContent = "";
     $("#social-view").hidden = false;
     fillProfile();
-    await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked()]);
+    await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked(), loadOwnGallery(), loadVerification()]);
   } catch (error) {
     $("#global-status").textContent = error.message || "ไม่สามารถโหลด ChatGun ได้";
     toast(error.message, true);
@@ -319,6 +363,38 @@ $("#hide-discovery").addEventListener("click", async (event) => {
   } catch (error) { toast(error.message, true); } finally { setBusy(event.currentTarget, false); }
 });
 
+$("#gallery-upload").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const button = event.submitter;
+  const data = new FormData(event.currentTarget);
+  setBusy(button, true, "กำลังอัปโหลด…");
+  try {
+    const headers = { "x-csrf-token": decodeURIComponent(cookie("__Host-cg_csrf")), accept: "application/json" };
+    const response = await fetch("/api/social/gallery", { method: "POST", credentials: "same-origin", headers, body: data });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "อัปโหลดไม่สำเร็จ");
+    event.currentTarget.reset();
+    await loadOwnGallery();
+    toast("อัปโหลดรูปแล้ว");
+  } catch (error) { toast(error.message, true); } finally { setBusy(button, false); }
+});
+
+$("#verification-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const button = event.submitter;
+  const data = new FormData(event.currentTarget);
+  data.set("consent", data.get("consent") ? "accepted" : "");
+  setBusy(button, true, "กำลังส่งอย่างปลอดภัย…");
+  try {
+    const response = await fetch("/api/social/verification", { method: "POST", credentials: "same-origin", headers: { "x-csrf-token": decodeURIComponent(cookie("__Host-cg_csrf")), accept: "application/json" }, body: data });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "ส่งหลักฐานไม่สำเร็จ");
+    event.currentTarget.reset();
+    await loadVerification();
+    toast("ส่งหลักฐานแล้ว");
+  } catch (error) { toast(error.message, true); } finally { setBusy(button, false); }
+});
+
 $("#location-toggle").addEventListener("click", updateLocation);
 $("#refresh").addEventListener("click", async () => { try { await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked()]); toast("อัปเดตข้อมูลแล้ว"); } catch (error) { toast(error.message, true); } });
 [$("#people-search"), $("#radius-filter"), $("#gender-filter"), $("#interest-filter")].forEach((input) => input.addEventListener("input", renderPeople));
@@ -329,6 +405,26 @@ document.addEventListener("click", async (event) => {
   if (event.target.closest(".chat-back")) { $(".chat-layout").classList.remove("open"); state.selectedChat = null; return; }
   const chat = event.target.closest("[data-chat]");
   if (chat) return openChat(chat.dataset.chat);
+  const galleryAction = event.target.closest("[data-gallery-action]");
+  if (galleryAction) {
+    event.preventDefault();
+    const { galleryAction: name, photo, user } = galleryAction.dataset;
+    if (name === "view") {
+      try {
+        const result = await api(`/api/social/gallery?user=${encodeURIComponent(user)}&photo=${encodeURIComponent(photo)}`);
+        const item = result.photos.find((entry) => entry.id === photo);
+        $("#profile-dialog-content").innerHTML = `<div class="dialog-profile"><img class="gallery-view" src="/api/social/media/${encodeURIComponent(photo)}" alt="${escapeHtml(item?.caption || "รูปในแกลเลอรี")}"><p>${escapeHtml(item?.caption || "")}</p><div class="dialog-actions"><button class="secondary" data-gallery-action="like" data-photo="${escapeHtml(photo)}">♡ ${Number(item?.like_count || 0)}</button></div><div class="comments">${result.comments.map((comment) => `<p><strong>${escapeHtml(comment.sender_name)}</strong> ${escapeHtml(comment.body)}</p>`).join("")}</div><form id="gallery-comment"><input type="hidden" name="photo" value="${escapeHtml(photo)}"><input name="comment" maxlength="500" required placeholder="เขียนความคิดเห็น…"><button class="primary">ส่ง</button></form></div>`;
+      } catch (error) { toast(error.message, true); }
+      return;
+    }
+    if (name === "delete" && !confirm("ลบรูปนี้หรือไม่? การลบไฟล์จริงจะดำเนินการผ่านคิวอย่างปลอดภัย")) return;
+    try {
+      await api("/api/social/gallery", { method: "POST", body: { action: name, id: photo } });
+      if (["delete", "select"].includes(name)) await loadOwnGallery();
+      toast(name === "delete" ? "ซ่อนรูปและส่งเข้าคิวลบแล้ว" : name === "select" ? "ตั้งรูปหลักแล้ว" : "บันทึกแล้ว");
+    } catch (error) { toast(error.message, true); }
+    return;
+  }
   const action = event.target.closest("[data-action]");
   if (action) {
     event.preventDefault();
@@ -355,14 +451,35 @@ document.addEventListener("click", async (event) => {
   if (card && !event.target.closest("button")) showPerson(card.dataset.person);
 });
 
+$("#profile-dialog").addEventListener("submit", async (event) => {
+  if (!event.target.matches("#gallery-comment")) return;
+  event.preventDefault();
+  const data = new FormData(event.target);
+  setBusy(event.submitter, true);
+  try {
+    await api("/api/social/gallery", { method: "POST", body: { action: "comment", id: data.get("photo"), comment: data.get("comment") } });
+    toast("ส่งความคิดเห็นแล้ว");
+    event.target.reset();
+  } catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
+});
+
 $("#thread").addEventListener("submit", async (event) => {
   if (!event.target.matches(".composer")) return;
   event.preventDefault();
-  const input = $("input", event.target);
+  const input = $("input[name=body]", event.target);
+  const file = $("input[name=file]", event.target)?.files?.[0];
   const body = input.value.trim();
-  if (!body) return;
+  if (!body && !file) return;
   setBusy(event.submitter, true);
-  try { await api("/api/social/messages", { method: "POST", body: { action: "send", target: state.selectedChat, body } }); input.value = ""; await openChat(state.selectedChat); }
+  try {
+    if (file) {
+      const data = new FormData(); data.set("target", state.selectedChat); data.set("file", file);
+      const response = await fetch("/api/social/messages", { method: "POST", credentials: "same-origin", headers: { "x-csrf-token": decodeURIComponent(cookie("__Host-cg_csrf")), accept: "application/json" }, body: data });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || "ส่งรูปไม่สำเร็จ");
+    } else await api("/api/social/messages", { method: "POST", body: { action: "send", target: state.selectedChat, body } });
+    input.value = ""; event.target.reset(); await openChat(state.selectedChat);
+  }
   catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
 });
 
@@ -375,3 +492,16 @@ $("#rating-form").addEventListener("submit", async (event) => {
 });
 
 initialize();
+
+window.addEventListener("offline", () => { $("#global-status").textContent = "ออฟไลน์ — การเปลี่ยนแปลงจะยังไม่ถูกส่ง"; });
+window.addEventListener("online", () => { $("#global-status").textContent = ""; toast("กลับมาออนไลน์แล้ว"); });
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && state.config?.socialAppEnabled && state.profile) {
+    Promise.all([loadPeople(), loadRelationships()]).catch(() => {});
+  }
+});
+setInterval(() => {
+  if (document.visibilityState === "visible" && navigator.onLine && state.config?.socialAppEnabled && state.profile) {
+    Promise.all([loadPeople(), loadRelationships()]).catch(() => {});
+  }
+}, 30_000);

@@ -31,6 +31,7 @@ async function mockSocialApi(page) {
       ] },
       "/api/social/ratings": { ratings: [{ id: "v1", score: 5, comment: "สุภาพและเป็นมิตร", sender_name: "พลอย", created_at: 1_790_000_000 }] },
       "/api/social/blocks": { blocked: [] },
+      "/api/social/gallery": { photos: [], comments: [], owner: "me" },
     };
     const body = responses[url.pathname];
     await route.fulfill({ status: body ? 200 : 404, contentType: "application/json", body: JSON.stringify(body || { code: "not_found", error: "ไม่พบ" }) });

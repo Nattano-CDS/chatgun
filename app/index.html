@@ -87,7 +87,27 @@
             <label class="wide">ความสนใจ<input name="interests" maxlength="100"></label>
             <button class="primary" type="submit">บันทึกโปรไฟล์</button><button id="hide-discovery" class="secondary" type="button">ปิดการหาเพื่อนและลบตำแหน่ง</button>
           </form>
+          <section class="panel gallery-panel">
+            <div class="section-heading"><div><small>รูปโปรไฟล์และแกลเลอรี</small><h2>รูปภาพของคุณ</h2></div><span id="gallery-count">0 / 12</span></div>
+            <form id="gallery-upload" class="upload-form" hidden>
+              <label>เลือกรูป JPG, PNG หรือ WebP ไม่เกิน 8 MB<input type="file" name="file" accept="image/jpeg,image/png,image/webp" required></label>
+              <label>คำบรรยาย<input name="caption" maxlength="300"></label>
+              <button class="primary" type="submit">อัปโหลดรูป</button>
+            </form>
+            <p id="gallery-disabled" class="subtitle">การอัปโหลดรูปยังไม่เปิดใช้งาน คุณยังดูรูปเดิมได้</p>
+            <div id="my-gallery" class="gallery-grid"></div>
+          </section>
           <section class="panel blocked-panel"><h2>ผู้ใช้ที่คุณบล็อก</h2><div id="blocked-list"><p>ยังไม่มีผู้ใช้ที่บล็อก</p></div></section>
+          <section id="verification-panel" class="panel blocked-panel" hidden>
+            <div class="section-heading"><div><small>ทางเลือก</small><h2>ยืนยันตัวตน</h2></div><span id="verification-status">ยังไม่ส่ง</span></div>
+            <p class="subtitle">หลักฐานใช้เพื่อการตรวจสอบโดยผู้มีสิทธิ์เท่านั้น ไม่แสดงต่อสมาชิก และจะเข้าสู่คิวลบหลังการตัดสิน</p>
+            <form id="verification-form" class="form-grid">
+              <label>ภาพเอกสารยืนยันตัวตน<input type="file" name="identity" accept="image/jpeg,image/png,image/webp" required></label>
+              <label>ภาพเซลฟีสำหรับเปรียบเทียบ<input type="file" name="selfie" accept="image/jpeg,image/png,image/webp" required></label>
+              <label class="adult-check wide"><input type="checkbox" name="consent" required> ฉันเข้าใจวัตถุประสงค์และยินยอมส่งหลักฐานเพื่อการตรวจสอบนี้</label>
+              <button class="primary wide" type="submit">ส่งหลักฐานเพื่อตรวจสอบ</button>
+            </form>
+          </section>
         </div>
       </section>
     </main>
