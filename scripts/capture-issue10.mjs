@@ -55,12 +55,20 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
   await attempt('member-profile',()=>page.locator(original?'.card-open':'#people-grid [data-person]').first().click());
   await attempt('member-gallery',()=>page.locator(original?'.profile-gallery-top':'.member-profile-gallery-top').click());
   await attempt('gallery-post',()=>page.locator(original?'.ig-tile>button':'#dialog-gallery button').first().click());
+  await page.goto(target);await page.locator(original?'.photo-card':'#people-grid .person-card').first().waitFor();
+  await page.evaluate(async original=>{
+    const name=original?'near-demo':'chatgun-demo',key=original?'demo':'chatgun-browser-demo-v1';
+    await new Promise((resolve,reject)=>{const request=indexedDB.open(name,1);request.onsuccess=()=>{const db=request.result,tx=db.transaction('state','readwrite'),store=tx.objectStore('state'),get=store.get(key);get.onsuccess=()=>{const value=get.result||{};if(original){value.relations=[];value.ownRatings=[];value.messages=[];value.galleryPhotos=[];}else{value.relationships=[];value.ratings=[];value.messages={};value.gallery=[];}store.put(value,key);};tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};});
+  },original);
+  await page.reload();await page.locator(original?'.photo-card':'#people-grid .person-card').first().waitFor();
+  for(const [tab,name] of [['friends','friends-empty'],['chat','inbox-empty'],['reviews','reviews-empty'],['profile','own-gallery-empty']])await attempt(name,()=>nav(tab));
+  await nav('near');await context.setOffline(true);await shot('offline');await context.setOffline(false);
   for(const [name,path] of [['login',original?'/login':'/signup'],['register',original?'/register':'/acceptance'],['account','/account'],['admin-denied','/app/moderation.html']]){
     if(original&&['account','admin-denied'].includes(name))continue;
     await attempt(name,()=>page.goto(target+path));
   }
   await context.close();
 }
-await writeFile(resolve(output,'capture.json'),JSON.stringify({target,kind:original?'canonical-source-render':'live-site',viewports:[[390,844],[768,1024],[1440,1100]],failures},null,2));
+await writeFile(resolve(output,'capture.json'),JSON.stringify({target,kind:original?'canonical-source-render':'live-site',referenceCommit:original?'98bb83e44bf88eddb9822d7875f18cd4fe833ee2':undefined,fixture:'chatgun-browser-demo-v1; browser-only adapter and empty-state variations',viewports:[[390,844],[768,1024],[1440,1100]],failures},null,2));
 await browser.close();
 console.log(JSON.stringify({output,failures}));

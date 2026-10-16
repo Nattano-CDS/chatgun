@@ -17,7 +17,7 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
     await page.locator('#people-grid [data-clear-filters]').click();await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
     if(width<1100){await page.locator('#filter-toggle').click();await expect(page.locator('#discovery-filters')).toBeVisible();await page.keyboard.press('Escape');await expect(page.locator('#discovery-filters')).not.toBeVisible();await expect(page.locator('#filter-toggle')).toHaveAttribute('aria-expanded','false');}
     await page.locator('#people-grid [data-person]').first().focus();await page.keyboard.press('Enter');await expect(page.locator('#profile-dialog')).toBeVisible();
-    await expect(page.locator('.profile-navigation button')).toHaveCount(5);await page.keyboard.press('Escape');await expect(page.locator('#profile-dialog')).not.toBeVisible();
+    await expect(page.locator('.profile-navigation button')).toHaveCount(5);await page.keyboard.press('Escape');await expect(page.locator('#profile-dialog')).not.toBeVisible();await expect(page).not.toHaveURL(/\/people\//);
     await page.locator('#primary-nav [data-tab="chat"]').click();await page.locator('.conversation-list .conversation').first().click();
     await expect(page.locator('.conversation-list')).not.toBeVisible();await expect(page.locator('.composer')).toBeVisible();
     const composer=await page.locator('.composer').boundingBox(),nav=await page.locator('.sidebar').boundingBox();expect(composer.y+composer.height).toBeLessThanOrEqual(nav.y);

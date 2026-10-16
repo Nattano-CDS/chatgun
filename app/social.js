@@ -441,6 +441,7 @@ function renderRatings() {
 function fillProfile() {
   if (!state.profile) return;
   const form = $("#profile-form");
+  populateAvatar($('#profile-avatar'),state.profile);
   form.elements.name.value = state.profile.name || "";
   form.elements.gender.value = state.profile.gender || "ไม่ระบุ";
   form.elements.bio.value = state.profile.bio || "";
@@ -768,6 +769,9 @@ function sizeConversation() {
 }
 window.addEventListener("resize", sizeConversation);
 window.visualViewport?.addEventListener("resize", sizeConversation);
+$('#profile-dialog').addEventListener('cancel',()=>{
+  if(routedProfile())history.pushState({},'', '/app/');
+});
 
 async function initialize() {
   try {
