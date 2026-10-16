@@ -2,6 +2,8 @@
 
 Status: owner-review checkpoint. Phase 2 has not started.
 
+Working isolated Preview: <https://80b06647.chatgun.pages.dev>
+
 ## Implemented
 
 - Added the original NEAR v91 Noto Sans Thai font files and license.
@@ -37,7 +39,8 @@ The synthetic after-captures use portrait crops derived from NEAR v91's canonica
 - Screenshot dimensions: 390, 768, and 1440 CSS pixels verified.
 - Unit/integration/security suite: 86 passed, 0 failed.
 - Local Playwright social regression: 17 passed, 0 failed, 1 expected desktop skip for a mobile-only assertion.
-- The combined local auth/social run additionally produced four environment-only failures because local Wrangler has no Turnstile site key. These are not UI regressions; the same authentication checks must be rerun against the configured isolated Preview.
+- Preview Playwright authentication/social regression: 29 passed, 0 failed, 1 expected desktop skip for a mobile-only assertion.
+- The combined local auth/social run produced four environment-only failures because local Wrangler has no Turnstile site key. The same authentication checks passed against the configured isolated Preview.
 - Root route: `200`, `Cache-Control: no-store`, `X-Robots-Tag: noindex, nofollow`.
 - `/welcome`: `200` and contains the previous marketing content.
 
