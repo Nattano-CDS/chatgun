@@ -165,3 +165,18 @@ Screenshots are local ignored test artifacts and contain only synthetic UI data:
 
 These blockers are operational and external to the validated synthetic staging workflows;
 they must not be represented as completed by passing automated tests.
+
+## OAuth UAT continuation
+
+The stable branch alias `codex-near-migration.chatgun.pages.dev` was verified byte-for-byte
+against the Preview deployment built from commit `918fd85`. The first real OAuth attempt then
+identified Turnstile error `110200`: the dedicated Preview widget allowed only the earlier
+authentication-branch hostname. The stable branch hostname was added without changing the
+Production widget.
+
+During the readback, Wrangler unexpectedly emitted the existing Preview widget secret. It was
+immediately treated as compromised. A replacement Preview-only managed widget was created for
+the two authorized Preview hostnames, both encrypted Preview bindings were replaced without
+printing their values, and a new Preview deployment was triggered. The superseded widget must
+be removed only after the replacement deployment passes browser and server-side verification.
+No Production credential or configuration was changed.
