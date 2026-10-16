@@ -109,10 +109,12 @@ test("staging social and private media activation remain isolated from productio
   assert.match(production, /"BETA_INVITATION_REGISTRATION_ENABLED": "false"/u);
   assert.match(wrangler, /"MODERATION_TOOLS_ENABLED": "true"/u);
   assert.match(production, /"MODERATION_TOOLS_ENABLED": "false"/u);
-  for (const capability of ["IDENTITY_VERIFICATION_ENABLED", "DEMO_MODE_ENABLED"]) {
+  for (const capability of ["IDENTITY_VERIFICATION_ENABLED"]) {
     assert.match(wrangler, new RegExp(`"${capability}": "false"`, "u"));
     assert.match(production, new RegExp(`"${capability}": "false"`, "u"));
   }
+  assert.match(production, /"DEMO_MODE_ENABLED": "true"/u);
+  assert.match(production, /"OAUTH_LOGIN_ENABLED": "false"/u);
   assert.match(wrangler, /"ADULT_ONBOARDING_ENABLED": "true"/u);
   assert.match(production, /"ADULT_ONBOARDING_ENABLED": "false"/u);
   assert.match(wrangler, /"database_name": "chatgun-auth-staging"/u);

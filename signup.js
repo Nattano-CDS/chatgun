@@ -162,6 +162,12 @@ async function initializeTurnstile() {
   try {
     const response = await fetch("/api/auth/config", { credentials: "same-origin" });
     const config = await response.json();
+    if (config.oauthLoginEnabled === false) {
+      document.querySelectorAll("[data-provider]").forEach(button => { button.disabled = true; });
+      $("auth-description").textContent = "การเข้าสู่บัญชีจริงยังไม่เปิดใช้งาน ขณะนี้เปิดให้ชมโหมดตัวอย่าง";
+      message("กลับหน้าแรกเพื่อทดลอง ChatGun ด้วยข้อมูลสมมติ");
+      return;
+    }
     if (!response.ok || !config.turnstileSiteKey) throw new Error("ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย");
     if (config.newAccountRegistrationEnabled) {
       $("auth-heading").textContent = "เข้าสู่ระบบหรือสร้างบัญชี";

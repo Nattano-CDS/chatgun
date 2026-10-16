@@ -28,6 +28,7 @@ const state = {
   demoGallery: [],
   demoAssets: [],
   demoReports: [],
+  demoRatingsGiven: [],
   uploadQuotas: {
     timezone: "Asia/Bangkok",
     chat: { limit: 10, used: 0, reserved: 0, remaining: 10 },
@@ -74,7 +75,7 @@ function demoDatabase() {
 async function demoRead() {
   const database = await demoDatabase();
   return new Promise((resolve) => {
-    const request = database.transaction("state").objectStore("state").get("social");
+    const request = database.transaction("state").objectStore("state").get("chatgun-browser-demo-v1");
     request.onsuccess = () => { database.close(); resolve(request.result || null); };
     request.onerror = () => { database.close(); resolve(null); };
   });
@@ -82,9 +83,9 @@ async function demoRead() {
 
 async function demoSave() {
   const database = await demoDatabase();
-  const snapshot = { profile: state.profile, relationships: state.relationships, ratings: state.ratings, blocked: state.blocked, messages: state.demoMessages, gallery: state.demoGallery, assets: state.demoAssets, reports: state.demoReports };
+  const snapshot = { profile: state.profile, relationships: state.relationships, ratings: state.ratings, blocked: state.blocked, messages: state.demoMessages, gallery: state.demoGallery, assets: state.demoAssets, reports: state.demoReports, givenRatings: state.demoRatingsGiven, uploadQuotas: state.uploadQuotas };
   await new Promise((resolve, reject) => {
-    const request = database.transaction("state", "readwrite").objectStore("state").put(snapshot, "social");
+    const request = database.transaction("state", "readwrite").objectStore("state").put(snapshot, "chatgun-browser-demo-v1");
     request.onsuccess = resolve;
     request.onerror = () => reject(request.error);
   }).finally(() => database.close());
@@ -130,13 +131,16 @@ async function demoApi(path, options = {}) {
     state.demoMessages[target] ||= [];
     if (method === "GET") return { messages: [...state.demoMessages[target]].reverse(), hasMore: false };
     if (body.action === "send") state.demoMessages[target].push({ id: crypto.randomUUID(), sender_user_id: "demo-me", receiver_user_id: target, body: body.body || "", media_id: body.mediaId || null, created_at: Math.floor(Date.now() / 1000) });
+    const relation = relationshipFor(target);
+    if (relation && body.action === "read") { relation.unread_count = 0; renderRelationships(); }
+    if (relation && body.action === "send") Object.assign(relation,{last_message_at:Math.floor(Date.now()/1000),last_message_sender_id:"demo-me",last_message_body:body.body||"",last_message_media_id:body.mediaId||null});
     await demoSave(); return { ok: true };
   }
   if (url.pathname === "/api/social/chat-assets") return { assets: state.demoAssets.map(({ id, created_at }) => ({ id, created_at })) };
   if (url.pathname === "/api/social/upload-quotas") return state.uploadQuotas;
   if (url.pathname === "/api/social/ratings") {
     if (method === "GET") return { ratings: state.ratings };
-    state.ratings.unshift({ id: crypto.randomUUID(), score: body.score, comment: body.comment, sender_name: "สมาชิกสาธิต", created_at: Math.floor(Date.now() / 1000) });
+    state.demoRatingsGiven.unshift({ id: crypto.randomUUID(), target: body.target, score: body.score, comment: body.comment, created_at: Math.floor(Date.now() / 1000) });
     await demoSave(); return { ok: true };
   }
   if (url.pathname === "/api/social/gallery") {
@@ -163,7 +167,7 @@ async function demoApi(path, options = {}) {
     else if (!['delete', 'select', 'like', 'comment'].includes(body.action)) throw new Error("คำขอไม่ถูกต้อง");
     await demoSave(); return { ok: true, mediaDeletionPending: false };
   }
-  if (url.pathname === "/api/social/reports") {
+  if (["/api/social/reports", "/api/social/reports/media", "/api/social/media/appeals"].includes(url.pathname) && method === "POST") {
     state.demoReports.push({ id: crypto.randomUUID(), target: body.target, category: body.category, details: body.details, status: "pending", created_at: Math.floor(Date.now() / 1000) });
     await demoSave(); return { ok: true };
   }
@@ -171,31 +175,58 @@ async function demoApi(path, options = {}) {
 }
 
 async function startDemo() {
+  const network = await window.chatgunDemoNetwork();
   const saved = await demoRead().catch(() => null);
   state.demo = true;
   state.config = { ...state.config, socialAppEnabled: true, publicDiscoveryEnabled: true, friendRequestsEnabled: true, messagingEnabled: true, ratingsEnabled: true, mediaUploadEnabled: true, identityVerificationEnabled: false };
   state.account = { user: { id: "demo-me", displayName: "คุณ" }, providers: [] };
   state.profile = saved?.profile || { user_id: "demo-me", name: "คุณ", gender: "ไม่ระบุ", bio: "กำลังทดลอง ChatGun", interests: "กาแฟ, เพื่อนใหม่", discovery_visible: 1 };
-  state.people = [
-    { user_id: "demo-min", name: "มิน", gender: "หญิง", bio: "ชอบคาเฟ่และถ่ายรูป", interests: "กาแฟ, ถ่ายรูป", distance: 82, rating: 4.8, rating_count: 12 },
-    { user_id: "demo-ton", name: "ต้น", gender: "ชาย", bio: "วิ่งและท่องเที่ยว", interests: "วิ่ง, ท่องเที่ยว", distance: 640, rating: 4.5, rating_count: 6 },
-    { user_id: "demo-ploy", name: "พลอย", gender: "หญิง", bio: "อ่านหนังสือและดนตรี", interests: "หนังสือ, ดนตรี", distance: 1200, rating: 4.9, rating_count: 18 },
-  ];
-  state.relationships = saved?.relationships || [{ other_user_id: "demo-ploy", requested_by: "demo-ploy", status: "accepted", name: "พลอย", gender: "หญิง", bio: "เพื่อนในโหมดสาธิต", updated_at: 1 }];
-  state.ratings = saved?.ratings || [{ id: "demo-rating", score: 5, comment: "สุภาพและเป็นมิตร", sender_name: "พลอย", created_at: Math.floor(Date.now() / 1000) }];
+  state.people = network.people;
+  state.relationships = saved?.relationships || network.relationships;
+  state.ratings = saved?.ratings || network.ratings;
   state.blocked = saved?.blocked || [];
-  state.demoMessages = saved?.messages || { "demo-ploy": [{ id: "demo-message", sender_user_id: "demo-ploy", receiver_user_id: "demo-me", body: "ยินดีต้อนรับสู่โหมดสาธิต 👋", created_at: Math.floor(Date.now() / 1000) }] };
-  state.demoGallery = saved?.gallery || state.people.map((person, index) => ({ id: `demo-photo-${index}`, owner: person.user_id, caption: `รูปตัวอย่างของ ${person.name}`, url: "/logo.svg", like_count: 3 + index, liked: false, comments: [] }));
+  state.demoMessages = saved?.messages || network.messages;
+  state.demoGallery = saved?.gallery || network.gallery;
   state.demoAssets = saved?.assets || [];
   state.demoReports = saved?.reports || [];
+  state.demoRatingsGiven = saved?.givenRatings || [];
+  if (saved?.uploadQuotas) state.uploadQuotas = saved.uploadQuotas;
   state.myGallery = state.demoGallery.filter((photo) => photo.owner === "demo-me");
   state.locationFresh = true;
   $("#disabled-view").hidden = true;
   $("#global-status").textContent = "";
   $("#social-view").hidden = false;
   $("#demo-banner").hidden = false;
+  document.body.dataset.demo = "true";
+  $("#location-banner").classList.add("active");
+  $("#location-banner strong").textContent = "ระยะทางและโปรไฟล์เป็นข้อมูลสมมติ";
+  $("#location-banner p").textContent = "โหมดตัวอย่างไม่อ่านหรือบันทึกตำแหน่งของคุณ";
+  $("#location-toggle").textContent = "ตัวอย่าง";
+  $("#location-toggle").disabled = true;
+  $("#moderation-notifications").innerHTML = `<div class="notification-row"><strong>ตัวอย่าง: รูปภาพของคุณผ่านการตรวจแล้ว</strong><small>การแจ้งเตือนสมมติ</small></div>`;
   fillProfile(); renderPeople(); renderRelationships(); renderRatings(); renderBlocked(); renderOwnGallery();
   $("#app").setAttribute("aria-busy", "false");
+  const route = routedProfile();
+  if (route) await showPerson(route.user, { historyMode: "none", photo: route.photo });
+}
+
+function syncDemoUploadDay() {
+  const day = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0,10);
+  if (state.uploadQuotas.localDay !== day) {
+    state.uploadQuotas.localDay = day;
+    for (const name of ["chat", "gallery"]) state.uploadQuotas[name] = { limit:10,used:0,reserved:0,remaining:10 };
+  }
+}
+function consumeDemoUpload(category) {
+  syncDemoUploadDay();
+  const quota = state.uploadQuotas[category];
+  if (quota.remaining <= 0) throw new Error("อัปโหลดครบ 10 รูปสำหรับวันนี้แล้ว ลองใหม่หลัง 00:00 น. เวลาไทย");
+  quota.used += 1; quota.remaining -= 1;
+}
+
+function populateAvatar(element, person) {
+  const url = person.selected_photo_id ? galleryMediaUrl(person.selected_photo_id) : "";
+  if (element && url) element.innerHTML = `<img src="${escapeHtml(url)}" alt="">`;
 }
 
 function escapeHtml(value) {
@@ -377,6 +408,7 @@ function renderConversations(friends = state.relationships.filter((item) => item
     const time = person.last_message_at ? new Date(Number(person.last_message_at) * 1000).toLocaleString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
     return `<button class="conversation ${state.selectedChat === person.other_user_id ? "active" : ""}" data-chat="${escapeHtml(person.other_user_id)}"><span class="avatar">${escapeHtml(initials(person.name))}</span><span class="conversation-copy"><span><strong>${escapeHtml(person.name)}</strong><time>${escapeHtml(time)}</time></span><small>${escapeHtml(preview)}</small></span>${Number(person.unread_count || 0) ? `<b class="inbox-unread">${Number(person.unread_count)}</b>` : ""}</button>`;
   }).join("") : `<div class="empty"><p>ต้องเป็นเพื่อนกันก่อนจึงจะแชทได้</p></div>`;
+  for (const person of friends) populateAvatar($(`[data-chat="${CSS.escape(person.other_user_id)}"] .avatar`, list), person);
 }
 
 function renderRatings() {
@@ -405,6 +437,7 @@ function renderOwnGallery() {
 }
 
 function renderUploadQuotas() {
+  if (state.demo) syncDemoUploadDay();
   const gallery = state.uploadQuotas?.gallery;
   const chat = state.uploadQuotas?.chat;
   const reset = "รีเซ็ต 00:00 น. เวลาไทย";
@@ -597,7 +630,7 @@ async function showPerson(id, { historyMode = "push", photo = null } = {}) {
     <div class="member-profile-image">${portrait(person, false)}</div><div class="member-profile-shade"></div>
     <div class="member-profile-brand"><img src="/logo.svg" alt=""><span>ChatGun</span><strong>โปรไฟล์</strong></div>
     <button class="member-profile-gallery-top" type="button" data-profile-gallery aria-expanded="false">▦ แกลเลอรี</button>
-    <section class="member-profile-info"><h2>${escapeHtml(person.name)}${person.identity_verified ? " ✓" : ""}</h2><p class="member-profile-facts">${escapeHtml(person.gender || "ไม่ระบุ")} ${person.distance !== undefined ? `· ${escapeHtml(formatDistance(person.distance, person.distance_label))}` : ""}</p><p class="member-profile-bio">${escapeHtml(person.bio || "ยังไม่ได้แนะนำตัว")}</p><div class="member-profile-interests">${interests.map((interest) => `<span>${escapeHtml(interest)}</span>`).join("")}</div><div class="dialog-actions">${friendAction}${!own && state.config.ratingsEnabled && Number(person.distance) <= 100 ? `<button class="secondary" data-action="rate" data-user="${escapeHtml(id)}">ให้คะแนน</button>` : ""}${own ? "" : `<button class="danger" data-action="block" data-user="${escapeHtml(id)}">บล็อก</button><button class="secondary" data-action="report" data-user="${escapeHtml(id)}">รายงาน</button>`}</div></section>
+    <section class="member-profile-info"><h2>${escapeHtml(person.name)}${person.identity_verified ? " ✓" : ""}</h2><p class="member-profile-facts">${escapeHtml(person.gender || "ไม่ระบุ")} ${person.distance !== undefined ? `· ${escapeHtml(formatDistance(person.distance, person.distance_label))}` : ""}</p><p class="member-profile-bio">${escapeHtml(person.bio || "ยังไม่ได้แนะนำตัว")}</p><div class="member-profile-interests">${interests.map((interest) => `<span>${escapeHtml(interest)}</span>`).join("")}</div><div class="dialog-actions">${friendAction}${!own && state.config.ratingsEnabled ? `<button class="secondary" data-action="rate" data-user="${escapeHtml(id)}">ให้คะแนน</button>` : ""}${own ? "" : `<button class="danger" data-action="block" data-user="${escapeHtml(id)}">บล็อก</button><button class="secondary" data-action="report" data-user="${escapeHtml(id)}">รายงาน</button>`}</div></section>
     <section class="member-profile-gallery" aria-label="แกลเลอรี" hidden><header><button type="button" data-profile-gallery>← กลับโปรไฟล์</button><h3>แกลเลอรีของ ${escapeHtml(person.name)}</h3></header><div id="dialog-gallery" class="gallery-grid"></div></section>
   </article>`;
   $("#profile-dialog").showModal();
@@ -614,6 +647,7 @@ function renderGalleryPost() {
   if (!item) return;
   const report = owner === state.account?.user?.id ? "" : `<button class="danger" data-media-report="${escapeHtml(item.id)}">รายงานรูป</button>`;
   $("#profile-dialog-content").innerHTML = `<div class="dialog-profile"><img class="gallery-view" src="${escapeHtml(galleryMediaUrl(item.id))}" alt="${escapeHtml(item.caption || "รูปในแกลเลอรี")}"><p>${escapeHtml(item.caption || "")}</p><div class="dialog-actions"><button class="secondary" data-gallery-action="previous" ${index <= 0 ? "disabled" : ""}>← รูปก่อนหน้า</button><button class="secondary" data-gallery-action="like" data-photo="${escapeHtml(item.id)}">${item.liked ? "♥" : "♡"} ${Number(item.like_count || 0)}</button><button class="secondary" data-gallery-action="next" ${index >= photos.length - 1 ? "disabled" : ""}>รูปถัดไป →</button>${report}</div><div class="comments">${comments.map((comment) => `<p><strong>${escapeHtml(comment.sender_name)}</strong> ${escapeHtml(comment.body)}</p>`).join("") || "<p>ยังไม่มีความคิดเห็นที่คุณมีสิทธิ์อ่าน</p>"}</div><form id="gallery-comment"><input type="hidden" name="photo" value="${escapeHtml(item.id)}"><input type="hidden" name="owner" value="${escapeHtml(owner)}"><input name="comment" maxlength="500" required placeholder="เขียนถึงเจ้าของโปรไฟล์…"><button class="primary">ส่ง</button></form><small>เจ้าของโปรไฟล์และเพื่อนที่ยอมรับกันแล้วอ่านความคิดเห็นได้</small></div>`;
+  $("#profile-dialog-content .dialog-profile").classList.add("gallery-post");
 }
 
 async function openGalleryPhoto(owner, photo, { historyMode = "push" } = {}) {
@@ -652,6 +686,7 @@ async function openChat(id) {
   const thread = $("#thread");
   thread.innerHTML = `<header class="thread-head"><button class="icon-button chat-back" aria-label="กลับ">←</button><span class="avatar">${escapeHtml(initials(person.name))}</span><strong>${escapeHtml(person.name)}</strong></header><details class="chat-safety"><summary>⚠ ระวังการหลอกโอนเงินและขอข้อมูลส่วนตัว</summary><p>อย่าโอนเงินหรือส่งรหัส OTP รหัสผ่าน ข้อมูลบัญชีธนาคาร หรือรูปเอกสารยืนยันตัวตนให้คู่สนทนา</p><p>${person.identity_verified ? "บัญชีนี้ยืนยันตัวตนแล้ว แต่ตรายืนยันไม่รับรองพฤติกรรมหรือความปลอดภัยในการทำธุรกรรม" : "บัญชีนี้ยังไม่ยืนยันตัวตน โปรดระมัดระวังเป็นพิเศษ"}</p></details><div class="messages"><p>กำลังโหลด…</p></div>${state.config.mediaUploadEnabled ? `<p id="chat-upload-quota" class="upload-quota" aria-live="polite"></p>` : ""}<form class="composer">${state.config.mediaUploadEnabled ? `<label class="icon-button" title="ส่งรูป">▧<input type="file" name="file" accept="image/jpeg,image/png,image/webp" aria-label="ส่งรูป" hidden></label><button class="icon-button asset-library" type="button" title="รูปที่ส่งล่าสุด" aria-label="รูปที่ส่งล่าสุด">▦</button>` : ""}<input name="body" maxlength="2000" placeholder="พิมพ์ข้อความ…"><button class="primary">ส่ง</button></form>`;
   renderUploadQuotas();
+  populateAvatar($("#thread .avatar"), person);
   try {
     await loadMessagePage(id);
     await api("/api/social/messages", { method: "POST", body: { action: "read", target: id } });
@@ -667,12 +702,29 @@ function switchTab(tab) {
   $$("#primary-nav button").forEach((button) => button.classList.toggle("active", button.dataset.tab === tab));
   $$(".tab-view").forEach((view) => { view.hidden = view.id !== `${tab}-tab`; });
   $("#page-title").textContent = labels[tab];
+  if (tab === "chat") requestAnimationFrame(sizeConversation);
 }
+
+function sizeConversation() {
+  const layout = $(".chat-layout");
+  if (state.activeTab !== "chat" || !layout) return;
+  const viewport = window.visualViewport?.height || innerHeight;
+  const navigation = $(".sidebar").getBoundingClientRect().height;
+  layout.style.setProperty("--chat-height", `${Math.max(260, Math.min(730, viewport - layout.getBoundingClientRect().top - navigation - 20))}px`);
+}
+window.addEventListener("resize", sizeConversation);
+window.visualViewport?.addEventListener("resize", sizeConversation);
 
 async function initialize() {
   try {
     document.body.dataset.activeTab = state.activeTab;
     state.config = await api("/api/social/config");
+    if (state.config.demoModeEnabled && (state.config.demoAutoStartEnabled || new URLSearchParams(location.search).get("demo") === "1")) {
+      // Prefer a legitimate live session. Anonymous/disabled canaries use only browser fixtures.
+      if (!state.config.socialAppEnabled) return await startDemo();
+      try { await api("/api/auth/me"); }
+      catch (error) { if (error.status === 401) return await startDemo(); throw error; }
+    }
     if (!state.config.socialAppEnabled) {
       $("#global-status").textContent = "";
       $("#disabled-view").hidden = false;
@@ -751,11 +803,12 @@ $("#profile-form").addEventListener("submit", async (event) => {
 });
 
 $("#hide-discovery").addEventListener("click", async (event) => {
-  setBusy(event.currentTarget, true);
+  const button=event.currentTarget;
+  setBusy(button, true);
   try {
     await api("/api/social/profile", { method: "POST", body: { action: "hide" } });
     state.locationFresh = false; state.people = []; renderPeople(); toast("ปิดการค้นหาและล้างตำแหน่งแล้ว");
-  } catch (error) { toast(error.message, true); } finally { setBusy(event.currentTarget, false); }
+  } catch (error) { toast(error.message, true); } finally { setBusy(button, false); }
 });
 
 $("#notification-toggle").addEventListener("click", async (event) => {
@@ -788,6 +841,7 @@ $("#gallery-upload").addEventListener("submit", async (event) => {
       if (state.demoGallery.filter((photo) => photo.owner === "demo-me").length >= 12) throw new Error("อัปโหลดได้สูงสุด 12 รูป");
       const optimized = data.get("file");
       const photo = { id: crypto.randomUUID(), owner: "demo-me", caption: String(data.get("caption") || ""), url: await fileDataUrl(optimized), like_count: 0, liked: false, comments: [], created_at: Math.floor(Date.now() / 1000) };
+      consumeDemoUpload("gallery");
       state.demoGallery.unshift(photo);
       state.myGallery = state.demoGallery.filter((item) => item.owner === "demo-me");
       await demoSave(); form.reset(); renderOwnGallery(); toast("เพิ่มรูปตัวอย่างแล้ว"); return;
@@ -809,6 +863,7 @@ $("#gallery-upload").addEventListener("submit", async (event) => {
 
 $("#verification-form").addEventListener("submit", async (event) => {
   event.preventDefault();
+  const form = event.currentTarget;
   const button = event.submitter;
   const data = new FormData(event.currentTarget);
   data.set("consent", data.get("consent") ? "accepted" : "");
@@ -821,7 +876,7 @@ $("#verification-form").addEventListener("submit", async (event) => {
     const response = await fetch("/api/social/verification", { method: "POST", credentials: "same-origin", headers: { "x-csrf-token": decodeURIComponent(cookie("__Host-cg_csrf")), accept: "application/json" }, body: data });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(payload.error || "ส่งหลักฐานไม่สำเร็จ");
-    event.currentTarget.reset();
+    form.reset();
     await loadVerification();
     toast("ส่งหลักฐานแล้ว");
   } catch (error) { toast(error.message, true); } finally { setBusy(button, false); }
@@ -975,6 +1030,7 @@ $("#thread").addEventListener("submit", async (event) => {
       const optimized = await optimizeImage(file);
       if (state.demo) {
         const asset = { id: crypto.randomUUID(), url: await fileDataUrl(optimized), created_at: Math.floor(Date.now() / 1000) };
+        consumeDemoUpload("chat");
         state.demoAssets.unshift(asset);
         state.demoAssets = state.demoAssets.slice(0, 5);
         await api("/api/social/messages", { method: "POST", body: { action: "send", target: state.selectedChat, mediaId: asset.id, body: "" } });
@@ -999,37 +1055,41 @@ $("#thread").addEventListener("submit", async (event) => {
 
 $("#rating-form").addEventListener("submit", async (event) => {
   event.preventDefault();
+  const form = event.currentTarget;
   const data = new FormData(event.currentTarget);
   setBusy(event.submitter, true);
-  try { await api("/api/social/ratings", { method: "POST", body: { target: data.get("target"), score: Number(data.get("score")), comment: data.get("comment") } }); $("#rating-dialog").close(); event.currentTarget.reset(); toast("ส่งความคิดเห็นแล้ว"); }
+  try { await api("/api/social/ratings", { method: "POST", body: { target: data.get("target"), score: Number(data.get("score")), comment: data.get("comment") } }); $("#rating-dialog").close(); form.reset(); toast("ส่งความคิดเห็นแล้ว"); }
   catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
 });
 
 $("#report-form").addEventListener("submit", async (event) => {
   event.preventDefault();
+  const form = event.currentTarget;
   const data = new FormData(event.currentTarget);
   setBusy(event.submitter, true);
   try {
     await api("/api/social/reports", { method: "POST", body: { target: data.get("target"), category: data.get("category"), details: data.get("details") } });
-    $("#report-dialog").close(); event.currentTarget.reset(); toast("ส่งรายงานให้ผู้ดูแลแล้ว");
+    $("#report-dialog").close(); form.reset(); toast(state.demo ? "บันทึกรายงานตัวอย่างในเบราว์เซอร์แล้ว" : "ส่งรายงานให้ผู้ดูแลแล้ว");
   } catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
 });
 
 $("#media-report-form").addEventListener("submit", async (event) => {
   event.preventDefault();
+  const form = event.currentTarget;
   const data = new FormData(event.currentTarget); setBusy(event.submitter, true);
   try {
     await api("/api/social/reports/media", { method: "POST", body: { mediaId: data.get("mediaId"), reason: data.get("reason"), details: data.get("details") } });
-    $("#media-report-dialog").close(); event.currentTarget.reset(); toast("ส่งรายงานรูปภาพให้ผู้ดูแลแล้ว");
+    $("#media-report-dialog").close(); form.reset(); toast(state.demo ? "บันทึกรายงานรูปตัวอย่างในเบราว์เซอร์แล้ว" : "ส่งรายงานรูปภาพให้ผู้ดูแลแล้ว");
   } catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
 });
 
 $("#media-appeal-form").addEventListener("submit", async (event) => {
   event.preventDefault();
+  const form = event.currentTarget;
   const data = new FormData(event.currentTarget); setBusy(event.submitter, true);
   try {
     await api("/api/social/media/appeals", { method: "POST", body: { mediaId: data.get("mediaId"), reason: data.get("reason") } });
-    $("#media-appeal-dialog").close(); event.currentTarget.reset(); await loadMediaSafety(); toast("ส่งคำอุทธรณ์แล้ว");
+    $("#media-appeal-dialog").close(); form.reset(); await loadMediaSafety(); toast(state.demo ? "บันทึกคำอุทธรณ์ตัวอย่างในเบราว์เซอร์แล้ว" : "ส่งคำอุทธรณ์แล้ว");
   } catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
 });
 

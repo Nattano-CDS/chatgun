@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "chatgun",
-  "pages_build_output_dir": ".",
+  "pages_build_output_dir": "dist",
   "compatibility_date": "2026-10-15",
   "vars": {
     "EMAIL_OTP_ENABLED": "false",
@@ -24,7 +24,8 @@
     "RATINGS_ENABLED": "true",
     "IDENTITY_VERIFICATION_ENABLED": "false",
     "MODERATION_TOOLS_ENABLED": "true",
-    "DEMO_MODE_ENABLED": "false"
+    "DEMO_MODE_ENABLED": "true",
+    "DEMO_AUTO_START_ENABLED": "true"
   },
   "d1_databases": [
     {
@@ -63,7 +64,10 @@
         "RATINGS_ENABLED": "false",
         "IDENTITY_VERIFICATION_ENABLED": "false",
         "MODERATION_TOOLS_ENABLED": "false",
-        "DEMO_MODE_ENABLED": "false"
+        "DEMO_MODE_ENABLED": "true",
+        "DEMO_AUTO_START_ENABLED": "true",
+        "PUBLIC_DEMO_CANARY_ENABLED": "true",
+        "OAUTH_LOGIN_ENABLED": "false"
       },
       "d1_databases": [
         {

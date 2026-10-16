@@ -204,6 +204,7 @@ async function verifyOtp(request, env) {
 
 async function startOauth(request, env, provider) {
   requireSameOrigin(request);
+  if (String(env.OAUTH_LOGIN_ENABLED).toLowerCase() === "false") return failure("การเข้าสู่บัญชีจริงยังไม่เปิดใช้งาน กรุณาใช้โหมดตัวอย่าง", 503, "oauth_unavailable");
   assertEnvironment(env, ["RATE_LIMIT_PEPPER"]);
   const body = await readJson(request);
   if (!await verifyTurnstile(request, env, body.turnstileToken, "auth_start")) {
@@ -327,6 +328,7 @@ async function startOauth(request, env, provider) {
 }
 
 async function oauthCallback(request, env, provider) {
+  if (String(env.OAUTH_LOGIN_ENABLED).toLowerCase() === "false") return authErrorRedirect(request, "oauth_unavailable");
   const url = new URL(request.url);
   const providerDenied = url.searchParams.has("error");
   const state = url.searchParams.get("state") || "";
@@ -606,7 +608,8 @@ export async function onRequest({ request, env }) {
       const mobileOtpEnabled = featureEnabled(env.MOBILE_OTP_ENABLED);
       return json({
         turnstileSiteKey: env.TURNSTILE_SITE_KEY || null,
-        oauthProviders: [...PROVIDERS],
+        oauthLoginEnabled: String(env.OAUTH_LOGIN_ENABLED).toLowerCase() !== "false",
+        oauthProviders: String(env.OAUTH_LOGIN_ENABLED).toLowerCase() === "false" ? [] : [...PROVIDERS],
         emailOtpEnabled,
         mobileOtpEnabled,
         smsEnabled: mobileOtpEnabled,

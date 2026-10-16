@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "node scripts/build-pages.mjs",
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "test:coverage": "node --experimental-test-coverage --test --test-concurrency=1 test/*.test.js",
     "test:e2e": "playwright test"

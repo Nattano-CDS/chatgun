@@ -9,7 +9,13 @@
 /signup.html
   Cache-Control: no-store
 
+/signup
+  Cache-Control: no-store
+
 /account.html
+  Cache-Control: no-store
+
+/account
   Cache-Control: no-store
 
 /acceptance*

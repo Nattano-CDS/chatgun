@@ -329,6 +329,7 @@ async function config(env) {
     identityVerificationEnabled: enabled(env.IDENTITY_VERIFICATION_ENABLED),
     sensitiveContentEnabled: enabled(env.SENSITIVE_CONTENT_ENABLED),
     demoModeEnabled: enabled(env.DEMO_MODE_ENABLED),
+    demoAutoStartEnabled: enabled(env.DEMO_MODE_ENABLED) && enabled(env.DEMO_AUTO_START_ENABLED),
     gameEnabled: false,
     emailOtpEnabled: false,
     mobileOtpEnabled: false,

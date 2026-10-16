@@ -114,7 +114,7 @@ test("optional demo remains browser-only and contains no game", async ({ page })
   await page.goto("/app/");
   await page.getByRole("button", { name: "ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์" }).click();
   await expect(page.locator("#demo-banner")).toBeVisible();
-  await expect(page.locator("#people-grid").getByText("มิน")).toBeVisible();
+  await expect(page.locator("#people-grid").getByText("มะปราง")).toBeVisible();
   await expect(page.getByRole("button", { name: "เกม" })).toHaveCount(0);
 });
 
@@ -129,11 +129,11 @@ test("browser-only demo supports local gallery and chat image workflows", async 
   await page.locator('#gallery-upload input[type="file"]').setInputFiles({ name: "demo.png", mimeType: "image/png", buffer: png });
   await page.locator('#gallery-upload input[name="caption"]').fill("รูปตัวอย่างในเครื่อง");
   await page.getByRole("button", { name: "อัปโหลดรูป" }).click();
-  await expect(page.locator("#gallery-count")).toHaveText("1 / 12");
-  await expect(page.locator("#my-gallery img")).toHaveAttribute("src", /^data:image\//u);
+  await expect(page.locator("#gallery-count")).toHaveText("3 / 12");
+  await expect(page.locator("#my-gallery img").first()).toHaveAttribute("src", /^data:image\//u);
 
   await page.locator('#primary-nav button[data-tab="chat"]').click();
-  await page.getByRole("button", { name: /พลอย/u }).click();
+  await page.getByRole("button", { name: /ต้นน้ำ/u }).click();
   await page.locator('#thread input[type="file"]').setInputFiles({ name: "chat.png", mimeType: "image/png", buffer: png });
   await page.locator("#thread .composer").getByRole("button", { name: "ส่ง", exact: true }).click();
   await expect(page.locator("#thread .chat-image")).toHaveAttribute("src", /^data:image\//u);

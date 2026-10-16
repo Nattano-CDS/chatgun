@@ -5,19 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>บัญชี ChatGun</title>
   <link rel="icon" href="./favicon.svg">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./auth-shell.css">
+  <link rel="stylesheet" href="./account.css">
   <script defer src="./account.js"></script>
-  <style>
-    .account-card{max-width:660px;margin:60px auto;padding:42px 28px;border:1px solid #eceafa;border-radius:28px;box-shadow:0 20px 65px #555cad14}
-    .account-section{margin:30px auto 0;max-width:500px;padding-top:24px;border-top:1px solid #eceafa}.account-section h2{font-size:21px}
-    .link-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.link-provider,.reauth-provider{padding:11px;border:1px solid #dedced;border-radius:12px;background:#fff;color:#5044af;font:inherit;cursor:pointer}
-    .link-provider:disabled,.reauth-provider:disabled{opacity:.5;cursor:wait}.turnstile{min-height:65px;margin:20px 0;display:flex;justify-content:center}.account-message{min-height:24px;color:#b83c63;font-size:13px}
-    .danger-zone{border-color:#f2ccd4}.danger-zone h2{color:#982944}.danger{border:1px solid #c83a5c;background:#fff;color:#a32645;padding:11px 16px;border-radius:12px;font:inherit;font-weight:700;cursor:pointer}
-    .danger-confirm{background:#a32645;color:#fff}.deletion-confirm{display:grid;gap:10px;margin-top:16px}.deletion-confirm[hidden]{display:none}.deletion-confirm input{padding:12px;border:1px solid #d8d6e4;border-radius:10px;font:inherit}
-    @media(max-width:520px){.account-card{margin:20px 14px}.link-grid{grid-template-columns:1fr}}
-  </style>
 </head>
-<body>
+<body class="auth-page">
+  <header class="auth-header"><a class="auth-brand" href="/"><img src="/logo.svg" alt=""><span>Chat<span>Gun</span></span></a><a class="auth-header-link" href="/">กลับไปหาเพื่อน</a></header>
   <main class="section account-card">
     <img src="./logo.svg" alt="ChatGun" width="90">
     <h1>ยินดีต้อนรับสู่ ChatGun</h1>
