@@ -32,7 +32,7 @@ Post-migration checks:
 | Suite | Result | Coverage summary |
 | --- | --- | --- |
 | Node unit/integration | 49 passed, 0 failed | OAuth/OTP regressions; flags; CSRF; rate limits; D1 migration/idempotency; retention; deletion retry/concurrency; discovery privacy; stable message cursors and private inbox previews; blocking; reports; ratings; gallery/R2 mock; private received-image forwarding; moderator media/purpose auditing; verification evidence lifecycle |
-| Complete deployed-Preview Playwright suite | 21 passed, 1 intentional skip | Signup and Turnstile; legal/account regressions; desktop/mobile social shell; chat preview/safety guidance; deep profile routes and browser history; fail-closed screen; IndexedDB demo; explicit game absence; purpose-gated moderator queue; untrusted report markup rendered as text |
+| Complete deployed-Preview Playwright suite | 23 passed, 1 intentional skip | Signup and Turnstile; legal/account regressions; desktop/mobile social shell; chat preview/safety guidance; deep profile routes and browser history; fail-closed screen; IndexedDB demo with local-only gallery/chat image and reuse-library workflows; explicit game absence; purpose-gated moderator queue; untrusted report markup rendered as text |
 | Real Preview HTTP | passed | `/app/` 200/no-store/noindex; same-origin geolocation policy; `/api/social/config` all false; disabled social API returns 404 `feature_disabled` |
 | Preview D1 | passed | Migrations applied only to staging and foreign keys verified |
 
