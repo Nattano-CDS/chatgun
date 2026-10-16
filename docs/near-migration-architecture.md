@@ -47,8 +47,9 @@ Production activation still requires qualified Thai legal review of the threshol
 - The ChatGun Cloudflare account was re-confirmed as `23017b53386fb67fc62a52cdd017454c` before mutation.
 - `0003_social.sql` and `0004_moderation_audit.sql` were applied only to D1 `chatgun-auth-staging` (`5bbfd55d-eb22-4324-8a7d-57bef14110ea`). Existing staging users were preserved and the foreign-key check passed.
 - The repository default Pages binding now points to staging D1; only `[env.production]` points to `chatgun-auth`. This matches the configuration downloaded read-only from Pages.
-- Preview is deployed at the branch alias `https://codex-near-migration.chatgun.pages.dev` with non-media social capabilities enabled only for authenticated, pre-seeded synthetic members; registration and high-risk capabilities remain disabled and `noindex` behavior is intact. Immutable validation URLs are recorded in PR #6.
-- R2 cannot yet be configured: the ChatGun account API returns `10042`, and the dashboard requires the owner to add a usage-billed, automatically renewing R2 subscription using the account payment method. Media flags and the cleanup Worker remain undeployed until that explicit billing action and subsequent private-media validation complete.
+- Private R2 bucket `chatgun-media-staging` is bound as `MEDIA` only in Preview. Production explicitly has an empty R2 binding list and keeps `MEDIA_UPLOAD_ENABLED=false`.
+- `chatgun-media-cleanup-staging` runs daily against staging D1/R2. Live scheduled-event validation deleted queued binaries, removed pending media metadata, recorded idempotent completion, and left no pending objects.
+- Preview private gallery/chat media is enabled only for authenticated synthetic members. Registration and high-risk capabilities remain disabled and `noindex` behavior is intact. Immutable validation URLs are recorded in PR #6.
 - Live staging evidence uses three `cg-stage-*` users with 24-hour sessions. Positive/negative API flows and desktop/mobile UI persist only to `chatgun-auth-staging`; no provider identity is fabricated or linked.
 - Production migrations `0002`–`0004` remain pending and were not applied.
 

@@ -13,7 +13,7 @@
     "PUBLIC_DISCOVERY_ENABLED": "true",
     "FRIEND_REQUESTS_ENABLED": "true",
     "MESSAGING_ENABLED": "true",
-    "MEDIA_UPLOAD_ENABLED": "false",
+    "MEDIA_UPLOAD_ENABLED": "true",
     "RATINGS_ENABLED": "true",
     "IDENTITY_VERIFICATION_ENABLED": "false",
     "MODERATION_TOOLS_ENABLED": "false",
@@ -25,6 +25,12 @@
       "database_name": "chatgun-auth-staging",
       "database_id": "5bbfd55d-eb22-4324-8a7d-57bef14110ea",
       "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "chatgun-media-staging"
     }
   ],
   "env": {
@@ -52,7 +58,8 @@
           "database_id": "9738a051-d914-42d0-8e7b-8098ef2b959d",
           "migrations_dir": "migrations"
         }
-      ]
+      ],
+      "r2_buckets": []
     }
   }
 }

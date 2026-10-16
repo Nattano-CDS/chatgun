@@ -3,6 +3,7 @@ import test from "node:test";
 import { issueSession, unixTime } from "../functions/_lib/db.js";
 import { onRequest } from "../functions/api/social/[[path]].js";
 import { environment, TestD1 } from "./helpers/d1.js";
+import { ONE_PIXEL_PNG } from "./helpers/image.js";
 
 class TestR2 {
   constructor() { this.objects = new Map(); }
@@ -37,7 +38,7 @@ test("verification evidence is private, reviewed by role, and queued for deletio
   const now = unixTime();
   await database.prepare("INSERT INTO moderation_roles(user_id,role,created_at) VALUES ('verify-reviewer','identity_reviewer',?)").bind(now).run();
   const runtime = { ...environment(database), MEDIA: media, SOCIAL_APP_ENABLED: "true", IDENTITY_VERIFICATION_ENABLED: "true", MODERATION_TOOLS_ENABLED: "true" };
-  const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
+  const png = ONE_PIXEL_PNG;
   const form = new FormData();
   form.set("identity", new File([png], "identity.png", { type: "image/png" }));
   form.set("selfie", new File([png], "selfie.png", { type: "image/png" }));

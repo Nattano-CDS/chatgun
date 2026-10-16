@@ -3,6 +3,7 @@ import test from "node:test";
 import { issueSession, unixTime } from "../functions/_lib/db.js";
 import { onRequest } from "../functions/api/social/[[path]].js";
 import { environment, TestD1 } from "./helpers/d1.js";
+import { ONE_PIXEL_PNG } from "./helpers/image.js";
 
 class TestR2 {
   constructor() { this.objects = new Map(); }
@@ -61,7 +62,7 @@ test("gallery validates bytes, stores private media, authorizes reads, and queue
   await database.prepare(`INSERT INTO social_relationships(id,user_low,user_high,requested_by,status,created_at,updated_at) VALUES ('rel','media-friend','media-owner','media-owner','accepted',1,1)`).run();
 
   const form = new FormData();
-  const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
+  const png = ONE_PIXEL_PNG;
   form.set("file", new File([png], "photo.png", { type: "image/png" }));
   form.set("caption", "ภาพทดสอบ");
   const upload = await onRequest({
@@ -122,7 +123,7 @@ test("chat images require friendship, remain private, and retain only five activ
   const recipient = await member(database, "chat-media-b", "ผู้รับ");
   const stranger = await member(database, "chat-media-c", "คนอื่น");
   await database.prepare(`INSERT INTO social_relationships(id,user_low,user_high,requested_by,status,created_at,updated_at) VALUES ('chat-rel','chat-media-a','chat-media-b','chat-media-a','accepted',1,1)`).run();
-  const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
+  const png = ONE_PIXEL_PNG;
   for (let index = 0; index < 6; index += 1) {
     const form = new FormData();
     form.set("target", "chat-media-b");
@@ -150,7 +151,7 @@ test("received chat images can be reused only while an accepted unblocked relati
   const outsider = await member(database, "reuse-outsider", "บุคคลอื่น");
   await database.prepare(`INSERT INTO social_relationships(id,user_low,user_high,requested_by,status,created_at,updated_at) VALUES ('reuse-original','reuse-owner','reuse-recipient','reuse-owner','accepted',1,1)`).run();
   await database.prepare(`INSERT INTO social_relationships(id,user_low,user_high,requested_by,status,created_at,updated_at) VALUES ('reuse-next','reuse-friend','reuse-recipient','reuse-recipient','accepted',1,1)`).run();
-  const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
+  const png = ONE_PIXEL_PNG;
   const form = new FormData();
   form.set("target", "reuse-recipient");
   form.set("file", new File([png], "shared.png", { type: "image/png" }));

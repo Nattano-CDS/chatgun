@@ -21,11 +21,16 @@ export async function drainMediaDeletionQueue(env, timestamp = unixTime()) {
   for (const row of due.results || []) {
     try {
       await env.MEDIA.delete(row.object_key);
-      await env.DB.prepare(`
-        UPDATE media_deletion_queue
-        SET completed_at = ?, attempts = attempts + 1, last_error_code = NULL
-        WHERE object_key = ? AND completed_at IS NULL
-      `).bind(timestamp, row.object_key).run();
+      await env.DB.batch([
+        env.DB.prepare(`
+          DELETE FROM social_media WHERE object_key = ? AND state = 'pending_deletion'
+        `).bind(row.object_key),
+        env.DB.prepare(`
+          UPDATE media_deletion_queue
+          SET completed_at = ?, attempts = attempts + 1, last_error_code = NULL
+          WHERE object_key = ? AND completed_at IS NULL
+        `).bind(timestamp, row.object_key),
+      ]);
       completed += 1;
     } catch {
       const attempts = Number(row.attempts || 0) + 1;

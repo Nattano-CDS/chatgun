@@ -1,6 +1,7 @@
 import { safeUuid } from "../../_lib/crypto.js";
 import { getSession, hasRecentAuthentication, rateLimit, requireCsrf, unixTime } from "../../_lib/db.js";
 import { RequestError, failure, json, readJson, requireSameOrigin } from "../../_lib/http.js";
+import { sanitizeImage } from "../../_lib/image.js";
 
 const LOCATION_FRESH_SECONDS = 120;
 const ALLOWED_GENDERS = new Set([
@@ -494,9 +495,10 @@ async function messages(request, env) {
     if (!(file instanceof File) || file.size < 1 || file.size > 8 * 1024 * 1024) {
       throw new SocialError("invalid_file", "รูปภาพต้องมีขนาดไม่เกิน 8 MB");
     }
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const contentType = imageType(bytes, file.type);
-    if (!contentType) throw new SocialError("invalid_image", "รองรับเฉพาะ JPG, PNG และ WebP ที่ถูกต้อง");
+    let image;
+    try { image = sanitizeImage(new Uint8Array(await file.arrayBuffer()), file.type); }
+    catch { throw new SocialError("invalid_image", "รองรับเฉพาะ JPG, PNG และ WebP ที่ถูกต้อง"); }
+    const { bytes, contentType } = image;
     const mediaId = safeUuid();
     const messageId = safeUuid();
     const objectKey = `chat/${safeUuid()}`;
@@ -811,17 +813,6 @@ async function ratings(request, env) {
   return json({ ok: true }, 201);
 }
 
-function imageType(bytes, declaredType) {
-  if (bytes.length < 12) return null;
-  const jpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-  const png = bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47
-    && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a;
-  const webp = String.fromCharCode(...bytes.slice(0, 4)) === "RIFF"
-    && String.fromCharCode(...bytes.slice(8, 12)) === "WEBP";
-  const detected = jpeg ? "image/jpeg" : png ? "image/png" : webp ? "image/webp" : null;
-  return detected === declaredType ? detected : null;
-}
-
 async function mayViewProfile(db, env, viewer, owner) {
   if (viewer === owner) return true;
   if (await isBlocked(db, viewer, owner)) return false;
@@ -882,9 +873,10 @@ async function gallery(request, env) {
       "SELECT COUNT(*) count FROM profile_photos WHERE owner_user_id = ?",
     ).bind(session.user_id).first();
     if (Number(count?.count || 0) >= 12) throw new SocialError("gallery_full", "อัปโหลดได้สูงสุด 12 รูป", 409);
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const detectedType = imageType(bytes, file.type);
-    if (!detectedType) throw new SocialError("invalid_image", "รองรับเฉพาะ JPG, PNG และ WebP ที่ถูกต้อง");
+    let image;
+    try { image = sanitizeImage(new Uint8Array(await file.arrayBuffer()), file.type); }
+    catch { throw new SocialError("invalid_image", "รองรับเฉพาะ JPG, PNG และ WebP ที่ถูกต้อง"); }
+    const { bytes, contentType: detectedType } = image;
     const id = safeUuid();
     const objectKey = `gallery/${safeUuid()}`;
     const timestamp = unixTime();
@@ -1002,10 +994,10 @@ async function verification(request, env) {
     if (!(file instanceof File) || file.size < 1 || file.size > 8 * 1024 * 1024) {
       throw new SocialError("invalid_file", "หลักฐานแต่ละรูปต้องมีขนาดไม่เกิน 8 MB");
     }
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const contentType = imageType(bytes, file.type);
-    if (!contentType) throw new SocialError("invalid_image", "รองรับเฉพาะ JPG, PNG และ WebP ที่ถูกต้อง");
-    prepared.push({ kind, id: safeUuid(), key: `verification/${safeUuid()}`, bytes, contentType });
+    let image;
+    try { image = sanitizeImage(new Uint8Array(await file.arrayBuffer()), file.type); }
+    catch { throw new SocialError("invalid_image", "รองรับเฉพาะ JPG, PNG และ WebP ที่ถูกต้อง"); }
+    prepared.push({ kind, id: safeUuid(), key: `verification/${safeUuid()}`, bytes: image.bytes, contentType: image.contentType });
   }
   const uploaded = [];
   try {

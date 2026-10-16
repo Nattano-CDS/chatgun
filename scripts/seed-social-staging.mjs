@@ -29,6 +29,9 @@ if (!identity.includes(ACCOUNT_ID)) throw new Error(`Refusing to seed: active Cl
 
 const statements = [
   "PRAGMA foreign_keys = ON;",
+  `INSERT OR IGNORE INTO media_deletion_queue(object_key,operation_id,next_attempt_at,created_at)
+   SELECT object_key,'synthetic-reseed-' || id,${now},${now} FROM social_media
+   WHERE owner_user_id IN (${members.map((member) => sql(member.id)).join(",")});`,
   `DELETE FROM users WHERE id IN (${members.map((member) => sql(member.id)).join(",")});`,
 ];
 for (const member of members) {

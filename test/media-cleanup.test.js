@@ -6,6 +6,9 @@ import { TestD1 } from "./helpers/d1.js";
 test("media cleanup deletes due objects, records completion, and leaves future work", async () => {
   const database = new TestD1();
   database.exec(`
+    INSERT INTO users(id,display_name,status,created_at,updated_at) VALUES ('cleanup-owner','Cleanup','active',1,1);
+    INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,state,created_at)
+    VALUES ('cleanup-media','cleanup-owner','due.webp','gallery','image/webp',10,'pending_deletion',1);
     INSERT INTO media_deletion_queue(object_key,operation_id,next_attempt_at,created_at)
     VALUES ('due.webp','op',99,1),('future.webp','op',200,1);
   `);
@@ -22,6 +25,9 @@ test("media cleanup deletes due objects, records completion, and leaves future w
   assert.equal(database.database.prepare(
     "SELECT completed_at FROM media_deletion_queue WHERE object_key='future.webp'",
   ).get().completed_at, null);
+  assert.equal(database.database.prepare(
+    "SELECT COUNT(*) count FROM social_media WHERE object_key='due.webp'",
+  ).get().count, 0);
   database.close();
 });
 
