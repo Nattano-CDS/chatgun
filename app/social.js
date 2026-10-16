@@ -614,6 +614,15 @@ async function initialize() {
       if (error.status === 401) return location.replace("/signup.html?next=%2Fapp%2F");
       throw error;
     }
+    if (state.account.acceptanceRequired || state.account.nextPath === "/acceptance") {
+      return location.replace("/acceptance");
+    }
+    if (state.account.nextPath === "/app/?onboarding=1") {
+      $("#global-status").textContent = "";
+      $("#onboarding-view").hidden = false;
+      $("#onboarding-form").elements.name.value = state.account.user.displayName || "";
+      return;
+    }
     try { state.profile = (await api("/api/social/profile")).profile; }
     catch (error) {
       if (error.code === "not_found" && state.config.adultOnboardingEnabled) {
@@ -652,7 +661,7 @@ $("#onboarding-form").addEventListener("submit", async (event) => {
   const data = new FormData(event.currentTarget);
   setBusy(button, true);
   try {
-    const result = await api("/api/social/onboarding/adult", { method: "POST", body: { name: data.get("name"), gender: data.get("gender"), bio: data.get("bio"), interests: data.get("interests"), dateOfBirth: data.get("dateOfBirth"), confirmedAdult: data.get("adult") === "on", noticeVersion: state.config.adultNoticeVersion } });
+    const result = await api("/api/social/onboarding/member", { method: "POST", body: { name: data.get("name"), gender: data.get("gender"), bio: data.get("bio"), interests: data.get("interests") } });
     state.profile = result.profile;
     location.reload();
   } catch (error) { toast(error.message, true); } finally { setBusy(button, false); }

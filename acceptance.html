@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>ยืนยันก่อนเข้าร่วม | ChatGun</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/acceptance.css">
+  <script defer src="/acceptance.js"></script>
+</head>
+<body>
+  <header><a href="/" class="brand"><img src="/logo.svg" width="40" alt=""><span>Chat<span class="gradient">Gun</span></span></a></header>
+  <main>
+    <section class="acceptance-card" aria-labelledby="acceptance-title">
+      <img class="mark" src="/logo.svg" width="72" alt="">
+      <p class="eyebrow">ขั้นตอนสำหรับสมาชิกใหม่</p>
+      <h1 id="acceptance-title">ยืนยันก่อนเริ่มใช้งาน</h1>
+      <p class="intro">โปรดอ่านและยืนยันทั้งสองข้อ การยืนยันอายุนี้เป็นการแจ้งด้วยตนเอง และไม่ใช่การตรวจสอบอายุโดยบุคคลที่สาม</p>
+      <form id="acceptance-form">
+        <label class="confirmation">
+          <input id="adult-confirmation" name="adult" type="checkbox" required>
+          <span>ข้าพเจ้าขอยืนยันว่ามีอายุ 18 ปีบริบูรณ์ขึ้นไป</span>
+        </label>
+        <label class="confirmation">
+          <input id="policy-confirmation" name="policy" type="checkbox" required>
+          <span>ข้าพเจ้ายอมรับ<a href="/terms.html" target="_blank" rel="noopener">ข้อกำหนดการใช้บริการ</a>และรับทราบ<a href="/privacy.html" target="_blank" rel="noopener">นโยบายความเป็นส่วนตัว</a></span>
+        </label>
+        <p id="message" role="status" aria-live="polite"></p>
+        <button class="continue" type="submit">ยอมรับและดำเนินการต่อ</button>
+        <button id="decline" class="decline" type="button">ไม่ยอมรับและออกจากระบบ</button>
+      </form>
+      <p class="safety-note">การยืนยันด้วยตนเองไม่อนุญาตให้เข้าถึงเนื้อหาที่ต้องมีการตรวจสอบอายุหรือการยืนยันตัวตนเพิ่มเติม</p>
+    </section>
+  </main>
+</body>
+</html>

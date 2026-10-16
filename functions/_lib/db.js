@@ -54,7 +54,7 @@ export async function getSession(request, db, timestamp = unixTime()) {
   return db.prepare(`
     SELECT s.token_hash, s.csrf_hash, s.user_id, s.expires_at,
            sae.authenticated_at,
-           u.email, u.display_name, u.avatar_url, u.status
+           u.email, u.display_name, u.avatar_url, u.status, u.account_state
     FROM sessions s
     JOIN users u ON u.id = s.user_id
     LEFT JOIN session_auth_evidence sae ON sae.token_hash = s.token_hash
@@ -239,8 +239,8 @@ export async function findOrCreateIdentity(
             AND expires_at > ? AND use_count < max_uses
         `).bind(timestamp, claimNonce, invitationId, timestamp),
         db.prepare(`
-          INSERT INTO users(id, email, email_verified_at, display_name, avatar_url, status, created_at, updated_at)
-          SELECT ?, ?, ?, ?, ?, 'active', ?, ?
+          INSERT INTO users(id, email, email_verified_at, display_name, avatar_url, status, account_state, created_at, updated_at)
+          SELECT ?, ?, ?, ?, ?, 'active', 'pending_acceptance', ?, ?
           WHERE EXISTS (
             SELECT 1 FROM beta_invitations WHERE id = ? AND last_claim_nonce = ?
           )
@@ -287,8 +287,8 @@ export async function findOrCreateIdentity(
       return userId;
     }
     await db.prepare(`
-      INSERT INTO users(id, email, email_verified_at, display_name, avatar_url, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, 'active', ?, ?)
+      INSERT INTO users(id, email, email_verified_at, display_name, avatar_url, status, account_state, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, 'active', 'pending_acceptance', ?, ?)
     `).bind(
       userId,
       safeEmail,
@@ -337,8 +337,8 @@ export async function createVerifiedEmailUser(db, email, timestamp = unixTime())
   const userId = safeUuid();
   try {
     await db.prepare(`
-      INSERT INTO users(id, email, email_verified_at, status, created_at, updated_at)
-      VALUES (?, ?, ?, 'active', ?, ?)
+      INSERT INTO users(id, email, email_verified_at, status, account_state, created_at, updated_at)
+      VALUES (?, ?, ?, 'active', 'pending_acceptance', ?, ?)
     `).bind(userId, email, timestamp, timestamp, timestamp).run();
     return userId;
   } catch (error) {

@@ -15,7 +15,7 @@ LINE_CLIENT_SECRET=replace-me
 LINE_EMAIL_ENABLED=false
 NEW_ACCOUNT_REGISTRATION_ENABLED=false
 BETA_INVITATION_REGISTRATION_ENABLED=false
-ADULT_NOTICE_VERSION=controlled-beta-v1
+ACCEPTANCE_FLOW_ENABLED=false
 SOCIAL_APP_ENABLED=false
 ADULT_ONBOARDING_ENABLED=false
 PUBLIC_DISCOVERY_ENABLED=false
@@ -27,5 +27,7 @@ RATINGS_ENABLED=false
 IDENTITY_VERIFICATION_ENABLED=false
 MODERATION_TOOLS_ENABLED=false
 DEMO_MODE_ENABLED=false
-# Required only when adult onboarding is explicitly enabled in isolated staging.
+# Required only when acceptance/onboarding is explicitly enabled in isolated staging.
 ADULT_NOTICE_VERSION=owner-legal-review-required
+TERMS_VERSION=owner-legal-review-required
+PRIVACY_VERSION=owner-legal-review-required

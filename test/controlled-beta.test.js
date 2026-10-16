@@ -146,6 +146,10 @@ test("one-time invitation is bound to OAuth, stored only as a hash, and consumed
   const env = environment(database);
   env.NEW_ACCOUNT_REGISTRATION_ENABLED = "false";
   env.BETA_INVITATION_REGISTRATION_ENABLED = "true";
+  env.ACCEPTANCE_FLOW_ENABLED = "true";
+  env.ADULT_NOTICE_VERSION = "adult-preview-v1";
+  env.TERMS_VERSION = "terms-preview-v1";
+  env.PRIVACY_VERSION = "privacy-preview-v1";
   await insertInvitation(database);
 
   const first = await startLine(env);
@@ -162,13 +166,17 @@ test("one-time invitation is bound to OAuth, stored only as a hash, and consumed
 
   const accepted = await finishLine(env, first, "invited-line-user");
   assert.equal(accepted.status, 303);
-  assert.equal(accepted.headers.get("location"), "/account.html");
+  assert.equal(accepted.headers.get("location"), "/acceptance");
   const enrollment = database.database.prepare(`
     SELECT e.status, e.invitation_id FROM beta_enrollments e
     JOIN identities i ON i.user_id = e.user_id
     WHERE i.provider = 'line' AND i.subject = 'invited-line-user'
   `).get();
   assert.deepEqual({ ...enrollment }, { status: "pending_age", invitation_id: "invite-1" });
+  assert.equal(database.database.prepare(`
+    SELECT u.account_state FROM users u JOIN identities i ON i.user_id = u.id
+    WHERE i.provider = 'line' AND i.subject = 'invited-line-user'
+  `).get().account_state, "pending_acceptance");
   assert.equal(database.database.prepare("SELECT use_count FROM beta_invitations").get().use_count, 1);
 
   const rejected = await finishLine(env, second, "second-line-user");

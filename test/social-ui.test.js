@@ -25,7 +25,7 @@ test("social client uses same-origin APIs, CSRF, escaped rendering, and fail-clo
   assert.match(script, /headers\["x-csrf-token"\]/u);
   assert.match(script, /node\.textContent = String/u);
   assert.match(script, /if \(!state\.config\.socialAppEnabled\)/u);
-  assert.match(script, /\/api\/social\/onboarding\/adult/u);
+  assert.match(script, /\/api\/social\/onboarding\/member/u);
   assert.match(script, /ระวังการหลอกโอนเงินและขอข้อมูลส่วนตัว/u);
   assert.match(script, /last_message_sender_id/u);
   assert.match(script, /navigator\.permissions\.query\(\{ name: "geolocation" \}\)/u);

@@ -115,11 +115,13 @@ fetch("/api/auth/me", { credentials: "same-origin" })
     account = result;
     document.getElementById("status").textContent = `เข้าสู่ระบบแล้ว ${account.user.displayName || account.user.email || "สมาชิก ChatGun"}`;
     document.getElementById("logout").hidden = false;
-    document.getElementById("linking").hidden = false;
+    document.getElementById("linking").hidden = !account.canLinkAccounts;
     document.getElementById("deletion").hidden = false;
     fetch("/api/social/config", { credentials: "same-origin" })
       .then((response) => response.ok ? response.json() : null)
-      .then((config) => { if (config?.socialAppEnabled) document.getElementById("open-social").hidden = false; })
+      .then((config) => {
+        if (config?.socialAppEnabled && account.nextPath === "/app/") document.getElementById("open-social").hidden = false;
+      })
       .catch(() => {});
     if (new URLSearchParams(window.location.search).get("reauth") === "account_deletion") {
       deletionMessage("ยืนยันตัวตนสำเร็จแล้ว คุณสามารถเริ่มคำขอลบบัญชีได้");

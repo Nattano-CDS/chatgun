@@ -2,6 +2,7 @@ import { safeUuid } from "../../_lib/crypto.js";
 import { getSession, hasRecentAuthentication, rateLimit, requireCsrf, unixTime } from "../../_lib/db.js";
 import { RequestError, failure, json, readJson, requireSameOrigin } from "../../_lib/http.js";
 import { sanitizeImage } from "../../_lib/image.js";
+import { acceptanceFlowEnabled, currentAcceptance } from "../../_lib/acceptance.js";
 import { selfDeclaredAdult } from "../../_lib/age.js";
 
 const LOCATION_FRESH_SECONDS = 120;
@@ -25,7 +26,7 @@ function capability(env, name) {
   if (!enabled(env[name])) throw new SocialError("feature_disabled", "ฟีเจอร์นี้ยังไม่เปิดใช้งาน", 404);
 }
 
-async function authenticated(request, env, { csrf = false } = {}) {
+async function authenticated(request, env, { csrf = false, onboarding = false } = {}) {
   const session = await getSession(request, env.DB);
   if (!session) throw new SocialError("unauthorized", "กรุณาเข้าสู่ระบบ", 401);
   const betaEnrollment = await env.DB.prepare(
@@ -33,6 +34,19 @@ async function authenticated(request, env, { csrf = false } = {}) {
   ).bind(session.user_id).first();
   if (betaEnrollment?.status === "revoked") {
     throw new SocialError("beta_access_revoked", "สิทธิ์เข้าร่วม Beta ถูกระงับ", 403);
+  }
+  if (acceptanceFlowEnabled(env)) {
+    const acceptance = await currentAcceptance(env.DB, session.user_id, env);
+    if (!acceptance.accepted || session.account_state === "pending_acceptance") {
+      throw new SocialError("acceptance_required", "กรุณายืนยันอายุและยอมรับข้อกำหนดก่อน", 403);
+    }
+    if (onboarding) {
+      if (!["pending_onboarding", "active"].includes(session.account_state)) {
+        throw new SocialError("onboarding_not_available", "บัญชีนี้ไม่อยู่ในขั้นตอนสร้างโปรไฟล์", 403);
+      }
+    } else if (session.account_state !== "active") {
+      throw new SocialError("onboarding_required", "กรุณาสร้างโปรไฟล์ก่อน", 403);
+    }
   }
   if (csrf) {
     requireSameOrigin(request);
@@ -107,7 +121,7 @@ function visibleProfile(profile, own) {
 async function targetExists(db, target) {
   return Boolean(await db.prepare(`
     SELECT 1 present FROM member_profiles p JOIN users u ON u.id = p.user_id
-    WHERE p.user_id = ? AND u.status = 'active'
+    WHERE p.user_id = ? AND u.status = 'active' AND u.account_state = 'active'
   `).bind(target).first());
 }
 
@@ -152,7 +166,7 @@ async function config(env) {
   return json({
     socialAppEnabled,
     adultOnboardingEnabled,
-    ageAssuranceModel: adultOnboardingEnabled ? "date_of_birth_self_declaration" : null,
+    ageAssuranceModel: adultOnboardingEnabled ? "post_oauth_self_declaration_without_date_of_birth" : null,
     adultNoticeVersion: adultOnboardingEnabled ? String(env.ADULT_NOTICE_VERSION || "") || null : null,
     publicDiscoveryEnabled: enabled(env.PUBLIC_DISCOVERY_ENABLED),
     friendRequestsEnabled: enabled(env.FRIEND_REQUESTS_ENABLED),
@@ -161,6 +175,7 @@ async function config(env) {
     mediaQuarantineEnabled: enabled(env.MEDIA_QUARANTINE_ENABLED),
     ratingsEnabled: enabled(env.RATINGS_ENABLED),
     identityVerificationEnabled: enabled(env.IDENTITY_VERIFICATION_ENABLED),
+    sensitiveContentEnabled: false,
     demoModeEnabled: enabled(env.DEMO_MODE_ENABLED),
     gameEnabled: false,
     emailOtpEnabled: false,
@@ -168,16 +183,24 @@ async function config(env) {
   });
 }
 
-async function adultOnboarding(request, env) {
+async function memberOnboarding(request, env) {
   capability(env, "SOCIAL_APP_ENABLED");
   capability(env, "ADULT_ONBOARDING_ENABLED");
-  const session = await authenticated(request, env, { csrf: true });
+  const session = await authenticated(request, env, { csrf: true, onboarding: true });
+  if (acceptanceFlowEnabled(env) && session.account_state === "active") {
+    const existingProfile = await env.DB.prepare("SELECT 1 present FROM member_profiles WHERE user_id = ?")
+      .bind(session.user_id).first();
+    if (existingProfile) throw new SocialError("onboarding_complete", "สร้างโปรไฟล์เรียบร้อยแล้ว", 409);
+  }
   const betaEnrollment = enabled(env.BETA_INVITATION_REGISTRATION_ENABLED)
     ? await env.DB.prepare(
       "SELECT status FROM beta_enrollments WHERE user_id = ?",
     ).bind(session.user_id).first()
     : null;
-  if (!enabled(env.NEW_ACCOUNT_REGISTRATION_ENABLED) && betaEnrollment?.status !== "pending_age") {
+  const resumableExistingAccount = acceptanceFlowEnabled(env)
+    && session.account_state === "pending_onboarding" && !betaEnrollment;
+  if (!enabled(env.NEW_ACCOUNT_REGISTRATION_ENABLED)
+    && betaEnrollment?.status !== "pending_age" && !resumableExistingAccount) {
     throw new SocialError("registration_closed", "ขณะนี้ยังไม่เปิดรับสมัครบัญชีใหม่", 403);
   }
   if (!hasRecentAuthentication(session)) {
@@ -185,27 +208,40 @@ async function adultOnboarding(request, env) {
   }
   await limited(env, "adult_onboarding_user_hour", session.user_id, 5, 3600);
   const body = await readJson(request);
-  const noticeVersion = String(env.ADULT_NOTICE_VERSION || "");
-  const declaredAge = selfDeclaredAdult(body.dateOfBirth);
-  if (!noticeVersion || body.confirmedAdult !== true || body.noticeVersion !== noticeVersion
-    || !declaredAge.valid || !declaredAge.adult) {
-    throw new SocialError("adult_confirmation_required", "กรุณายืนยันว่าคุณมีอายุ 18 ปีขึ้นไป", 400);
-  }
   const name = cleanText(body.name || session.display_name, 50, { required: true });
   const gender = ALLOWED_GENDERS.has(body.gender) ? body.gender : "ไม่ระบุ";
   const bio = cleanText(body.bio, 250);
   const interests = cleanText(body.interests, 100);
   const timestamp = unixTime();
-  const eventId = safeUuid();
+  const noticeVersion = String(env.ADULT_NOTICE_VERSION || "");
+  let assurance;
+  const assuranceStatements = [];
+  if (acceptanceFlowEnabled(env)) {
+    assurance = await env.DB.prepare(`
+      SELECT id FROM age_assurance_events
+      WHERE user_id = ? AND age_band = 'adult_18_plus' AND method = 'self_declaration'
+        AND notice_version = ? AND revoked_at IS NULL
+      ORDER BY declared_at DESC LIMIT 1
+    `).bind(session.user_id, noticeVersion).first();
+    if (!assurance) throw new SocialError("acceptance_required", "กรุณายืนยันอายุและยอมรับข้อกำหนดก่อน", 403);
+  } else {
+    const declaredAge = selfDeclaredAdult(body.dateOfBirth);
+    if (!noticeVersion || body.confirmedAdult !== true || body.noticeVersion !== noticeVersion
+      || !declaredAge.valid || !declaredAge.adult) {
+      throw new SocialError("adult_confirmation_required", "กรุณายืนยันว่าคุณมีอายุ 18 ปีขึ้นไป", 400);
+    }
+    assurance = { id: safeUuid() };
+    assuranceStatements.push(
+      env.DB.prepare("UPDATE age_assurance_events SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL")
+        .bind(timestamp, session.user_id),
+      env.DB.prepare(`
+        INSERT INTO age_assurance_events(id, user_id, age_band, method, notice_version, declared_at)
+        VALUES (?, ?, 'adult_18_plus', 'self_declaration', ?, ?)
+      `).bind(assurance.id, session.user_id, noticeVersion, timestamp),
+    );
+  }
   await env.DB.batch([
-    env.DB.prepare(`
-      UPDATE age_assurance_events SET revoked_at = ?
-      WHERE user_id = ? AND revoked_at IS NULL
-    `).bind(timestamp, session.user_id),
-    env.DB.prepare(`
-      INSERT INTO age_assurance_events(id, user_id, age_band, method, notice_version, declared_at)
-      VALUES (?, ?, 'adult_18_plus', 'self_declaration', ?, ?)
-    `).bind(eventId, session.user_id, noticeVersion, timestamp),
+    ...assuranceStatements,
     env.DB.prepare(`
       INSERT INTO member_profiles(
         user_id, age_assurance_id, name, gender, bio, interests, created_at, updated_at
@@ -217,10 +253,14 @@ async function adultOnboarding(request, env) {
         bio = excluded.bio,
         interests = excluded.interests,
         updated_at = excluded.updated_at
-    `).bind(session.user_id, eventId, name, gender, bio, interests, timestamp, timestamp),
+    `).bind(session.user_id, assurance.id, name, gender, bio, interests, timestamp, timestamp),
     env.DB.prepare(`
       UPDATE beta_enrollments SET status = 'active', activated_at = ?
       WHERE user_id = ? AND status = 'pending_age'
+    `).bind(timestamp, session.user_id),
+    env.DB.prepare(`
+      UPDATE users SET account_state = 'active', updated_at = ?
+      WHERE id = ? AND status = 'active' AND account_state = 'pending_onboarding'
     `).bind(timestamp, session.user_id),
   ]);
   return json({ profile: await profileFor(env.DB, session.user_id) }, 201);
@@ -1255,7 +1295,9 @@ export async function onRequest({ request, env }) {
     if (!env.DB) throw new Error("missing_db_binding");
     const path = new URL(request.url).pathname;
     if (request.method === "GET" && path === "/api/social/config") return config(env);
-    if (request.method === "POST" && path === "/api/social/onboarding/adult") return await adultOnboarding(request, env);
+    if (request.method === "POST" && (path === "/api/social/onboarding/member" || path === "/api/social/onboarding/adult")) {
+      return await memberOnboarding(request, env);
+    }
     if (path === "/api/social/profile") {
       if (request.method === "GET") return await getProfile(request, env);
       if (request.method === "POST") return await updateProfile(request, env);

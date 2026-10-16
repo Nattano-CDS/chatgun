@@ -12,5 +12,8 @@
 /account.html
   Cache-Control: no-store
 
+/acceptance*
+  Cache-Control: no-store
+
 /app/*
   Cache-Control: no-store

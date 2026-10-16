@@ -37,15 +37,13 @@
 
       <section id="onboarding-view" class="onboarding panel" hidden>
         <div class="section-heading"><div><small>สมาชิกใหม่</small><h1>สร้างโปรไฟล์ ChatGun</h1></div><img src="/logo.svg" alt="" width="64"></div>
-        <p>โปรดกรอกวันเกิดเพื่อให้ระบบตรวจว่าอายุครบ 18 ปี ข้อมูลนี้เป็นการยืนยันด้วยตนเอง ไม่ใช่การตรวจสอบโดยบุคคลที่สาม และระบบจะไม่บันทึกวันเกิด</p>
+        <p>ตั้งค่าโปรไฟล์สำหรับ ChatGun Social การยืนยันอายุและข้อกำหนดของคุณถูกบันทึกแล้ว โดยไม่มีการจัดเก็บวันเกิด</p>
         <form id="onboarding-form" class="form-grid">
           <label>ชื่อที่แสดง<input name="name" maxlength="50" required autocomplete="nickname"></label>
           <label>เพศ<select name="gender"><option>ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option></select></label>
-          <label class="wide">วันเกิด (ใช้คำนวณอายุเท่านั้น)<input type="date" name="dateOfBirth" required autocomplete="bday"></label>
           <label class="wide">เกี่ยวกับคุณ<textarea name="bio" maxlength="250"></textarea></label>
           <label class="wide">ความสนใจ<input name="interests" maxlength="100" placeholder="กาแฟ, เทคโนโลยี, ท่องเที่ยว"></label>
-          <label class="adult-check wide"><input type="checkbox" name="adult" required> ฉันยืนยันว่ามีอายุ 18 ปีขึ้นไป และได้อ่านประกาศสำหรับการทดสอบนี้แล้ว</label>
-          <button class="primary wide" type="submit">สร้างโปรไฟล์และเริ่มใช้งาน</button>
+          <button class="primary wide" type="submit">สร้างโปรไฟล์และเข้าสู่ ChatGun Social</button>
         </form>
       </section>
 

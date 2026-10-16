@@ -27,6 +27,12 @@ import {
   unixTime,
 } from "../../_lib/db.js";
 import { exchangeCode, providerConfiguration, verifyProviderIdentity } from "../../_lib/oauth.js";
+import {
+  acceptanceFlowEnabled,
+  accountJourney,
+  currentAcceptance,
+  requiredAcceptanceVersions,
+} from "../../_lib/acceptance.js";
 
 const PROVIDERS = new Set(["google", "facebook", "line"]);
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
@@ -220,6 +226,12 @@ async function startOauth(request, env, provider) {
     const session = await getSession(request, env.DB);
     if (!session) return failure("กรุณาเข้าสู่ระบบก่อนดำเนินการ", 401, "unauthorized");
     if (!await requireCsrf(request, session)) return failure("คำขอหมดอายุ กรุณาลองใหม่", 403, "invalid_csrf");
+    if (body.link === true && acceptanceFlowEnabled(env)) {
+      const journey = await accountJourney(env.DB, session.user_id, env);
+      if (journey.nextPath !== "/app/") {
+        return failure("กรุณายอมรับข้อกำหนดและสร้างโปรไฟล์ให้เสร็จก่อนเชื่อมบัญชี", 403, "account_setup_required");
+      }
+    }
     linkUserId = session.user_id;
     if (reauthPurpose) {
       const linked = await env.DB.prepare(
@@ -375,7 +387,11 @@ async function oauthCallback(request, env, provider) {
       },
     );
     const session = await issueSession(env.DB, userId, timestamp);
-    return redirect("/account.html", [cookie(OAUTH_COOKIE, "", 0), ...session.cookies]);
+    if (flow.link_user_id) {
+      return redirect("/account.html", [cookie(OAUTH_COOKIE, "", 0), ...session.cookies]);
+    }
+    const journey = await accountJourney(env.DB, userId, env);
+    return redirect(journey.nextPath, [cookie(OAUTH_COOKIE, "", 0), ...session.cookies]);
   } catch (error) {
     console.error(JSON.stringify({ event: "oauth_callback_failed", provider, reason: error?.message || "unknown" }));
     const redirectCode = error?.message === "identity_already_linked"
@@ -392,16 +408,113 @@ async function currentUser(request, env) {
   const identities = await env.DB.prepare(
     "SELECT provider FROM identities WHERE user_id = ? ORDER BY provider",
   ).bind(session.user_id).all();
+  const journey = await accountJourney(env.DB, session.user_id, env);
   return json({
     user: {
       id: session.user_id,
       email: session.email,
       displayName: session.display_name,
       avatarUrl: session.avatar_url,
+      accountState: journey.accountState || session.account_state || "active",
     },
     providers: (identities.results || []).map(({ provider }) => provider),
     recentlyAuthenticated: hasRecentAuthentication(session),
+    acceptanceRequired: journey.acceptanceRequired,
+    nextPath: journey.nextPath,
+    canLinkAccounts: journey.nextPath === "/app/",
   });
+}
+
+async function acceptanceStatus(request, env) {
+  const session = await getSession(request, env.DB);
+  if (!session) return failure("กรุณาเข้าสู่ระบบ", 401, "unauthorized");
+  if (!acceptanceFlowEnabled(env)) return failure("ขั้นตอนนี้ยังไม่เปิดใช้งาน", 404, "feature_disabled");
+  const acceptance = await currentAcceptance(env.DB, session.user_id, env);
+  const journey = await accountJourney(env.DB, session.user_id, env);
+  return json({
+    accepted: acceptance.accepted,
+    required: acceptance.required,
+    versions: acceptance.versions,
+    acceptedAt: acceptance.acceptedAt,
+    accountState: journey.accountState,
+    nextPath: journey.nextPath,
+    user: { displayName: session.display_name },
+  });
+}
+
+async function acceptRequirements(request, env) {
+  requireSameOrigin(request);
+  const session = await getSession(request, env.DB);
+  if (!session) return failure("กรุณาเข้าสู่ระบบ", 401, "unauthorized");
+  if (!acceptanceFlowEnabled(env)) return failure("ขั้นตอนนี้ยังไม่เปิดใช้งาน", 404, "feature_disabled");
+  if (!await requireCsrf(request, session)) return failure("คำขอหมดอายุ กรุณาลองใหม่", 403, "invalid_csrf");
+  const body = await readJson(request);
+  const versions = requiredAcceptanceVersions(env);
+  if (body.confirmedAdult !== true) {
+    return failure("ผู้ที่มีอายุต่ำกว่า 18 ปีไม่สามารถเข้าร่วม ChatGun Beta ได้", 403, "underage_not_eligible");
+  }
+  if (body.acceptedTerms !== true || body.acknowledgedPrivacy !== true
+    || body.adultNoticeVersion !== versions.adultNotice
+    || body.termsVersion !== versions.terms
+    || body.privacyVersion !== versions.privacy) {
+    return failure("กรุณายืนยันข้อกำหนดและนโยบายฉบับปัจจุบัน", 400, "acceptance_required");
+  }
+  const current = await currentAcceptance(env.DB, session.user_id, env);
+  if (current.accepted) {
+    const journey = await accountJourney(env.DB, session.user_id, env);
+    return json({ accepted: true, nextPath: journey.nextPath, alreadyAccepted: true });
+  }
+  const user = await env.DB.prepare(
+    "SELECT account_state FROM users WHERE id = ? AND status = 'active'",
+  ).bind(session.user_id).first();
+  if (!user || user.account_state === "disabled") {
+    return failure("บัญชีนี้ไม่พร้อมใช้งาน", 403, "account_disabled");
+  }
+  const timestamp = unixTime();
+  const profile = await env.DB.prepare("SELECT 1 present FROM member_profiles WHERE user_id = ?").bind(session.user_id).first();
+  const nextState = profile ? "active" : "pending_onboarding";
+  try {
+    await env.DB.batch([
+      env.DB.prepare(`
+        INSERT INTO account_acceptances(
+          id, user_id, adult_notice_version, terms_version, privacy_version,
+          adult_declared_at, terms_accepted_at, privacy_acknowledged_at, accepted_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(safeUuid(), session.user_id, versions.adultNotice, versions.terms, versions.privacy,
+        timestamp, timestamp, timestamp, timestamp),
+      env.DB.prepare(`
+        INSERT INTO age_assurance_events(id, user_id, age_band, method, notice_version, declared_at)
+        SELECT ?, ?, 'adult_18_plus', 'self_declaration', ?, ?
+        WHERE NOT EXISTS (
+          SELECT 1 FROM age_assurance_events
+          WHERE user_id = ? AND notice_version = ? AND revoked_at IS NULL
+        )
+      `).bind(safeUuid(), session.user_id, versions.adultNotice, timestamp,
+        session.user_id, versions.adultNotice),
+      env.DB.prepare(`
+        UPDATE users SET account_state = ?, updated_at = ?
+        WHERE id = ? AND status = 'active' AND account_state != 'disabled'
+      `).bind(nextState, timestamp, session.user_id),
+    ]);
+  } catch (error) {
+    const accepted = await currentAcceptance(env.DB, session.user_id, env);
+    if (!accepted.accepted) throw error;
+  }
+  return json({ accepted: true, nextPath: profile ? "/app/" : "/app/?onboarding=1" });
+}
+
+async function declineAcceptance(request, env) {
+  requireSameOrigin(request);
+  const session = await getSession(request, env.DB);
+  if (!session) return failure("กรุณาเข้าสู่ระบบ", 401, "unauthorized");
+  if (!await requireCsrf(request, session)) return failure("คำขอหมดอายุ กรุณาลองใหม่", 403, "invalid_csrf");
+  await env.DB.prepare("UPDATE sessions SET revoked_at = ? WHERE token_hash = ?")
+    .bind(unixTime(), session.token_hash).run();
+  return appendCookies(json({ declined: true, redirectUrl: "/" }), [
+    cookie(SESSION_COOKIE, "", 0),
+    cookie(CSRF_COOKIE, "", 0, { httpOnly: false }),
+    cookie(OAUTH_COOKIE, "", 0),
+  ]);
 }
 
 async function requestAccountDeletion(request, env) {
@@ -517,6 +630,9 @@ export async function onRequest({ request, env }) {
       return failure("ไม่อนุญาตวิธีเรียกนี้", 405, "method_not_allowed");
     }
     if (request.method === "GET" && path === "/api/auth/me") return await currentUser(request, env);
+    if (request.method === "GET" && path === "/api/auth/acceptance") return await acceptanceStatus(request, env);
+    if (request.method === "POST" && path === "/api/auth/acceptance") return await acceptRequirements(request, env);
+    if (request.method === "POST" && path === "/api/auth/acceptance/decline") return await declineAcceptance(request, env);
     if (request.method === "POST" && path === "/api/auth/logout") return await logout(request, env);
     if (request.method === "POST" && path === "/api/auth/account-deletion/request") {
       return await requestAccountDeletion(request, env);

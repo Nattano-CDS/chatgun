@@ -80,6 +80,7 @@ test("social capabilities fail closed and never expose a game capability", async
     mediaQuarantineEnabled: false,
     ratingsEnabled: false,
     identityVerificationEnabled: false,
+    sensitiveContentEnabled: false,
     demoModeEnabled: false,
     gameEnabled: false,
     emailOtpEnabled: false,
