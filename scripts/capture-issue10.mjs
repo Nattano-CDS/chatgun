@@ -18,7 +18,7 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
     await page.route('**/assets/demo/*.png',async route=>route.fulfill({contentType:'image/png',body:await readFile(resolve('assets/demo',new URL(route.request().url()).pathname.split('/').at(-1)))}));
   }
   const shot=async name=>{
-    await page.evaluate(async()=>{await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,5000))]);await Promise.race([Promise.all([...document.images].filter(i=>i.getBoundingClientRect().top<innerHeight).map(i=>i.decode().catch(()=>{}))),new Promise(r=>setTimeout(r,5000))]);});
+    await page.evaluate(async()=>{await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,5000))]);await Promise.race([Promise.all([...document.images].filter(i=>{const r=i.getBoundingClientRect();return r.width>0&&r.height>0&&r.top<innerHeight&&r.bottom>0;}).map(i=>i.decode().catch(()=>{}))),new Promise(r=>setTimeout(r,5000))]);});
     await page.waitForTimeout(200);
     await page.screenshot({path:resolve(output,`${name}-${width}.png`),fullPage:false});
   };
@@ -76,7 +76,11 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
   await nav('near');await context.setOffline(true);await shot('offline');await context.setOffline(false);
   for(const [name,path] of [['upload-photos',original?'/photos':'/app/photos'],['login',original?'/login':'/signup'],['register',original?'/register':'/acceptance'],['account','/account'],['admin-denied','/app/moderation.html']]){
     if(original&&['account','admin-denied'].includes(name))continue;
-    await attempt(name,async()=>{await page.goto(target+path);if(!original&&name==='account')await page.waitForURL(/\/signup(?:\.html)?(?:\?|$)/,{timeout:10000});});
+    await attempt(name,async()=>{
+      const acceptance=!original&&name==='register'?page.waitForResponse(r=>new URL(r.url()).pathname==='/api/auth/acceptance'&&r.request().method()==='GET'):null;
+      await page.goto(target+path);
+      if(!original&&(name==='account'||(acceptance&&(await acceptance).status()===401)))await page.waitForURL(/\/signup(?:\.html)?(?:\?|$)/,{timeout:10000});
+    });
   }
   await context.close();
 }
