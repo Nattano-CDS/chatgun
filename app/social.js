@@ -651,7 +651,7 @@ async function showPerson(id, { historyMode = "push", photo = null } = {}) {
     const navigation = $('#primary-nav').cloneNode(true);
     navigation.removeAttribute('id');navigation.className='profile-navigation';
     navigation.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));
-    navigation.querySelectorAll('[data-tab]').forEach(e=>{e.dataset.profileTab=e.dataset.tab;delete e.dataset.tab;});
+    navigation.querySelectorAll('[data-tab]').forEach(e=>{e.dataset.profileTab=e.dataset.tab;e.classList.toggle('active',e.dataset.profileTab==='profile');delete e.dataset.tab;});
     $('#profile-dialog').append(navigation);
   }
   const relation = relationshipFor(id);
