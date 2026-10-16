@@ -25,6 +25,7 @@ const state = {
   threadMessages: [],
   threadHasMore: false,
   galleryView: null,
+  chosenAsset: null,
   threadPolling: false,
   locationPermission: null,
   demoGallery: [],
@@ -743,6 +744,14 @@ async function openChat(id) {
   thread.prepend(brand);
   const library = $('.asset-library',thread);
   if (library) $('.thread-head',thread).append(library);
+  state.chosenAsset=null;
+  if(state.config.mediaUploadEnabled){
+    const picker=document.createElement('div');picker.className='chat-image-picker';picker.hidden=true;
+    picker.innerHTML='<div class="image-picker-heading"><strong>เลือกรูปเดิม</strong><button type="button" data-picker-upload>อัปโหลดรูปใหม่</button><button type="button" data-picker-close aria-label="ปิดตัวเลือกรูป">×</button></div><div class="image-picker-carousel"></div>';
+    $('.composer',thread).before(picker);
+    const toggle=document.createElement('button');toggle.type='button';toggle.className='icon-button picker-toggle';toggle.setAttribute('aria-label','เลือกรูปแชท');toggle.setAttribute('aria-expanded','false');toggle.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h9M4 4v16h16v-9M16 3h6M19 0v6M4 16l5-5 5 5 3-3 3 3"/></svg>';
+    $('.composer>label',thread).hidden=true;$('.composer',thread).prepend(toggle);
+  }
   const send = $('.composer>.primary',thread);
   send.setAttribute('aria-label','ส่ง');
   send.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z M22 2 11 13"/></svg>';
@@ -964,6 +973,15 @@ $("#refresh").addEventListener("click", async () => { try { await Promise.all([l
 [$("#people-search"), $("#radius-filter"), $("#gender-filter"), $("#interest-filter"), $("#relationship-filter")].forEach((input) => input.addEventListener("input", renderPeople));
 
 document.addEventListener("click", async (event) => {
+  if(event.target.closest('.picker-toggle')){
+    const picker=$('#thread .chat-image-picker');picker.hidden=!picker.hidden;$('#thread .picker-toggle').setAttribute('aria-expanded',String(!picker.hidden));
+    if(picker.hidden){state.chosenAsset=null;$('#thread input[name=body]').disabled=false;}
+    if(!picker.hidden)try{const{assets}=await api('/api/social/chat-assets');$('.image-picker-carousel',picker).innerHTML=assets.length?assets.map(a=>`<button type="button" data-picker-asset="${escapeHtml(a.id)}" aria-label="เลือกรูปนี้" aria-pressed="false"><img src="${escapeHtml(chatMediaUrl(a.id))}" alt="รูปแชทเดิม"></button>`).join(''):'<p>ยังไม่มีรูปแชทเดิม เลือกอัปโหลดรูปใหม่ได้</p>';const upload=$('[data-picker-upload]',picker);upload.disabled=Number(state.uploadQuotas.chat.remaining)<=0;}catch(error){toast(error.message,true);}return;
+  }
+  if(event.target.closest('[data-picker-upload]')){state.chosenAsset=null;$('#thread input[name=body]').disabled=false;$('#thread input[name=file]').click();return;}
+  if(event.target.closest('[data-picker-close]')){state.chosenAsset=null;$('#thread .chat-image-picker').hidden=true;$('#thread .picker-toggle').setAttribute('aria-expanded','false');$('#thread input[name=body]').disabled=false;return;}
+  const chosen=event.target.closest('[data-picker-asset]');
+  if(chosen){state.chosenAsset=chosen.dataset.pickerAsset;$$('[data-picker-asset]').forEach(b=>{b.classList.toggle('selected',b===chosen);b.setAttribute('aria-pressed',String(b===chosen));});$('#thread input[name=body]').disabled=true;return;}
   if(event.target.closest('[data-apply-filters]')){$('#discovery-filters').close();return;}
   const profileTab=event.target.closest('[data-profile-tab]');
   if(profileTab){$('#profile-dialog').close();history.replaceState({},'', '/');switchTab(profileTab.dataset.profileTab);return;}
@@ -1019,15 +1037,21 @@ document.addEventListener("click", async (event) => {
   if (event.target.closest(".asset-library")) {
     try {
       const assets = (await api("/api/social/chat-assets")).assets;
-      $("#asset-grid").innerHTML = assets.length ? assets.map((asset) => `<button class="gallery-item" data-asset="${escapeHtml(asset.id)}"><img src="${escapeHtml(chatMediaUrl(asset.id))}" alt="รูปที่เคยส่ง"></button>`).join("") : `<p class="subtitle">ยังไม่มีรูปที่ส่งล่าสุด</p>`;
+      $("#asset-grid").innerHTML = assets.length ? assets.map((asset) => `<button data-asset="${escapeHtml(asset.id)}" aria-label="เลือกรูปเพื่อส่งต่อ"><img src="${escapeHtml(chatMediaUrl(asset.id))}" alt="รูปที่เคยส่ง"><span>➤ ส่งต่อ</span></button>`).join("") : `<p class="subtitle">ยังไม่มีรูปที่ส่งล่าสุด</p>`;
       $("#asset-dialog").showModal();
     } catch (error) { toast(error.message, true); }
     return;
   }
   const reusableAsset = event.target.closest("[data-asset]");
   if (reusableAsset) {
-    try { await api("/api/social/messages", { method: "POST", body: { action: "send", target: state.selectedChat, mediaId: reusableAsset.dataset.asset, body: "" } }); $("#asset-dialog").close(); await openChat(state.selectedChat); }
-    catch (error) { toast(error.message, true); }
+    $('#asset-grid').innerHTML=`<div class="forward-friends"><h2>เลือกเพื่อนที่จะส่งรูป</h2>${state.relationships.filter(p=>p.status==='accepted').map(p=>`<button data-forward-user="${escapeHtml(p.other_user_id)}" data-forward-asset="${escapeHtml(reusableAsset.dataset.asset)}">${escapeHtml(p.name)} <span aria-hidden="true">➤</span></button>`).join('')}</div>`;
+    return;
+  }
+  const forward=event.target.closest('[data-forward-user]');
+  if(forward){
+    setBusy(forward,true);
+    try { await api("/api/social/messages", { method: "POST", body: { action: "send", target: forward.dataset.forwardUser, mediaId: forward.dataset.forwardAsset, body: "" } }); $("#asset-dialog").close(); await openChat(forward.dataset.forwardUser); }
+    catch (error) { toast(error.message, true);setBusy(forward,false); }
     return;
   }
   const chat = event.target.closest("[data-chat]");
@@ -1105,9 +1129,10 @@ $("#thread").addEventListener("submit", async (event) => {
   const input = $("input[name=body]", event.target);
   const file = $("input[name=file]", event.target)?.files?.[0];
   const body = input.value.trim();
-  if (!body && !file) return;
+  if (!body && !file && !state.chosenAsset) return;
   setBusy(event.submitter, true);
   try {
+    if(state.chosenAsset){await api('/api/social/messages',{method:'POST',body:{action:'send',target:state.selectedChat,mediaId:state.chosenAsset,body:''}});state.chosenAsset=null;await openChat(state.selectedChat);return;}
     if (file) {
       const optimized = await optimizeImage(file);
       if (state.demo) {

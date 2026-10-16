@@ -51,6 +51,12 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
   for(const tab of ['friends','chat','reviews','profile'])await attempt(tab==='chat'?'inbox':tab,()=>nav(tab));
   await nav('chat');
   await attempt('chat',()=>page.locator(original?'.inbox-row':'.conversation-list .conversation').first().click());
+  if(await page.locator('.picker-toggle').count()){
+    await attempt('image-picker',()=>page.locator('.picker-toggle').click());
+    await page.locator(original?'button[aria-label="ปิดตัวเลือกรูป"]':'[data-picker-close]').click();
+  }else{await shot('image-picker');failures.push({width,name:'image-picker',missing:true,note:'Baseline lacks canonical inline image picker'});}
+  await attempt('chat-gallery-empty',()=>page.locator(original?'.thread-gallery':'.asset-library').click());
+  await page.locator(original?'.chat-gallery-heading button':'#asset-dialog .dialog-close').click();
   await nav('near');
   await attempt('member-profile',()=>page.locator(original?'.card-open':'#people-grid [data-person]').first().click());
   await attempt('member-gallery',()=>page.locator(original?'.profile-gallery-top':'.member-profile-gallery-top').click());

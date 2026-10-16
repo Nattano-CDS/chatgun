@@ -161,6 +161,15 @@ test("browser-only demo supports local gallery and chat image workflows", async 
   await expect(page.locator("#thread .chat-image")).toHaveAttribute("src", /^data:image\//u);
   await page.getByRole("button", { name: "รูปที่ส่งล่าสุด" }).click();
   await expect(page.locator("#asset-grid img")).toHaveAttribute("src", /^data:image\//u);
+  await page.locator('#asset-grid [data-asset]').first().click();
+  await page.locator('[data-forward-user="demo-03"]').click();
+  await expect(page.locator('#thread .chat-image')).toHaveAttribute('src',/^data:image\//u);
+  await expect(page.locator('#chat-upload-quota')).toContainText('9/10');
+  await page.getByRole('button',{name:'เลือกรูปแชท',exact:true}).click();
+  await page.locator('[data-picker-asset]').first().click();
+  await page.locator('#thread .composer').getByRole('button',{name:'ส่ง',exact:true}).click();
+  await expect(page.locator('#thread .chat-image')).toHaveCount(2);
+  await expect(page.locator('#chat-upload-quota')).toContainText('9/10');
 });
 
 test("social shell reports offline state and recovers when connectivity returns", async ({ page, context }) => {
