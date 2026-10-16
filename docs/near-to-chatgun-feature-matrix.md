@@ -50,7 +50,12 @@ Implementation evidence at this checkpoint:
 
 - Migrations `0003_social.sql` and `0004_moderation_audit.sql` were applied only to `chatgun-auth-staging`; three pre-existing staging users were preserved and `PRAGMA foreign_key_check` returned no violations.
 - Production was inspected read-only and still has migrations `0002`–`0004` pending; none were applied.
-- Validated committed-candidate Preview: `https://d0db539e.chatgun.pages.dev`. Social shell, discovery, relationships, messaging, ratings, private media, and invitation-only adult onboarding are enabled against isolated staging only. Public registration, moderation tools, identity verification, Demo, Game, email OTP, and mobile OTP remain disabled. Production has no R2 binding and overrides Beta/social/media capabilities to `false`.
+- Validated exact-head Preview for commit `9fb0eeeb2fd625a0dd2688cbc6a38d9868e62a2d`:
+  `https://8d5486db.chatgun.pages.dev`. Social shell, discovery, relationships, messaging,
+  ratings, private media, and invitation-only adult onboarding are enabled against isolated
+  staging only. Public registration, moderation tools, identity verification, Demo, Game,
+  email OTP, and mobile OTP remain disabled. Production has no R2 binding and overrides
+  Beta/social/media capabilities to `false`.
 - Current automated evidence: 63 unit/integration tests pass; the full deployed-Preview suite passed 30 tests with 4 intentional project-specific skips. Details and screenshots are recorded in `docs/near-migration-validation.md` and PR #6.
 - R2 is active. Private bucket `chatgun-media-staging` and scheduled Worker `chatgun-media-cleanup-staging` are staging-only. Live tests verified private reads, metadata removal, deletion/account-deletion queues, and an empty post-test bucket. No NEAR, PiggyPrice, or Production resource was accessed or mutated.
 
@@ -58,7 +63,7 @@ Implementation evidence at this checkpoint:
 
 | Feature | Original source files | Original route/page | API endpoints | Database tables | UI components | Dependencies | Current NEAR functionality | ChatGun destination | Migration status | Verification evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Authentication and session entry | `app/chatgpt-auth.ts`, `app/login/page.tsx`, `app/logout-button.tsx`, `app/auth-link.tsx`, `app/site-shell.tsx` | `/login`, dispatch-owned sign-in/sign-out routes | Dispatch-owned SIWC routes | Identity is supplied by Sites; profile data uses `profiles` | Login panel, account state, logout link | ChatGPT SIWC, request identity headers | Signs visitors in, preserves a stable site-scoped user ID, and returns to the app | Keep ChatGun Google, Facebook, and LINE OAuth, secure sessions, logout, linking, CSRF, Turnstile, and rate limits from PR #3/#5; do not migrate SIWC | **Partially migrated** | PR #3 tests cover destination auth internals; real-provider public-launch approval remains separate. NEAR v91 source proves SIWC behavior. |
+| Authentication and session entry | `app/chatgpt-auth.ts`, `app/login/page.tsx`, `app/logout-button.tsx`, `app/auth-link.tsx`, `app/site-shell.tsx` | `/login`, dispatch-owned sign-in/sign-out routes | Dispatch-owned SIWC routes | Identity is supplied by Sites; profile data uses `profiles` | Login panel, account state, logout link | ChatGPT SIWC, request identity headers | Signs visitors in, preserves a stable site-scoped user ID, and returns to the app | Keep ChatGun Google, Facebook, and LINE OAuth, secure sessions, logout, linking, CSRF, Turnstile, and rate limits from PR #3/#5; do not migrate SIWC | **Partially migrated** | PR #3 tests cover destination auth internals. The final exact-head browser run was blocked by an interactive Turnstile challenge before provider redirect; no Google/Facebook/LINE success is claimed. NEAR v91 source proves SIWC behavior. |
 | New-member registration and onboarding | `app/register/page.tsx`, `app/register/register-form.tsx`, `app/api/near/route.ts` | `/register` | `POST /api/near` (`profile`) | `profiles` | Registration form, authenticated return flow | SIWC, D1 | Creates a display profile with name, gender, bio, and interests | Add authenticated ChatGun member onboarding after social login; connect `users.id` to the social profile model | **Implemented for controlled staging; launch-gated** | Public registration stays off. A one-use hashed invitation is bound to OAuth and consumed transactionally; the new account remains `pending_age` until recent-authenticated server-side 18+ onboarding creates its profile. |
 | Age eligibility | No age field or gate exists in NEAR | None | None | None | None | None | NEAR does not collect or enforce age | Add the requested 18+ gate only after owner/legal approval of threshold, assurance method, evidence minimization, correction, and evasion controls | **Technically implemented; policy-gated** | Bangkok-date DOB calculation rejects under-18/invalid claims and stores only an adult self-declaration event. It is not independent verification; owner and qualified Thai legal approval remain required. |
 | Application shell and navigation | `app/site-shell.tsx`, `app/near.tsx`, `app/bottom-nav.tsx`, `app/layout.tsx` | `/` | None directly | None | Desktop/sidebar-derived shell, sticky toolbar, six-item mobile bottom navigation | Next/Vinext, React, Lucide | Navigates discovery, friends, chat, private reviews, game, and profile; preserves badges and route state | Recreate five non-game destinations with ChatGun branding; omit game navigation | **Migrated and verified** | Deployed Preview desktop/mobile tests cover all five non-game destinations; Game has no route, control, API, schema, asset pack, or dependency. |
@@ -164,16 +169,22 @@ The shared `api-client`, `visible-poll`, `Portrait`, chat, profile, demo-store, 
 - Last stable implementation: **Sites version 91 / commit `98bb83e`**, active and successfully published.
 - NEAR non-game product features inventoried: **26**, plus **1** destination-required account-deletion integration row.
 - Migrated and verified without a launch dependency: **4** (application shell/navigation, optional browser-only demo, offline/recovery UX, and responsive/accessibility layout).
-- Live staging verified but public-launch gated: **14** (presence, coarse-distance discovery,
-  filters, member profile, profile/privacy settings, friend requests, friend list, text
-  messaging, unread/device notifications, ratings, blocking, reporting, private gallery media,
-  and relationship-authorized chat media).
-- Partially migrated or operationally gated: **4** (provider authentication/publishing,
-  moderation staffing/message audit, production media scanning, and Production account-deletion
-  operation).
-- Blocked on an external prerequisite: **8** (registration/onboarding, age eligibility, profile media, gallery, photo likes, photo comments, chat images, and identity verification).
+- Live staging verified but public-launch gated: **18** (presence, coarse-distance discovery,
+  filters, member profile, profile/privacy settings, profile-photo management, gallery, likes,
+  comments, friend requests, friend list, text messaging, chat images, unread/device
+  notifications, ratings, blocking, reporting, and account deletion).
+- Technically implemented but policy/operationally gated: **3** (invitation onboarding,
+  self-declared adult eligibility, and moderator message/media audit).
+- Partially migrated: **1** (provider authentication: code-level validation passes, but the
+  final real-provider browser journeys are blocked at interactive Turnstile and remain
+  unverified).
+- Blocked on an external prerequisite: **1** (high-risk identity verification activation).
 - Excluded game areas: **11 groups**, covering all current game UI, logic, APIs, tables, assets, dependencies, and tests.
-- Verified implementation/parity evidence exists for **16 of 27 rows** (4 dependency-free plus 12 isolated live-staging rows). Launch-gated rows are not represented as Production-ready.
+- Verified technical implementation/parity evidence exists for **25 of 27 rows** (4
+  dependency-free, 18 isolated live-staging, and 3 technically verified but operationally
+  gated). The provider-authentication row is not counted without real-provider E2E; identity
+  verification is deliberately blocked. Launch-gated rows are not represented as
+  Production-ready.
 
 Production activation remains blocked until the 18+ age-assurance decision, staffed social
   safety operations, location/media policy approval, production scanner decision, provider

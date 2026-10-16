@@ -9,7 +9,9 @@ Scope: isolated Preview and `chatgun-auth-staging` only
 - Cloudflare account confirmed before mutation: `23017b53386fb67fc62a52cdd017454c` (ChatGun).
 - No PiggyPrice or NEAR Cloudflare resource was accessed or modified.
 - No ChatGun Production deployment, D1 migration, user-data mutation, PR merge, or legal publication occurred. Only clearly prefixed synthetic rows were created or replaced in staging.
-- Validated committed-candidate Preview: `https://d0db539e.chatgun.pages.dev`.
+- Validated exact-head Preview for commit `9fb0eeeb2fd625a0dd2688cbc6a38d9868e62a2d`:
+  `https://8d5486db.chatgun.pages.dev` (deployment
+  `8d5486db-42ac-4fa7-857a-99522dca57d4`).
 - Preview enables invitation-only 18+ onboarding plus the social shell, discovery, friend requests, messaging, ratings, and private gallery/chat media for authorized staging tests. Public registration, moderation tools, identity verification, Demo, Game, email OTP, and mobile OTP remain disabled. Production has no `MEDIA` binding and keeps Beta onboarding, media, and every social capability disabled.
 - R2 bucket `chatgun-media-staging` and Worker `chatgun-media-cleanup-staging` are staging-only. No custom domain or public R2 development URL was enabled.
 
@@ -38,12 +40,16 @@ Post-migration checks:
 | Suite | Result | Coverage summary |
 | --- | --- | --- |
 | Node unit/integration | 63 passed, 0 failed | Prior auth/social/privacy regressions plus invalid/expired/revoked/reused/racing/multi-use invitation rejection, existing login while registration is closed, Bangkok birthday boundaries, under-age rejection, coarse location disclosure, anti-probing limits, media quarantine/release authorization/audit, image validation, and deletion transitions |
-| Complete deployed-Preview Playwright suite | 30 passed, 0 failed, 4 intentional project-specific skips | Real Pages/D1/R2 API flows plus desktop/mobile rendering, baseline auth/legal/social/moderation regressions, offline recovery, Demo isolation, and Game absence |
+| Complete deployed-Preview Playwright suite | 30 passed, 0 failed, 4 intentional project-specific skips | Real Pages/D1/R2 API flows plus desktop/mobile rendering, baseline auth/legal/social/moderation regressions, offline recovery, Demo isolation, and Game absence. The skips are reciprocal project exclusions: three state-mutating live flows run once on desktop, while the dedicated mobile shell assertion runs only on mobile. |
 | Live Pages/API flow | passed | Existing non-media flows plus gallery/chat upload and download; owner/friend/stranger/anonymous authorization; selection, like, comment, delete; block revocation; MIME spoof rejection; metadata removal; account deletion |
 | Real Preview HTTP | passed | `/app/` 200/no-store/noindex; same-origin geolocation; invitation-only adult onboarding and private media true only in Preview; public registration/moderation/verification/Demo/Game/OTP false |
 | Preview D1/R2 | passed | `DB → chatgun-auth-staging`; `MEDIA → chatgun-media-staging`; scheduled queue drain completed all synthetic object operations; final bucket size/object count and D1 media/pending counts are zero; foreign keys clean |
 
-Playwright screenshots are generated locally under `test-results/artifacts/` for desktop and mobile. They are test artifacts, not Production assets.
+Playwright screenshots are generated locally under `test-results/artifacts/` and
+`test-results/screenshots/` for desktop and mobile. They are test artifacts, not Production
+assets. The exact 2026-10-16 run produced signup, social-shell, persisted live-social, and
+mobile-navigation captures; their paths and hashes are recorded in
+`docs/final-uat-beta-readiness.md`.
 
 ## Security properties verified in code/tests
 
@@ -71,7 +77,12 @@ Playwright screenshots are generated locally under `test-results/artifacts/` for
 2. **Moderation operation:** designate trained role holders and approve media/report/message access, scanning, escalation, takedown, appeal, and incident runbooks. Media is technically verified in isolated staging but remains public-launch gated.
 3. **Location/media policy:** approve location retention/visibility and media/content retention rules; confirm whether a malware/content-safety scanning provider is required before public uploads.
 4. **Identity verification:** requires an explicit necessity/lawful-basis decision, approved notice, reviewer process, and incident response. Keep disabled.
-5. **Provider/public E2E:** real Google/Facebook/LINE login, linking, and logout still require approved public-provider test identities and publishing status.
+5. **Provider/public E2E:** the exact-head browser run reached Preview Turnstile, which
+   requested an interactive human challenge before any provider redirect. The challenge was
+   not solved or bypassed, so real Google/Facebook/LINE login, account-page session, linking,
+   and logout are explicitly untested in this candidate. An authorized human must complete
+   Turnstile and any provider account-selection, consent, password, or MFA prompts for each
+   existing staging identity, then record the callback/account/logout result.
 
 ## Assessment
 
