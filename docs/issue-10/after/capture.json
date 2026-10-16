@@ -1,6 +1,8 @@
 {
-  "target": "http://127.0.0.1:8788",
+  "target": "https://codex-chatgun-release-candid.chatgun.pages.dev",
+  "commit": "a1e5463aa9681cb1d01acba207e0f5433457f475",
   "kind": "live-site",
+  "fixture": "chatgun-browser-demo-v1; browser-only adapter and empty-state variations",
   "viewports": [
     [
       390,

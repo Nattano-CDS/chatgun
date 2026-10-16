@@ -1,6 +1,6 @@
 # Issue #10 — consolidated parity remediation
 
-Status: validation in progress; not a claim of pixel identity or real-user launch readiness.
+Status: release-candidate validation passed for the fictional demonstration; not a claim of pixel identity or real-user launch readiness. Actual Production publication is verified separately.
 
 ## Reference and evidence
 
@@ -41,6 +41,7 @@ The historical overlapping Friends headings were already corrected in the Produc
 - Original NEAR has no equivalent post-OAuth acceptance state machine, versioned legal acceptance, secure account deletion, media quarantine/appeals or role-audited moderation dashboard. Those are tested as labelled browser fixtures and backend regressions, not falsely marked pixel-equivalent.
 - Synthetic distances remain labelled as fictional, and no actual coordinates or device geolocation are requested by demo mode.
 - Safety/report/block/delete/quota controls remain available where authorized; private comments remain permission checked. Source's smaller controls are not copied where this would undermine minimum touch targets or conceal safety actions.
+- Existing authorized ChatGun quick actions remain available on portrait cards. Their visible shortcuts and clearer request wording are retained functionality, not a claim that every original NEAR card has an identical action set.
 - Production legal routes remain a factual demo notice, not publication of unapproved legal drafts. `/welcome` retains the separate marketing page.
 - Fictional review/message text and timestamps differ from original's built-in eight-person sample; the comparison adapter supplies the approved 20-person public fixture instead.
 
@@ -61,3 +62,24 @@ Build uses the explicit `dist` public-asset boundary. Credentials, tests, docume
 ## Remaining non-visual launch constraints
 
 No public registration, real-user invitations, Sensitive Content or live Production media/Admin enablement is authorized by this remediation. Legal approval, provider publishing, verified Production Admin bootstrap, moderation backup/coverage limitations and content-safety operations remain separate real-user Beta blockers. This report must not be used as approval to remove those gates.
+
+## Final release-candidate validation
+
+Validated runtime commit: `a1e5463aa9681cb1d01acba207e0f5433457f475` on the [authorized stable Preview](https://codex-chatgun-release-candid.chatgun.pages.dev). Subsequent evidence-only commits must preserve this runtime tree.
+
+| Check | Actual result |
+| --- | --- |
+| Unit, local database integration and security regressions | **96 passed; 0 failed; 0 skipped**, including every deployable JavaScript file parsing |
+| Full configured Playwright desktop/mobile suite | **48 passed; 0 failed; 26 skipped** (74 total) |
+| Three explicit reference widths | 390×844, 768×1024, 1440×1100; geometry, overflow, fixed navigation and composer clearance passed |
+| Browser-only network workflows | Profile edit, request/accept/reject, blocking/unblocking, chat persistence, image upload/reuse/forwarding, gallery likes/comments, reports, quotas and recovery passed |
+| Protected workflows | Acceptance/onboarding/account/deletion/Admin displayed in labelled browser API fixtures; authorization and deletion server regressions in local integration tests |
+| Production database | No pending migrations; foreign-key violations **0**; integrity query wrote **0** rows and did not change the database |
+| Isolation | Different D1 IDs; staging R2 preserved; Production R2 unbound; all real-user Production gates unchanged |
+| Rollback | Previous successful Production deployment and SHA verified; frontend rollback requires no database restore |
+
+The 26 browser skips comprise 16 live-session/D1/R2 suites deliberately not enabled, 9 duplicate explicit-width tests in the mobile project, and 1 desktop-inapplicable mobile-only test. No skipped scenario is called a PASS. Real Google/Facebook/LINE callbacks were **not repeated**: provider configurations and the authentication backend are unchanged. Widget initialization on the authorized hostname is not proof of successful CAPTCHA verification or an OAuth callback.
+
+Decision: **GO for the corrected fictional demonstration release**, subject to actual Production smoke/SHA verification. **NO-GO for real-user Beta or enabling live Production features**. Native iOS keyboard/assistive-technology behavior, a new real OAuth callback run, live media/deletion mutations and human moderation operations are not newly certified by these browser captures.
+
+Production publication results and the exact served SHA are recorded in the release comment on PR #11 and the final owner-review package; they must not be inferred from a successful Preview build alone.

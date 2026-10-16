@@ -33,5 +33,11 @@
     "sha": "5d8fb15a37031c2d150ab39fa60fd473e13e7418"
   },
   "migrations": "Read-only Wrangler listing: no pending Production migrations",
-  "dataMutations": "none"
+  "dataMutations": "none",
+  "productionForeignKeyCheck": {
+    "violations": 0,
+    "rowsRead": 0,
+    "rowsWritten": 0,
+    "changedDatabase": false
+  }
 }

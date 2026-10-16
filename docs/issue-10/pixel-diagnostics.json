@@ -1,0 +1,506 @@
+[
+  {
+    "name": "discovery",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 12.89,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "friends",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 19.43,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "inbox",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 16,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "chat",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 30.61,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "profile",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 8.5,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "reviews",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 10.42,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "member-profile",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 24.98,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "member-gallery",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 7.43,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "gallery-post",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 6.1,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "login",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 12.84,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "register",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 13.47,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "search-empty",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 14.66,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "filters",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 16.27,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "friends-empty",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 7.38,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "inbox-empty",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 2.77,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "reviews-empty",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 5.02,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "own-gallery-empty",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 9.42,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "offline",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 56.26,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "upload-photos",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 9.42,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "image-picker",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 23.08,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "chat-gallery-empty",
+    "width": 390,
+    "height": 844,
+    "rawChangedPercent": 13.69,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "discovery",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 11.31,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "friends",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 19.12,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "inbox",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 5.19,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "chat",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 15.88,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "profile",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 11.54,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "reviews",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 7.23,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "member-profile",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 22.16,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "member-gallery",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 8.72,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "gallery-post",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 28.49,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "login",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 7.23,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "register",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 7.24,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "search-empty",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 5.82,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "filters",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 9.94,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "friends-empty",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 3.82,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "inbox-empty",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 1.45,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "reviews-empty",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 2.86,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "own-gallery-empty",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 6.9,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "offline",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 60.83,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "upload-photos",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 6.9,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "image-picker",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 13.91,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "chat-gallery-empty",
+    "width": 768,
+    "height": 1024,
+    "rawChangedPercent": 12.16,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "discovery",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 10.48,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "friends",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 10.37,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "inbox",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 6,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "chat",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 10.14,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "profile",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 6.26,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "reviews",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 4.59,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "member-profile",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 10.9,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "member-gallery",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 5.24,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "gallery-post",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 7.18,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "login",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 3.97,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "register",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 3.97,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "search-empty",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 3.2,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "filters",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 10.54,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "friends-empty",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 2.1,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "inbox-empty",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 0.86,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "reviews-empty",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 1.65,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "own-gallery-empty",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 1.89,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "offline",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 49.03,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "upload-photos",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 1.89,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "image-picker",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 8.88,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  },
+  {
+    "name": "chat-gallery-empty",
+    "width": 1440,
+    "height": 1100,
+    "rawChangedPercent": 12.64,
+    "threshold": 20,
+    "note": "Unmasked diagnostic, not a pass score: branding, omitted Game, dynamic times and purposeful security differences included."
+  }
+]

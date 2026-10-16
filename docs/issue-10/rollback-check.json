@@ -1,0 +1,8 @@
+{
+  "deployment": "50223453-56bf-46d8-ae01-831ac71bb91b",
+  "environment": "production",
+  "sha": "5d8fb15a37031c2d150ab39fa60fd473e13e7418",
+  "status": "success",
+  "mode": "verified recovery target, not exercised during this release",
+  "d1RestoreRequired": false
+}
