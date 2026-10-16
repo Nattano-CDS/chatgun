@@ -7,10 +7,15 @@ treated as sufficient consent or contractual capacity under Thai law.
 
 - New-account registration is disabled server-side.
 - Existing linked accounts may sign in so staging testers are not locked out.
-- Public discovery and unsolicited messaging are disabled and have no API implementation.
+- Invitation-only adult onboarding exists only in Preview and remains subject to owner/legal
+  approval before any real invitation is issued.
+- Discovery, friend requests, messaging, ratings, and media APIs are implemented and enabled in
+  the current synthetic Preview for parity testing. They are disabled in Production and must
+  remain unavailable to real participants until the controlled-Beta wave gates are approved.
 - Email OTP, mobile OTP and LINE email permission remain disabled.
-- No date of birth, government ID or parent contact is collected while the lawful and
-  proportionate model is unresolved.
+- Preview adult onboarding uses date of birth transiently to calculate an age band and does not
+  store the date. Government ID and parent contact are not collected; identity verification is
+  disabled.
 
 ## Owner and legal decision required
 
@@ -78,6 +83,6 @@ review before migration work begins.
 
 ## Activation gate
 
-Registration, discovery and messaging remain **NO-GO** until the selected age model,
+Real-user registration, discovery and messaging remain **NO-GO** until the selected age model,
 minor-safe defaults, moderation operations, data-retention rules and approved legal notices
 are all implemented and independently tested.

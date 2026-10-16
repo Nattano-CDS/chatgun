@@ -247,3 +247,27 @@ across two users, no duplicate provider subjects, no foreign-key violations, and
 invitations/enrollments. Logout revoked the newest linked-account session, and direct account
 access redirected to signup. No Production, PiggyPrice, provider-publishing, or invitation state
 was changed.
+
+## Controlled Beta operational review
+
+The final operational review does not change the technical Preview authentication result, but
+it confirms that the current synthetic-UAT configuration must not receive real invitations.
+Preview currently enables discovery, friend requests, messaging, ratings, and uploads while
+media quarantine and moderation tools are off. That is suitable only for the authorized
+synthetic parity suite. A real-participant Wave 1 requires an isolated, fail-closed configuration
+with discovery, location, friend requests, messaging, ratings, identity verification, and all
+uploads off; named reviewers must have tested, least-privilege moderation access before block and
+report tools are represented as operational.
+
+The remaining owner decisions and exact stop conditions are recorded in
+`docs/controlled-beta-owner-decisions.md`. The report lifecycle and implementation gaps are in
+`docs/moderation-operations-runbook.md`; staged rollout/rollback and the feature boundary are in
+`docs/controlled-beta-readiness.md`. Policy comparison found that the consolidated legal draft
+is substantially aligned with the implementation, but the reachable `privacy.html`,
+`terms.html`, and `data-deletion.html` pages are materially incomplete for real social-feature
+participants. They require owner/legal-approved replacements before invitations. A bilingual
+Beta participation notice is drafted but deliberately unapproved.
+
+Therefore the evidence-based decision remains: **GO for synthetic staging UAT; NO-GO for any
+real-user Beta until the owner/legal/staffing checklist is signed and the exact Wave 1
+configuration passes acceptance; NO-GO for Production.**

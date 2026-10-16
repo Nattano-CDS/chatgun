@@ -5,6 +5,13 @@ document does not authorize Production deployment, provider publishing, or publi
 registration. Reviewed against commit `21ab7834ce9107c92a5826d00920e999efc829e9` and the
 changes in this branch on 16 October 2026.
 
+> Superseding checkpoint (2026-10-16): real Google, Facebook, and LINE Preview OAuth E2E,
+> positive/negative account linking, and the final 63-test/25-executed-Playwright regression are
+> documented in `docs/final-uat-beta-readiness.md`. The older deployment/test counts below are
+> preserved as evidence from the original trust-and-safety implementation pass, not the current
+> release result. Controlled-Beta decisions now live in
+> `docs/controlled-beta-owner-decisions.md` and `docs/controlled-beta-readiness.md`.
+
 ## Implemented in this review
 
 - The adult gate now requires a syntactically valid date of birth and calculates age on the
