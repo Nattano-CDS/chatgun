@@ -35,8 +35,10 @@ Existing active accounts with the current evidence and a profile go directly to 
 ## Automated evidence
 
 - Node unit/integration/security suite: 72 passed, 0 failed.
-- Focused Playwright acceptance UI: 2 passed (desktop and mobile), including unchecked defaults, policy links, versioned submission, responsive rendering, and onboarding redirect.
+- Stable-Preview Playwright suite on `https://codex-near-migration.chatgun.pages.dev`: 27 passed, 0 failed, 9 skipped. The skipped cases are the eight live-social project runs that require an explicitly supplied synthetic session bundle plus the intentional desktop exclusion for the mobile-only layout assertion.
+- Acceptance UI passed on desktop and mobile, including unchecked defaults, policy links, versioned submission, responsive rendering, and onboarding redirect. Preview screenshots were captured locally as test artifacts.
 - Covered: pending-account bypass rejection, false/underage declaration rejection, stale-version rejection, acceptance recovery, Terms version change, one-time acceptance, onboarding activation, duplicate-onboarding rejection, decline/session revocation, same-origin/CSRF enforcement, invitation-bound OAuth creation, account-linking regression, and account-deletion regression.
+- Preview HTTP checks confirmed `/acceptance` is no-store, unauthenticated acceptance status returns `401`, OTP remains disabled, and `sensitiveContentEnabled` is false. A post-migration foreign-key check returned no violations.
 
 ## Remaining release blockers
 
