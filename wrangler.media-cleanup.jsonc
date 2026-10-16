@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "chatgun-media-cleanup-staging",
+  "main": "workers/media-cleanup.js",
+  "compatibility_date": "2026-10-15",
+  "triggers": {
+    "crons": ["37 3 * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "chatgun-auth-staging",
+      "database_id": "5bbfd55d-eb22-4324-8a7d-57bef14110ea",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "chatgun-media-staging"
+    }
+  ]
+}

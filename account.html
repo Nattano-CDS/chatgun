@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>บัญชี ChatGun</title>
+  <link rel="icon" href="./favicon.svg">
+  <link rel="stylesheet" href="./auth-shell.css">
+  <link rel="stylesheet" href="./account.css">
+  <script defer src="./account.js"></script>
+</head>
+<body class="auth-page">
+  <header class="auth-header"><a class="auth-brand" href="/"><img src="/logo.svg" alt=""><span>Chat<span>Gun</span></span></a><a class="auth-header-link" href="/">กลับไปหาเพื่อน</a></header>
+  <main class="section account-card">
+    <img src="./logo.svg" alt="ChatGun" width="90">
+    <h1>ยินดีต้อนรับสู่ ChatGun</h1>
+    <p id="status">กำลังตรวจสอบบัญชี...</p>
+    <a id="open-social" class="button" href="./app/" hidden>เปิด ChatGun Social</a>
+    <section id="linking" class="account-section" hidden>
+      <h2>เชื่อมบัญชีเข้าสู่ระบบ</h2>
+      <p class="section-lead">เพิ่มวิธีเข้าสู่ระบบให้บัญชีนี้อย่างปลอดภัย</p>
+      <div class="link-grid"><button class="link-provider" data-provider="google" type="button">Google</button><button class="link-provider" data-provider="facebook" type="button">Facebook</button><button class="link-provider" data-provider="line" type="button">LINE</button></div>
+      <div id="turnstile" class="turnstile" aria-label="การตรวจสอบความปลอดภัย"></div>
+      <p id="message" class="account-message" role="status" aria-live="polite"></p>
+    </section>
+    <section id="deletion" class="account-section danger-zone" hidden>
+      <h2>ลบบัญชี</h2>
+      <p>การยืนยันจะปิดการเข้าถึงทันที ลบบัญชี โปรไฟล์ ความสัมพันธ์ เนื้อหาที่เกี่ยวข้อง ลิงก์ Google/Facebook/LINE และเซสชัน ระบบอาจต้องให้คุณยืนยันตัวตนกับผู้ให้บริการอีกครั้ง ไฟล์รูปภาพจะเข้าสู่คิวลบแยกต่างหาก</p>
+      <button id="delete-start" class="danger" type="button">เริ่มคำขอลบบัญชี</button>
+      <div id="delete-reauth" hidden><p>เลือกบัญชีที่เชื่อมไว้เพื่อยืนยันตัวตนอีกครั้ง:</p><div id="reauth-providers" class="link-grid"></div></div>
+      <form id="delete-confirm" class="deletion-confirm" hidden>
+        <label for="delete-phrase">พิมพ์ <strong>ลบบัญชีถาวร</strong> เพื่อยืนยัน</label>
+        <input id="delete-phrase" name="confirmText" autocomplete="off" required>
+        <button class="danger danger-confirm" type="submit">ยืนยันลบบัญชีถาวร</button>
+      </form>
+      <p id="delete-message" class="account-message" role="status" aria-live="polite"></p>
+    </section>
+    <button id="logout" class="button" hidden>ออกจากระบบ</button>
+  </main>
+</body>
+</html>

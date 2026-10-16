@@ -1,1 +1,28 @@
-<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>สมัครสมาชิก | ChatGun</title><link rel="icon" href="./favicon.svg"><link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./signup.css"><script defer src="./signup.js"></script></head><body><header><a href="./" class="brand"><img src="./logo.svg" width="40" alt=""><span>Chat<span class="gradient">Gun</span></span></a><a href="./">← กลับหน้าแรก</a></header><main><aside><span class="eyebrow">WELCOME TO CHATGUN ✦</span><h1>มาเป็นส่วนหนึ่ง<br><span class="gradient">ของเรื่องราวดี ๆ</span></h1><p>แชทกัน แชร์กัน เจอกัน — พบเพื่อนใหม่และคอมมูนิตี้ที่ใช่</p></aside><section class="card"><h2>สร้างบัญชีใหม่</h2><p>เลือกวิธีสมัครสมาชิกที่สะดวกสำหรับคุณ</p><div class="providers"><button data-provider="line" class="line">LINE</button><button data-provider="facebook" class="facebook">Facebook</button><button data-provider="google" class="google">Google</button></div><div class="separator">หรือสมัครด้วย OTP</div><div class="tabs"><button id="phone-tab" class="active" type="button">เบอร์มือถือ</button><button id="email-tab" type="button">อีเมล</button></div><form id="start"><label for="contact" id="contact-label">เบอร์มือถือ (+66)</label><input id="contact" type="tel" inputmode="tel" autocomplete="tel" placeholder="0812345678" required><button class="primary" type="submit">ส่งรหัส OTP →</button></form><form id="verify" hidden><p>ส่งรหัสไปที่ <strong id="destination"></strong></p><label for="code">รหัส OTP 6 หลัก</label><input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required placeholder="000000"><button class="primary" type="submit">ยืนยันและสมัครสมาชิก →</button><button id="resend" type="button" class="link">ส่งรหัสใหม่</button><button id="change" type="button" class="link">เปลี่ยนช่องทาง</button></form><p id="message" role="status" aria-live="polite"></p><small>การสมัครสมาชิกถือว่ายอมรับข้อกำหนดและนโยบายความเป็นส่วนตัวของ ChatGun</small></section></main></body></html>
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>สมัครสมาชิก | ChatGun</title>
+  <link rel="icon" href="./favicon.svg">
+  <link rel="stylesheet" href="./auth-shell.css">
+  <link rel="stylesheet" href="./signup.css">
+  <script defer src="./signup.js"></script>
+</head>
+<body class="auth-page">
+  <header class="auth-header"><a href="/welcome" class="auth-brand"><img src="./logo.svg" alt=""><span>Chat<span>Gun</span></span></a><a class="auth-header-link" href="/welcome">เกี่ยวกับ ChatGun</a></header>
+  <main class="auth-content">
+    <section class="auth-panel signup-panel">
+      <div class="auth-mark" aria-hidden="true"><img src="./logo.svg" alt=""></div>
+      <p class="auth-kicker">เข้าสู่ ChatGun</p>
+      <h2 id="auth-heading">เข้าสู่ระบบด้วยบัญชีเดิม</h2><p id="auth-description">การสมัครบัญชีใหม่ยังไม่เปิดเป็นสาธารณะ</p>
+      <div class="providers"><button type="button" data-provider="line" class="line">ดำเนินการต่อด้วย LINE</button><button type="button" data-provider="facebook" class="facebook">ดำเนินการต่อด้วย Facebook</button><button type="button" data-provider="google" class="google">ดำเนินการต่อด้วย Google</button></div>
+      <p id="social-consent" class="social-consent">เมื่อดำเนินการต่อ ChatGun จะรับชื่อ รูปโปรไฟล์ และอีเมลเท่าที่ผู้ให้บริการอนุญาต เพื่อยืนยันบัญชีเดิมและรักษาความปลอดภัยในการเข้าสู่ระบบ</p>
+      <div id="turnstile" class="turnstile" aria-label="การตรวจสอบความปลอดภัย"></div>
+      <button id="turnstile-retry" class="turnstile-retry" type="button" hidden>ลองโหลดระบบยืนยันอีกครั้ง</button>
+      <p id="message" class="auth-message" role="status" aria-live="polite"></p>
+      <p class="auth-note">หลังเข้าสู่ระบบ สมาชิกใหม่จะได้อ่านและยืนยัน<a href="./terms.html">ข้อกำหนดการใช้บริการ</a>และ<a href="./privacy.html">นโยบายความเป็นส่วนตัว</a>ก่อนสร้างโปรไฟล์</p>
+    </section>
+  </main>
+</body>
+</html>

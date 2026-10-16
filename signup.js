@@ -1,1 +1,189 @@
-"use strict";const $=id=>document.getElementById(id);let channel="phone",challenge=null,busy=false;function msg(s,ok=false){$("message").textContent=s;$("message").classList.toggle("ok",ok)}function lock(v){busy=v;document.querySelectorAll("button").forEach(b=>b.disabled=v)}function switchTo(c){channel=c;challenge=null;$("verify").hidden=true;$("start").hidden=false;$("phone-tab").classList.toggle("active",c==="phone");$("email-tab").classList.toggle("active",c==="email");$("contact-label").textContent=c==="phone"?"เบอร์มือถือ (+66)":"อีเมล";$("contact").type=c==="phone"?"tel":"email";$("contact").inputMode=c==="phone"?"tel":"email";$("contact").placeholder=c==="phone"?"0812345678":"you@example.com";$("contact").value="";msg("")} $("phone-tab").onclick=()=>switchTo("phone");$("email-tab").onclick=()=>switchTo("email");function destination(){const s=$("contact").value.trim();if(channel==="phone"){const n=s.replace(/\D/g,"");if(!/^0[689]\d{8}$/.test(n))throw Error("กรุณากรอกเบอร์มือถือไทยให้ถูกต้อง");return "+66"+n.slice(1)}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s))throw Error("กรุณากรอกอีเมลให้ถูกต้อง");return s.toLowerCase()}async function api(path,data){const r=await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},credentials:"same-origin",body:JSON.stringify(data)});const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.message||"ระบบยืนยันตัวตนยังไม่พร้อมใช้งาน");return j}async function send(){if(busy)return;let dest;try{dest=destination()}catch(e){msg(e.message);return}lock(true);try{const r=await api("/api/auth/otp/start",{channel,destination:dest});if(!r.challengeId)throw Error("ระบบ OTP ยังไม่พร้อมใช้งาน");challenge=r.challengeId;$("destination").textContent=dest;$("start").hidden=true;$("verify").hidden=false;msg("ส่ง OTP แล้ว",true)}catch(e){msg(e.message)}finally{lock(false)}}$("start").onsubmit=e=>{e.preventDefault();send()};$("resend").onclick=send;$("change").onclick=()=>switchTo(channel);$("verify").onsubmit=async e=>{e.preventDefault();if(busy)return;const code=$("code").value.trim();if(!/^\d{6}$/.test(code)){msg("กรุณากรอก OTP 6 หลัก");return}lock(true);try{const r=await api("/api/auth/otp/verify",{challengeId:challenge,code});if(!r.authenticated||!r.redirectUrl||!r.redirectUrl.startsWith("/")||r.redirectUrl.startsWith("//"))throw Error("ยืนยันตัวตนไม่สำเร็จ");location.assign(r.redirectUrl)}catch(e){msg(e.message)}finally{lock(false)}};document.querySelectorAll("[data-provider]").forEach(b=>b.onclick=()=>location.assign("/api/auth/oauth/"+b.dataset.provider+"/start"));
+"use strict";
+
+const $ = (id) => document.getElementById(id);
+let busy = false;
+let turnstileWidget = null;
+let turnstileReady = false;
+let turnstileSiteKey = null;
+let turnstileScript = null;
+let turnstileLoadTimer = null;
+
+const TURNSTILE_SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+const TURNSTILE_CONNECTION_MESSAGE = "ไม่สามารถเชื่อมต่อระบบยืนยันความปลอดภัยได้ โปรดตรวจสอบอินเทอร์เน็ต อนุญาต challenges.cloudflare.com ในตัวบล็อกเนื้อหา แล้วลองใหม่";
+
+const ERROR_MESSAGES = {
+  provider_denied: "คุณยกเลิกการเข้าสู่ระบบ กรุณาลองอีกครั้งเมื่อต้องการ",
+  invalid_state: "คำขอเข้าสู่ระบบหมดอายุ กรุณาเริ่มใหม่",
+  oauth_expired: "คำขอเข้าสู่ระบบหมดอายุ กรุณาเริ่มใหม่",
+  oauth_used: "คำขอนี้ถูกใช้ไปแล้ว กรุณาเริ่มใหม่",
+  identity_linked: "บัญชีนี้เชื่อมกับสมาชิกคนอื่นแล้ว",
+  registration_closed: "ขณะนี้เปิดให้เข้าสู่ระบบด้วยบัญชีเดิมเท่านั้น การสมัครใหม่จะเปิดหลังมาตรการคุ้มครองผู้เยาว์ได้รับอนุมัติ",
+  oauth_failed: "ไม่สามารถเข้าสู่ระบบกับผู้ให้บริการนี้ได้ กรุณาลองใหม่",
+};
+
+function message(text, ok = false) {
+  $("message").textContent = text;
+  $("message").classList.toggle("ok", ok);
+}
+
+function lock(value) {
+  busy = value;
+  document.querySelectorAll("[data-provider]").forEach((button) => { button.disabled = value; });
+}
+
+function turnstileToken() {
+  if (!turnstileReady || turnstileWidget === null) throw new Error("ระบบตรวจสอบความปลอดภัยยังไม่พร้อม กรุณารอสักครู่");
+  const token = window.turnstile.getResponse(turnstileWidget);
+  if (!token) throw new Error("กรุณายืนยันว่าคุณไม่ใช่โปรแกรมอัตโนมัติ");
+  return token;
+}
+
+function resetTurnstile() {
+  if (turnstileReady && turnstileWidget !== null) window.turnstile.reset(turnstileWidget);
+}
+
+function showTurnstileFailure(text = TURNSTILE_CONNECTION_MESSAGE, retry = true) {
+  turnstileReady = false;
+  message(text);
+  $("turnstile-retry").hidden = !retry;
+}
+
+function handleTurnstileError(code) {
+  const normalizedCode = String(code || "");
+  if (["110100", "110110", "110200", "400020", "400021", "400070"].includes(normalizedCode)) {
+    showTurnstileFailure("เว็บไซต์ทดสอบนี้ยังไม่ได้รับอนุญาตให้ใช้ระบบยืนยันความปลอดภัย โปรดแจ้งผู้ดูแล ChatGun", false);
+    return;
+  }
+  showTurnstileFailure();
+}
+
+function renderTurnstile() {
+  if (!window.turnstile || !turnstileSiteKey) {
+    showTurnstileFailure();
+    return;
+  }
+  try {
+    turnstileWidget = window.turnstile.render("#turnstile", {
+      sitekey: turnstileSiteKey,
+      action: "auth_start",
+      theme: "light",
+      callback: () => {
+        turnstileReady = true;
+        $("turnstile-retry").hidden = true;
+        message("");
+      },
+      "error-callback": handleTurnstileError,
+      "expired-callback": () => {
+        turnstileReady = true;
+        message("การยืนยันหมดอายุแล้ว กรุณายืนยันอีกครั้ง");
+      },
+      "timeout-callback": () => showTurnstileFailure("ระบบยืนยันใช้เวลานานเกินไป กรุณาลองโหลดอีกครั้ง"),
+      "unsupported-callback": () => showTurnstileFailure("เบราว์เซอร์นี้ไม่รองรับระบบยืนยันความปลอดภัย กรุณาอัปเดตเบราว์เซอร์หรือใช้เบราว์เซอร์อื่น", false),
+    });
+    turnstileReady = true;
+  } catch {
+    showTurnstileFailure();
+  }
+}
+
+function loadTurnstileScript() {
+  clearTimeout(turnstileLoadTimer);
+  turnstileScript?.remove();
+  turnstileScript = document.createElement("script");
+  turnstileScript.src = TURNSTILE_SCRIPT_URL;
+  turnstileScript.async = true;
+  turnstileScript.defer = true;
+  turnstileScript.onload = () => {
+    clearTimeout(turnstileLoadTimer);
+    renderTurnstile();
+  };
+  turnstileScript.onerror = () => {
+    clearTimeout(turnstileLoadTimer);
+    showTurnstileFailure();
+  };
+  document.head.appendChild(turnstileScript);
+  turnstileLoadTimer = window.setTimeout(() => {
+    if (!window.turnstile) showTurnstileFailure();
+  }, 15000);
+}
+
+$("turnstile-retry").addEventListener("click", () => {
+  $("turnstile-retry").hidden = true;
+  message("กำลังโหลดระบบยืนยันความปลอดภัยอีกครั้ง…");
+  turnstileReady = false;
+  if (window.turnstile) {
+    try {
+      if (turnstileWidget !== null) window.turnstile.remove(turnstileWidget);
+    } catch {
+      // The failed widget might already have been removed by Turnstile.
+    }
+    turnstileWidget = null;
+    $("turnstile").replaceChildren();
+    renderTurnstile();
+    return;
+  }
+  loadTurnstileScript();
+});
+
+async function api(path, data) {
+  const response = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "same-origin",
+    body: JSON.stringify(data),
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.message || "ระบบยืนยันตัวตนยังไม่พร้อมใช้งาน");
+  return body;
+}
+
+document.querySelectorAll("[data-provider]").forEach((button) => {
+  button.addEventListener("click", async () => {
+    if (busy) return;
+    let token;
+    try { token = turnstileToken(); } catch (error) { message(error.message); return; }
+    lock(true);
+    try {
+      const result = await api(`/api/auth/oauth/${button.dataset.provider}/start`, {
+        turnstileToken: token,
+      });
+      const target = new URL(result.authorizationUrl);
+      if (target.protocol !== "https:") throw new Error("ปลายทางเข้าสู่ระบบไม่ถูกต้อง");
+      window.location.assign(target.toString());
+    } catch (error) {
+      message(error.message);
+      lock(false);
+      resetTurnstile();
+    }
+  });
+});
+
+async function initializeTurnstile() {
+  try {
+    const response = await fetch("/api/auth/config", { credentials: "same-origin" });
+    const config = await response.json();
+    if (config.oauthLoginEnabled === false) {
+      document.querySelectorAll("[data-provider]").forEach(button => { button.disabled = true; });
+      $("auth-description").textContent = "การเข้าสู่บัญชีจริงยังไม่เปิดใช้งาน ขณะนี้เปิดให้ชมโหมดตัวอย่าง";
+      message("กลับหน้าแรกเพื่อทดลอง ChatGun ด้วยข้อมูลสมมติ");
+      return;
+    }
+    if (!response.ok || !config.turnstileSiteKey) throw new Error("ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย");
+    if (config.newAccountRegistrationEnabled) {
+      $("auth-heading").textContent = "เข้าสู่ระบบหรือสร้างบัญชี";
+      $("auth-description").textContent = "เลือกบัญชีโซเชียลที่คุณต้องการใช้กับ ChatGun";
+      $("social-consent").textContent = "เมื่อดำเนินการต่อ ChatGun จะรับชื่อ รูปโปรไฟล์ และอีเมลเท่าที่ผู้ให้บริการอนุญาต เพื่อสร้างหรือยืนยันบัญชีและรักษาความปลอดภัยในการเข้าสู่ระบบ";
+    }
+    turnstileSiteKey = config.turnstileSiteKey;
+    loadTurnstileScript();
+  } catch (error) {
+    showTurnstileFailure(error.message);
+  }
+}
+
+const authError = new URLSearchParams(window.location.search).get("auth_error");
+if (authError) {
+  message(ERROR_MESSAGES[authError] || "ไม่สามารถเข้าสู่ระบบได้ กรุณาลองใหม่");
+  window.history.replaceState({}, "", window.location.pathname);
+}
+initializeTurnstile();
