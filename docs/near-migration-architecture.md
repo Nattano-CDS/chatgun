@@ -47,7 +47,7 @@ Production activation still requires qualified Thai legal review of the threshol
 - The ChatGun Cloudflare account was re-confirmed as `23017b53386fb67fc62a52cdd017454c` before mutation.
 - `0003_social.sql` and `0004_moderation_audit.sql` were applied only to D1 `chatgun-auth-staging` (`5bbfd55d-eb22-4324-8a7d-57bef14110ea`). Existing staging users were preserved and the foreign-key check passed.
 - The repository default Pages binding now points to staging D1; only `[env.production]` points to `chatgun-auth`. This matches the configuration downloaded read-only from Pages.
-- Preview is deployed at `https://codex-near-migration-zjaq.chatgun.pages.dev` with every social capability disabled and `noindex` behavior intact.
+- Preview is deployed at `https://ee2405db.chatgun.pages.dev` (branch alias `https://codex-near-migration.chatgun.pages.dev`) with every social capability disabled and `noindex` behavior intact.
 - R2 cannot yet be configured: the ChatGun account API returns `10042` and requires R2 enablement in the Cloudflare Dashboard. Media flags and the cleanup Worker must remain undeployed until that action is complete.
 - Production migrations `0002`–`0004` remain pending and were not applied.
 
@@ -90,6 +90,8 @@ NEAR behavior is preserved while routes are namespaced to avoid collisions with 
 | `POST /api/social/blocks` | block/unblock enforced across every social query |
 | `POST /api/social/reports` | categorized report creation |
 | `GET/POST /api/social/moderation/*` | role-gated queue and decisions with audit events |
+
+The restricted `/app/moderation` console requires a case-specific purpose of at least ten characters before each read or decision. Non-Latin purposes are percent-encoded in the browser, decoded and validated server-side, and stored in the moderation audit trail. Report and message content is inserted into the DOM as text. Identity and message media is delivered only from role-gated, purpose-audited, no-store endpoints.
 
 Compatibility adapters in the client may retain NEAR action names during the initial port, but the server contracts above must be typed and tested directly.
 

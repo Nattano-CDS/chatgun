@@ -9,7 +9,7 @@ Scope: isolated Preview and `chatgun-auth-staging` only
 - Cloudflare account confirmed before mutation: `23017b53386fb67fc62a52cdd017454c` (ChatGun).
 - No PiggyPrice or NEAR Cloudflare resource was accessed or modified.
 - No ChatGun Production deployment, D1 migration, user-data mutation, PR merge, or legal publication occurred.
-- Preview URL: `https://codex-near-migration-zjaq.chatgun.pages.dev`.
+- Preview URL: `https://ee2405db.chatgun.pages.dev` (branch alias `https://codex-near-migration.chatgun.pages.dev`).
 - All social, demo, registration, media, moderation, verification, email-OTP, and mobile-OTP capabilities are disabled in the deployed environment.
 
 ## D1 result
@@ -31,8 +31,8 @@ Post-migration checks:
 
 | Suite | Result | Coverage summary |
 | --- | --- | --- |
-| Node unit/integration | 44 passed, 0 failed | OAuth/OTP regressions; flags; CSRF; rate limits; D1 migration/idempotency; retention; deletion retry/concurrency; discovery privacy; relationships; messages; blocking; reports; ratings; gallery/R2 mock; chat images; moderation/audit; verification evidence lifecycle |
-| Playwright social shell | 7 passed, 1 intentional skip | Desktop and mobile layouts; discovery/friend/review/profile navigation; fail-closed screen; IndexedDB demo; explicit game absence |
+| Node unit/integration | 48 passed, 0 failed | OAuth/OTP regressions; flags; CSRF; rate limits; D1 migration/idempotency; retention; deletion retry/concurrency; discovery privacy; stable message cursors; blocking; reports; ratings; gallery/R2 mock; private chat images; moderator media/purpose auditing; verification evidence lifecycle |
+| Complete deployed-Preview Playwright suite | 19 passed, 1 intentional skip | Signup and Turnstile; legal/account regressions; desktop/mobile social shell; fail-closed screen; IndexedDB demo; explicit game absence; purpose-gated moderator queue; untrusted report markup rendered as text |
 | Real Preview HTTP | passed | `/app/` 200/no-store/noindex; same-origin geolocation policy; `/api/social/config` all false; disabled social API returns 404 `feature_disabled` |
 | Preview D1 | passed | Migrations applied only to staging and foreign keys verified |
 
@@ -46,6 +46,7 @@ Playwright screenshots are generated locally under `test-results/artifacts/` for
 - Gallery comment bodies are returned only to the profile owner or accepted friends.
 - Private media uses authorization checks plus `private, no-store`, `nosniff`, restrictive CSP, random object keys, byte-signature validation, and bounded size/count.
 - Moderation requires a D1 role, feature flag, explicit access purpose, and audit event. Decisions and their audit records are transactional.
+- The restricted moderator console percent-encodes non-Latin access purposes for transport, records the decoded purpose, renders report/message data with `textContent`, and retrieves sensitive images through private purpose-audited endpoints.
 - Verification evidence is never public, requires recent auth and explicit consent, and enters the deletion queue immediately after a decision. The feature remains disabled.
 - Account deletion revokes access immediately, cascades social rows, queues object deletion, and does not claim binary deletion while work is pending.
 - No game table, API, navigation destination, asset pack, or dependency was migrated.
@@ -64,4 +65,3 @@ Playwright screenshots are generated locally under `test-results/artifacts/` for
 - Code foundation for isolated staging: **GO**.
 - Public social-feature activation: **NO-GO**.
 - Production migration/deployment: **NO-GO**.
-
