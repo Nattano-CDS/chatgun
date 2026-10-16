@@ -2,11 +2,11 @@
 
 Date: 2026-10-16 (Asia/Bangkok)  
 Branch: `codex/near-migration`  
-Candidate tested: `b1510c728daad06e64581e352be984ee4d8781a9`
+Candidate tested: `bb5b4eeb983d6d7c2c7b73e2649619168967639d`
 
 Stable Preview: `https://codex-near-migration.chatgun.pages.dev`
 
-Exact deployment: `https://135cd46a.chatgun.pages.dev`
+Exact deployment: `https://cd16a782.chatgun.pages.dev`
 Scope: ChatGun Preview, `chatgun-auth-staging`, and `chatgun-media-staging` only
 
 ## Release decision
@@ -29,7 +29,7 @@ Scope: ChatGun Preview, `chatgun-auth-staging`, and `chatgun-media-staging` only
 | Git | Local and `origin/codex/near-migration` were clean at the requested candidate before this evidence-only update |
 | Pull request | PR #6 open and draft; base `codex/privacy-safety`; Cloudflare Pages check passed; not merged |
 | Cloudflare identity | Wrangler 4.151.0 confirmed ChatGun account `23017b53386fb67fc62a52cdd017454c` |
-| Preview deployment | Deployment `135cd46a-7834-4f7b-9704-a5939c9401d7`, source `b1510c7`; stable branch alias and exact deployment both responded successfully after the LINE Preview secret rotation |
+| Preview deployment | Deployment `cd16a782-0cc9-4946-8f5e-bb823ffb4d0f`, source `bb5b4ee`; the stable branch alias served the same current branch head during the final Google/Facebook E2E continuation |
 | Preview D1 | `DB` maps to `chatgun-auth-staging` (`5bbfd55d-eb22-4324-8a7d-57bef14110ea`); migrations 0001–0007 applied; none pending |
 | Preview R2 | `MEDIA` maps to private `chatgun-media-staging`; final object count 0 and size 0 B |
 | Production isolation | Production config keeps registration/Beta/social/media/moderation flags false, binds `DB` to `chatgun-auth`, has no `MEDIA` binding, and was not mutated |
@@ -42,7 +42,7 @@ Scope: ChatGun Preview, `chatgun-auth-staging`, and `chatgun-media-staging` only
 | Playwright desktop/mobile | 25 | 0 | 9 | Stable-Preview rerun; eight live-social tests skipped because synthetic session secrets were not loaded, plus one desktop exclusion for the mobile-only assertion |
 | Dependency audit | 1 | 0 | 0 | `npm audit --audit-level=high`: 0 vulnerabilities |
 | D1 integrity/cleanup | 7 | 0 | 0 | Media, pending/failed deletions, ratings, invitations, and enrollments all zero; foreign-key check empty; R2 zero objects |
-| Real provider browser journeys | 3 | 0 | 0 | Google, Facebook, and LINE completed authorization, callback, session creation, authenticated access, logout, and denial/cancellation handling |
+| Real provider browser journeys | 3 | 0 | 0 | Google, Facebook, and LINE completed authorization, callback, session creation, authenticated access, logout, and denial/cancellation handling; Google-to-Facebook account linking also passed with a separate authorized identity |
 
 The stable-Preview rerun intentionally omitted the state-mutating live-social tests because its
 synthetic session secrets were not supplied. Those four tests were skipped in both projects;
@@ -96,12 +96,21 @@ callback was added to the actual Preview channel, not the separate Production ch
 | Facebook | **PASS** — real provider consent returned to `/account` | **PASS** — provider **Cancel** returned the Thai cancellation message | Existing identity reused; newest session revoked on logout |
 | LINE | **PASS** — real **Continue as Nat** login returned to `/account` after Preview secret rotation | **PASS** — issued-state denial returned the Thai cancellation message | Existing identity reused; newest session revoked on logout; `/account` redirected to signup afterward |
 
-Read-only D1 verification after the journeys found six users, one identity per provider, zero
-invitations, zero enrollments, and no foreign-key violations. The three newly created sessions
-were the newest rows and all were revoked. Invalid callbacks without usable state also failed
-closed with the Thai expired-request message. No real-user invitation or account was created.
-Positive/negative account-linking logic passes automated tests; a live cross-provider linking
-journey remains untested because no separately authorized disposable identity was available.
+Read-only D1 verification after the journeys found six users and four provider identities:
+one Facebook identity, one LINE identity, and two Google identities. The Facebook staging user
+owns its original Facebook identity plus the separately authorized Google identity; the original
+Google-only user remains separate. The `(provider, subject)` primary key has no duplicates,
+`PRAGMA foreign_key_check` returned no rows, and invitations/enrollments remained zero. The
+session created by the successful link was revoked by logout, and direct `/account` access then
+redirected to signup. Invalid callbacks without usable state also failed closed with the Thai
+expired-request message. No invitation or new ChatGun user was created.
+
+Live account-linking evidence now covers both directions required for release review. Linking an
+already-owned Google identity from the Facebook session was rejected with the Thai
+`identity_linked` error and left the Facebook session usable. Linking a distinct authorized
+Google identity then returned to the same Facebook-backed ChatGun account and persisted both
+providers on that single user. Automated tests separately cover CSRF/session requirements,
+duplicate-provider races, and unauthorized cross-user linking.
 
 ## Data and cleanup evidence
 
@@ -215,8 +224,26 @@ zero invitations, zero enrollments, and no foreign-key violations; the newest LI
 non-null `revoked_at`. The stable-Preview regression rerun again passed 63/63 Node tests and
 25/25 executed Playwright tests, with the same 9 intentional skips.
 
-The stable alias served source `b1510c7` during the final checks. The first Playwright command
+The stable alias served source `bb5b4ee` during the final checks. The first Playwright command
 accidentally used the suite's older default branch hostname and was stopped after reproducing
 stale-host failures; the correctly targeted stable-Preview rerun passed 25 tests with 9
 documented skips. No Production deployment, provider publishing, invitation issuance, or
 real-user account creation occurred.
+
+## Google and Facebook account-linking continuation
+
+The final continuation used the stable Preview at source `bb5b4ee` and the isolated
+`chatgun-auth-staging` database. Google and Facebook standalone login, callback, authenticated
+account access, logout, post-logout denial, provider cancellation, and consumed-state replay
+rejection all passed. The active Google authorization request visibly used PKCE S256, nonce,
+state, and the exact stable callback. Facebook used the dedicated Preview application and exact
+stable callback.
+
+For the positive linking case, a fresh OAuth flow created from the authenticated Facebook
+account was verified read-only in D1 as `is_link_flow=1`, with no invitation and a 600-second
+TTL. Selecting the separately authorized Google identity returned to `/account` as the existing
+Facebook ChatGun member. D1 then reported `facebook,google` on that user, two Google identities
+across two users, no duplicate provider subjects, no foreign-key violations, and zero Beta
+invitations/enrollments. Logout revoked the newest linked-account session, and direct account
+access redirected to signup. No Production, PiggyPrice, provider-publishing, or invitation state
+was changed.
