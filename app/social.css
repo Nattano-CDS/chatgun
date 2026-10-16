@@ -364,7 +364,7 @@ body:not([data-active-tab="near"]) .app .toolbar h1 { font-size: 25px; color: va
   box-shadow: 0 8px 24px rgba(53, 36, 69, .08);
 }
 .app .person-card.context-near:hover { border-color: transparent; box-shadow: 0 12px 30px rgba(53, 36, 69, .14); transform: translateY(-2px); }
-.app .person-card.context-near .portrait { position: absolute; z-index: -2; inset: 0; aspect-ratio: auto; color: rgba(255,255,255,.5); background: linear-gradient(145deg, #756385, #47404f); font-size: 100px; }
+.app .person-card.context-near .portrait { position: absolute; z-index: 0; inset: 0; aspect-ratio: auto; color: rgba(255,255,255,.5); background: linear-gradient(145deg, #756385, #47404f); font-size: 100px; }
 .app .person-card.context-near:nth-child(3n+2) .portrait { background: linear-gradient(145deg, #607f67, #34473e); }
 .app .person-card.context-near:nth-child(3n) .portrait { background: linear-gradient(145deg, #8a685b, #503d3b); }
 .app .person-card.context-near .portrait > img { width: 100%; height: 100%; object-fit: cover; }

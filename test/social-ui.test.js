@@ -34,9 +34,11 @@ test("Phase 1 uses the canonical NEAR tokens, typography, navigation and portrai
   assert.match(styles, /\.app \.sidebar nav \{ display: grid; grid-template-columns: repeat\(5/u);
   assert.match(styles, /\.app #people-grid \{ grid-template-columns: repeat\(3/u);
   assert.match(styles, /\.app \.person-card\.context-near/u);
+  assert.match(styles, /\.person-card\.context-near \.portrait \{ position: absolute; z-index: 0/u);
   assert.match(styles, /linear-gradient\(180deg, rgba\(20,17,28/u);
   assert.match(html, /id="filter-toggle"/u);
   assert.match(script, /dataset\.activeTab/u);
+  assert.doesNotMatch(script, /alt="รูปของ \$\{escapeHtml\(person\.name\)\}" loading="lazy"/u);
   assert.doesNotMatch(html, />เกม</u);
 });
 

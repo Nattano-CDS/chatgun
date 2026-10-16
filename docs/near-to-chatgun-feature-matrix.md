@@ -2,6 +2,11 @@
 
 Status: consolidated release-candidate checkpoint on `codex/chatgun-release-candidate`. No NEAR source, Production data, or Production deployment was modified.
 
+Owner-review synthetic staging evidence is documented in
+`docs/synthetic-owner-review-dataset.md`. Batch `chatgun-owner-review-v1` populates every
+non-game social surface with traceable fictional data while preserving private R2 access,
+location expiry, upload quotas, moderation, and staging isolation.
+
 ## Canonical source identification
 
 The original implementation is confidently identified as the owner-controlled ChatGPT Site below.

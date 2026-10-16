@@ -19,7 +19,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
     "oauth_flows", "oauth_reauth_contexts", "otp_challenges",
     "photo_comments", "photo_likes", "profile_photos", "proximity_ratings", "rate_limits",
     "session_auth_evidence", "sessions", "social_blocks", "social_media", "social_messages",
-    "social_relationships", "social_reports", "users",
+    "social_relationships", "social_reports", "synthetic_seed_batches", "synthetic_seed_objects", "synthetic_seed_records", "users",
   ]);
   const indexes = database.database.prepare(
     "SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE 'idx_%' ORDER BY name",
@@ -35,7 +35,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
     "idx_otp_ip_created", "idx_photo_comments_created", "idx_profile_photos_owner",
     "idx_profiles_discovery", "idx_rate_limits_expiry", "idx_ratings_receiver",
     "idx_relationships_high_status", "idx_relationships_low_status", "idx_reports_reason_status", "idx_reports_status",
-    "idx_session_auth_evidence_expiry", "idx_sessions_expiry", "idx_sessions_user",
+    "idx_session_auth_evidence_expiry", "idx_sessions_expiry", "idx_sessions_user", "idx_synthetic_seed_objects_media", "idx_synthetic_seed_records_type",
   ]);
   assert.throws(() => database.database.prepare(
     "INSERT INTO identities(provider, subject, user_id, created_at, last_login_at) VALUES ('evil', 'x', 'x', 1, 1)",

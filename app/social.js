@@ -304,7 +304,7 @@ function updateProfileRoute(user, photo = null, mode = "push") {
 function portrait(person, distance = true) {
   const selectedUrl = person.selected_photo_id ? galleryMediaUrl(person.selected_photo_id) : "";
   const image = selectedUrl
-    ? `<img src="${escapeHtml(selectedUrl)}" alt="รูปของ ${escapeHtml(person.name)}" loading="lazy">`
+    ? `<img src="${escapeHtml(selectedUrl)}" alt="รูปของ ${escapeHtml(person.name)}">`
     : escapeHtml(initials(person.name));
   return `<div class="portrait">${image}${distance && person.distance !== undefined ? `<span class="distance-pill">${escapeHtml(formatDistance(person.distance, person.distance_label))}</span>` : ""}</div>`;
 }
