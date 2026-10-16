@@ -9,6 +9,7 @@ const headers = readFileSync("_headers", "utf8");
 const redirects = readFileSync("_redirects", "utf8");
 const moderationHtml = readFileSync("app/moderation.html", "utf8");
 const moderationScript = readFileSync("app/moderation.js", "utf8");
+const wrangler = readFileSync("wrangler.jsonc", "utf8");
 
 test("social UI exposes only the approved non-game navigation", () => {
   for (const tab of ["near", "friends", "chat", "reviews", "profile"]) {
@@ -53,4 +54,18 @@ test("moderation UI requires a recorded purpose and renders untrusted data as te
   assert.match(moderationScript, /element\.textContent = String\(text\)/u);
   assert.doesNotMatch(moderationScript, /innerHTML|insertAdjacentHTML|document\.write/u);
   assert.match(moderationScript, /__Host-cg_csrf/u);
+});
+
+test("staging social activation remains isolated from production and media", () => {
+  const production = wrangler.split('"production"', 2)[1];
+  for (const capability of ["SOCIAL_APP_ENABLED", "PUBLIC_DISCOVERY_ENABLED", "FRIEND_REQUESTS_ENABLED", "MESSAGING_ENABLED", "RATINGS_ENABLED"]) {
+    assert.match(wrangler, new RegExp(`"${capability}": "true"`, "u"));
+    assert.match(production, new RegExp(`"${capability}": "false"`, "u"));
+  }
+  for (const capability of ["NEW_ACCOUNT_REGISTRATION_ENABLED", "ADULT_ONBOARDING_ENABLED", "MEDIA_UPLOAD_ENABLED", "IDENTITY_VERIFICATION_ENABLED", "MODERATION_TOOLS_ENABLED", "DEMO_MODE_ENABLED"]) {
+    assert.match(wrangler, new RegExp(`"${capability}": "false"`, "u"));
+    assert.match(production, new RegExp(`"${capability}": "false"`, "u"));
+  }
+  assert.match(wrangler, /"database_name": "chatgun-auth-staging"/u);
+  assert.match(production, /"database_name": "chatgun-auth"/u);
 });
