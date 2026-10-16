@@ -118,6 +118,25 @@ test("optional demo remains browser-only and contains no game", async ({ page })
   await expect(page.getByRole("button", { name: "เกม" })).toHaveCount(0);
 });
 
+test("profile names cannot break out of text or media attributes", async ({ page }) => {
+  await page.unroute("**/api/**");
+  await page.route("**/api/social/config",route=>route.fulfill({json:{...config,socialAppEnabled:false,demoModeEnabled:true}}));
+  await page.goto("/app/");
+  await page.getByRole("button",{name:"ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์"}).click();
+  await page.locator('#primary-nav [data-tab="profile"]').click();
+  await page.locator('#my-gallery button[data-gallery-action="select"]').first().click();
+  await expect(page.locator('#my-gallery .selected')).toHaveCount(1);
+  const payload='x" onerror="alert(1)';
+  await page.locator('#profile-form input[name="name"]').fill(payload);
+  await page.getByRole("button",{name:"บันทึกโปรไฟล์",exact:true}).click();
+  await expect(page.locator("#toast")).toContainText("บันทึกโปรไฟล์แล้ว");
+  await page.getByRole("button",{name:"ดูโปรไฟล์และแกลเลอรี"}).click();
+  await expect(page.locator(".member-profile-info h2")).toHaveText(payload);
+  await expect(page.locator(".member-profile-image img")).toHaveAttribute("alt",`รูปของ ${payload}`);
+  await expect(page.locator("#profile-dialog img[onerror]")).toHaveCount(0);
+  await expect(page.locator("#profile-dialog [onmouseover],#profile-dialog [onfocus]")).toHaveCount(0);
+});
+
 test("browser-only demo supports local gallery and chat image workflows", async ({ page }) => {
   await page.unroute("**/api/**");
   await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false, demoModeEnabled: true }) }));

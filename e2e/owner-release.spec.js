@@ -11,7 +11,7 @@ for (const width of [390,768,1440]) {
     const errors=[];const apiWrites=[];const memberReads=[];
     page.on("pageerror",e=>errors.push(e.message));
     page.on("request",r=>{if(new URL(r.url()).pathname.startsWith("/api/")){if(!["GET","HEAD"].includes(r.method()))apiWrites.push(r.url());else memberReads.push(new URL(r.url()).pathname);}});
-    const shot=async(name)=>{await page.screenshot({path:resolve(directory,`${name}-${width}.png`),fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);};
+    const shot=async(name)=>{await page.screenshot({path:resolve(directory,`${name}-${width}.png`),fullPage:!["member-profile","member-gallery","gallery-post"].includes(name)});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);};
     await page.goto("/?demo=1");
     await expect(page.locator("#demo-banner")).toContainText("สมมติ");
     await expect(page.locator("#people-grid .person-card")).toHaveCount(20);
@@ -52,10 +52,17 @@ for (const width of [390,768,1440]) {
     await page.locator('#primary-nav [data-tab="near"]').click();
     await page.locator('#people-grid [data-person="demo-02"]').click();
     await expect(page.locator(".member-profile-view")).toBeVisible();await shot("member-profile");
+    await expect(page.locator(".member-profile-brand")).toContainText("ตัวอย่าง");
+    const back=await page.locator('#profile-dialog>.dialog-close').boundingBox();
+    const brand=await page.locator('.member-profile-brand').boundingBox();
+    const galleryControl=await page.locator('.member-profile-gallery-top').boundingBox();
+    expect(back.x+back.width).toBeLessThanOrEqual(brand.x);
+    expect(brand.x+brand.width).toBeLessThanOrEqual(galleryControl.x);
     await page.locator(".member-profile-gallery-top").click();
     await expect(page.locator(".member-profile-gallery")).toBeVisible();await shot("member-gallery");
     await page.locator("#dialog-gallery button").first().click();
     await expect(page.locator(".gallery-post")).toBeVisible();
+    await expect(page.locator(".demo-post-notice")).toContainText("โหมดตัวอย่าง");
     await page.locator("#gallery-comment input[name=comment]").fill("ภาพตัวอย่างน่ารักดี");
     await page.locator("#gallery-comment button").click();
     await expect(page.locator(".comments")).toContainText("ภาพตัวอย่างน่ารักดี");await shot("gallery-post");
