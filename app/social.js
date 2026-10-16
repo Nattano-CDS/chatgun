@@ -232,7 +232,7 @@ function populateAvatar(element, person) {
 function escapeHtml(value) {
   const node = document.createElement("span");
   node.textContent = String(value ?? "");
-  return node.innerHTML;
+  return node.innerHTML.replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 }
 
 function demoMedia(id, collection) {
@@ -633,6 +633,12 @@ async function showPerson(id, { historyMode = "push", photo = null } = {}) {
     <section class="member-profile-info"><h2>${escapeHtml(person.name)}${person.identity_verified ? " ✓" : ""}</h2><p class="member-profile-facts">${escapeHtml(person.gender || "ไม่ระบุ")} ${person.distance !== undefined ? `· ${escapeHtml(formatDistance(person.distance, person.distance_label))}` : ""}</p><p class="member-profile-bio">${escapeHtml(person.bio || "ยังไม่ได้แนะนำตัว")}</p><div class="member-profile-interests">${interests.map((interest) => `<span>${escapeHtml(interest)}</span>`).join("")}</div><div class="dialog-actions">${friendAction}${!own && state.config.ratingsEnabled ? `<button class="secondary" data-action="rate" data-user="${escapeHtml(id)}">ให้คะแนน</button>` : ""}${own ? "" : `<button class="danger" data-action="block" data-user="${escapeHtml(id)}">บล็อก</button><button class="secondary" data-action="report" data-user="${escapeHtml(id)}">รายงาน</button>`}</div></section>
     <section class="member-profile-gallery" aria-label="แกลเลอรี" hidden><header><button type="button" data-profile-gallery>← กลับโปรไฟล์</button><h3>แกลเลอรีของ ${escapeHtml(person.name)}</h3></header><div id="dialog-gallery" class="gallery-grid"></div></section>
   </article>`;
+  if (state.demo) {
+    const label = $(".member-profile-brand strong");
+    if (label) label.textContent = "โปรไฟล์ตัวอย่าง";
+    const title = $(".member-profile-gallery h3");
+    if (title) title.textContent += " · ตัวอย่าง";
+  }
   $("#profile-dialog").showModal();
   try {
     const gallery = (await api(`/api/social/gallery?user=${encodeURIComponent(id)}`)).photos;
@@ -648,6 +654,12 @@ function renderGalleryPost() {
   const report = owner === state.account?.user?.id ? "" : `<button class="danger" data-media-report="${escapeHtml(item.id)}">รายงานรูป</button>`;
   $("#profile-dialog-content").innerHTML = `<div class="dialog-profile"><img class="gallery-view" src="${escapeHtml(galleryMediaUrl(item.id))}" alt="${escapeHtml(item.caption || "รูปในแกลเลอรี")}"><p>${escapeHtml(item.caption || "")}</p><div class="dialog-actions"><button class="secondary" data-gallery-action="previous" ${index <= 0 ? "disabled" : ""}>← รูปก่อนหน้า</button><button class="secondary" data-gallery-action="like" data-photo="${escapeHtml(item.id)}">${item.liked ? "♥" : "♡"} ${Number(item.like_count || 0)}</button><button class="secondary" data-gallery-action="next" ${index >= photos.length - 1 ? "disabled" : ""}>รูปถัดไป →</button>${report}</div><div class="comments">${comments.map((comment) => `<p><strong>${escapeHtml(comment.sender_name)}</strong> ${escapeHtml(comment.body)}</p>`).join("") || "<p>ยังไม่มีความคิดเห็นที่คุณมีสิทธิ์อ่าน</p>"}</div><form id="gallery-comment"><input type="hidden" name="photo" value="${escapeHtml(item.id)}"><input type="hidden" name="owner" value="${escapeHtml(owner)}"><input name="comment" maxlength="500" required placeholder="เขียนถึงเจ้าของโปรไฟล์…"><button class="primary">ส่ง</button></form><small>เจ้าของโปรไฟล์และเพื่อนที่ยอมรับกันแล้วอ่านความคิดเห็นได้</small></div>`;
   $("#profile-dialog-content .dialog-profile").classList.add("gallery-post");
+  if (state.demo) {
+    const notice = document.createElement("p");
+    notice.className = "demo-post-notice";
+    notice.textContent = "โหมดตัวอย่าง · ไม่มีการเผยแพร่ไปยังสมาชิกจริง";
+    $(".gallery-post").prepend(notice);
+  }
 }
 
 async function openGalleryPhoto(owner, photo, { historyMode = "push" } = {}) {

@@ -2,6 +2,7 @@
    inbox/thread, request-card, upload page, private reviews and profile form. */
 .app{padding-bottom:0}.chat-layout{height:var(--chat-height,600px)!important;min-height:260px!important}.thread .composer{position:relative;z-index:1}.thread .upload-quota{padding:0 14px;margin:8px 0}
 .toast{z-index:100;bottom:calc(94px + env(safe-area-inset-bottom));max-width:min(390px,calc(100% - 32px))}
+.demo-post-notice{margin:0 0 16px;padding:12px 16px;border:1px solid #ded6ff;border-radius:13px;color:#6041b0;background:#eeebff;font-size:13px;line-height:1.6}
 .tab-view>.subtitle{margin:4px 0 22px;line-height:1.65}.tab-view>h2{font-size:22px;margin:26px 0 16px}.tab-view>h2:first-of-type{margin-top:0}
 .tab-view .subtitle{line-height:1.65}.panel .subtitle{margin:12px 0 20px}.panel .section-heading{margin-top:0}
 #requests-grid:empty{display:none}#requests-grid,#friends-grid{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:16px;margin-bottom:28px}

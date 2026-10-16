@@ -52,10 +52,12 @@ for (const width of [390,768,1440]) {
     await page.locator('#primary-nav [data-tab="near"]').click();
     await page.locator('#people-grid [data-person="demo-02"]').click();
     await expect(page.locator(".member-profile-view")).toBeVisible();await shot("member-profile");
+    await expect(page.locator(".member-profile-brand")).toContainText("ตัวอย่าง");
     await page.locator(".member-profile-gallery-top").click();
     await expect(page.locator(".member-profile-gallery")).toBeVisible();await shot("member-gallery");
     await page.locator("#dialog-gallery button").first().click();
     await expect(page.locator(".gallery-post")).toBeVisible();
+    await expect(page.locator(".demo-post-notice")).toContainText("โหมดตัวอย่าง");
     await page.locator("#gallery-comment input[name=comment]").fill("ภาพตัวอย่างน่ารักดี");
     await page.locator("#gallery-comment button").click();
     await expect(page.locator(".comments")).toContainText("ภาพตัวอย่างน่ารักดี");await shot("gallery-post");
