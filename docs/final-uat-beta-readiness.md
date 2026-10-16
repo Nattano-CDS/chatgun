@@ -180,3 +180,25 @@ the two authorized Preview hostnames, both encrypted Preview bindings were repla
 printing their values, and a new Preview deployment was triggered. The superseded widget must
 be removed only after the replacement deployment passes browser and server-side verification.
 No Production credential or configuration was changed.
+
+After the replacement deployment became active, Turnstile passed on the stable branch alias
+and all three provider authorization endpoints were retried through the real browser flow.
+Each provider rejected the stable callback before account selection or consent:
+
+| Provider | Actual result | Provider response |
+| --- | --- | --- |
+| Google | **FAIL** | OAuth error 400, `redirect_uri_mismatch` |
+| Facebook | **FAIL** | `URL Blocked`; redirect URI is not in Client OAuth Settings |
+| LINE | **FAIL** | HTTP 400, `Invalid redirect_uri value` |
+
+The required callbacks are:
+
+- `https://codex-near-migration.chatgun.pages.dev/api/auth/oauth/google/callback`
+- `https://codex-near-migration.chatgun.pages.dev/api/auth/oauth/facebook/callback`
+- `https://codex-near-migration.chatgun.pages.dev/api/auth/oauth/line/callback`
+
+No login callback, ChatGun session, logout, cancellation, or live linking test can occur until
+the corresponding provider console preserves its existing callbacks and adds the exact stable
+Preview callback. Post-retry D1 checks remained unchanged at six users, one identity per
+provider, zero invitations, zero enrollments, and zero foreign-key violations. No real-user
+account was created.
