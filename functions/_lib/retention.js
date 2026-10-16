@@ -1,5 +1,6 @@
 export const DELETION_RECEIPT_TTL_SECONDS = 7 * 24 * 60 * 60;
 export const REVOKED_SESSION_GRACE_SECONDS = 24 * 60 * 60;
+export const STALE_PRESENCE_GRACE_SECONDS = 24 * 60 * 60;
 
 const CLEANUP_TARGETS = [
   {
@@ -52,6 +53,33 @@ const CLEANUP_TARGETS = [
       SELECT rowid FROM deletion_receipts WHERE expires_at <= ? LIMIT ?
     )`,
     values: (now, limit) => [now, limit],
+  },
+  {
+    name: "stalePresence",
+    sql: `UPDATE member_profiles
+      SET discovery_visible = 0, latitude = NULL, longitude = NULL,
+          accuracy = NULL, located_at = NULL, updated_at = ?
+      WHERE rowid IN (
+        SELECT rowid FROM member_profiles
+        WHERE located_at IS NOT NULL AND located_at <= ? LIMIT ?
+      )`,
+    values: (now, limit) => [now, now - STALE_PRESENCE_GRACE_SECONDS, limit],
+  },
+  {
+    name: "revokedAgeAssurance",
+    sql: `DELETE FROM age_assurance_events WHERE rowid IN (
+      SELECT rowid FROM age_assurance_events
+      WHERE revoked_at IS NOT NULL AND revoked_at <= ? LIMIT ?
+    )`,
+    values: (now, limit) => [now - REVOKED_SESSION_GRACE_SECONDS, limit],
+  },
+  {
+    name: "completedMediaQueue",
+    sql: `DELETE FROM media_deletion_queue WHERE rowid IN (
+      SELECT rowid FROM media_deletion_queue
+      WHERE completed_at IS NOT NULL AND completed_at <= ? LIMIT ?
+    )`,
+    values: (now, limit) => [now - DELETION_RECEIPT_TTL_SECONDS, limit],
   },
 ];
 

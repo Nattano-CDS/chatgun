@@ -421,7 +421,9 @@ async function confirmDeletion(request, env) {
   );
   if (!receipt) return failure("คำขอลบบัญชีหมดอายุหรือถูกใช้แล้ว", 409, "deletion_request_unavailable");
   return appendCookies(json({
-    deleted: true,
+    deleted: receipt.mediaDeletionPending === 0,
+    accountAccessRevoked: true,
+    mediaDeletionPending: receipt.mediaDeletionPending,
     receipt: { requestId: receipt.requestId, completedAt: receipt.completedAt },
   }), [
     cookie(SESSION_COOKIE, "", 0),

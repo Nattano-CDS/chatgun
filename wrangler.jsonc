@@ -7,7 +7,15 @@
     "EMAIL_OTP_ENABLED": "false",
     "MOBILE_OTP_ENABLED": "false",
     "LINE_EMAIL_ENABLED": "false",
-    "NEW_ACCOUNT_REGISTRATION_ENABLED": "false"
+    "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
+    "SOCIAL_APP_ENABLED": "false",
+    "ADULT_ONBOARDING_ENABLED": "false",
+    "PUBLIC_DISCOVERY_ENABLED": "false",
+    "FRIEND_REQUESTS_ENABLED": "false",
+    "MESSAGING_ENABLED": "false",
+    "MEDIA_UPLOAD_ENABLED": "false",
+    "RATINGS_ENABLED": "false",
+    "IDENTITY_VERIFICATION_ENABLED": "false"
   },
   "d1_databases": [
     {
@@ -24,7 +32,15 @@
         "EMAIL_OTP_ENABLED": "false",
         "MOBILE_OTP_ENABLED": "false",
         "LINE_EMAIL_ENABLED": "false",
-        "NEW_ACCOUNT_REGISTRATION_ENABLED": "false"
+        "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
+        "SOCIAL_APP_ENABLED": "false",
+        "ADULT_ONBOARDING_ENABLED": "false",
+        "PUBLIC_DISCOVERY_ENABLED": "false",
+        "FRIEND_REQUESTS_ENABLED": "false",
+        "MESSAGING_ENABLED": "false",
+        "MEDIA_UPLOAD_ENABLED": "false",
+        "RATINGS_ENABLED": "false",
+        "IDENTITY_VERIFICATION_ENABLED": "false"
       },
       "d1_databases": [
         {
@@ -41,7 +57,15 @@
         "EMAIL_OTP_ENABLED": "false",
         "MOBILE_OTP_ENABLED": "false",
         "LINE_EMAIL_ENABLED": "false",
-        "NEW_ACCOUNT_REGISTRATION_ENABLED": "false"
+        "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
+        "SOCIAL_APP_ENABLED": "false",
+        "ADULT_ONBOARDING_ENABLED": "false",
+        "PUBLIC_DISCOVERY_ENABLED": "false",
+        "FRIEND_REQUESTS_ENABLED": "false",
+        "MESSAGING_ENABLED": "false",
+        "MEDIA_UPLOAD_ENABLED": "false",
+        "RATINGS_ENABLED": "false",
+        "IDENTITY_VERIFICATION_ENABLED": "false"
       },
       "d1_databases": [
         {

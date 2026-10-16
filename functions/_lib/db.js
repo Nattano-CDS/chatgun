@@ -149,10 +149,20 @@ export async function confirmAccountDeletion(
       )
     `).bind(requestId, operationId),
     db.prepare(`
+      INSERT OR IGNORE INTO media_deletion_queue(
+        object_key, operation_id, attempts, next_attempt_at, created_at
+      )
+      SELECT object_key, ?, 0, ?, ? FROM social_media
+      WHERE owner_user_id = (
+        SELECT user_id FROM account_deletion_requests
+        WHERE request_id = ? AND operation_id = ? AND status = 'processing'
+      ) AND state IN ('active', 'pending_deletion')
+    `).bind(operationId, timestamp, timestamp, requestId, operationId),
+    db.prepare(`
       INSERT INTO deletion_receipts(
         request_id, completed_at, policy_version, implementation_version, outcome, expires_at
       )
-      SELECT request_id, ?, 'technical-draft-v1', 'privacy-safety-v1', 'deleted', ?
+      SELECT request_id, ?, 'technical-draft-v1', 'near-migration-v1', 'deleted', ?
       FROM account_deletion_requests
       WHERE request_id = ? AND operation_id = ? AND status = 'processing'
     `).bind(timestamp, receiptExpiresAt, requestId, operationId),
@@ -164,7 +174,12 @@ export async function confirmAccountDeletion(
     `).bind(requestId, operationId),
   ]);
   if (Number(results[0]?.meta?.changes || 0) !== 1) return null;
-  return { requestId, completedAt: timestamp, receiptExpiresAt };
+  return {
+    requestId,
+    completedAt: timestamp,
+    receiptExpiresAt,
+    mediaDeletionPending: Number(results[5]?.meta?.changes || 0),
+  };
 }
 
 export async function requireCsrf(request, session) {
