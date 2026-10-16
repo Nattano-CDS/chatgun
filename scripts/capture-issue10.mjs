@@ -61,9 +61,9 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
     await new Promise((resolve,reject)=>{const request=indexedDB.open(name,1);request.onsuccess=()=>{const db=request.result,tx=db.transaction('state','readwrite'),store=tx.objectStore('state'),get=store.get(key);get.onsuccess=()=>{const value=get.result||{};if(original){value.relations=[];value.ownRatings=[];value.messages=[];value.galleryPhotos=[];}else{value.relationships=[];value.ratings=[];value.messages={};value.gallery=[];}store.put(value,key);};tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};});
   },original);
   await page.reload();await page.locator(original?'.photo-card':'#people-grid .person-card').first().waitFor();
-  for(const [tab,name] of [['friends','friends-empty'],['chat','inbox-empty'],['reviews','reviews-empty'],['profile','own-gallery-empty']])await attempt(name,()=>nav(tab));
+  for(const [tab,name] of [['friends','friends-empty'],['chat','inbox-empty'],['reviews','reviews-empty'],['profile','own-gallery-empty']])await attempt(name,async()=>{await nav(tab);if(tab==='profile')await page.goto(target+(original?'/photos':'/app/photos'));});
   await nav('near');await context.setOffline(true);await shot('offline');await context.setOffline(false);
-  for(const [name,path] of [['login',original?'/login':'/signup'],['register',original?'/register':'/acceptance'],['account','/account'],['admin-denied','/app/moderation.html']]){
+  for(const [name,path] of [['upload-photos',original?'/photos':'/app/photos'],['login',original?'/login':'/signup'],['register',original?'/register':'/acceptance'],['account','/account'],['admin-denied','/app/moderation.html']]){
     if(original&&['account','admin-denied'].includes(name))continue;
     await attempt(name,()=>page.goto(target+path));
   }

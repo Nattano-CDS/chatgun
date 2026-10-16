@@ -217,6 +217,7 @@ async function startDemo() {
   $("#moderation-notifications").innerHTML = `<div class="notification-row"><strong>ตัวอย่าง: รูปภาพของคุณผ่านการตรวจแล้ว</strong><small>การแจ้งเตือนสมมติ</small></div>`;
   fillProfile(); renderPeople(); renderRelationships(); renderRatings(); renderBlocked(); renderOwnGallery();
   switchTab(state.activeTab);
+  if(location.pathname==='/app/photos')openOwnGallery(false);
   $("#app").setAttribute("aria-busy", "false");
   const route = routedProfile();
   if (route) await showPerson(route.user, { historyMode: "none", photo: route.photo });
@@ -753,6 +754,7 @@ async function openChat(id) {
 }
 
 function switchTab(tab) {
+  delete document.body.dataset.ownGallery;
   state.activeTab = tab;
   document.body.dataset.activeTab = tab;
   $(".toolbar")?.classList.remove("filters-open");
@@ -826,7 +828,7 @@ async function initialize() {
     fillProfile();
     await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked(), loadOwnGallery(), loadUploadQuotas(), loadVerification(), loadMediaSafety()]);
     await monitorLocationPermission();
-    if (location.pathname === "/app/photos") switchTab("profile");
+    if (location.pathname === "/app/photos") openOwnGallery(false);
     const route = routedProfile();
     if (route) await showPerson(route.user, { historyMode: "none", photo: route.photo });
   } catch (error) {
@@ -889,6 +891,9 @@ $("#notification-toggle").addEventListener("click", async (event) => {
   toast("เปิดการแจ้งเตือนแล้ว");
 });
 $("#view-own-profile").addEventListener("click", () => showPerson(state.account.user.id));
+function openOwnGallery(push=true){switchTab('profile');document.body.dataset.ownGallery='true';if(push)history.pushState({},'', '/app/photos');}
+$('#manage-gallery').addEventListener('click',()=>openOwnGallery());
+$('#gallery-settings-back').addEventListener('click',()=>{switchTab('profile');history.pushState({},'', '/app/');});
 
 $("#gallery-upload").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -1201,6 +1206,8 @@ window.addEventListener("pagehide", () => {
   if (state.locationPermission) state.locationPermission.onchange = null;
 });
 window.addEventListener("popstate", () => {
+  if(location.pathname==='/app/photos')openOwnGallery(false);
+  else delete document.body.dataset.ownGallery;
   const route = routedProfile();
   if (route) showPerson(route.user, { historyMode: "none", photo: route.photo });
   else if ($("#profile-dialog").open) $("#profile-dialog").close();

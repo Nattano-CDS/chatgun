@@ -99,10 +99,11 @@
             <label>เพศ<select name="gender"><option>ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option></select></label>
             <label class="wide">เกี่ยวกับคุณ<textarea name="bio" maxlength="250"></textarea></label>
             <label class="wide">ความสนใจ<input name="interests" maxlength="100"></label>
-            <button class="primary" type="submit">บันทึกโปรไฟล์</button><button id="view-own-profile" class="secondary" type="button">ดูโปรไฟล์และแกลเลอรี</button><button id="hide-discovery" class="secondary" type="button">ปิดการหาเพื่อนและลบตำแหน่ง</button>
+            <button class="primary" type="submit">บันทึกโปรไฟล์</button><button id="manage-gallery" class="primary" type="button">อัปโหลดรูปโปรไฟล์และ Gallery</button><button id="view-own-profile" class="secondary" type="button">ดูโปรไฟล์และแกลเลอรี</button><button id="hide-discovery" class="secondary" type="button">ปิดการหาเพื่อนและลบตำแหน่ง</button>
             <button id="notification-toggle" class="secondary wide" type="button">เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้</button>
           </form>
           <section class="panel gallery-panel">
+            <button id="gallery-settings-back" class="secondary" type="button">← กลับโปรไฟล์</button>
             <div class="section-heading"><div><small>รูปโปรไฟล์และแกลเลอรี</small><h2>รูปภาพของคุณ</h2></div><span id="gallery-count">0 / 12</span></div>
             <p id="gallery-upload-quota" class="upload-quota" aria-live="polite">แกลเลอรี: กำลังตรวจสอบโควตา…</p>
             <form id="gallery-upload" class="upload-form" hidden>
