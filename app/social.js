@@ -787,6 +787,10 @@ window.visualViewport?.addEventListener("resize", sizeConversation);
 $('#profile-dialog').addEventListener('cancel',()=>{
   if(routedProfile())history.pushState({},'', '/app/');
 });
+$('#profile-dialog').addEventListener('close',()=>{
+  // Report, block and chat actions also close this route, not only its Back button.
+  if(routedProfile())history.pushState({},'', '/app/');
+});
 
 async function initialize() {
   try {
@@ -1123,6 +1127,9 @@ $("#profile-dialog").addEventListener("submit", async (event) => {
   } catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
 });
 
+$('#thread').addEventListener('change',event=>{
+  if(event.target.matches('input[name=file]')&&event.target.files?.length)event.target.closest('form').requestSubmit();
+});
 $("#thread").addEventListener("submit", async (event) => {
   if (!event.target.matches(".composer")) return;
   event.preventDefault();

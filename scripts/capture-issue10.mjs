@@ -36,10 +36,13 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
       const messages=fixture.conversations.flatMap(c=>c.messages.map((body,i)=>({id:`message-${c.with}-${i}`,sender:i%2?'demo-me':`demo-${c.with}`,receiver:i%2?`demo-${c.with}`:'demo-me',body,created:now-(12-i)*120000})));
       const galleryPhotos=people.map(p=>({id:`demo-portrait-${p.slug}`,owner:p.id,caption:`ภาพตัวละครสมมติ ${p.name}`,url:p.photoUrl,likeCount:3,likedByMe:false,comments:[{id:`comment-${p.id}`,name:'เพื่อนตัวอย่าง',body:'รูปนี้ดูสดใสดีมาก'}]}));
       galleryPhotos.push(...people.slice(0,2).map(p=>({id:`own-${p.id}`,owner:'demo-me',caption:'แกลเลอรีตัวอย่าง — ตัวละครสมมติ',url:p.photoUrl,likeCount:4,comments:[]})));
-      const value={me,people,relations,messages,galleryPhotos,ownRatings:people.slice(0,15).map((p,i)=>({name:p.name,score:4+i%2,comment:['คุยเป็นกันเองและสุภาพ','ชอบแลกเปลี่ยนเรื่องคาเฟ่กับหนังสือ','เป็นเพื่อนที่รับฟังและให้เกียรติกัน'][i%3],created:now-i*3600000})),blockedUsers:[],chatImages:[],reports:[]};
+      const value={me,people,relations,messages,galleryPhotos,ownRatings:people.slice(0,15).map((p,i)=>({name:p.name,score:4+i%2,comment:['คุยเป็นกันเองและสุภาพ','ชอบแลกเปลี่ยนเรื่องคาเฟ่กับหนังสือ','เป็นเพื่อนที่รับฟังและให้เกียรติกัน'][i%3],created:now-i*3600000})),blockedUsers:[],chatImages:[{id:'fixture-chat-01',url:'/assets/demo/01.png',created:now}],reports:[]};
       await new Promise((resolve,reject)=>{const request=indexedDB.open('near-demo',1);request.onsuccess=()=>{const db=request.result;const tx=db.transaction('state','readwrite');tx.objectStore('state').put(value,'demo');tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};});
     },fixture);
     await page.reload();await page.locator('.photo-card').first().waitFor();
+  }else{
+    await page.evaluate(async()=>{await new Promise((resolve,reject)=>{const request=indexedDB.open('chatgun-demo',1);request.onsuccess=()=>{const db=request.result,tx=db.transaction('state','readwrite');tx.objectStore('state').put({assets:[{id:'fixture-chat-01',url:'/assets/demo/01.png',created_at:Math.floor(Date.now()/1000)}]},'chatgun-browser-demo-v1');tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};});});
+    await page.reload();await page.locator('#people-grid .person-card').first().waitFor();
   }
   await shot('discovery');
   const search=page.locator(original?'.toolbar-search input':'#people-search');

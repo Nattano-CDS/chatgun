@@ -31,3 +31,17 @@ test('failed portrait remains labelled; persistent auth navigation excludes Game
   await page.goto('/');await expect(page.locator('[data-image-error]').first()).toHaveAttribute('aria-label',/มะปราง/);
   await page.goto('/signup');await expect(page.locator('.auth-navigation a')).toHaveCount(5);await expect(page.locator('.auth-navigation')).not.toContainText('เกม');
 });
+test('fictional friendship accept/reject/request/block/unblock persists without server writes',async({page})=>{
+  await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+  const writes=[];page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&r.method()!=='GET')writes.push(r.url());});
+  await page.goto('/');await page.locator('#primary-nav [data-tab=friends]').click();
+  await page.locator('#requests-grid [data-action=accept]').first().click();await expect(page.locator('#friends-grid .person-card')).toHaveCount(11);
+  await page.locator('#requests-grid [data-action=reject]').first().click();await expect(page.locator('#requests-grid .person-card')).toHaveCount(3);
+  await page.locator('#primary-nav [data-tab=near]').click();
+  await page.locator('[data-person="demo-01"] [data-action=request]').click();await expect(page.locator('[data-person="demo-01"] .discovery-action')).toBeDisabled();
+  await page.locator('#people-grid [data-person="demo-02"]').click();page.once('dialog',d=>d.accept());await page.locator('#profile-dialog [data-action=block]').click();
+  await page.locator('#primary-nav [data-tab=profile]').click();await expect(page.locator('#blocked-list')).toContainText('ต้นน้ำ');
+  await page.locator('#blocked-list [data-action=unblock]').click();await expect(page.locator('#blocked-list')).not.toContainText('ต้นน้ำ');
+  await page.reload();await page.locator('#primary-nav [data-tab=friends]').click();
+  await expect(page.locator('#requests-grid .person-card')).toHaveCount(4);expect(writes).toEqual([]);
+});

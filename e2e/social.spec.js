@@ -157,7 +157,6 @@ test("browser-only demo supports local gallery and chat image workflows", async 
   await page.locator('#primary-nav button[data-tab="chat"]').click();
   await page.getByRole("button", { name: /ต้นน้ำ/u }).click();
   await page.locator('#thread input[type="file"]').setInputFiles({ name: "chat.png", mimeType: "image/png", buffer: png });
-  await page.locator("#thread .composer").getByRole("button", { name: "ส่ง", exact: true }).click();
   await expect(page.locator("#thread .chat-image")).toHaveAttribute("src", /^data:image\//u);
   await page.getByRole("button", { name: "รูปที่ส่งล่าสุด" }).click();
   await expect(page.locator("#asset-grid img")).toHaveAttribute("src", /^data:image\//u);
