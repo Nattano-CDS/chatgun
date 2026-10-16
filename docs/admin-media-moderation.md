@@ -56,9 +56,10 @@ LINE identity creates a `pending_acceptance` account, must complete the versione
 declaration and Terms/Privacy acceptance, then must complete member onboarding before reaching
 Social. Self-declaration does not unlock Sensitive content. Email and Mobile OTP remain disabled.
 
-`NEW_ACCOUNT_REGISTRATION_ENABLED=true` exists only in the Preview configuration on the migration
-branch. Production remains `false`; this work does not deploy or activate public Production
-registration. Dormant invitation tables remain for migration compatibility but are not restored.
+The consolidated release candidate resets `NEW_ACCOUNT_REGISTRATION_ENABLED=false` in Preview as
+well as Production. Existing authorized identities can sign in, but unknown provider identities
+cannot create accounts. Dormant invitation tables remain for migration compatibility and are not
+treated as an active registration path.
 
 ## Migration 0009
 

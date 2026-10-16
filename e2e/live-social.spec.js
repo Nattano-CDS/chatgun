@@ -40,6 +40,26 @@ async function mutate(request, baseURL, account, path, data) {
   });
 }
 
+async function moderate(request, baseURL, account, path, data) {
+  return request.post(`${baseURL}${path}`, {
+    headers: {
+      cookie: `__Host-cg_session=${account.token}; __Host-cg_csrf=${account.csrf}`,
+      origin: baseURL,
+      "x-csrf-token": account.csrf,
+      "x-moderation-purpose": encodeURIComponent("Release candidate synthetic moderation validation"),
+      "content-type": "application/json",
+    },
+    data,
+  });
+}
+
+async function moderationRead(request, baseURL, account, path) {
+  return request.get(`${baseURL}${path}`, { headers: {
+    cookie: `__Host-cg_session=${account.token}`,
+    "x-moderation-purpose": encodeURIComponent("Release candidate synthetic moderation validation"),
+  } });
+}
+
 async function read(request, baseURL, account, path) {
   return request.get(`${baseURL}${path}`, { headers: { cookie: `__Host-cg_session=${account.token}` } });
 }
@@ -140,6 +160,7 @@ test("staging R2 gallery and chat media remain private and relationship-authoriz
   const alice = member("cg-stage-alice");
   const bob = member("cg-stage-bob");
   const charlie = member("cg-stage-charlie");
+  const moderator = member("cg-stage-moderator");
 
   const galleryUpload = await upload(request, baseURL, alice, "/api/social/gallery", {
     file: { name: "private.png", mimeType: "image/png", buffer: pngWithMetadata() },
@@ -149,6 +170,14 @@ test("staging R2 gallery and chat media remain private and relationship-authoriz
   const galleryId = (await galleryUpload.json()).id;
   const anonymous = await request.get(`${baseURL}/api/social/media/${galleryId}`);
   expect(anonymous.status()).toBe(401);
+  const pendingOwnerRead = await read(request, baseURL, alice, `/api/social/media/${galleryId}`);
+  expect(pendingOwnerRead.status()).toBe(404);
+  const moderatorObject = await moderationRead(request, baseURL, moderator, `/api/social/moderation/media/${galleryId}`);
+  expect(moderatorObject.status()).toBe(200);
+  const releaseGallery = await moderate(request, baseURL, moderator, "/api/social/moderation/media", {
+    id: galleryId, status: "released", category: "general", reason: "Synthetic general gallery image approved for RC validation", revision: 0,
+  });
+  expect(releaseGallery.status()).toBe(200);
   const ownerRead = await read(request, baseURL, alice, `/api/social/media/${galleryId}`);
   expect(ownerRead.status()).toBe(200);
   expect(ownerRead.headers()["cache-control"]).toContain("private, no-store");
@@ -164,6 +193,32 @@ test("staging R2 gallery and chat media remain private and relationship-authoriz
   expect(friendGalleryData.comments.map((comment) => comment.body)).toContain("ความคิดเห็นสังเคราะห์");
   const forbiddenDelete = await mutate(request, baseURL, bob, "/api/social/gallery", { action: "delete", id: galleryId });
   expect(forbiddenDelete.status()).toBe(403);
+
+  const mediaReport = await mutate(request, baseURL, bob, "/api/social/reports/media", {
+    mediaId: galleryId, reason: "privacy", details: "Synthetic media report for release-candidate validation",
+  });
+  expect(mediaReport.status()).toBe(201);
+  const reportQueue = await moderationRead(request, baseURL, moderator, "/api/social/moderation/media-reports?status=pending");
+  expect(reportQueue.status()).toBe(200);
+  const queuedReport = (await reportQueue.json()).reports.find((report) => report.media_id === galleryId);
+  expect(queuedReport).toBeTruthy();
+  expect((await moderate(request, baseURL, moderator, "/api/social/moderation/media-reports", {
+    id: queuedReport.id, status: "reviewed", note: "Synthetic report reviewed during RC validation",
+  })).status()).toBe(200);
+  expect((await moderate(request, baseURL, moderator, "/api/social/moderation/media", {
+    id: galleryId, status: "rejected", category: "prohibited", reason: "Synthetic prohibited decision for appeal validation", revision: 1,
+  })).status()).toBe(200);
+  expect((await read(request, baseURL, alice, `/api/social/media/${galleryId}`)).status()).toBe(404);
+  expect((await mutate(request, baseURL, alice, "/api/social/media/appeals", {
+    mediaId: galleryId, reason: "Synthetic owner appeal requesting independent review",
+  })).status()).toBe(201);
+  const appealQueue = await moderationRead(request, baseURL, moderator, "/api/social/moderation/appeals?status=pending");
+  const appeal = (await appealQueue.json()).appeals.find((item) => item.media_id === galleryId);
+  expect(appeal).toBeTruthy();
+  expect((await moderate(request, baseURL, moderator, "/api/social/moderation/appeals", {
+    id: appeal.id, decision: "granted", category: "general", reason: "Synthetic appeal granted after independent RC review", revision: appeal.revision,
+  })).status()).toBe(200);
+  expect((await read(request, baseURL, alice, `/api/social/media/${galleryId}`)).status()).toBe(200);
 
   const spoofed = await upload(request, baseURL, alice, "/api/social/gallery", {
     file: { name: "spoofed.png", mimeType: "image/png", buffer: Buffer.alloc(64) },
@@ -181,6 +236,10 @@ test("staging R2 gallery and chat media remain private and relationship-authoriz
   const chatMessage = await read(request, baseURL, bob, `/api/social/messages?target=${alice.id}`);
   const uploadedMessage = (await chatMessage.json()).messages.find((message) => message.id === chatUploadResult.messageId);
   expect(uploadedMessage.media_id).toBeTruthy();
+  expect((await read(request, baseURL, bob, `/api/social/chat/media/${uploadedMessage.media_id}`)).status()).toBe(404);
+  expect((await moderate(request, baseURL, moderator, "/api/social/moderation/media", {
+    id: uploadedMessage.media_id, status: "released", category: "general", reason: "Synthetic chat image approved for RC validation", revision: 0,
+  })).status()).toBe(200);
   expect((await read(request, baseURL, bob, `/api/social/chat/media/${uploadedMessage.media_id}`)).status()).toBe(200);
   expect((await read(request, baseURL, charlie, `/api/social/chat/media/${uploadedMessage.media_id}`)).status()).toBe(404);
 
@@ -232,7 +291,8 @@ test("desktop and mobile render persisted staging profile, discovery, notificati
   await page.locator('#gallery-upload input[type="file"]').setInputFiles({ name: "browser.png", mimeType: "image/png", buffer: PNG });
   await page.locator('#gallery-upload input[name="caption"]').fill("รูปจากเบราว์เซอร์ staging");
   await page.locator("#gallery-upload").getByRole("button", { name: "อัปโหลดรูป" }).click();
-  await expect(page.locator("#my-gallery img")).toBeVisible();
+  await expect(page.locator("#toast")).toContainText("อัปโหลดรูปแล้ว");
+  await expect(page.locator("#my-gallery img")).toHaveCount(0);
   await page.getByRole("button", { name: "เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้" }).click();
   await expect(page.getByRole("button", { name: "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้" })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem("chatgun-notifications"))).toBe("enabled");

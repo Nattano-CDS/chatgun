@@ -70,7 +70,8 @@ test("staging social and private media activation remain isolated from productio
   assert.match(production, /"MEDIA_UPLOAD_ENABLED": "false"/u);
   assert.match(production, /"MEDIA_QUARANTINE_ENABLED": "true"/u);
   assert.match(production, /"SENSITIVE_CONTENT_ENABLED": "false"/u);
-  assert.match(wrangler, /"NEW_ACCOUNT_REGISTRATION_ENABLED": "true"/u);
+  assert.doesNotMatch(wrangler, /"NEW_ACCOUNT_REGISTRATION_ENABLED": "true"/u);
+  assert.match(wrangler, /"NEW_ACCOUNT_REGISTRATION_ENABLED": "false"/u);
   assert.match(production, /"NEW_ACCOUNT_REGISTRATION_ENABLED": "false"/u);
   assert.match(wrangler, /"BETA_INVITATION_REGISTRATION_ENABLED": "false"/u);
   assert.match(production, /"BETA_INVITATION_REGISTRATION_ENABLED": "false"/u);

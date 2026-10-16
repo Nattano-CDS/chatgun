@@ -14,6 +14,7 @@ const members = [
   { id: "cg-stage-alice", name: "อลิซ ทดสอบ", email: "alice.social@example.test", latitude: 13.75630, longitude: 100.50180 },
   { id: "cg-stage-bob", name: "บ็อบ ทดสอบ", email: "bob.social@example.test", latitude: 13.75655, longitude: 100.50195 },
   { id: "cg-stage-charlie", name: "ชาร์ลี ทดสอบ", email: "charlie.social@example.test", latitude: 13.76000, longitude: 100.50400 },
+  { id: "cg-stage-moderator", name: "ผู้ดูแลสังเคราะห์", email: "moderator.social@example.test", latitude: 13.75800, longitude: 100.50300, moderator: true },
 ].map((member) => ({ ...member, token: randomBytes(32).toString("base64url"), csrf: randomBytes(32).toString("base64url") }));
 
 function hash(value) {
@@ -43,14 +44,23 @@ const statements = [
 ];
 for (const member of members) {
   const assuranceId = randomUUID();
+  const acceptanceId = randomUUID();
   const tokenHash = hash(member.token);
   statements.push(
-    `INSERT INTO users(id,email,email_verified_at,display_name,status,created_at,updated_at) VALUES (${sql(member.id)},${sql(member.email)},${now},${sql(member.name)},'active',${now},${now});`,
+    `INSERT INTO users(id,email,email_verified_at,display_name,status,account_state,created_at,updated_at) VALUES (${sql(member.id)},${sql(member.email)},${now},${sql(member.name)},'active','active',${now},${now});`,
+    `INSERT INTO account_acceptances(id,user_id,adult_notice_version,terms_version,privacy_version,adult_declared_at,terms_accepted_at,privacy_acknowledged_at,accepted_at) VALUES (${sql(acceptanceId)},${sql(member.id)},'controlled-beta-v1','controlled-beta-terms-v1','controlled-beta-privacy-v1',${now},${now},${now},${now});`,
     `INSERT INTO age_assurance_events(id,user_id,age_band,method,notice_version,declared_at) VALUES (${sql(assuranceId)},${sql(member.id)},'adult_18_plus','self_declaration','synthetic-staging-v1',${now});`,
     `INSERT INTO member_profiles(user_id,age_assurance_id,name,gender,bio,interests,discovery_visible,latitude,longitude,accuracy,located_at,created_at,updated_at) VALUES (${sql(member.id)},${sql(assuranceId)},${sql(member.name)},'ไม่ระบุ','บัญชีสังเคราะห์สำหรับทดสอบ staging','ทดสอบ, ความปลอดภัย',1,${member.latitude},${member.longitude},5,${now},${now},${now});`,
     `INSERT INTO sessions(token_hash,user_id,csrf_hash,created_at,expires_at,last_seen_at) VALUES (${sql(tokenHash)},${sql(member.id)},${sql(hash(member.csrf))},${now},${expiresAt},${now});`,
     `INSERT INTO session_auth_evidence(token_hash,user_id,authenticated_at,expires_at) VALUES (${sql(tokenHash)},${sql(member.id)},${now},${expiresAt});`,
   );
+  if (member.moderator) {
+    const grantId = randomUUID();
+    statements.push(
+      `INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at) VALUES (${sql(grantId)},${sql(member.id)},'safety_admin','Synthetic release-candidate staging validation only',${now},${expiresAt});`,
+      `INSERT INTO moderation_role_events(id,grant_id,actor_user_id,target_user_id,role,action,reason,created_at) VALUES (${sql(randomUUID())},${sql(grantId)},NULL,${sql(member.id)},'safety_admin','grant','Synthetic release-candidate staging validation only',${now});`,
+    );
+  }
 }
 const temporary = mkdtempSync(resolve(tmpdir(), "chatgun-social-seed-"));
 const sqlFile = resolve(temporary, "seed.sql");
