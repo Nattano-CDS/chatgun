@@ -1,6 +1,6 @@
 # NEAR to ChatGun feature matrix
 
-Status: implementation checkpoint on `codex/near-migration`. No NEAR source, Production data, or Production deployment was modified.
+Status: consolidated release-candidate checkpoint on `codex/chatgun-release-candidate`. No NEAR source, Production data, or Production deployment was modified.
 
 ## Canonical source identification
 
@@ -37,6 +37,27 @@ No standalone feed, communities/groups, notification center, or settings route w
 
 ## Current implementation checkpoint
 
+### Consolidated release-candidate evidence (2026-10-16)
+
+PRs #3, #5, #6, and #7 are a linear ancestry chain and are present in the release candidate. PR
+#4's review-only Markdown drafts are included without replacing the newer runtime legal pages.
+Staging migrations `0001`–`0010` report no pending work; foreign-key and duplicate-provider-subject
+checks are clean. Against isolated Pages Preview `https://a4620500.chatgun.pages.dev`, the final
+suite passed **76/76 unit/integration/security tests** and **32 Playwright tests** on desktop/mobile
+with **4 intentional cross-project mutation skips and 0 failures**. Live evidence covers profile,
+discovery, friends, text/image chat, gallery, ratings, notifications, reports, blocks, moderation,
+appeals, account deletion, session revocation, private R2 authorization, quarantine, metadata
+stripping, cleanup, and offline recovery. The staging Worker drained all four due post-test R2
+deletions; D1 then had zero pending deletion operations, zero pending-deletion media rows, zero
+orphan reviews, and no active Sensitive or Prohibited media.
+
+Google, Facebook, and LINE were not interactively repeated because this integration did not change
+provider authorization/callback/session code; the real authorized-provider evidence recorded in
+PR #6 is retained. Public registration, Email OTP, Mobile OTP, Game, Sensitive content, Demo, and
+identity verification remain disabled. Production has no R2 binding and all social/media/moderation
+capabilities remain fail-closed. Detailed current evidence and blockers are in
+`docs/release-candidate-validation.md`.
+
 The row-level status/evidence cells below are preserved as the source-discovery baseline that justified the architecture. This checkpoint supersedes those baseline cells for current destination status:
 
 | Current status | Features | Evidence / remaining gate |
@@ -50,21 +71,27 @@ Implementation evidence at this checkpoint:
 
 - Migrations `0003_social.sql` and `0004_moderation_audit.sql` were applied only to `chatgun-auth-staging`; three pre-existing staging users were preserved and `PRAGMA foreign_key_check` returned no violations.
 - Production was inspected read-only and still has migrations `0002`–`0004` pending; none were applied.
-- Validated stable Preview for commit `bb5b4eeb983d6d7c2c7b73e2649619168967639d`:
-  `https://codex-near-migration.chatgun.pages.dev` (deployment `https://cd16a782.chatgun.pages.dev`). Social shell, discovery, relationships, messaging,
-  ratings, private media, and invitation-only adult onboarding are enabled against isolated
-  staging only. Public registration, moderation tools, identity verification, Demo, Game,
-  email OTP, and mobile OTP remain disabled. Production has no R2 binding and overrides
-  Beta/social/media capabilities to `false`.
-- Current automated evidence: 72 unit/integration/security tests pass. The new post-OAuth acceptance page additionally passes focused Playwright checks on desktop and mobile. Earlier stable-Preview browser evidence passed 25 tests with 9 intentional environment/project skips. Real Google, Facebook, and LINE login/callback/session/logout journeys passed with authorized existing staging identities before the acceptance-state change; each provider must therefore be rerun after the new Preview deploy before the new journey is marked real-E2E complete. A real distinct Google identity was linked to the Facebook-backed ChatGun user, while an already-owned Google identity was rejected without changing ownership. Details and screenshots are recorded in `docs/post-oauth-acceptance-journey.md`, `docs/near-migration-validation.md`, `docs/final-uat-beta-readiness.md`, and PR #6.
+- Consolidated Preview `https://a4620500.chatgun.pages.dev` enables the social shell,
+  discovery, relationships, messaging, ratings, private media, and moderation only for authorized
+  synthetic staging sessions. Public and invitation-based registration, identity verification,
+  Demo, Game, Sensitive content, Email OTP, and Mobile OTP remain disabled. Production has no R2
+  binding and overrides acceptance/social/media/moderation capabilities to `false`.
+- Current automated evidence is 76 unit/integration/security tests and 32 deployed-Preview
+  Playwright tests passing with 4 intentional cross-project mutation skips and no failures. Real
+  Google, Facebook, and LINE authorization/callback/session/logout passed earlier on the stable
+  Preview with authorized identities. The release candidate did not repeat interactive provider
+  tests because it changed no OAuth/provider code; it retains the PR #6 evidence and verifies
+  closed registration, acceptance, linking ownership, cancellation/replay, logout, and deletion
+  regressions automatically. Details and screenshots are recorded in
+  `docs/release-candidate-validation.md` and the referenced PR #6 reports.
 - R2 is active. Private bucket `chatgun-media-staging` and scheduled Worker `chatgun-media-cleanup-staging` are staging-only. Live tests verified private reads, metadata removal, deletion/account-deletion queues, and an empty post-test bucket. No NEAR, PiggyPrice, or Production resource was accessed or mutated.
 
 ## Complete non-game feature inventory
 
 | Feature | Original source files | Original route/page | API endpoints | Database tables | UI components | Dependencies | Current NEAR functionality | ChatGun destination | Migration status | Verification evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Authentication and session entry | `app/chatgpt-auth.ts`, `app/login/page.tsx`, `app/logout-button.tsx`, `app/auth-link.tsx`, `app/site-shell.tsx` | `/login`, dispatch-owned sign-in/sign-out routes | Dispatch-owned SIWC routes | Identity is supplied by Sites; profile data uses `profiles` | Login panel, account state, logout link | ChatGPT SIWC, request identity headers | Signs visitors in, preserves a stable site-scoped user ID, and returns to the app | Keep ChatGun Google, Facebook, and LINE OAuth, secure sessions, logout, linking, CSRF, Turnstile, and rate limits from PR #3/#5; add post-OAuth acceptance before member onboarding; do not migrate SIWC | **Automated acceptance verified; provider rerun required** | Google, Facebook, and LINE previously passed real authorization/callback/session/logout on stable Preview. The new versioned `pending_acceptance → pending_onboarding → active` state machine is server-enforced and passes unit/integration/security plus desktop/mobile browser tests. Invitation-only creation, linking ownership, cancellation, replay, logout, and deletion regressions pass. Real provider journeys must be rerun after deploying this commit to Preview; Production remains disabled. |
-| New-member registration and onboarding | `app/register/page.tsx`, `app/register/register-form.tsx`, `app/api/near/route.ts` | `/register` | `POST /api/near` (`profile`) | `profiles` | Registration form, authenticated return flow | SIWC, D1 | Creates a display profile with name, gender, bio, and interests | Add authenticated ChatGun member onboarding after social login; connect `users.id` to the social profile model | **Implemented for controlled staging; launch-gated** | Public registration stays off. A one-use hashed invitation is bound to OAuth and consumed transactionally; the new account remains `pending_age` until recent-authenticated server-side 18+ onboarding creates its profile. |
+| Authentication and session entry | `app/chatgpt-auth.ts`, `app/login/page.tsx`, `app/logout-button.tsx`, `app/auth-link.tsx`, `app/site-shell.tsx` | `/login`, dispatch-owned sign-in/sign-out routes | Dispatch-owned SIWC routes | Identity is supplied by Sites; profile data uses `profiles` | Login panel, account state, logout link | ChatGPT SIWC, request identity headers | Signs visitors in, preserves a stable site-scoped user ID, and returns to the app | Keep ChatGun Google, Facebook, and LINE OAuth, secure sessions, logout, linking, CSRF, Turnstile, and rate limits from PR #3/#5; add post-OAuth acceptance before member onboarding; do not migrate SIWC | **Stable-Preview provider E2E passed; RC regression passed** | Google, Facebook, and LINE passed real authorization/callback/session/logout with authorized identities in PR #6. The versioned `pending_acceptance → pending_onboarding → active` state machine is server-enforced and passes unit/integration/security plus desktop/mobile browser tests. Linking ownership, cancellation, replay, logout, deletion, and closed-registration regressions pass. No provider code changed during consolidation, so interactive login was not repeated. Production remains disabled. |
+| New-member registration and onboarding | `app/register/page.tsx`, `app/register/register-form.tsx`, `app/api/near/route.ts` | `/register` | `POST /api/near` (`profile`) | `profiles` | Registration form, authenticated return flow | SIWC, D1 | Creates a display profile with name, gender, bio, and interests | Add authenticated ChatGun member onboarding after social login; connect `users.id` to the social profile model | **Implemented; registration release-gated** | The acceptance and onboarding state machine is implemented and tested. Both public registration and the dormant invitation mechanism are disabled in this release candidate; unknown provider identities fail closed while existing authorized identities can sign in. |
 | Age eligibility | No age field or gate exists in NEAR | None | None | None | None | None | NEAR does not collect or enforce age | Add the requested 18+ gate only after owner/legal approval of threshold, assurance method, evidence minimization, correction, and evasion controls | **Technically implemented; policy-gated** | Bangkok-date DOB calculation rejects under-18/invalid claims and stores only an adult self-declaration event. It is not independent verification; owner and qualified Thai legal approval remain required. |
 | Application shell and navigation | `app/site-shell.tsx`, `app/near.tsx`, `app/bottom-nav.tsx`, `app/layout.tsx` | `/` | None directly | None | Desktop/sidebar-derived shell, sticky toolbar, six-item mobile bottom navigation | Next/Vinext, React, Lucide | Navigates discovery, friends, chat, private reviews, game, and profile; preserves badges and route state | Recreate five non-game destinations with ChatGun branding; omit game navigation | **Migrated and verified** | Deployed Preview desktop/mobile tests cover all five non-game destinations; Game has no route, control, API, schema, asset pack, or dependency. |
 | Live/demo mode switching | `app/near.tsx`, `app/demo.ts`, `app/demo-store.ts` | `/` | Reuses normal UI actions in demo mode without network writes | IndexedDB `near-demo` only | Demo banner, mode switch, sample profiles/content | IndexedDB, FileReader | Lets anonymous/signed-in users explore representative discovery, friendships, chat, gallery, reviews, moderation, and verification data | Decide whether a safe ChatGun demo remains a product requirement; never mix demo data with real D1 data | **Migrated and verified, disabled by default** | Browser-only IndexedDB demo covers local gallery/chat images and five-image reuse without network persistence; deployed Preview keeps `DEMO_MODE_ENABLED=false`. |
@@ -173,8 +200,8 @@ The shared `api-client`, `visible-poll`, `Portrait`, chat, profile, demo-store, 
   filters, member profile, profile/privacy settings, profile-photo management, gallery, likes,
   comments, friend requests, friend list, text messaging, chat images, unread/device
   notifications, ratings, blocking, reporting, and account deletion).
-- Technically implemented but policy/operationally gated: **3** (invitation onboarding,
-  self-declared adult eligibility, and moderator message/media audit).
+- Technically implemented but policy/operationally gated: **3** (closed registration/onboarding
+  state machine, self-declared adult eligibility, and moderator message/media audit).
 - Partially migrated: **0**. Provider authentication is staging-verified; provider publishing
   and Production credentials remain release gates rather than missing migration behavior.
 - Blocked on an external prerequisite: **1** (high-risk identity verification activation).
@@ -187,5 +214,5 @@ The shared `api-client`, `visible-poll`, `Portrait`, chat, profile, demo-store, 
 
 Production activation remains blocked until the 18+ age-assurance decision, staffed social
   safety operations, location/media policy approval, production scanner decision, provider
-  publishing, Production migrations 0002–0007, and identity-verification decision are approved.
+  publishing, Production migrations 0002–0010, and identity-verification decision are approved.
 Staging R2 and real private-media authorization/deletion E2E pass; public media remains off.

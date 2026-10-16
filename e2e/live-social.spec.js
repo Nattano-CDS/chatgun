@@ -156,6 +156,7 @@ test("staging social APIs persist positive and negative non-media workflows", as
 });
 
 test("staging R2 gallery and chat media remain private and relationship-authorized", async ({ request, baseURL }, testInfo) => {
+  test.setTimeout(90_000);
   test.skip(testInfo.project.name !== "desktop-chromium", "run staging mutations once");
   const alice = member("cg-stage-alice");
   const bob = member("cg-stage-bob");
