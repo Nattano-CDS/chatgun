@@ -12,8 +12,6 @@ const ERROR_MESSAGES = {
   oauth_used: "คำขอนี้ถูกใช้ไปแล้ว กรุณาเริ่มใหม่",
   identity_linked: "บัญชีนี้เชื่อมกับสมาชิกคนอื่นแล้ว",
   registration_closed: "ขณะนี้เปิดให้เข้าสู่ระบบด้วยบัญชีเดิมเท่านั้น การสมัครใหม่จะเปิดหลังมาตรการคุ้มครองผู้เยาว์ได้รับอนุมัติ",
-  invitation_invalid: "รหัสเชิญไม่ถูกต้องหรือหมดอายุ กรุณาตรวจสอบรหัสแล้วลองใหม่",
-  invitation_unavailable: "รหัสเชิญถูกใช้หรือหมดอายุแล้ว กรุณาขอรหัสใหม่จากผู้ดูแล Beta",
   oauth_failed: "ไม่สามารถเข้าสู่ระบบกับผู้ให้บริการนี้ได้ กรุณาลองใหม่",
 };
 
@@ -59,7 +57,6 @@ document.querySelectorAll("[data-provider]").forEach((button) => {
     try {
       const result = await api(`/api/auth/oauth/${button.dataset.provider}/start`, {
         turnstileToken: token,
-        invitationCode: $("invitation-code").value.trim(),
       });
       const target = new URL(result.authorizationUrl);
       if (target.protocol !== "https:") throw new Error("ปลายทางเข้าสู่ระบบไม่ถูกต้อง");
@@ -80,11 +77,6 @@ async function initializeTurnstile() {
     if (config.newAccountRegistrationEnabled) {
       $("auth-heading").textContent = "เข้าสู่ระบบหรือสร้างบัญชี";
       $("auth-description").textContent = "เลือกบัญชีโซเชียลที่คุณต้องการใช้กับ ChatGun";
-      $("social-consent").textContent = "เมื่อดำเนินการต่อ ChatGun จะรับชื่อ รูปโปรไฟล์ และอีเมลเท่าที่ผู้ให้บริการอนุญาต เพื่อสร้างหรือยืนยันบัญชีและรักษาความปลอดภัยในการเข้าสู่ระบบ";
-    } else if (config.invitationOnlyRegistrationEnabled) {
-      $("auth-heading").textContent = "เข้าสู่ระบบ หรือเข้าร่วม Beta";
-      $("auth-description").textContent = "Beta จำกัดเฉพาะผู้ได้รับเชิญอายุ 18 ปีขึ้นไป ส่วนสมาชิกเดิมเข้าสู่ระบบได้ตามปกติ";
-      $("invitation-field").hidden = false;
       $("social-consent").textContent = "เมื่อดำเนินการต่อ ChatGun จะรับชื่อ รูปโปรไฟล์ และอีเมลเท่าที่ผู้ให้บริการอนุญาต เพื่อสร้างหรือยืนยันบัญชีและรักษาความปลอดภัยในการเข้าสู่ระบบ";
     }
     const script = document.createElement("script");

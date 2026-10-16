@@ -9,11 +9,6 @@ aside p{color:#747b94;line-height:1.9}
 .card h2{text-align:center;font-size:28px;margin:0}
 .card>p{text-align:center;color:#8188a1;font-size:13px}
 .providers{display:grid;gap:10px;margin-top:25px}
-.invitation-field{margin-top:22px;text-align:left}
-.invitation-field label{display:block;margin-bottom:7px;color:#242943;font-size:13px;font-weight:650}
-.invitation-field input{box-sizing:border-box;width:100%;padding:12px 13px;border:1px solid #dcddeb;border-radius:12px;font:inherit;color:#242943;background:#fff}
-.invitation-field input:focus{outline:3px solid #7253df22;border-color:#7253df}
-.invitation-field p{margin:7px 2px 0;color:#777d94;font-size:11px;line-height:1.55;text-align:left}
 button{font-family:inherit;cursor:pointer}
 .providers button{padding:12px;border-radius:12px;border:1px solid #e5e5ef;background:white;font-size:15px}
 .providers .line{border-color:#06c755;color:#06a94a}

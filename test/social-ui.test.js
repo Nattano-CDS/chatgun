@@ -68,14 +68,16 @@ test("staging social and private media activation remain isolated from productio
   assert.match(wrangler, /"MEDIA_QUARANTINE_ENABLED": "false"/u);
   assert.match(production, /"MEDIA_UPLOAD_ENABLED": "false"/u);
   assert.match(production, /"MEDIA_QUARANTINE_ENABLED": "true"/u);
-  for (const capability of ["NEW_ACCOUNT_REGISTRATION_ENABLED", "IDENTITY_VERIFICATION_ENABLED", "MODERATION_TOOLS_ENABLED", "DEMO_MODE_ENABLED"]) {
+  assert.match(wrangler, /"NEW_ACCOUNT_REGISTRATION_ENABLED": "true"/u);
+  assert.match(production, /"NEW_ACCOUNT_REGISTRATION_ENABLED": "false"/u);
+  assert.match(wrangler, /"BETA_INVITATION_REGISTRATION_ENABLED": "false"/u);
+  assert.match(production, /"BETA_INVITATION_REGISTRATION_ENABLED": "false"/u);
+  for (const capability of ["IDENTITY_VERIFICATION_ENABLED", "MODERATION_TOOLS_ENABLED", "DEMO_MODE_ENABLED"]) {
     assert.match(wrangler, new RegExp(`"${capability}": "false"`, "u"));
     assert.match(production, new RegExp(`"${capability}": "false"`, "u"));
   }
-  for (const capability of ["BETA_INVITATION_REGISTRATION_ENABLED", "ADULT_ONBOARDING_ENABLED"]) {
-    assert.match(wrangler, new RegExp(`"${capability}": "true"`, "u"));
-    assert.match(production, new RegExp(`"${capability}": "false"`, "u"));
-  }
+  assert.match(wrangler, /"ADULT_ONBOARDING_ENABLED": "true"/u);
+  assert.match(production, /"ADULT_ONBOARDING_ENABLED": "false"/u);
   assert.match(wrangler, /"database_name": "chatgun-auth-staging"/u);
   assert.match(wrangler, /"binding": "MEDIA"[\s\S]*"bucket_name": "chatgun-media-staging"/u);
   assert.match(production, /"database_name": "chatgun-auth"/u);
