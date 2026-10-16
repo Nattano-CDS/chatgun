@@ -21,9 +21,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "chatgun-auth",
-      "database_id": "9738a051-d914-42d0-8e7b-8098ef2b959d",
-      "preview_database_id": "DB",
+      "database_name": "chatgun-auth-staging",
+      "database_id": "5bbfd55d-eb22-4324-8a7d-57bef14110ea",
       "migrations_dir": "migrations"
     }
   ],
@@ -49,33 +48,6 @@
           "binding": "DB",
           "database_name": "chatgun-auth",
           "database_id": "9738a051-d914-42d0-8e7b-8098ef2b959d",
-          "preview_database_id": "DB",
-          "migrations_dir": "migrations"
-        }
-      ]
-    },
-    "preview": {
-      "vars": {
-        "EMAIL_OTP_ENABLED": "false",
-        "MOBILE_OTP_ENABLED": "false",
-        "LINE_EMAIL_ENABLED": "false",
-        "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
-        "SOCIAL_APP_ENABLED": "false",
-        "ADULT_ONBOARDING_ENABLED": "false",
-        "PUBLIC_DISCOVERY_ENABLED": "false",
-        "FRIEND_REQUESTS_ENABLED": "false",
-        "MESSAGING_ENABLED": "false",
-        "MEDIA_UPLOAD_ENABLED": "false",
-        "RATINGS_ENABLED": "false",
-        "IDENTITY_VERIFICATION_ENABLED": "false",
-        "MODERATION_TOOLS_ENABLED": "false"
-      },
-      "d1_databases": [
-        {
-          "binding": "DB",
-          "database_name": "chatgun-auth-staging",
-          "database_id": "5bbfd55d-eb22-4324-8a7d-57bef14110ea",
-          "preview_database_id": "DB",
           "migrations_dir": "migrations"
         }
       ]
