@@ -1,5 +1,5 @@
 import { DatabaseSync } from "node:sqlite";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 
 class PreparedStatement {
@@ -30,11 +30,26 @@ class PreparedStatement {
 export class TestD1 {
   constructor() {
     this.database = new DatabaseSync(":memory:");
-    this.database.exec(readFileSync(resolve("migrations/0001_auth.sql"), "utf8"));
+    for (const migration of readdirSync(resolve("migrations")).filter((name) => name.endsWith(".sql")).sort()) {
+      this.database.exec(readFileSync(resolve("migrations", migration), "utf8"));
+    }
   }
 
   prepare(sql) {
     return new PreparedStatement(this.database, sql);
+  }
+
+  async batch(statements) {
+    this.database.exec("BEGIN IMMEDIATE");
+    try {
+      const results = [];
+      for (const statement of statements) results.push(await statement.run());
+      this.database.exec("COMMIT");
+      return results;
+    } catch (error) {
+      this.database.exec("ROLLBACK");
+      throw error;
+    }
   }
 
   exec(sql) {
@@ -57,6 +72,7 @@ export function environment(database) {
     TURNSTILE_SITE_KEY: "turnstile-site",
     EMAIL_OTP_ENABLED: "false",
     MOBILE_OTP_ENABLED: "false",
+    NEW_ACCOUNT_REGISTRATION_ENABLED: "true",
     GOOGLE_CLIENT_ID: "google-client",
     GOOGLE_CLIENT_SECRET: "google-secret",
     LINE_CLIENT_ID: "line-client",

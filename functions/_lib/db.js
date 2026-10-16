@@ -1,7 +1,10 @@
 import { CSRF_COOKIE, SESSION_COOKIE, cookie, parseCookies } from "./http.js";
 import { constantTimeEqual, randomToken, sha256, safeUuid } from "./crypto.js";
+import { DELETION_RECEIPT_TTL_SECONDS } from "./retention.js";
 
 export const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
+export const RECENT_AUTH_TTL_SECONDS = 10 * 60;
+export const DELETION_REQUEST_TTL_SECONDS = 10 * 60;
 
 export function unixTime() {
   return Math.floor(Date.now() / 1000);
@@ -23,10 +26,18 @@ export async function rateLimit(db, scope, rawKey, limit, windowSeconds, secret,
 export async function issueSession(db, userId, timestamp = unixTime()) {
   const token = randomToken();
   const csrf = randomToken();
-  await db.prepare(`
+  const tokenHash = await sha256(token);
+  const expiresAt = timestamp + SESSION_TTL_SECONDS;
+  await db.batch([
+    db.prepare(`
     INSERT INTO sessions(token_hash, user_id, csrf_hash, created_at, expires_at, last_seen_at)
     VALUES (?, ?, ?, ?, ?, ?)
-  `).bind(await sha256(token), userId, await sha256(csrf), timestamp, timestamp + SESSION_TTL_SECONDS, timestamp).run();
+    `).bind(tokenHash, userId, await sha256(csrf), timestamp, expiresAt, timestamp),
+    db.prepare(`
+      INSERT INTO session_auth_evidence(token_hash, user_id, authenticated_at, expires_at)
+      VALUES (?, ?, ?, ?)
+    `).bind(tokenHash, userId, timestamp, expiresAt),
+  ]);
   return {
     token,
     csrf,
@@ -42,11 +53,118 @@ export async function getSession(request, db, timestamp = unixTime()) {
   if (!token) return null;
   return db.prepare(`
     SELECT s.token_hash, s.csrf_hash, s.user_id, s.expires_at,
+           sae.authenticated_at,
            u.email, u.display_name, u.avatar_url, u.status
     FROM sessions s
     JOIN users u ON u.id = s.user_id
+    LEFT JOIN session_auth_evidence sae ON sae.token_hash = s.token_hash
     WHERE s.token_hash = ? AND s.revoked_at IS NULL AND s.expires_at > ? AND u.status = 'active'
   `).bind(await sha256(token), timestamp).first();
+}
+
+export function hasRecentAuthentication(session, timestamp = unixTime()) {
+  const authenticatedAt = Number(session?.authenticated_at || 0);
+  return authenticatedAt > 0 && authenticatedAt >= timestamp - RECENT_AUTH_TTL_SECONDS;
+}
+
+export async function markSessionReauthenticated(db, tokenHash, userId, timestamp = unixTime()) {
+  const updated = await db.prepare(`
+    UPDATE session_auth_evidence
+    SET authenticated_at = ?
+    WHERE token_hash = ? AND user_id = ? AND expires_at > ?
+  `).bind(timestamp, tokenHash, userId, timestamp).run();
+  return Number(updated.meta?.changes || 0) === 1;
+}
+
+export async function createDeletionRequest(db, userId, timestamp = unixTime()) {
+  const requestId = safeUuid();
+  const confirmationToken = randomToken();
+  const confirmationHash = await sha256(confirmationToken);
+  const expiresAt = timestamp + DELETION_REQUEST_TTL_SECONDS;
+  await db.prepare(`
+    INSERT INTO account_deletion_requests(
+      request_id, user_id, confirmation_hash, status, operation_id,
+      requested_at, expires_at, updated_at
+    ) VALUES (?, ?, ?, 'pending', NULL, ?, ?, ?)
+    ON CONFLICT(user_id) DO UPDATE SET
+      request_id = excluded.request_id,
+      confirmation_hash = excluded.confirmation_hash,
+      status = 'pending',
+      operation_id = NULL,
+      requested_at = excluded.requested_at,
+      expires_at = excluded.expires_at,
+      updated_at = excluded.updated_at
+  `).bind(
+    requestId,
+    userId,
+    confirmationHash,
+    timestamp,
+    expiresAt,
+    timestamp,
+  ).run();
+  return { requestId, confirmationToken, expiresAt };
+}
+
+export async function confirmAccountDeletion(
+  db,
+  userId,
+  requestId,
+  confirmationToken,
+  timestamp = unixTime(),
+) {
+  const operationId = safeUuid();
+  const confirmationHash = await sha256(confirmationToken);
+  const receiptExpiresAt = timestamp + DELETION_RECEIPT_TTL_SECONDS;
+  const results = await db.batch([
+    db.prepare(`
+      UPDATE account_deletion_requests
+      SET status = 'processing', operation_id = ?, updated_at = ?
+      WHERE request_id = ? AND user_id = ? AND confirmation_hash = ?
+        AND status = 'pending' AND expires_at > ?
+    `).bind(operationId, timestamp, requestId, userId, confirmationHash, timestamp),
+    db.prepare(`
+      UPDATE users SET status = 'disabled', updated_at = ?
+      WHERE id = (
+        SELECT user_id FROM account_deletion_requests
+        WHERE request_id = ? AND operation_id = ? AND status = 'processing'
+      )
+    `).bind(timestamp, requestId, operationId),
+    db.prepare(`
+      UPDATE sessions SET revoked_at = COALESCE(revoked_at, ?)
+      WHERE user_id = (
+        SELECT user_id FROM account_deletion_requests
+        WHERE request_id = ? AND operation_id = ? AND status = 'processing'
+      )
+    `).bind(timestamp, requestId, operationId),
+    db.prepare(`
+      DELETE FROM identities WHERE user_id = (
+        SELECT user_id FROM account_deletion_requests
+        WHERE request_id = ? AND operation_id = ? AND status = 'processing'
+      )
+    `).bind(requestId, operationId),
+    db.prepare(`
+      DELETE FROM oauth_flows WHERE link_user_id = (
+        SELECT user_id FROM account_deletion_requests
+        WHERE request_id = ? AND operation_id = ? AND status = 'processing'
+      )
+    `).bind(requestId, operationId),
+    db.prepare(`
+      INSERT INTO deletion_receipts(
+        request_id, completed_at, policy_version, implementation_version, outcome, expires_at
+      )
+      SELECT request_id, ?, 'technical-draft-v1', 'privacy-safety-v1', 'deleted', ?
+      FROM account_deletion_requests
+      WHERE request_id = ? AND operation_id = ? AND status = 'processing'
+    `).bind(timestamp, receiptExpiresAt, requestId, operationId),
+    db.prepare(`
+      DELETE FROM users WHERE id = (
+        SELECT user_id FROM account_deletion_requests
+        WHERE request_id = ? AND operation_id = ? AND status = 'processing'
+      )
+    `).bind(requestId, operationId),
+  ]);
+  if (Number(results[0]?.meta?.changes || 0) !== 1) return null;
+  return { requestId, completedAt: timestamp, receiptExpiresAt };
 }
 
 export async function requireCsrf(request, session) {
@@ -56,7 +174,13 @@ export async function requireCsrf(request, session) {
   return constantTimeEqual(await sha256(headerToken), session.csrf_hash);
 }
 
-export async function findOrCreateIdentity(db, profile, linkUserId, timestamp = unixTime()) {
+export async function findOrCreateIdentity(
+  db,
+  profile,
+  linkUserId,
+  timestamp = unixTime(),
+  { allowRegistration = true } = {},
+) {
   const existing = await db.prepare(
     `SELECT i.user_id, u.status FROM identities i JOIN users u ON u.id = i.user_id
      WHERE i.provider = ? AND i.subject = ?`,
@@ -71,6 +195,8 @@ export async function findOrCreateIdentity(db, profile, linkUserId, timestamp = 
     `).bind(timestamp, profile.email, profile.emailVerified ? 1 : 0, profile.provider, profile.subject).run();
     return existing.user_id;
   }
+
+  if (!linkUserId && !allowRegistration) throw new Error("registration_closed");
 
   let userId = linkUserId || null;
   if (!userId && profile.email && profile.emailVerified) {

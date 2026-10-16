@@ -65,6 +65,8 @@ Set these non-secret environment variables:
 - `EMAIL_OTP_ENABLED=false` — Phase 1 server-side gate; do not enable without a reviewed rollout
 - `MOBILE_OTP_ENABLED=false` — Phase 1 server-side gate; no mobile OTP implementation is active
 - `LINE_EMAIL_ENABLED=false` — request only `openid profile` until LINE grants email permission
+- `NEW_ACCOUNT_REGISTRATION_ENABLED=false` — keep new account creation closed until the
+  age-assurance/parental-authorization model is approved
 - `EMAIL_FROM` — sender on a Resend-verified domain
 - `GOOGLE_CLIENT_ID`
 - `FACEBOOK_CLIENT_ID`
@@ -110,3 +112,17 @@ npm run test:coverage
 ```
 
 On a preview deployment, test success, denial, expiry, callback replay, provider revocation/failure, logout CSRF, mobile layout, and throttling for all three providers. Confirm the signup UI has no OTP controls and both OTP feature flags remain false. Do not merge or promote production until those checks pass.
+
+## 8. Privacy cleanup Worker and account deletion
+
+Migration `0002_privacy_safety.sql` adds recent-authentication evidence, OAuth reauthentication
+context, one-time deletion requests and non-identifying deletion receipts. Apply it to
+`chatgun-auth-staging` before deploying `wrangler.cleanup.jsonc`.
+
+The cleanup configuration is deliberately staging-only and binds only
+`chatgun-auth-staging`. It deletes expired security rows in bounded daily batches and has no
+public route. Do not copy it to a Production Worker until retention periods, monitoring,
+backup replay and ownership are approved.
+
+See `docs/privacy-safety-implementation.md` and `docs/minor-safety-launch-gate.md` for the
+security model, staging runbook and launch blockers.

@@ -6,7 +6,8 @@
   "vars": {
     "EMAIL_OTP_ENABLED": "false",
     "MOBILE_OTP_ENABLED": "false",
-    "LINE_EMAIL_ENABLED": "false"
+    "LINE_EMAIL_ENABLED": "false",
+    "NEW_ACCOUNT_REGISTRATION_ENABLED": "false"
   },
   "d1_databases": [
     {
@@ -22,7 +23,8 @@
       "vars": {
         "EMAIL_OTP_ENABLED": "false",
         "MOBILE_OTP_ENABLED": "false",
-        "LINE_EMAIL_ENABLED": "false"
+        "LINE_EMAIL_ENABLED": "false",
+        "NEW_ACCOUNT_REGISTRATION_ENABLED": "false"
       },
       "d1_databases": [
         {
@@ -38,7 +40,8 @@
       "vars": {
         "EMAIL_OTP_ENABLED": "false",
         "MOBILE_OTP_ENABLED": "false",
-        "LINE_EMAIL_ENABLED": "false"
+        "LINE_EMAIL_ENABLED": "false",
+        "NEW_ACCOUNT_REGISTRATION_ENABLED": "false"
       },
       "d1_databases": [
         {
