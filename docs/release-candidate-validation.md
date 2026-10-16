@@ -26,8 +26,8 @@ disabled and Production has no R2 binding.
 ## Isolated Preview evidence
 
 - Cloudflare account: `23017b53386fb67fc62a52cdd017454c` (reverified before staging work).
-- Pages Preview deployment for the approved moderation schedule: `https://6706d666.chatgun.pages.dev`
-  (implementation commit `58dba13`).
+- Current Pages Preview deployment: `https://b5338fde.chatgun.pages.dev`
+  (Admin Dashboard simplification and owner bootstrap tooling commit `f34a174`).
 - Branch alias: `https://codex-chatgun-release-candid.chatgun.pages.dev`.
 - Preview D1: `DB → chatgun-auth-staging`
   (`5bbfd55d-eb22-4324-8a7d-57bef14110ea`).

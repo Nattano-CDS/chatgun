@@ -46,15 +46,25 @@ created.
 - Role administration, private-object access, writes, and account deletion retain applicable
   recent-authentication, CSRF, same-origin, role, purpose, and session controls.
 
-## Automated evidence
+## Deployed Preview and automated evidence
 
+- Implementation commit: `f34a174`.
+- Isolated Preview: `https://b5338fde.chatgun.pages.dev`.
 - Unit/integration/security: 78 passed, 0 failed, 0 skipped.
 - Focused Dashboard Playwright: 2 passed across desktop and mobile.
+- Full deployed desktop/mobile Playwright: 32 passed, 0 failed, and four intentional duplicate-
+  mutation skips.
 - The routine Overview test verifies the fixed audit purpose, stale-but-valid routine session,
   ordinary-user denial, and two audited queue views.
+- A live synthetic `safety_admin` request to the deployed Overview returned 200 without a purpose
+  header; a live ordinary-member request returned 403. D1 recorded exactly one matching
+  `queue_view` with `media_id=overview` and `purpose=routine_admin_dashboard_access`.
 - Existing role-management tests verify unauthorized grant denial, self-grant denial, audited
   grant/revoke, immediate post-revocation denial, and stale-authentication denial.
 - Existing deletion tests verify recent authentication and CSRF requirements.
-
-The full deployed Preview regression and final D1/R2 integrity results are recorded in PR #8 after
-the isolated Preview validation run.
+- Staging migrations `0001`–`0010` have no pending work. Foreign-key and duplicate provider-
+  subject checks returned no rows. The cleanup Worker completed all five due R2 operations.
+  Pending/exhausted deletions, pending-deletion media, orphan reviews, active Sensitive media, and
+  active Prohibited media are all zero. The three owner grants remained active after the run.
+- Five staging users remained: two non-synthetic accounts were preserved and three reserved
+  synthetic accounts remained after the destructive synthetic account-deletion scenario.
