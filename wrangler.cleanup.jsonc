@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "chatgun-privacy-cleanup-staging",
+  "account_id": "23017b53386fb67fc62a52cdd017454c",
+  "main": "workers/privacy-cleanup.js",
+  "compatibility_date": "2026-10-15",
+  "workers_dev": false,
+  "preview_urls": false,
+  "send_metrics": false,
+  "triggers": {
+    "crons": ["17 3 * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "chatgun-auth-staging",
+      "database_id": "5bbfd55d-eb22-4324-8a7d-57bef14110ea",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

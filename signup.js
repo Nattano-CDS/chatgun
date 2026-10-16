@@ -11,6 +11,7 @@ const ERROR_MESSAGES = {
   oauth_expired: "คำขอเข้าสู่ระบบหมดอายุ กรุณาเริ่มใหม่",
   oauth_used: "คำขอนี้ถูกใช้ไปแล้ว กรุณาเริ่มใหม่",
   identity_linked: "บัญชีนี้เชื่อมกับสมาชิกคนอื่นแล้ว",
+  registration_closed: "ขณะนี้เปิดให้เข้าสู่ระบบด้วยบัญชีเดิมเท่านั้น การสมัครใหม่จะเปิดหลังมาตรการคุ้มครองผู้เยาว์ได้รับอนุมัติ",
   oauth_failed: "ไม่สามารถเข้าสู่ระบบกับผู้ให้บริการนี้ได้ กรุณาลองใหม่",
 };
 
@@ -71,6 +72,11 @@ async function initializeTurnstile() {
     const response = await fetch("/api/auth/config", { credentials: "same-origin" });
     const config = await response.json();
     if (!response.ok || !config.turnstileSiteKey) throw new Error("ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย");
+    if (config.newAccountRegistrationEnabled) {
+      $("auth-heading").textContent = "เข้าสู่ระบบหรือสร้างบัญชี";
+      $("auth-description").textContent = "เลือกบัญชีโซเชียลที่คุณต้องการใช้กับ ChatGun";
+      $("social-consent").textContent = "เมื่อดำเนินการต่อ ChatGun จะรับชื่อ รูปโปรไฟล์ และอีเมลเท่าที่ผู้ให้บริการอนุญาต เพื่อสร้างหรือยืนยันบัญชีและรักษาความปลอดภัยในการเข้าสู่ระบบ";
+    }
     const script = document.createElement("script");
     script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
     script.async = true;

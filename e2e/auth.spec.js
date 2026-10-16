@@ -6,14 +6,15 @@ const screenshotDirectory = resolve("test-results/screenshots");
 
 test.beforeAll(() => mkdirSync(screenshotDirectory, { recursive: true }));
 
-test("signup renders branded auth controls with Preview Turnstile", async ({ page }, testInfo) => {
+test("signup renders existing-account auth controls with Preview Turnstile", async ({ page }, testInfo) => {
   await page.goto("/signup.html");
   await expect(page).toHaveTitle("สมัครสมาชิก | ChatGun");
-  await expect(page.getByRole("heading", { name: "เข้าสู่ระบบหรือสร้างบัญชี" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "เข้าสู่ระบบด้วยบัญชีเดิม" })).toBeVisible();
+  await expect(page.getByText(/การสมัครบัญชีใหม่ปิดไว้/u)).toBeVisible();
   await expect(page.getByRole("button", { name: "ดำเนินการต่อด้วย Google" })).toBeVisible();
   await expect(page.getByRole("button", { name: "ดำเนินการต่อด้วย Facebook" })).toBeVisible();
   await expect(page.getByRole("button", { name: "ดำเนินการต่อด้วย LINE" })).toBeVisible();
-  await expect(page.getByText(/รับชื่อ รูปโปรไฟล์ และอีเมลจากผู้ให้บริการ/u)).toBeVisible();
+  await expect(page.getByText(/รับชื่อ รูปโปรไฟล์ และอีเมลเท่าที่ผู้ให้บริการอนุญาต/u)).toBeVisible();
   await expect(page.getByRole("link", { name: "นโยบายความเป็นส่วนตัว" })).toHaveAttribute("href", "./privacy.html");
   await expect(page.getByRole("link", { name: "ข้อกำหนดการใช้บริการ" })).toHaveAttribute("href", "./terms.html");
   await expect(page.getByText(/OTP/u)).toHaveCount(0);
@@ -48,7 +49,7 @@ test("legal review pages disclose unresolved owner decisions", async ({ page }) 
 test("account page redirects unauthenticated users to signup", async ({ page }) => {
   await page.goto("/account.html");
   await expect(page).toHaveURL(/\/signup(?:\.html)?$/u);
-  await expect(page.getByRole("heading", { name: "เข้าสู่ระบบหรือสร้างบัญชี" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "เข้าสู่ระบบด้วยบัญชีเดิม" })).toBeVisible();
 });
 
 test("Pages Functions expose secure config and reject cross-origin mutations", async ({ request, baseURL }) => {
@@ -61,6 +62,12 @@ test("Pages Functions expose secure config and reject cross-origin mutations", a
   expect(config.emailOtpEnabled).toBe(false);
   expect(config.mobileOtpEnabled).toBe(false);
   expect(config.smsEnabled).toBe(false);
+  expect(config.newAccountRegistrationEnabled).toBe(false);
+  expect(config.safety).toEqual({
+    publicDiscoveryEnabled: false,
+    unsolicitedMessagingEnabled: false,
+    minorRegistrationEnabled: false,
+  });
   expect(config.turnstileSiteKey).toMatch(/^0x[\w-]+$/u);
 
   const disabledOtpResponse = await request.post("/api/auth/otp/start", {

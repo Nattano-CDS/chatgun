@@ -1,5 +1,47 @@
 <!doctype html>
 <html lang="th">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>บัญชี ChatGun</title><link rel="icon" href="./favicon.svg"><link rel="stylesheet" href="./style.css"><script defer src="./account.js"></script><style>.account-card{max-width:620px;margin:60px auto;padding:42px 28px;border:1px solid #eceafa;border-radius:28px;box-shadow:0 20px 65px #555cad14}.account-links{margin:30px auto;max-width:420px;padding-top:24px;border-top:1px solid #eceafa}.account-links h2{font-size:21px}.link-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.link-provider{padding:11px;border:1px solid #dedced;border-radius:12px;background:#fff;color:#5044af;font:inherit;cursor:pointer}.link-provider:disabled{opacity:.5;cursor:wait}.turnstile{min-height:65px;margin:20px 0;display:flex;justify-content:center}.account-message{min-height:24px;color:#b83c63;font-size:13px}@media(max-width:520px){.account-card{margin:20px 14px}.link-grid{grid-template-columns:1fr}}</style></head>
-<body><main class="section account-card"><img src="./logo.svg" alt="ChatGun" width="90"><h1>ยินดีต้อนรับสู่ ChatGun</h1><p id="status">กำลังตรวจสอบบัญชี...</p><section id="linking" class="account-links" hidden><h2>เชื่อมบัญชีเข้าสู่ระบบ</h2><p class="section-lead">เพิ่มวิธีเข้าสู่ระบบให้บัญชีนี้อย่างปลอดภัย</p><div class="link-grid"><button class="link-provider" data-provider="google" type="button">Google</button><button class="link-provider" data-provider="facebook" type="button">Facebook</button><button class="link-provider" data-provider="line" type="button">LINE</button></div><div id="turnstile" class="turnstile" aria-label="การตรวจสอบความปลอดภัย"></div><p id="message" class="account-message" role="status" aria-live="polite"></p></section><button id="logout" class="button" hidden>ออกจากระบบ</button></main></body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>บัญชี ChatGun</title>
+  <link rel="icon" href="./favicon.svg">
+  <link rel="stylesheet" href="./style.css">
+  <script defer src="./account.js"></script>
+  <style>
+    .account-card{max-width:660px;margin:60px auto;padding:42px 28px;border:1px solid #eceafa;border-radius:28px;box-shadow:0 20px 65px #555cad14}
+    .account-section{margin:30px auto 0;max-width:500px;padding-top:24px;border-top:1px solid #eceafa}.account-section h2{font-size:21px}
+    .link-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.link-provider,.reauth-provider{padding:11px;border:1px solid #dedced;border-radius:12px;background:#fff;color:#5044af;font:inherit;cursor:pointer}
+    .link-provider:disabled,.reauth-provider:disabled{opacity:.5;cursor:wait}.turnstile{min-height:65px;margin:20px 0;display:flex;justify-content:center}.account-message{min-height:24px;color:#b83c63;font-size:13px}
+    .danger-zone{border-color:#f2ccd4}.danger-zone h2{color:#982944}.danger{border:1px solid #c83a5c;background:#fff;color:#a32645;padding:11px 16px;border-radius:12px;font:inherit;font-weight:700;cursor:pointer}
+    .danger-confirm{background:#a32645;color:#fff}.deletion-confirm{display:grid;gap:10px;margin-top:16px}.deletion-confirm[hidden]{display:none}.deletion-confirm input{padding:12px;border:1px solid #d8d6e4;border-radius:10px;font:inherit}
+    @media(max-width:520px){.account-card{margin:20px 14px}.link-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="section account-card">
+    <img src="./logo.svg" alt="ChatGun" width="90">
+    <h1>ยินดีต้อนรับสู่ ChatGun</h1>
+    <p id="status">กำลังตรวจสอบบัญชี...</p>
+    <section id="linking" class="account-section" hidden>
+      <h2>เชื่อมบัญชีเข้าสู่ระบบ</h2>
+      <p class="section-lead">เพิ่มวิธีเข้าสู่ระบบให้บัญชีนี้อย่างปลอดภัย</p>
+      <div class="link-grid"><button class="link-provider" data-provider="google" type="button">Google</button><button class="link-provider" data-provider="facebook" type="button">Facebook</button><button class="link-provider" data-provider="line" type="button">LINE</button></div>
+      <div id="turnstile" class="turnstile" aria-label="การตรวจสอบความปลอดภัย"></div>
+      <p id="message" class="account-message" role="status" aria-live="polite"></p>
+    </section>
+    <section id="deletion" class="account-section danger-zone" hidden>
+      <h2>ลบบัญชี</h2>
+      <p>การยืนยันจะลบบัญชี โปรไฟล์ ลิงก์ Google/Facebook/LINE และเซสชันในฐานข้อมูลหลัก ระบบอาจต้องให้คุณยืนยันตัวตนกับผู้ให้บริการอีกครั้ง</p>
+      <button id="delete-start" class="danger" type="button">เริ่มคำขอลบบัญชี</button>
+      <div id="delete-reauth" hidden><p>เลือกบัญชีที่เชื่อมไว้เพื่อยืนยันตัวตนอีกครั้ง:</p><div id="reauth-providers" class="link-grid"></div></div>
+      <form id="delete-confirm" class="deletion-confirm" hidden>
+        <label for="delete-phrase">พิมพ์ <strong>ลบบัญชีถาวร</strong> เพื่อยืนยัน</label>
+        <input id="delete-phrase" name="confirmText" autocomplete="off" required>
+        <button class="danger danger-confirm" type="submit">ยืนยันลบบัญชีถาวร</button>
+      </form>
+      <p id="delete-message" class="account-message" role="status" aria-live="polite"></p>
+    </section>
+    <button id="logout" class="button" hidden>ออกจากระบบ</button>
+  </main>
+</body>
 </html>
