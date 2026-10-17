@@ -25,6 +25,12 @@ if(staticPrelaunch){
   const file=resolve(output,'app/index.html'),html=readFileSync(file,'utf8');
   if(!html.includes('<body>'))throw Error('Static prelaunch marker insertion failed');
   writeFileSync(file,html.replace('<body>','<body data-static-prelaunch="true">'));
+  // Real OAuth/registration are disabled in a closed release. Never leave
+  // clickable provider buttons pointing into a known-unavailable API.
+  for(const page of ['signup.html','account.html','acceptance.html']){
+    const destination=resolve(output,page);
+    if(existsSync(destination))copyFileSync('canary-notice.html',destination);
+  }
 }
 if (process.env.CF_PAGES_BRANCH === "main" || process.env.CHATGUN_CANARY_BUILD === "true") {
   for (const page of ["privacy.html","terms.html","data-deletion.html"]) copyFileSync("canary-notice.html",resolve(output,page));
