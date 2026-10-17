@@ -11,6 +11,10 @@ test('all builds exclude fictional assets, demo generators and canary fallback',
     for(const path of ['assets/demo','app/demo-network.js','app/demo-gallery.js','app/demo-bootstrap.js','test','scripts','docs','e2e-retired','playwright.config.js','playwright.issue16.config.js'])assert.equal(existsSync(join(directory,path)),false,path);
     assert.deepEqual(JSON.parse(readFileSync(join(directory,'_routes.json'))),{version:1,include:['/api/*'],exclude:[]});
     assert.equal(JSON.parse(readFileSync(join(directory,'release.json'))).fictionalDemoEnabled,false);
+    assert.match(readFileSync(join(directory,'app/index.html'),'utf8'),/src="\/app\/social\.js\?v=[a-f0-9]{40}"/);
+    assert.match(readFileSync(join(directory,'app/social.js'),'utf8'),/online-presence\.js\?v=[a-f0-9]{40}/);
+    assert.ok(JSON.parse(readFileSync(join(directory,'release-assets.json'))).files.some(file=>file.path==='app/social.js'&&file.sha256.length===64));
     const source=readFileSync(join(directory,'app/social.js'),'utf8');assert.doesNotMatch(source,/startDemo|demoSave|demoApi|initializeGallery|chatgunDemoNetwork/);
+    assert.doesNotMatch(readFileSync(join(directory,'signup.js'),'utf8'),/ทดลอง ChatGun ด้วยข้อมูลสมมติ|เปิดให้ชมโหมดตัวอย่าง/);
   }
 });

@@ -3,7 +3,7 @@ import { createOnlinePresence } from "./online-presence.js";
 let onlinePresence;
 const onlineSlot=(person,id)=>window.ChatgunNearComponents.online(person,id,escapeHtml);
 async function startOnlinePresence() {
-  onlinePresence = createOnlinePresence({ request: api, targets: () => [...document.querySelectorAll("[data-online-user]")].filter((e) => e.parentElement.getClientRects().length).map((e) => e.dataset.onlineUser), apply: (statuses) => {
+  onlinePresence = createOnlinePresence({ request: (path,options={})=>api(path,{signal:AbortSignal.timeout(8000),...options}), targets: () => [...document.querySelectorAll("[data-online-user]")].filter((e) => e.parentElement.getClientRects().length).map((e) => e.dataset.onlineUser), apply: (statuses) => {
     for (const slot of document.querySelectorAll("[data-online-user]")) slot.innerHTML = statuses[slot.dataset.onlineUser] === !0 ? '<span class="member-online-dot" aria-hidden="true"></span><span>ออนไลน์</span>' : "";
   }, preference: (enabled) => {
     $("#online-status-toggle").checked = enabled;
@@ -839,7 +839,6 @@ document.addEventListener("click", async (event) => {
     await showPerson(currentActor(), { photo: "upload" });
     return;
   }
-  event.target.closest("[data-reset-gallery-fixtures]");
   const more = event.target.closest("[data-more-conversations]");
   if (more) {
     more.disabled = !0;

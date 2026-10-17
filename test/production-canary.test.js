@@ -22,7 +22,9 @@ test("public canary never publishes unapproved legal drafts", async () => {
   for (const path of ["/privacy","/privacy.html","/terms","/terms.html","/data-deletion","/data-deletion.html"]) {
     const response = await middleware({env:{PUBLIC_DEMO_CANARY_ENABLED:"true"},request:new Request(`https://chatgun.social${path}`),next(){throw Error("draft must not be published");}});
     assert.equal(response.status,200);
-    assert.match(await response.text(),/บุคคลและบทสนทนาสมมติ/u);
+    const body=await response.text();
+    assert.match(body,/กำลังเตรียมเปิดให้บริการ/u);
+    assert.doesNotMatch(body,/เปิดให้ชมด้วยบุคคล|กลับโหมดตัวอย่าง/u);
     assert.equal(response.headers.get("cache-control"),"no-store");
   }
 });
@@ -37,5 +39,5 @@ test("public build excludes test bundles, credentials, scripts and backups",()=>
   const names=readdirSync(directory);
   for(const forbidden of ["test-results","playwright-report","scripts","docs",".git",".dev.vars","functions","wrangler.jsonc"]) assert.ok(!names.includes(forbidden));
   assert.ok(names.includes("assets"));assert.ok(names.includes("app"));assert.ok(names.includes("signup.html"));
-  for(const file of ["privacy.html","terms.html","data-deletion.html"])assert.equal(readFileSync(join(directory,file),"utf8"),readFileSync("canary-notice.html","utf8"));
+  for(const file of ["privacy.html","terms.html","data-deletion.html"])assert.equal(readFileSync(join(directory,file),"utf8").replaceAll(/\?v=[a-f0-9]{40}/g,''),readFileSync("canary-notice.html","utf8"));
 });

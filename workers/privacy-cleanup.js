@@ -14,7 +14,7 @@ export default {
       const deleted = await runRetentionCleanup(env.DB, timestamp);
       // Additive-schema compatibility: older Production databases remain untouched.
       const presence=await env.DB.prepare("SELECT 1 ok FROM sqlite_master WHERE type='table' AND name='member_presence_leases'").first();
-      if(presence)await env.DB.prepare('DELETE FROM member_presence_leases WHERE rowid IN (SELECT rowid FROM member_presence_leases WHERE touched_at<=? LIMIT 500)').bind(timestamp-110).run();
+      if(presence)await env.DB.prepare('DELETE FROM member_presence_leases WHERE rowid IN (SELECT rowid FROM member_presence_leases WHERE touched_at<=? LIMIT 500)').bind(timestamp-90).run();
       console.log(JSON.stringify({ event: "privacy_cleanup_completed", deleted }));
     })());
   },

@@ -1,5 +1,5 @@
 import {eligibleSql,unblockedSql} from './social-permissions.js';
-export const ONLINE_TTL_SECONDS = 110;
+export const ONLINE_TTL_SECONDS = 90;
 
 export async function onlineStatuses(db,viewer,targets,now=Math.floor(Date.now()/1000)) {
   const ids=[...new Set(targets)];

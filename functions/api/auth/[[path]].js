@@ -204,7 +204,7 @@ async function verifyOtp(request, env) {
 
 async function startOauth(request, env, provider) {
   requireSameOrigin(request);
-  if (String(env.OAUTH_LOGIN_ENABLED).toLowerCase() === "false") return failure("การเข้าสู่บัญชีจริงยังไม่เปิดใช้งาน กรุณาใช้โหมดตัวอย่าง", 503, "oauth_unavailable");
+  if (String(env.OAUTH_LOGIN_ENABLED).toLowerCase() === "false") return failure("ChatGun กำลังเตรียมเปิดให้บริการ ยังไม่เปิดใช้งานการเข้าสู่บัญชี", 503, "oauth_unavailable");
   assertEnvironment(env, ["RATE_LIMIT_PEPPER"]);
   const body = await readJson(request);
   if (!await verifyTurnstile(request, env, body.turnstileToken, "auth_start")) {

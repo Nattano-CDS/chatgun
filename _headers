@@ -27,3 +27,9 @@
 
 /app/*
   Cache-Control: no-store
+
+/release.json
+  Cache-Control: no-store
+
+/release-assets.json
+  Cache-Control: no-store

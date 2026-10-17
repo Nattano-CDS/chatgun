@@ -34,14 +34,14 @@ test('presence fails closed behind service flags and requires auth, CSRF, eligib
   assert.equal((await f.call('owner',body)).status,403);
   f.env.PRESENCE_ENABLED='false';assert.equal((await f.call('owner',body)).status,404);
 });
-test('independent opt-in, real heartbeat, safe booleans, 110s expiry and no geolocation dependency',async t=>{
+test('independent opt-in, real heartbeat, safe booleans, 90s expiry and no geolocation dependency',async t=>{
   const f=await fixture(t);assert.deepEqual(await f.online(),{owner:false,unknown:false});
   await f.heartbeat();assert.deepEqual(await f.online(),{owner:false,unknown:false});
   await f.preference();await f.heartbeat();assert.deepEqual(await f.online(),{owner:true,unknown:false});
   const result=await(await f.call('viewer')).json();assert.deepEqual(Object.keys(result).sort(),['showOnline','statuses']);
   assert.doesNotMatch(JSON.stringify(result),/touched|last_seen|token|latitude|longitude|expires/);
   assert.equal((await f.db.prepare("SELECT located_at FROM member_profiles WHERE user_id='owner'").first()).located_at,1);
-  f.db.exec(`UPDATE member_presence_leases SET touched_at=${unixTime()-110}`);assert.equal((await f.online()).owner,false);
+  f.db.exec(`UPDATE member_presence_leases SET touched_at=${unixTime()-90}`);assert.equal((await f.online()).owner,false);
   await f.heartbeat();await f.preference(false);assert.equal((await f.online()).owner,false);
   assert.equal((await f.db.prepare('SELECT COUNT(*) n FROM member_presence_leases').first()).n,0);
 });
@@ -81,4 +81,15 @@ test('client pauses in background, drops stale booleans on API failure and never
   assert.equal(statuses.member,false);assert.equal(calls.at(-1).body.action,'offline');
   const count=calls.length;await interval();assert.equal(calls.length,count);
   doc.visibilityState='visible';clock=120000;fail=true;await controller.refresh();assert.equal(statuses.member,false);controller.stop();
+});
+test('cached Online booleans expire even while the next request hangs',async()=>{
+  const doc=new EventTarget();doc.visibilityState='visible';let clock=0,expire,delay,statuses,hang=false,release;
+  const controller=createOnlinePresence({doc,now:()=>clock,every:()=>1,cancel:()=>{},later:(fn,ms)=>{expire=fn;delay=ms;return 1;},clearLater:()=>{},targets:()=>['member'],apply:s=>{statuses=s;},request:async()=>{
+    if(hang)await new Promise(resolve=>{release=resolve;});
+    clock+=1000;return {showOnline:true,statuses:{member:true}};
+  }});
+  await controller.start();assert.equal(statuses.member,true);assert.equal(delay,29000);
+  hang=true;const pending=controller.refresh();await Promise.resolve();
+  expire();assert.equal(statuses.member,false);
+  controller.stop();release();await pending;assert.equal(statuses.member,false);
 });

@@ -1,6 +1,8 @@
 import { cpSync, mkdirSync, readdirSync, copyFileSync, existsSync, writeFileSync, rmSync } from "node:fs";
 import { resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 // An explicit public asset boundary: never publish repository/test/session/backup files.
 const output = resolve(process.env.CHATGUN_BUILD_DIR || "dist");
 if (output === resolve(".") || output === "/") throw new Error("Refusing workspace output");
@@ -17,5 +19,22 @@ for (const directory of ["app", "assets"]) cpSync(directory, resolve(output, dir
 if (process.env.CF_PAGES_BRANCH === "main" || process.env.CHATGUN_CANARY_BUILD === "true") {
   for (const page of ["privacy.html","terms.html","data-deletion.html"]) copyFileSync("canary-notice.html",resolve(output,page));
 }
-writeFileSync(resolve(output,"release.json"),JSON.stringify({commit:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),fictionalDemoEnabled:false})+"\n");
+const commit=execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim();
+const files=[];
+function versionAssets(directory,prefix=''){
+  for(const entry of readdirSync(directory,{withFileTypes:true})){
+    const path=resolve(directory,entry.name),relative=prefix+entry.name;
+    if(entry.isDirectory()){versionAssets(path,relative+'/');continue;}
+    if(/\.(?:html|js)$/u.test(relative)){
+      let source=readFileSync(path,'utf8');
+      if(relative.endsWith('.html'))source=source.replace(/(src|href)=(["'])(\/[^"'?#]+\.(?:js|css))\2/gu,(_,attribute,quote,url)=>`${attribute}=${quote}${url}?v=${commit}${quote}`);
+      else source=source.replace(/(from\s*["'])(\.{1,2}\/[^"'?#]+\.js)(["'])/gu,(_,before,url,after)=>`${before}${url}?v=${commit}${after}`);
+      writeFileSync(path,source);
+    }
+    if(/\.(?:html|js|css)$/u.test(relative))files.push({path:relative,sha256:createHash('sha256').update(readFileSync(path)).digest('hex')});
+  }
+}
+versionAssets(output);
+const manifest=JSON.stringify({commit,files},null,2)+'\n';writeFileSync(resolve(output,'release-assets.json'),manifest);
+writeFileSync(resolve(output,"release.json"),JSON.stringify({commit,fictionalDemoEnabled:false,assetsManifestSha256:createHash('sha256').update(manifest).digest('hex')})+"\n");
 console.log(`Public asset package: ${output}`);

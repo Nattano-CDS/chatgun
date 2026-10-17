@@ -1,0 +1,19 @@
+// Read-only, account-scoped infrastructure evidence. Never output env values or user rows.
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {writeFileSync} from 'node:fs';
+const account='23017b53386fb67fc62a52cdd017454c',database='9738a051-d914-42d0-8e7b-8098ef2b959d';
+const {token}=JSON.parse(execFileSync('npx',['wrangler@4.151.1','auth','token','--json'],{encoding:'utf8'}));
+async function api(path,body){const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}${path}`,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const result=await r.json();assert.ok(r.ok&&result.success,'Scoped Cloudflare infrastructure read failed');return result.result;}
+async function query(sql){const result=await api(`/d1/database/${database}/query`,{sql});assert.ok(!result[0].meta?.changed_db);return result[0].results;}
+const project=await api('/pages/projects/chatgun'),prod=project.deployment_configs.production,preview=project.deployment_configs.preview;
+assert.equal(prod.d1_databases.DB.id,database);assert.equal(preview.d1_databases.DB.id,'5bbfd55d-eb22-4324-8a7d-57bef14110ea');
+const flags={};for(const name of ['OAUTH_LOGIN_ENABLED','SOCIAL_APP_ENABLED','NEW_ACCOUNT_REGISTRATION_ENABLED','MESSAGING_ENABLED','MEDIA_UPLOAD_ENABLED','MODERATION_TOOLS_ENABLED','SENSITIVE_CONTENT_ENABLED','PUBLIC_DISCOVERY_ENABLED','EMAIL_OTP_ENABLED','MOBILE_OTP_ENABLED']){flags[name]=prod.env_vars[name]?.value;assert.equal(flags[name],'false',name+' must remain closed');}
+const credentials={};for(const name of ['GOOGLE_CLIENT_ID','GOOGLE_CLIENT_SECRET','FACEBOOK_CLIENT_ID','FACEBOOK_CLIENT_SECRET','LINE_CLIENT_ID','LINE_CLIENT_SECRET','TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY','RATE_LIMIT_PEPPER'])credentials[name]={configured:Boolean(prod.env_vars[name]),storageType:prod.env_vars[name]?.type||'missing'};
+const migrations=await query('SELECT name FROM d1_migrations ORDER BY id');
+const schema=await query("SELECT name,type FROM sqlite_master WHERE type IN('table','index','trigger') AND name NOT LIKE 'sqlite_%' ORDER BY type,name");
+const tables=new Set(schema.filter(x=>x.type==='table').map(x=>x.name)),synthetic= tables.has('synthetic_seed_batches')?(await query('SELECT COUNT(*) n FROM synthetic_seed_batches'))[0].n:null;
+const foreignKeyViolations=(await query('SELECT COUNT(*) n FROM pragma_foreign_key_check'))[0].n;assert.equal(foreignKeyViolations,0);
+const buckets=await api('/r2/buckets');const productionBuckets=(buckets.buckets||[]).filter(b=>/^chatgun-media-production$/.test(b.name)).map(b=>b.name);
+const result={checkedAt:new Date().toISOString(),account,productionD1:database,previewD1:preview.d1_databases.DB.id,previewR2:preview.r2_buckets.MEDIA?.name,productionR2Bindings:Object.keys(prod.r2_buckets||{}).length,dedicatedProductionBucketFound:productionBuckets.length>0,productionFlags:flags,credentialMetadata:credentials,providerPublishingStatus:'NOT reverified in developer consoles; credentials existing does not prove publishing or callback success',productionMigrations:migrations.map(m=>m.name),pendingMigrations:['0013_direct_chat_private_albums.sql','0014_gallery_capacity.sql','0015_authenticated_online_presence.sql'].filter(name=>!migrations.some(m=>m.name===name)),schemaObjectCounts:Object.fromEntries(['table','index','trigger'].map(type=>[type,schema.filter(x=>x.type===type).length])),foreignKeyViolations,syntheticBatchCount:synthetic,canonicalDeployment:{id:project.canonical_deployment.id,sha:project.canonical_deployment.deployment_trigger.metadata.commit_hash},productionWrites:0};
+writeFileSync('docs/issue-16/production-readiness.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result,null,2));

@@ -164,8 +164,8 @@ async function initializeTurnstile() {
     const config = await response.json();
     if (config.oauthLoginEnabled === false) {
       document.querySelectorAll("[data-provider]").forEach(button => { button.disabled = true; });
-      $("auth-description").textContent = "การเข้าสู่บัญชีจริงยังไม่เปิดใช้งาน ขณะนี้เปิดให้ชมโหมดตัวอย่าง";
-      message("กลับหน้าแรกเพื่อทดลอง ChatGun ด้วยข้อมูลสมมติ");
+      $("auth-description").textContent = "ChatGun กำลังเตรียมเปิดให้บริการ ยังไม่เปิดรับสมาชิกหรือเข้าสู่บัญชี";
+      message("ระบบบัญชียังไม่พร้อมใช้งาน โปรดกลับมาตรวจสอบภายหลัง");
       return;
     }
     if (!response.ok || !config.turnstileSiteKey) throw new Error("ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย");
