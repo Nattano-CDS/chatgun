@@ -714,19 +714,30 @@ async function showPerson(id, {historyMode='push',photo=null}={}) {
 function renderGalleryPost(){
   const c=profileContext(state.selectedPerson,state.galleryView.photos);
   $('#profile-dialog-content').innerHTML=ChatgunNearComponents.post({...c,view:state.galleryView});
+  galleryBusy(Boolean(state.galleryBusy));
   state.personRouteView='post';document.body.dataset.personRoute='post';openProfileSurface();
 }
 function postFeedback(message='',error=false){
   const feedback=$('[data-post-feedback]');if(!feedback)return false;
   feedback.hidden=!message;feedback.setAttribute('role',error?'alert':'status');feedback.textContent=message;return true;
 }
-async function openGalleryPhoto(owner,photo,{historyMode='push'}={}){
+function galleryBusy(busy){
+  state.galleryBusy=busy;
+  const like=$('.post-like'),submit=$('#gallery-comment button'),input=$('#gallery-comment input[name=comment]');
+  if(like){like.disabled=busy;like.setAttribute('aria-busy',String(busy));}
+  if(submit){submit.disabled=busy||!input?.value.trim();submit.setAttribute('aria-busy',String(busy));}
+}
+function samePost(owner,photo){return !$('#profile-dialog').hidden&&location.pathname===profilePath(owner,photo);}
+async function openGalleryPhoto(owner,photo,{historyMode='push',preserveComment=false}={}){
+  const generation=state.profileRequest,draft=preserveComment&&samePost(owner,photo)?$('#gallery-comment input[name=comment]')?.value:null;
   const result=await api('/api/social/gallery?user='+encodeURIComponent(owner)+'&photo='+encodeURIComponent(photo));
+  if(generation!==state.profileRequest||$('#profile-dialog').hidden)return;
   const index=result.photos.findIndex(p=>p.id===photo);
   if(index<0)throw new Error('ไม่พบรูปหรือคุณไม่มีสิทธิ์ดูรูปนี้');
   state.galleryView={...result,index};state.personPhotos=result.photos;
   if(historyMode!=='none')updateProfileRoute(owner,photo,historyMode);
   renderGalleryPost();
+  if(draft!=null){$('#gallery-comment input[name=comment]').value=draft;galleryBusy(Boolean(state.galleryBusy));}
 }
 
 function renderThreadMessages() {
@@ -1125,7 +1136,7 @@ document.addEventListener("click", async (event) => {
       return;
     }
     if (name === "delete" && !confirm("ลบรูปนี้หรือไม่? การลบไฟล์จริงจะดำเนินการผ่านคิวอย่างปลอดภัย")) return;
-    if(name==='like'){setBusy(galleryAction,true);postFeedback();}
+    if(name==='like'){if(state.galleryBusy)return;galleryBusy(true);postFeedback();}
     try {
       await api("/api/social/gallery", { method: "POST", body: { action: name, id: photo } });
       if (["delete", "select"].includes(name)) {
@@ -1135,9 +1146,9 @@ document.addEventListener("click", async (event) => {
         fillProfile();
         if(!$('#profile-dialog').hidden){state.personPhotos=state.myGallery;renderPersonRoute('gallery');}
       }
-      if (name === "like" && state.galleryView) await openGalleryPhoto(state.galleryView.owner, photo, { historyMode: "replace" });
+      if (name === "like" && state.galleryView && samePost(user||state.galleryView.owner,photo)) await openGalleryPhoto(state.galleryView.owner, photo, { historyMode: "replace",preserveComment:true });
       if(name!=='like')toast(name === "delete" ? "ซ่อนรูปและส่งเข้าคิวลบแล้ว" : "ตั้งรูปหลักแล้ว");
-    } catch (error) { if(name!=='like'||!postFeedback(error.message,true))toast(error.message, true); } finally { if(name==='like')setBusy(galleryAction,false); }
+    } catch (error) { if(name!=='like')toast(error.message,true);else if(samePost(state.galleryView?.owner,photo))postFeedback(error.message,true); } finally { if(name==='like')galleryBusy(false); }
     return;
   }
   const action = event.target.closest("[data-action]");
@@ -1176,17 +1187,19 @@ document.addEventListener("keydown", (event) => {
 $("#profile-dialog").addEventListener("submit", async (event) => {
   if (!event.target.matches("#gallery-comment")) return;
   event.preventDefault();
+  if(state.galleryBusy)return;
   const data = new FormData(event.target);
-  setBusy(event.submitter, true);
+  galleryBusy(true);
   postFeedback();
   try {
     await api("/api/social/gallery", { method: "POST", body: { action: "comment", id: data.get("photo"), comment: data.get("comment") } });
+    if(!samePost(data.get('owner'),data.get('photo')))return;
     await openGalleryPhoto(data.get("owner"), data.get("photo"), { historyMode: "replace" });
-    postFeedback('ส่งคอมเมนต์แล้ว');
-  } catch (error) { if(!postFeedback(error.message,true))toast(error.message, true); } finally { setBusy(event.submitter, false); }
+    if(samePost(data.get('owner'),data.get('photo')))postFeedback('ส่งคอมเมนต์แล้ว');
+  } catch (error) { if(samePost(data.get('owner'),data.get('photo')))postFeedback(error.message,true); } finally { galleryBusy(false); }
 });
 $('#profile-dialog').addEventListener('input',event=>{
-  if(event.target.matches('#gallery-comment input[name=comment]'))$('#gallery-comment button').disabled=!event.target.value.trim();
+  if(event.target.matches('#gallery-comment input[name=comment]'))$('#gallery-comment button').disabled=Boolean(state.galleryBusy)||!event.target.value.trim();
 });
 
 $('#thread').addEventListener('change',event=>{

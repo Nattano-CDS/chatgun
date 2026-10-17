@@ -79,13 +79,22 @@ test('gallery failed comment keeps its draft and inline reason; likes are disabl
  await page.route('**/api/social/gallery',async r=>{
   const body=r.request().postDataJSON();
   if(body.action==='comment')return r.fulfill({status:403,json:{error:'ไม่มีสิทธิ์ส่งความคิดเห็น'}});
-  likes++;await new Promise(resolve=>setTimeout(resolve,300));await r.fulfill({json:{ok:true}});
+  likes++;await new Promise(resolve=>setTimeout(resolve,300));await r.fulfill(likes===1?{status:503,json:{error:'บันทึก Like ไม่สำเร็จ กรุณาลองอีกครั้ง'}}:{json:{ok:true}});
  });
  await page.goto('/app/people/near-1/gallery/fixture-photo');await expect(page.locator('.post-layout')).toBeVisible();
  await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');await page.locator('#gallery-comment button').click();
  await expect(page.locator('[data-post-feedback]')).toHaveAttribute('role','alert');await expect(page.locator('[data-post-feedback]')).toHaveText('ไม่มีสิทธิ์ส่งความคิดเห็น');
  await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');
- await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();await expect(page.locator('.post-like')).toBeEnabled();expect(likes).toBe(1);
+  await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();await expect(page.locator('.post-like')).toBeEnabled();expect(likes).toBe(1);
+  await expect(page.locator('.post-like svg')).toHaveCount(1);await expect(page.locator('[data-post-feedback]')).toHaveText('บันทึก Like ไม่สำเร็จ กรุณาลองอีกครั้ง');
+  await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();
+  await page.locator('#gallery-comment input[name=comment]').fill('ร่างที่แก้ระหว่างกด Like');await expect(page.locator('#gallery-comment button')).toBeDisabled();
+  await expect(page.locator('.post-like')).toBeEnabled();await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ร่างที่แก้ระหว่างกด Like');
+  await expect(page.locator('[data-post-feedback]')).toBeHidden();
+  const response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/social/gallery'&&r.request().method()==='POST');
+  await page.locator('.post-like').click();await page.keyboard.press('Escape');await response;
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  await expect(page.locator('#profile-dialog')).toBeHidden();await expect(page).not.toHaveURL(/\/people\//);
 });
 
 test("desktop social shell preserves discovery, friends, chat, reviews, and profile without game", async ({ page }, testInfo) => {
