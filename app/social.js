@@ -667,6 +667,16 @@ window.addEventListener("resize", sizeConversation);
 window.visualViewport?.addEventListener("resize", sizeConversation);
 async function initialize() {
   offerDemoRetirement($("#retired-demo"));
+  // A closed prelaunch is intentionally static: it must remain accessible when
+  // the Cloudflare Functions allowance is exhausted. This marker exists only
+  // in explicitly generated closed-prelaunch releases, never in normal builds.
+  if (document.body.dataset.staticPrelaunch === "true") {
+    $("#global-status").textContent = "";
+    $("#disabled-view").hidden = false;
+    document.body.dataset.prelaunch = "true";
+    $("#app").setAttribute("aria-busy", "false");
+    return;
+  }
   try {
     if (document.body.dataset.activeTab = state.activeTab, state.config = await api("/api/social/config", { signal: AbortSignal.timeout(8e3) }), !state.config.socialAppEnabled) {
       $("#global-status").textContent = "", $("#disabled-view").hidden = !1, document.body.dataset.prelaunch = "true";
