@@ -1659,7 +1659,7 @@ async function gallery(request, env) {
         ))
       ORDER BY p.created_at DESC LIMIT 12
     `).bind(session.user_id, owner, scope, session.user_id, enabled(env.SENSITIVE_CONTENT_ENABLED) ? 1 : 0, session.user_id, unixTime()).all();
-    const photos = rows.results || [];
+    const photos = (rows.results || []).filter(p=>!url.searchParams.get('photo')||p.review_status==='released');
     if (url.searchParams.get("photo")) {
       const id = String(url.searchParams.get("photo"));
       if (!photos.some((photo) => photo.id === id)) throw new SocialError("not_found", "ไม่พบรูปภาพ", 404);
@@ -1679,6 +1679,7 @@ async function gallery(request, env) {
   if (contentType.startsWith("multipart/form-data")) {
     capability(env, "MEDIA_UPLOAD_ENABLED");
     if (!env.MEDIA) throw new Error("missing_media_binding");
+    await limited(env,'gallery_upload_attempt_user_hour',session.user_id,60,3600);
     const idempotencyKey = uploadIdempotencyKey(request);
     const form = await request.formData();
     const visibility = String(form.get('visibility') || 'private');
@@ -1695,6 +1696,9 @@ async function gallery(request, env) {
       if (prior && prior.visibility !== visibility) throw new SocialError('idempotency_conflict','คำขอนี้ใช้กับอีกอัลบั้มแล้ว',409);
       return json({ id: reservation.result_id, reviewStatus: "pending", idempotentReplay: true }, 201);
     }
+    // Cheap early rejection; the D1 trigger remains the atomic race safeguard.
+    const count=await env.DB.prepare('SELECT COUNT(*) n FROM profile_photos WHERE owner_user_id=?').bind(session.user_id).first();
+    if(Number(count?.n||0)>=12){await releaseMediaUpload(env.DB,session.user_id,'gallery',idempotencyKey);throw new SocialError('gallery_full','อัปโหลดได้สูงสุด 12 รูปรวมทั้งสองอัลบั้ม',409);}
     const { bytes, contentType: detectedType } = image;
     const id = safeUuid();
     const objectKey = `gallery/${safeUuid()}`;

@@ -4,7 +4,7 @@ import {TestD1,environment} from './helpers/d1.js';
 import {issueSession} from '../functions/_lib/db.js';
 import {onRequest} from '../functions/api/social/[[path]].js';
 import {ONE_PIXEL_PNG} from './helpers/image.js';
-import {initializeGallery,galleryBatch} from '../app/demo-gallery.js';
+import {initializeGallery,galleryBatch,resetGalleryBatch} from '../app/demo-gallery.js';
 
 async function fixture(t){
   const db=new TestD1();t.after(()=>db.close());const sessions={},objects=new Map();
@@ -50,6 +50,7 @@ test('separate upload scopes share quota, preserve quarantine, and reject cross-
   assert.equal(objects.size,2);assert.equal((await upload('private','public-upload-test-key-01')).status,409);
   assert.equal((await upload('invalid')).status,400);
   const owner=await (await call('owner','gallery?user=owner')).json();assert.equal(owner.photos.length,1);assert.equal(owner.photos[0].review_status,'pending');
+  assert.equal((await call('owner','gallery?user=owner&photo='+owner.photos[0].id)).status,404);
   assert.deepEqual((await (await call('viewer','gallery?user=owner')).json()).photos,[]);
 });
 test('shared 12-photo capacity is transaction-enforced and releases failed upload reservations',async t=>{
@@ -70,13 +71,22 @@ test('fictional gallery upgrade is bounded, additive, idempotent, and never rest
   assert.ok(s.demoGallery.filter(p=>p.owner==='demo-me'&&p.visibility==='public').length>=4);assert.ok(s.demoGallery.filter(p=>p.owner==='demo-me'&&p.visibility==='private').length>=4);
   s.demoGallery.splice(1,1);s.demoAlbumRequests[0].status='revoked';initializeGallery(s,{galleryBatch});
   assert.equal(s.demoGallery.length,baseline.demoGallery.length-1);assert.equal(s.demoAlbumRequests[0].status,'revoked');
+  s.demoGallery.push({id:'owner-upload',owner:'demo-me',visibility:'private',caption:'keep'});
+  const before=s.demoGallery.length;assert.equal(resetGalleryBatch(s).dryRun,true);assert.equal(s.demoGallery.length,before);
+  resetGalleryBatch(s,{confirmed:true});assert.equal(s.demoGallery.find(p=>p.id==='owner-upload').caption,'keep');assert.equal(s.demoGallery.find(p=>p.id==='legacy').caption,'edited');
 });
-test('failed capacity commit plus R2 deletion failure creates a durable cleanup retry',async t=>{
+test('failed media commit plus R2 deletion failure creates a durable cleanup retry',async t=>{
   const {db,env,upload,objects}=await fixture(t);
-  for(let i=0;i<12;i++)db.exec(`INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,created_at) VALUES('full${i}','owner','full${i}','gallery','image/png',1,1);INSERT INTO profile_photos(media_id,owner_user_id,created_at) VALUES('full${i}','owner',1)`);
+  db.batch=async()=>{throw Error('simulated media commit failure');};
   env.MEDIA.delete=async()=>{throw Error('simulated R2 outage');};
-  assert.equal((await upload('private','failure-gallery-key-001')).status,409);
+  assert.equal((await upload('private','failure-gallery-key-001')).status,500);
   assert.equal(objects.size,1);assert.equal((await db.prepare('SELECT COUNT(*) n FROM media_deletion_queue WHERE completed_at IS NULL').first()).n,1);
   assert.equal((await db.prepare("SELECT count(*) n FROM media_upload_quota_attempts WHERE status='released'").first()).n,1);
-  assert.equal((await db.prepare('SELECT count(*) n FROM profile_photos').first()).n,12);
+  assert.equal((await db.prepare('SELECT count(*) n FROM profile_photos').first()).n,0);
+});
+test('failed upload attempts are rate-limited independently of the successful daily quota',async t=>{
+  const {db,upload,objects}=await fixture(t);
+  for(let i=0;i<60;i++)assert.equal((await upload('invalid','rate-gallery-key-'+String(i).padStart(3,'0'))).status,400);
+  assert.equal((await upload('public','rate-gallery-next-00001')).status,429);
+  assert.equal(objects.size,0);assert.equal((await db.prepare('SELECT count(*) n FROM media_upload_quota_attempts').first()).n,0);
 });

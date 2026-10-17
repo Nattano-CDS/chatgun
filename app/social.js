@@ -1,4 +1,4 @@
-import {initializeGallery} from './demo-gallery.js';
+import {initializeGallery,resetGalleryBatch} from './demo-gallery.js';
 const state = {
   config: null,
   account: null,
@@ -145,6 +145,7 @@ function renderDemoPerspective(){
   let label=$('[data-demo-perspective-label]');if(!label){label=document.createElement('small');label.dataset.demoPerspectiveLabel='';label.setAttribute('aria-live','polite');$('#demo-banner').append(label);}
   label.textContent='มุมมองสิทธิ์สมมติ: '+(demoPerson(currentActor())?.name||'คุณ')+' · ไม่ใช่บัญชีจริง';
   host.innerHTML=`<label>จำลองมุมมองในแชท (บุคคลสมมติเท่านั้น)<select id="demo-actor" aria-label="มุมมองสมมติ">${[state.profile,...state.people].map(p=>`<option value="${escapeHtml(p.user_id)}" ${p.user_id===currentActor()?'selected':''}>${escapeHtml(p.user_id==='demo-me'?'คุณ — ตัวอย่าง':p.name)}</option>`).join('')}</select></label><p>ไม่ใช่การเข้าสู่บัญชีจริงหรือการให้สิทธิ์ Admin · บันทึกเฉพาะเบราว์เซอร์</p>`;
+  host.insertAdjacentHTML('beforeend','<button type="button" class="secondary" data-reset-gallery-fixtures>รีเซ็ตเฉพาะชุด Gallery สมมติ…</button>');
 }
 async function demoAlbum(body,method){
   const actor=currentActor(),now=Math.floor(Date.now()/1000);
@@ -234,11 +235,11 @@ async function demoApi(path, options = {}) {
     if (method === "GET") {
       const album=url.searchParams.get('album')||'public';
       if(!['public','private'].includes(album)||album==='private'&&!demoGranted(owner))throw new Error('ไม่มีสิทธิ์ดูอัลบั้มนี้');
-      const photos = state.demoGallery.filter((photo) => photo.owner === owner&&photo.visibility===album&&demoVisible(photo)).map((photo) => ({
+      const selected = url.searchParams.get("photo");
+      const photos = state.demoGallery.filter((photo) => photo.owner === owner&&photo.visibility===album&&demoVisible(photo)&&(!selected||!['pending','rejected'].includes(photo.review_status))).map((photo) => ({
         ...photo, selected: demoPerson(owner)?.selected_photo_id === photo.id,
         comments: undefined,
       }));
-      const selected = url.searchParams.get("photo");
       if(selected&&!photos.some(p=>p.id===selected))throw new Error('ไม่พบรูปภาพ');
       const comments = selected ? state.demoGallery.find((photo) => photo.id === selected)?.comments || [] : [];
       const request=state.demoAlbumRequests.find(r=>r.album_owner_id===owner&&r.requester_id===currentActor())||null;
@@ -858,6 +859,10 @@ async function refreshAlbumPermission(){
     if(generation!==state.profileRequest||$('#profile-dialog').hidden)return;
     const changed=JSON.stringify(result.album)!==JSON.stringify(state.album);
     state.album=result.album;state.personPhotos=result.photos;state.galleryLoadError=false;
+    if(state.personRouteView==='post'){
+      const id=state.galleryView?.photos[state.galleryView.index]?.id;
+      if(!result.photos.some(p=>p.id===id&&!['pending','rejected'].includes(p.review_status))){updateProfileRoute(profileContext(state.selectedPerson).id,'gallery','replace');renderPersonRoute('gallery');return;}
+    }
     if(!result.album?.granted&&id!==currentActor()){
       state.privateAlbumOpen=false;
       if(state.personRouteView==='post'){
@@ -1242,6 +1247,12 @@ $("#refresh").addEventListener("click", async () => { try { await Promise.all([l
 document.addEventListener("click", async (event) => {
   const upload=event.target.closest('[data-gallery-upload-route]');
   if(upload){event.preventDefault();if(profileContext(state.selectedPerson).id!==currentActor())return;await showPerson(currentActor(),{photo:'upload'});return;}
+  if(event.target.closest('[data-reset-gallery-fixtures]')&&state.demo){
+    if(!confirm('รีเซ็ตเฉพาะชุดภาพและสิทธิ์ตัวอย่าง Gallery? ประวัติของคำขอในชุดตัวอย่างจะเริ่มใหม่ รูปที่คุณอัปโหลด ข้อมูลเดิม และโควตาวันนี้จะไม่ถูกลบ'))return;
+    const before={demoGallery:state.demoGallery,demoAlbumRequests:state.demoAlbumRequests,demoSystemEvents:state.demoSystemEvents};
+    try{resetGalleryBatch(state,{confirmed:true});await demoSave();await loadRelationships();if(state.selectedChat)await loadMessagePage(state.selectedChat);toast('รีเซ็ตเฉพาะชุด Gallery สมมติแล้ว');}
+    catch(error){Object.assign(state,before);toast(error.message,true);}return;
+  }
   const more=event.target.closest('[data-more-conversations]');
   if(more){more.disabled=true;try{const result=await api('/api/social/conversations?offset='+state.conversationOffset);const ids=new Set(state.conversations.map(p=>p.other_user_id));state.conversations.push(...result.conversations.filter(p=>!ids.has(p.other_user_id)));state.conversationMore=!!result.hasMore;state.conversationOffset=result.nextOffset;renderConversations();}catch(error){toast(error.message,true);more.disabled=false;}return;}
   const mute=event.target.closest('[data-chat-mute]');

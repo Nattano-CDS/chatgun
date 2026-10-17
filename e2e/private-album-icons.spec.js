@@ -26,7 +26,7 @@ for(const width of [390,768,1440])test(`approved album icons and keyboard consen
   await simulateChatCounterpart(page);await page.locator('[data-album-action=revoke]').click();
   await page.locator('#demo-actor').selectOption('demo-me');await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();
   await expect(button).toHaveAttribute('data-album-state','locked');await expect(page.locator('#profile-dialog .album-feedback')).toHaveCount(0);
-  await page.locator('[data-close-profile]').click();await page.locator('[data-person=demo-me] .card-open').click();await expect(button).toHaveAttribute('data-album-state','unlocked');await button.click();await expect(page.locator('.album-management')).toBeVisible();
+  await page.keyboard.press('Escape');await page.locator('[data-person=demo-me] .card-open').click();await expect(button).toHaveAttribute('data-album-state','unlocked');await button.click();await expect(page.locator('.album-management')).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);expect(errors).toEqual([]);expect(writes).toEqual([]);
   // Side-by-side report uses actual rendered Production/Preview button captures, not mockup paths.
   const comparison=await browser.newPage({viewport:{width:360,height:130},deviceScaleFactor:2});

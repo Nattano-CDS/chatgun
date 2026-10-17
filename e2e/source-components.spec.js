@@ -73,7 +73,7 @@ for(const [width,height] of widths){
   expect(await page.locator('.thumb-small img').evaluate(i=>i.naturalWidth/i.naturalHeight)).toBe(2);
   await page.locator('[data-gallery-return]').first().click();await expect(page.locator('.gallery-grid .tile')).toBeDisabled();await expect(page.locator('.review-status')).toContainText('รอผู้ดูแลตรวจสอบ');
   await page.locator('.gallery-experience [data-gallery-action=delete]').click();await expect(page.locator('.gallery-experience .viewer-hint')).toBeVisible();
-  await page.locator('[data-close-profile]').click();await page.locator('#primary-nav [data-tab=profile]').click();await page.locator('#manage-gallery').click();await expect(page.locator('#gallery-upload-quota')).toContainText('9/10');
+  await page.keyboard.press('Escape');await page.locator('#primary-nav [data-tab=profile]').click();await page.locator('#manage-gallery').click();await expect(page.locator('#gallery-upload-quota')).toContainText('9/10');
  });
 }
 test('source card handles long Thai text, failed portraits and keyboard return focus',async({page})=>{

@@ -14,5 +14,6 @@ css+='\n.gallery-experience{padding:0 0 100px;margin:0;width:100%}.gallery-exper
 for(let i=0;i<=10;i++)css+=`\n.gallery-experience .quota-fill.used-${i}{width:${i*10}%}`;
 css+='\n.gallery-experience .lightbox{z-index:10000}.gallery-experience .lightbox-shell{min-height:0;margin:0;border:0}.gallery-experience .lightbox-art img{width:100%;height:100%;object-fit:contain;max-height:90vh}.gallery-experience .lightbox-arrows{padding:0;position:static;transform:none;width:auto}.gallery-experience .lightbox-arrows button{min-width:44px;min-height:44px;border-radius:9px}\n';
 css+='\n.gallery-experience .brand{min-height:44px}.gallery-experience .round-soft{min-width:44px;min-height:44px}.gallery-experience .breadcrumbs button,.gallery-experience .tile-owner-controls button{min-width:44px}.gallery-experience .lightbox-like{min-height:44px}.gallery-experience .comment-compose button{min-width:44px}\n';
+css+='\n.gallery-experience .breadcrumbs{height:16px;align-items:center}.gallery-experience .field-label span{color:#a296ae;font-weight:400}\n';
 css=css.replaceAll('.gallery-experience',':is(#profile-dialog,#app) .gallery-experience');
 writeFileSync('app/gallery-approved.css',css);

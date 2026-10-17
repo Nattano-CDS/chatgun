@@ -44,6 +44,7 @@ const form=new FormData();form.set('file',new File([ONE_PIXEL_PNG],'synthetic.pn
 const upload=await fetch(origin+'/api/social/gallery',{method:'POST',headers:{...headers('owner'),'idempotency-key':run+'-gallery'},body:form});
 assert.equal(upload.status,201,await upload.clone().text());const {id:photo}=await upload.json();
 check('quarantine denies owner bytes',(await call('owner','media/'+photo)).status===404);
+check('quarantine excludes owner photo navigation',(await call('owner','gallery?user='+ids.owner+'&album=private&photo='+photo)).status===404);
 // Synthetic fixture release, NOT evidence of a staffed moderator or scanning vendor.
 await query("UPDATE media_safety_reviews SET status='released',category='general',revision=revision+1,reviewed_at=? WHERE media_id=?",[unixTime(),photo]);
 check('private listing hides IDs',(await (await call('viewer','gallery?user='+ids.owner)).json()).photos.length===0);
@@ -98,6 +99,10 @@ const publicList=await (await call('viewer','gallery?user='+ids.owner)).json();
 check('released public listing excludes private fixture metadata',publicList.photos.some(p=>p.id===publicPhoto)&&publicList.photos.every(p=>p.visibility==='public')&&!JSON.stringify(publicList).includes(uiPhoto));
 check('public and private uploads count against one gallery quota',(await (await call('owner','upload-quotas')).json()).gallery.used===3);
 check('private next-photo list excludes public fixture',!(JSON.stringify(await (await call('owner','gallery?user='+ids.owner+'&album=private')).json())).includes(publicPhoto));
+await query("UPDATE media_safety_reviews SET status='rejected',category='prohibited',revision=revision+1 WHERE media_id=?",[publicPhoto]);
+check('moderation withdrawal removes public listing',!(JSON.stringify(await (await call('viewer','gallery?user='+ids.owner)).json())).includes(publicPhoto));
+check('moderation withdrawal denies old public bytes',(await call('viewer','media/'+publicPhoto)).status===404);
+await query("UPDATE media_safety_reviews SET status='released',category='general',revision=revision+1 WHERE media_id=?",[publicPhoto]);
 const summary={run,origin,commit:release.commit,database,bucket:'chatgun-issue13-media',syntheticOnly:true,checks:evidence,passed:evidence.length,failed:0,cleanup,oauth:'not retested; synthetic session fixture only'};
 const evidenceDirectory=process.env.RELEASE_EVIDENCE_DIR||'docs/issue-13';mkdirSync(evidenceDirectory,{recursive:true});writeFileSync(evidenceDirectory+'/cloud-test-results.json',JSON.stringify(summary,null,2)+'\n');
 // Session fixtures stay outside the repository, protected and short-lived operationally.

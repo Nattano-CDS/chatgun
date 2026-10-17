@@ -37,7 +37,7 @@ for(const width of [390,768,1440])test(`direct DM and two-sided fictional album 
   await expect(page.locator('#thread')).toContainText('เพิกถอนสิทธิ์');
   await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();await page.locator('.profile-gallery-button').click();
   await expect(page.locator('.gallery-tile-wrap')).toHaveCount(5);await shot('revoked-gallery');
-  await page.locator('[data-close-profile]').click();await page.reload();
+  await page.keyboard.press('Escape');await page.reload();
   await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('[data-chat=demo-01]').click();
   await expect(page.locator('#thread .message')).toContainText('สวัสดี ตัวอย่างแชทโดยตรง');await expect(page.locator('.album-system-card')).toHaveCount(3);
   // A different pair exercises explicit rejection, without shortening real cooldowns.
@@ -66,7 +66,7 @@ test('fictional owner media decisions persist and private portraits never become
   await page.locator('[data-profile-return]').first().click();
   await page.locator('[data-private-album]').click();
   await expect(page.locator('.gallery-experience .gallery-tile-wrap')).toHaveCount(6);
-  await page.locator('[data-close-profile]').click();await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('#demo-actor').selectOption('demo-me');await page.locator('#primary-nav [data-tab=near]').click();
+  await page.keyboard.press('Escape');await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('#demo-actor').selectOption('demo-me');await page.locator('#primary-nav [data-tab=near]').click();
   await expect(page.locator('[data-person=demo-01] .card-photo img')).toHaveCount(0);
   await page.reload();await expect(page.locator('[data-person=demo-01] .card-photo img')).toHaveCount(0);
   await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('#demo-actor').selectOption('demo-01');await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();await page.locator('[data-private-album]').click();
