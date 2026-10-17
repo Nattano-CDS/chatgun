@@ -64,6 +64,8 @@ for(const [width,height] of widths){
   const bytes=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=640;c.height=320;const x=c.getContext('2d');x.fillStyle='#645574';x.fillRect(0,0,640,320);x.fillStyle='#d0f17b';x.fillRect(30,30,200,260);return c.toDataURL('image/png').split(',')[1];});
   await page.locator('[data-upload-kind=gallery]').click();
   await page.locator('#gallery-upload input[type=file]').setInputFiles({name:'fictional-landscape.png',mimeType:'image/png',buffer:Buffer.from(bytes,'base64')});
+  await expect(page.locator('[data-upload-preview] img')).toHaveAttribute('src',/^data:image\/png/);
+  await expect(page.locator('[data-upload-preview] img')).toHaveJSProperty('naturalWidth',640);
   await page.locator('#gallery-upload button[type=submit]').click();await expect(page.locator('#gallery-count')).toHaveText('1 / 12');
   await expect(page.locator('#gallery-upload-quota')).toContainText('9/10');
   await page.locator('#gallery-settings-back').click();await page.locator('#view-own-profile').click();await page.locator('.profile-gallery-top').click();

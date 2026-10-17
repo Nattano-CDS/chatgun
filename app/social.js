@@ -918,14 +918,16 @@ document.addEventListener('click',event=>{
   if(event.target.closest('[data-choose-profile]')){$('[data-upload-kind="profile"]').click();$('#gallery-upload input[type=file]').click();}
   if(event.target.closest('[data-cancel-upload]')){$('#gallery-upload').reset();$('#gallery-upload input[type=file]').dispatchEvent(new Event('change'));}
 });
-$('#gallery-upload input[type=file]').addEventListener('change',event=>{
+$('#gallery-upload input[type=file]').addEventListener('change',async event=>{
   const file=event.target.files?.[0],preview=$('[data-upload-preview]');
-  if(preview.dataset.url)URL.revokeObjectURL(preview.dataset.url);
-  preview.replaceChildren();delete preview.dataset.url;
+  preview.replaceChildren();
   $('.upload-pending').hidden=!file;
   if(!file)preview.innerHTML=ChatgunNearComponents.icon('upload',30);
   if(file&&file.size<=8*1024*1024&&['image/jpeg','image/png','image/webp'].includes(file.type)){
-    const image=document.createElement('img');image.alt='ภาพตัวอย่างก่อนบันทึก';image.src=URL.createObjectURL(file);preview.dataset.url=image.src;preview.append(image);
+    // data: is already allowed by the strict image CSP; do not widen it for blob:.
+    const src=await fileDataUrl(file);
+    if(event.target.files?.[0]!==file)return;
+    const image=document.createElement('img');image.alt='ภาพตัวอย่างก่อนบันทึก';image.src=src;preview.append(image);
   }
 });
 
