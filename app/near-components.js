@@ -21,7 +21,7 @@ window.ChatgunNearComponents = (() => {
       <div class="person-details"><div class="person-top"></div>
         <div class="card-name-row"><button class="person-name" data-person-open="${h(id)}">${h(p.name)}</button>${own?'':badge(p)}</div>
         <p class="person-bio">${h(p.bio || 'ยินดีที่ได้รู้จัก')}</p>
-        <div class="rating-line">${own ? (demo?'โปรไฟล์ของคุณ · ตัวอย่าง':'โปรไฟล์ของคุณ') : p.rating_count ? Number(p.rating).toFixed(1) : 'ยังไม่มีคะแนน'}</div>
+        <div class="rating-line">${!own&&canRate?star:''}${own ? (demo?'โปรไฟล์ของคุณ · ตัวอย่าง':'โปรไฟล์ของคุณ') : p.rating_count ? Number(p.rating).toFixed(1) : 'ยังไม่มีคะแนน'}</div>
         <div class="card-actions">${own?`<button class="icon-button self-profile-open" data-person-open="${h(id)}" aria-label="ดูโปรไฟล์ของคุณ" title="ดูโปรไฟล์">${icon('next',22)}</button>`:canRate ? action('rate',h(id),star,'icon-button rate-button',`aria-label="ให้คะแนน" ${rateDisabled ? 'disabled' : ''}`) : ''}</div>
       </div></article>`;
     return request ? `<div class="request-card">${body}<div class="request-decisions">${context==='request' ? action('accept',h(id),'ยอมรับ','primary')+action('reject',h(id),'ปฏิเสธ','secondary') : action('cancel',h(id),'ยกเลิกคำขอ','secondary')}</div></div>` : body;
@@ -39,7 +39,7 @@ window.ChatgunNearComponents = (() => {
     return action(c.incoming?'accept':'request',id,c.userPlus+(c.incoming?'ยอมรับคำขอ':c.relation?.status==='pending'?'ส่งคำขอแล้ว':'เพิ่มเพื่อน'),'primary',c.relation?.status==='pending'&&!c.incoming?'disabled':'');
   }
   const chips = c => String(c.person.interests||'').split(',').map(i=>i.trim()).filter(Boolean).map(i=>`<span>${c.html(i)}</span>`).join('');
-  const score = c => c.person.rating_count ? `${Number(c.person.rating).toFixed(1)} · ${Number(c.person.rating_count)} คะแนน` : 'ยังไม่มีคะแนน';
+  const score = (c,gallery=false) => c.person.rating_count ? `${Number(c.person.rating).toFixed(1)}${gallery?' ★':''} · ${Number(c.person.rating_count)} คะแนน` : 'ยังไม่มีคะแนน';
   function profile(c) {
     const p=c.person,h=c.html;
     return `<main class="full-profile profile-route" aria-label="โปรไฟล์ ${h(p.name)}"><h1 class="sr-only">โปรไฟล์ ${h(p.name)}</h1>
@@ -59,7 +59,7 @@ window.ChatgunNearComponents = (() => {
     const p=c.person,h=c.html;
     return `<main class="full-profile profile-route gallery-page" aria-label="Gallery ${h(p.name)}">
       <header class="gallery-header"><button class="gallery-back" data-profile-return aria-label="กลับไปโปรไฟล์">${icon('back',23)}</button>${brand('Gallery')}<button class="gallery-back" data-close-profile aria-label="ปิด Gallery">${icon('close',22)}</button></header>
-      <div class="gallery-summary"><div class="gallery-avatar">${c.portrait(p,false)}</div><div><h2>${h(p.name)}${badge(p)}</h2><span>${c.photos.length} รูป · ${score(c)}</span><p>${h(p.bio||'ยังไม่ได้เขียน Bio')}</p>
+      <div class="gallery-summary"><div class="gallery-avatar">${c.portrait(p,false)}</div><div><h2>${h(p.name)}${badge(p)}</h2><span>${c.photos.length} รูป · ${score(c,true)}</span><p>${h(p.bio||'ยังไม่ได้เขียน Bio')}</p>
       <div class="gallery-facts"><span>${h(p.gender||'ไม่ระบุเพศ')}</span>${p.distance!=null?`<span>${icon('pin',14)}${h(c.distance)}</span>`:''}<span>${c.own?'โปรไฟล์ของคุณ':c.relation?.status==='accepted'?'เป็นเพื่อนกันแล้ว':c.incoming?'ส่งคำขอเป็นเพื่อนถึงคุณ':c.relation?.status==='pending'?'ส่งคำขอแล้ว':'ยังไม่ได้เป็นเพื่อน'}</span></div>
       <div class="gallery-interests">${chips(c)}</div>${c.own?'':`<div class="gallery-actions">${primary(c,16)}${c.canRate?action('rate',h(c.id),c.star+'ให้คะแนน','',c.rateDisabled?'disabled':''):''}${action('block',h(c.id),'บล็อก','')}</div>`}</div></div>
       ${c.demo?'<p class="gallery-demo">รูปสมมติสำหรับทดลองหน้าจอ · บันทึกเฉพาะเบราว์เซอร์</p>':''}

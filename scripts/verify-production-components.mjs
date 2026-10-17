@@ -13,7 +13,7 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
  const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),writes=[],errors=[];
  page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&!['GET','HEAD'].includes(r.method()))writes.push(r.url());});
  page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
- await page.goto(origin);await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
+ await page.goto(origin);await expect(page.locator('#people-grid .photo-card')).toHaveCount(17);
  await page.locator('#people-grid [data-person="demo-02"] .card-open').click();
  await page.locator('.profile-gallery-top').click();await page.locator('.ig-tile>button').first().click();
  await page.locator('.post-like').click();await expect(page.locator('.post-like')).toHaveAttribute('aria-pressed','true');

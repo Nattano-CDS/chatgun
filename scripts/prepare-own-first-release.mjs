@@ -1,0 +1,20 @@
+// Guarded frontend-only package; no database, R2, provider or feature-flag changes.
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {mkdtempSync,readFileSync,existsSync,writeFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+const baseline='0a4bd1d25c730d131615960e892c77b257b16947';
+const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+execFileSync('git',['diff','--exit-code',baseline,'--','functions','migrations','workers','wrangler.jsonc'],{stdio:'pipe'});
+execFileSync('git',['diff','--exit-code','HEAD','--','app','assets','functions','migrations','wrangler.jsonc'],{stdio:'pipe'});
+const directory=mkdtempSync(join(tmpdir(),'chatgun-own-first-production-'));
+execFileSync('node',['scripts/build-pages.mjs'],{env:{...process.env,CHATGUN_CANARY_BUILD:'true',CHATGUN_BUILD_DIR:directory},stdio:'pipe'});
+assert.equal(JSON.parse(readFileSync(join(directory,'release.json'))).commit,sha);
+for(const page of ['privacy.html','terms.html','data-deletion.html'])assert.deepEqual(readFileSync(join(directory,page)),readFileSync('canary-notice.html'));
+for(const path of ['docs','test-results','scripts','test','e2e','.dev.vars','node_modules'])assert.equal(existsSync(join(directory,path)),false,path);
+const manifest=readFileSync(join(directory,'assets/demo/network.json'));
+assert.deepEqual(manifest,execFileSync('git',['show',baseline+':assets/demo/network.json']));
+const fixture=JSON.parse(manifest);assert.equal(fixture.profiles.length,20);assert.equal(fixture.conversations.reduce((n,c)=>n+c.messages.length,0),120);
+const evidence={sha,directory,baseline,backendInfrastructureAndMigrationsUnchanged:true,unapprovedLegalDraftsExcluded:true,privateArtifactsExcluded:true,publicFixtureBytesUnchanged:true,fictionalOtherMembers:20,fictionalMessages:120,rollbackDeployment:'94825247-c404-4eef-98cc-7fea8b378025',databaseRollbackRequired:false};
+writeFileSync('docs/issue-10-own-first/package-check.json',JSON.stringify(evidence,null,2));console.log(JSON.stringify(evidence));

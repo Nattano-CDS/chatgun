@@ -27,6 +27,7 @@ test('full profile and gallery are source route structures, never duplicated mod
  assert.match(profile,/^<main class="full-profile profile-route"/);
  assert.match(profile,/class="full-name-row"/);assert.match(profile,/class="full-profile-actions"/);
  assert.match(gallery,/class="ig-tile"><button/);assert.match(gallery,/grid/);
+ assert.match(gallery,/4\.0 ★ · 2 คะแนน/);
  assert.doesNotMatch(profile+gallery,/<dialog|<nav|member-profile-view|profile-navigation/);
  assert.doesNotMatch(gallery,/delete-photo|route-gallery-upload/);
  assert.match(ui.gallery({...context,own:true,config:{mediaUploadEnabled:true}}),/id="route-gallery-upload"/);
