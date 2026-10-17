@@ -18,8 +18,9 @@ for(const width of [390,768,1440])test(`P0 fresh and returning demo access witho
     // This browser context is disposable. Never write to the owner's browser.
     saved.profile.bio='ข้อความสมมติที่ต้องคงอยู่';
     saved.chatPreferences['demo-me']={allowDirectMessages:false};
-    saved.messages['demo-01'].push({id:'incident15-retained-message',sender:'demo-me',body:'ข้อความสมมติที่บันทึกไว้',created_at:1});
+    Object.values(saved.messages).find(Array.isArray).push({id:'incident15-retained-message',sender:'demo-me',body:'ข้อความสมมติที่บันทึกไว้',created_at:1});
     saved.gallery[0].caption='คำบรรยายสมมติที่ต้องคงอยู่';
+    saved.gallery[0].url='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="violet"/></svg>');
     await new Promise((resolve,reject)=>{const tx=db.transaction('state','readwrite');tx.objectStore('state').put(saved,'chatgun-browser-demo-v1');tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});
     db.close();return JSON.stringify({profile:saved.profile,messages:saved.messages,gallery:saved.gallery,preferences:saved.chatPreferences,assets:saved.assets});
   });
