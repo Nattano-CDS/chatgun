@@ -30,6 +30,12 @@ css+=`\n.gallery-experience .thumb-small.saved{outline:2px solid var(--lime)}
 .gallery-experience .upload-limits .quota{margin:6px 0}
 .gallery-experience .upload-limits .quota-helper{margin:6px 0;font-size:12px}
 .gallery-experience .lightbox-caption,.gallery-experience .comment{overflow-wrap:anywhere}
+.gallery-experience .lightbox-side{min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.gallery-experience .lightbox-shell{height:90dvh;grid-template-rows:minmax(0,1fr)}
+.gallery-experience .lightbox-top,.gallery-experience .lightbox-like,.gallery-experience .comment-compose,.gallery-experience .lightbox-arrows{flex-shrink:0}
+.gallery-experience .lightbox-caption{max-height:120px;overflow-y:auto;flex-shrink:0}
+.gallery-experience .comment-group{display:flex;flex-direction:column;flex:1;min-height:0}
+.gallery-experience .post-comments{overflow-y:auto;min-height:0}
 .gallery-experience .lightbox-art{position:relative;min-width:0;background:#eee9f5}
 .gallery-experience .lightbox-art img{object-fit:contain}
 .gallery-experience .image-load-status{position:absolute;inset:0;display:grid;place-content:center;padding:24px;text-align:center;pointer-events:none}
@@ -52,8 +58,9 @@ body[data-person-route=upload] #profile-dialog .gallery-experience{padding-botto
 .gallery-experience .action-bar{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));z-index:45;background:#fff;padding:10px 16px;box-shadow:0 -3px 16px #21143912;border-top:1px solid var(--line);gap:8px;justify-content:flex-end}
 .gallery-experience .action-bar button{min-height:44px}
 .gallery-experience .lightbox{padding:8px;align-items:center}
-.gallery-experience .lightbox-shell{max-height:calc(100dvh - 16px);overflow:auto;grid-template-rows:minmax(160px,38dvh) auto}
-.gallery-experience .lightbox-art{height:38dvh;min-height:160px}
+.gallery-experience .lightbox-shell{display:grid;height:calc(100dvh - 16px);max-height:calc(100dvh - 16px);overflow:hidden;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(140px,32dvh) minmax(0,1fr)}
+.gallery-experience .lightbox-art{height:100%;min-height:0}
+.gallery-experience .lightbox-caption{max-height:72px;margin:8px 0}
 .gallery-experience .lightbox-art img{max-height:100%;object-fit:contain}
 .gallery-experience .comment-compose{position:sticky;bottom:0;background:white;z-index:2}
 body[data-keyboard-open=true][data-person-route=upload] .sidebar{visibility:hidden}

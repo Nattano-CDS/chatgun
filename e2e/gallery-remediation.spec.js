@@ -80,7 +80,10 @@ for(const width of [390,768,1440])test(`upload and viewer visual usability ${wid
   for(const [name,w,h] of [['portrait',300,900],['landscape',900,400],['square',600,600],['panorama',1800,200]]){
     const url='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="#d0f17b"/><circle cx="50%" cy="50%" r="70" fill="#6d42e5"/></svg>`);
     await edit(page,{viewer:{url,caption:'ภาพสมมติสำหรับทดสอบ '+name+' '+('คำบรรยายภาษาไทยที่ยาวมาก '.repeat(12))}});await page.goto('/app/people/demo-01/gallery');await page.locator('.gallery-grid .tile').first().click();await expect(page.locator('.lightbox')).toBeVisible();
-    expect(await page.locator('.lightbox-art img').evaluate(i=>getComputedStyle(i).objectFit)).toBe('contain');await page.locator('#gallery-comment input[name=comment]').fill('ทดสอบข้อความ');await expect(page.locator('#gallery-comment button')).toBeEnabled();await shot(page,'viewer-'+name+'-'+width);
+    expect(await page.locator('.lightbox-art img').evaluate(i=>getComputedStyle(i).objectFit)).toBe('contain');await page.locator('#gallery-comment input[name=comment]').fill('ทดสอบข้อความ');await expect(page.locator('#gallery-comment button')).toBeEnabled();
+    const arrow=await page.locator('.lightbox-arrows').boundingBox();expect(arrow.y+arrow.height).toBeLessThanOrEqual(width===390?844:width===768?1024:1100);
+    if(width<=768){const art=await page.locator('.lightbox-art').boundingBox(),side=await page.locator('.lightbox-side').boundingBox();expect(art.width).toBeGreaterThan(width-40);expect(side.y).toBeGreaterThanOrEqual(art.y+art.height-1);}
+    await shot(page,'viewer-'+name+'-'+width);
     await page.keyboard.press('Escape');await expect(page).toHaveURL(/demo-01\/gallery$/);
   }
   await edit(page,{viewer:{url:'/assets/demo/missing-synthetic.png',caption:''}});await page.reload();await page.locator('.gallery-grid .tile').first().click();await expect(page.locator('.image-load-status')).toContainText('โหลดรูปไม่สำเร็จ');await shot(page,'viewer-broken-'+width);
