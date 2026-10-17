@@ -16,6 +16,9 @@ for (const file of readdirSync(".", { withFileTypes: true })) {
 for (const directory of ["app", "assets"]) cpSync(directory, resolve(output, directory), { recursive: true });
 if (process.env.CF_PAGES_BRANCH === "main" || process.env.CHATGUN_CANARY_BUILD === "true") {
   for (const page of ["privacy.html","terms.html","data-deletion.html"]) copyFileSync("canary-notice.html",resolve(output,page));
+  // Only the guarded public demo build can recover independently of Pages Functions.
+  // This file contains no service credentials or live capability flags.
+  writeFileSync(resolve(output,"assets/demo/canary-runtime.json"),JSON.stringify({mode:"fictional-only-v1",demoBatch:"chatgun-browser-demo-v1"})+"\n");
 }
 writeFileSync(resolve(output,"release.json"),JSON.stringify({commit:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),demoBatch:"chatgun-browser-demo-v1"})+"\n");
 console.log(`Public asset package: ${output}`);

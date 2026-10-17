@@ -1,4 +1,5 @@
 import {initializeGallery,resetGalleryBatch} from './demo-gallery.js';
+import {loadSocialConfig} from './demo-bootstrap.js';
 const state = {
   config: null,
   account: null,
@@ -1094,7 +1095,7 @@ window.visualViewport?.addEventListener("resize", sizeConversation);
 async function initialize() {
   try {
     document.body.dataset.activeTab = state.activeTab;
-    state.config = await api("/api/social/config");
+    state.config = await loadSocialConfig(() => api("/api/social/config", { signal: AbortSignal.timeout(8000) }));
     if (state.config.demoModeEnabled && (state.config.demoAutoStartEnabled || new URLSearchParams(location.search).get("demo") === "1")) {
       // Prefer a legitimate live session. Anonymous/disabled canaries use only browser fixtures.
       if (!state.config.socialAppEnabled) return await startDemo();
