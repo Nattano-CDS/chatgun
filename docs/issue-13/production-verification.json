@@ -1,8 +1,8 @@
 {
-  "checkedAt": "2026-10-17T09:56:31.648Z",
+  "checkedAt": "2026-10-17T10:26:26.866Z",
   "origin": "https://chatgun.social",
-  "commit": "c1b04cc9e85a87dac5e824390840c03dfe14ec5d",
-  "deploymentId": "df2e3f0e-7ff3-46aa-9f20-896b9ba7e4d2",
+  "commit": "b6ba87434a82e655bff0cea39ce637fca5488b4a",
+  "deploymentId": "76424279-5a53-41cb-b9c1-9028b602da2c",
   "status": "PASS",
   "assets": [
     {
@@ -12,7 +12,7 @@
     },
     {
       "file": "app/social.js",
-      "sha256": "f8aa3643af264063e2c42368794816b6c1844ab149260036a4425d9184df75ca",
+      "sha256": "605e51e07b384ec3e16e36852a922d7c5bdcc69ad2346bed3ed9ed26fe5217c4",
       "matchesCommit": true
     },
     {
@@ -22,12 +22,12 @@
     },
     {
       "file": "app/near-components.js",
-      "sha256": "e7ecf2ddfaaa238d1e1f6fac76dd1d756cf1a01f5a11c7c7b485d61ff517f648",
+      "sha256": "11962b66f06e35781920cb85d847258ce8ac0a64c0332bf5096b693344f7f034",
       "matchesCommit": true
     },
     {
       "file": "app/near-components.css",
-      "sha256": "9f8e21d6b1d85d9d0da0f8021b75c662870391ccdce38b71ab8f86812f3b24e7",
+      "sha256": "3525bc4e7b8e38e34b5708840f226da577a9b41052459b297531db1c7b170863",
       "matchesCommit": true
     },
     {

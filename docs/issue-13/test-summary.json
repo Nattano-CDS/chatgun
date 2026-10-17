@@ -1,17 +1,17 @@
 {
-  "commit": "c1b04cc9e85a87dac5e824390840c03dfe14ec5d",
-  "checkedAt": "2026-10-17T09:49:55.199Z",
+  "commit": "b6ba87434a82e655bff0cea39ce637fca5488b4a",
+  "checkedAt": "2026-10-17T10:27:57Z",
   "unitIntegrationSecurity": {
-    "total": 118,
-    "passed": 118,
+    "total": 121,
+    "passed": 121,
     "failed": 0,
     "skipped": 0
   },
   "playwright": {
-    "passed": 80,
+    "passed": 86,
     "skipped": 36,
     "failed": 0,
-    "total": 116,
+    "total": 122,
     "viewports": [
       390,
       768,
@@ -29,9 +29,10 @@
   "dependencyVulnerabilities": 0,
   "oauth": "No real provider flow rerun; UI mocks are not provider/CAPTCHA E2E proof",
   "preview": {
-    "commit": "c1b04cc9e85a87dac5e824390840c03dfe14ec5d",
+    "commit": "b6ba87434a82e655bff0cea39ce637fca5488b4a",
     "demoBatch": "chatgun-browser-demo-v1"
   },
+  "productionPlaywright": {"passed":22,"skipped":6,"failed":0,"total":28,"apiMocks":false,"serverWrites":0},
   "guardedFictionalRelease": "GO",
   "realProductionServices": "NO-GO / disabled"
 }
