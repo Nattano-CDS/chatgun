@@ -5,6 +5,8 @@ import {issueSession} from '../functions/_lib/db.js';
 import {onRequest} from '../functions/api/social/[[path]].js';
 import {ONE_PIXEL_PNG} from './helpers/image.js';
 import {initializeGallery,galleryBatch,resetGalleryBatch} from '../app/demo-gallery.js';
+import vm from 'node:vm';
+import {readFileSync} from 'node:fs';
 
 async function fixture(t){
   const db=new TestD1();t.after(()=>db.close());const sessions={},objects=new Map();
@@ -89,4 +91,16 @@ test('failed upload attempts are rate-limited independently of the successful da
   for(let i=0;i<60;i++)assert.equal((await upload('invalid','rate-gallery-key-'+String(i).padStart(3,'0'))).status,400);
   assert.equal((await upload('public','rate-gallery-next-00001')).status,429);
   assert.equal(objects.size,0);assert.equal((await db.prepare('SELECT count(*) n FROM media_upload_quota_attempts').first()).n,0);
+});
+test('Gallery glyphs use the exact approved prototype paths, not alternative drawings',()=>{
+  const window={};vm.runInNewContext(readFileSync('app/gallery-approved.js','utf8'),{window});
+  const source=readFileSync('docs/gallery-approved/reference/chatgun-gallery-design/chatgun_gallery_ux_prototype.html','utf8');
+  for(const [_,name,paths] of source.matchAll(/^\s*(\w+):'([^']*)'/gm)){
+    assert.equal(window.ChatgunGallery.icon(name).match(/<svg[^>]*>([\s\S]*)<\/svg>/)[1],paths);
+  }
+});
+test('Public Gallery never reuses a private selected photo as its owner avatar',()=>{
+  const window={};vm.runInNewContext(readFileSync('app/gallery-approved.js','utf8'),{window});
+  const html=window.ChatgunGallery.gallery({person:{name:'owner',selected_photo_id:'private-secret'},id:'owner',own:true,photos:[{id:'public',visibility:'public'},{id:'private-secret',visibility:'private'}],html:String,portrait:p=>p.selected_photo_id?'<img src="'+p.selected_photo_id+'">':'initial',media:String,config:{},album:{granted:true}});
+  assert.ok(!html.includes('private-secret'));assert.match(html,/class="avatar">initial/);
 });

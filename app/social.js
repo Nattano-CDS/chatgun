@@ -778,7 +778,7 @@ function mountGalleryUpload(){
     if(uploadSelection.busy)return;
     for(const file of files){
       if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size<1||file.size>8*1024*1024){status('รองรับ JPG, PNG และ WebP ไม่เกิน 8 MB ต่อรูป',true);continue;}
-      if(uploadSelection.items.length>=state.uploadQuotas.gallery.remaining){status('จำนวนรูปเกินโควตาที่เหลือวันนี้',true);break;}
+      if(uploadSelection.items.filter(p=>!p.done).length>=state.uploadQuotas.gallery.remaining){status('จำนวนรูปเกินโควตาที่เหลือวันนี้',true);break;}
       try{const bitmap=await createImageBitmap(file);bitmap.close();uploadSelection.items.push({file,url:await fileDataUrl(file),key:crypto.randomUUID(),status:'พร้อมอัปโหลด'});}catch{status('ไฟล์รูปไม่ถูกต้องหรืออ่านไม่ได้',true);}
     }render();
   };

@@ -61,3 +61,11 @@ test('optional demo reset requires confirmation and preserves uploads, original 
   await page.goto('/app/people/demo-me/gallery');await expect(page.locator('.gallery-grid .tile')).toHaveCount(7);await expect(page.locator('.review-status')).toHaveCount(3);
   await page.goto('/app/me/private-gallery/upload');await expect(page.locator('[data-approved-quota]')).toHaveText('1 / 10 รูป');expect(writes).toEqual([]);
 });
+
+test('own private profile photo is not serialized into Public Gallery avatar or tiles',async({page})=>{
+  await page.goto('/');await page.locator('#primary-nav [data-tab=profile]').click();await page.locator('#manage-gallery').click();
+  await page.locator('#my-gallery [data-gallery-action=select][data-photo=demo-own-01]').click();await expect(page.locator('#toast')).toContainText('ตั้งรูปหลักแล้ว');
+  await page.goto('/app/people/demo-me/gallery');await expect(page.locator('.gallery-grid .tile')).toHaveCount(6);
+  await expect(page.locator('.gallery-experience .avatar img')).toHaveCount(0);
+  await expect(page.locator('.gallery-experience [data-photo=demo-own-01],.gallery-experience img[src$="/01.png"]')).toHaveCount(0);
+});
