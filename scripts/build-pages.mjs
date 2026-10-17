@@ -16,6 +16,16 @@ for (const file of readdirSync(".", { withFileTypes: true })) {
   if (file.isFile() && !file.name.startsWith('playwright.') && (/\.(html|css|js|svg|ico|png|webp)$/u.test(file.name) || ["_headers", "_redirects", "_routes.json"].includes(file.name))) copyFileSync(file.name, resolve(output, file.name));
 }
 for (const directory of ["app", "assets"]) cpSync(directory, resolve(output, directory), { recursive: true, filter: source => !/\/(?:assets\/demo|app\/demo-(?:network|gallery|bootstrap)\.js)(?:\/|$)/u.test(source) });
+// Explicit, static-only public release mode for an exhausted/unavailable Functions API.
+// It never enables a real account, seeds a profile, or invents an API response.
+const releaseMode=process.env.CHATGUN_RELEASE_MODE||'default';
+if(!['default','closed-prelaunch'].includes(releaseMode))throw Error('Unknown ChatGun release mode');
+const staticPrelaunch=releaseMode==='closed-prelaunch';
+if(staticPrelaunch){
+  const file=resolve(output,'app/index.html'),html=readFileSync(file,'utf8');
+  if(!html.includes('<body>'))throw Error('Static prelaunch marker insertion failed');
+  writeFileSync(file,html.replace('<body>','<body data-static-prelaunch="true">'));
+}
 if (process.env.CF_PAGES_BRANCH === "main" || process.env.CHATGUN_CANARY_BUILD === "true") {
   for (const page of ["privacy.html","terms.html","data-deletion.html"]) copyFileSync("canary-notice.html",resolve(output,page));
 }
@@ -36,5 +46,5 @@ function versionAssets(directory,prefix=''){
 }
 versionAssets(output);
 const manifest=JSON.stringify({commit,files},null,2)+'\n';writeFileSync(resolve(output,'release-assets.json'),manifest);
-writeFileSync(resolve(output,"release.json"),JSON.stringify({commit,fictionalDemoEnabled:false,assetsManifestSha256:createHash('sha256').update(manifest).digest('hex')})+"\n");
+writeFileSync(resolve(output,"release.json"),JSON.stringify({commit,fictionalDemoEnabled:false,staticPrelaunch,assetsManifestSha256:createHash('sha256').update(manifest).digest('hex')})+"\n");
 console.log(`Public asset package: ${output}`);
