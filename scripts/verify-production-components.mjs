@@ -8,7 +8,7 @@ assert.ok(expected,'Set the exact EXPECTED_SHA before testing Production');
 assert.equal((await fetch(origin+'/release.json').then(r=>r.json())).commit,expected);
 const config=await fetch(origin+'/api/social/config').then(r=>r.json());
 assert.equal(config.socialAppEnabled,false);assert.equal(config.mediaUploadEnabled,false);
-const browser=await chromium.launch(),results=[],directory='docs/issue-10-components/production-controls';await mkdir(directory,{recursive:true});
+const browser=await chromium.launch(),results=[],directory=process.env.PRODUCTION_CONTROLS_DIR||'docs/issue-10-components/production-controls';await mkdir(directory,{recursive:true});
 for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
  const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage(),writes=[],errors=[];
  page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&!['GET','HEAD'].includes(r.method()))writes.push(r.url());});

@@ -1,7 +1,7 @@
 import {chromium} from '@playwright/test';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {resolve} from 'node:path';
-const root=resolve('docs/issue-10-components'),after=process.env.AFTER_KIND||'after';
+const root=resolve(process.env.COMPARISON_ROOT||'docs/issue-10-components'),after=process.env.AFTER_KIND||'after';
 const capture=JSON.parse(await readFile(resolve(root,after,'capture.json'))),reference=JSON.parse(await readFile(resolve(root,'near/capture.json')));
 if(capture.failures.length||reference.failures.length)throw Error('Incomplete source/corrected capture');
 const measurements={};for(const kind of ['near','before',after])measurements[kind]=JSON.parse(await readFile(resolve(root,kind,'measurements.json')));

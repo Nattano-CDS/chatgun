@@ -366,11 +366,13 @@ function sourcePortrait(person) {
 
 function personCard(person, context = "near") {
   const id=person.user_id || person.other_user_id, relation=relationshipFor(id);
+  const own=Boolean(id && id===state.account?.user?.id);
   return ChatgunNearComponents.card({person,id,relation,context,
+    own,demo:state.demo,
     incoming:relation?.status==='pending'&&relation.requested_by!==state.account.user.id,
     html:escapeHtml,portrait:sourcePortrait,distance:formatDistance(person.distance,person.distance_label),
     star:starIcon,userPlus:userPlusIcon,rateDisabled:!state.locationFresh,
-    canRate:state.config.ratingsEnabled&&(!state.demo||(person.distance!=null&&person.distance<=100))});
+    canRate:!own&&state.config.ratingsEnabled&&(!state.demo||(person.distance!=null&&person.distance<=100))});
 }
 
 function renderPeople() {
@@ -386,6 +388,7 @@ function renderPeople() {
   const filter = JSON.stringify([query,gender,interest,relationship,radius]);
   if (filter !== state.discoveryFilter) { state.discoveryFilter = filter; state.discoveryPage = 1; }
   const people = state.people.filter((person) => {
+    if((person.user_id||person.other_user_id)===state.account?.user?.id)return false;
     const text = `${person.name} ${person.bio || ""} ${person.interests || ""}`.toLocaleLowerCase("th");
     return (!query || text.includes(query)) && (gender === "ทั้งหมด" || person.gender === gender)
       && (!interest || String(person.interests || "").toLocaleLowerCase("th").includes(interest))
@@ -398,7 +401,14 @@ function renderPeople() {
   const visible = people.slice((state.discoveryPage - 1) * 16, state.discoveryPage * 16);
   const columns = innerWidth >= 1400 ? 4 : innerWidth <= 1100 ? 2 : 3;
   const ad = '<div class="discovery-ad" aria-label="พื้นที่โฆษณา"><span>โฆษณา</span><small>พื้นที่โฆษณา · ยังไม่ได้เชื่อมผู้ให้บริการโฆษณา</small></div>';
-  $("#people-grid").innerHTML = visible.length ? visible.map((person,i) => `${i === columns * 2 ? ad : ''}${personCard(person)}`).join("") + ad : `<div class="empty"><h2>${state.locationFresh ? "ยังไม่พบคนที่ตรงกับการค้นหา" : "เปิดตำแหน่งเพื่อค้นหาเพื่อน"}</h2><p>${state.demo ? "ลองล้างตัวกรองเพื่อดูโปรไฟล์สมมติทั้งหมด" : "ChatGun ไม่แสดงพิกัดจริง และรับเฉพาะตำแหน่งที่มีความแม่นยำไม่เกิน 50 เมตร"}</p><button class="primary" data-clear-filters>ล้างตัวกรอง</button></div>`;
+  // A local shortcut, excluded from result counts/filters and the 16-other-member page.
+  // Never insert it into API results or publish a location/discovery visibility change.
+  const self=state.profile&&state.profile.user_id===state.account?.user?.id?state.profile:null;
+  const cards=[...(self?[self]:[]),...visible];
+  const empty=`<div class="empty"><h2>${state.locationFresh ? "ยังไม่พบคนที่ตรงกับการค้นหา" : "เปิดตำแหน่งเพื่อค้นหาเพื่อน"}</h2><p>${state.demo ? "ลองล้างตัวกรองเพื่อดูโปรไฟล์สมมติทั้งหมด" : "ChatGun ไม่แสดงพิกัดจริง และรับเฉพาะตำแหน่งที่มีความแม่นยำไม่เกิน 50 เมตร"}</p><button class="primary" data-clear-filters>ล้างตัวกรอง</button></div>`;
+  $("#people-grid").innerHTML=cards.map((person,i)=>`${i===columns*2?ad:''}${personCard(person)}`).join('')+(visible.length?ad:empty);
+  $('#people-count').title='จำนวนสมาชิกอื่นที่ตรงตัวกรอง ไม่รวมทางลัดโปรไฟล์ของคุณ';
+  $('#people-count').setAttribute('aria-label',`สมาชิกอื่น ${people.length} คน ไม่รวมโปรไฟล์ของคุณ`);
   $("#discovery-pagination").hidden = !people.length;
   $("#discovery-pagination").innerHTML = `<button class="secondary" data-discovery-page="${state.discoveryPage - 1}" ${state.discoveryPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><span aria-live="polite">หน้า ${state.discoveryPage} / ${pages}</span><button class="secondary" data-discovery-page="${state.discoveryPage + 1}" ${state.discoveryPage === pages ? 'disabled' : ''}>ถัดไป</button>`;
 }
@@ -450,6 +460,7 @@ function fillProfile() {
   form.elements.bio.value = state.profile.bio || "";
   form.elements.interests.value = state.profile.interests || "";
   $('#profile-verification').disabled=!state.config.identityVerificationEnabled||state.demo;
+  renderPeople();
 }
 
 function renderBlocked() {
@@ -879,6 +890,7 @@ $("#profile-form").addEventListener("submit", async (event) => {
   setBusy(event.submitter, true);
   try {
     state.profile = (await api("/api/social/profile", { method: "POST", body: { action: "edit", name: data.get("name"), gender: data.get("gender"), bio: data.get("bio"), interests: data.get("interests") } })).profile;
+    fillProfile();
     toast("บันทึกโปรไฟล์แล้ว");
   } catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
 });
@@ -1113,7 +1125,9 @@ document.addEventListener("click", async (event) => {
       await api("/api/social/gallery", { method: "POST", body: { action: name, id: photo } });
       if (["delete", "select"].includes(name)) {
         await loadOwnGallery();
-        if(name==='select'){state.profile.selected_photo_id=photo;fillProfile();}
+        if(name==='select')state.profile.selected_photo_id=photo;
+        if(name==='delete'&&state.profile.selected_photo_id===photo)state.profile.selected_photo_id=null;
+        fillProfile();
         if(!$('#profile-dialog').hidden){state.personPhotos=state.myGallery;renderPersonRoute('gallery');}
       }
       if (name === "like" && state.galleryView) await openGalleryPhoto(state.galleryView.owner, photo, { historyMode: "replace" });

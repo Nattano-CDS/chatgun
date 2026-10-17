@@ -55,9 +55,22 @@ test("root is the authenticated discovery entry while welcome retains marketing"
   await page.goto("/");
   await expect(page).toHaveURL(/\/$/u);
   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();
-  await expect(page.locator("#people-grid .person-card")).toHaveCount(2);
+  await expect(page.locator("#people-grid .person-card")).toHaveCount(3);
   await page.goto("/welcome");
   await expect(page.getByRole("heading", { name: /เรื่องดี ๆ เริ่มต้นจาก/u })).toBeVisible();
+});
+
+test('authenticated shortcut is session-owned, deduplicated and independent of discovery visibility',async({page})=>{
+ await page.route('**/api/social/profile',r=>r.fulfill({json:{profile:{user_id:'me',name:'นัท',bio:'โปรไฟล์ส่วนตัว',discovery_visible:0}}}));
+ await page.route('**/api/social/discovery',r=>r.fulfill({json:{locationFresh:true,people:[{user_id:'me',name:'stale API copy',distance:1},{user_id:'other',name:'สมาชิกอื่น',distance:250}]}}));
+ await page.goto('/');
+ const first=page.locator('#people-grid .person-card').first();
+ await expect(first).toHaveAttribute('data-person','me');await expect(first.locator('.person-name')).toHaveText('นัท');
+ await expect(page.locator('#people-grid [data-person=me]')).toHaveCount(1);
+ await expect(first.locator('.card-distance,[data-action],.verify-badge')).toHaveCount(0);
+ await expect(page.locator('#people-count')).toHaveText('1');
+ await page.locator('#people-search').fill('ไม่ตรงกับชื่อของคุณ');await expect(page.locator('#people-grid .person-card')).toHaveCount(1);
+ await first.locator('.card-open').click();await expect(page).toHaveURL(/people\/me$/);await expect(page.locator('.full-name-row')).toContainText('นัท');
 });
 
 test("desktop social shell preserves discovery, friends, chat, reviews, and profile without game", async ({ page }, testInfo) => {
@@ -82,7 +95,7 @@ test("mobile social shell uses bottom navigation and remains usable", async ({ p
   test.skip(testInfo.project.name !== "mobile-chromium", "mobile-only layout check");
   await page.goto("/app/");
   await expect(page.locator(".sidebar")).toBeVisible();
-  await expect(page.locator("#people-grid .person-card")).toHaveCount(2);
+  await expect(page.locator("#people-grid .person-card")).toHaveCount(3);
   await page.locator('#primary-nav button[data-tab="profile"]').click();
   await expect(page.getByRole("button", { name: "บันทึกโปรไฟล์" })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("social-mobile.png"), fullPage: true });

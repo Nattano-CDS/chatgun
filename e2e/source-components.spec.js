@@ -7,8 +7,8 @@ for(const [width,height] of widths){
   const writes=[],errors=[];page.on('pageerror',e=>errors.push(e.message));
   page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&!['GET','HEAD'].includes(r.method()))writes.push(r.url());});
   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
-  await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
-  const card=page.locator('#people-grid .photo-card').first();
+  await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(17);
+  const card=page.locator('#people-grid [data-person="demo-01"]');
   await expect(card.locator(':scope > .card-open')).toHaveCount(1);
   await expect(card.locator(':scope > .card-photo > .profile-photo')).toHaveCount(1);
   await expect(card.locator(':scope > .person-details > .card-name-row > button')).toHaveCount(1);
@@ -78,7 +78,7 @@ test('source card handles long Thai text, failed portraits and keyboard return f
  await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
  await page.route('**/assets/demo/network.json',async r=>{const response=await r.fetch(),data=await response.json();data.profiles[0].name='ชื่อสมมติสำหรับทดสอบชื่อภาษาไทยที่ยาวเป็นพิเศษ';data.profiles[0].bio='ชอบแลกเปลี่ยนเรื่องหนังสือและดนตรี '.repeat(8);await r.fulfill({json:data});});
  await page.route('**/assets/demo/01.png',r=>r.abort());
- await page.goto('/');const card=page.locator('#people-grid .photo-card').first();
+ await page.goto('/');const card=page.locator('#people-grid [data-person="demo-01"]');
  await expect(card.locator('[data-image-error]')).toHaveAttribute('aria-label',/ชื่อสมมติ/);
  expect(await card.evaluate(e=>e.scrollHeight<=e.clientHeight)).toBe(true);
  await card.locator('.card-open').focus();await page.keyboard.press('Enter');

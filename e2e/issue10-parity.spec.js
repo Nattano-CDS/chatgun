@@ -5,16 +5,16 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
     await page.setViewportSize({width,height});await page.emulateMedia({reducedMotion:'reduce'});
     await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
     const writes=[];page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&r.method()!=='GET')writes.push(r.url());});
-    await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
+    await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(17);
     const metrics=await page.locator('#people-grid').evaluate(e=>{
       const c=getComputedStyle(e),card=e.querySelector('.photo-card'),main=document.querySelector('#app>main');
       return {columns:c.gridTemplateColumns.split(' ').length,height:card.getBoundingClientRect().height,radius:getComputedStyle(card).borderRadius,padding:getComputedStyle(main).paddingLeft,background:getComputedStyle(document.body).backgroundColor,overflow:document.documentElement.scrollWidth>innerWidth};
     });
     expect(metrics).toEqual({columns:width===1440?4:2,height:width===390?290:390,radius:width===390?'17px':'22px',padding:width===390?'16px':width===768?'28px':'65px',background:'rgb(247, 247, 251)',overflow:false});
-    await page.locator('[data-discovery-page="2"]').click();await expect(page.locator('#people-grid .photo-card')).toHaveCount(4);
+    await page.locator('[data-discovery-page="2"]').click();await expect(page.locator('#people-grid .photo-card')).toHaveCount(5);
     await page.locator('[data-discovery-page="1"]').click();
     await page.locator('#people-search').fill('ไม่มีคนชื่อนี้ในตัวอย่าง');await expect(page.locator('#people-grid .empty')).toBeVisible();
-    await page.locator('#people-grid [data-clear-filters]').click();await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
+    await page.locator('#people-grid [data-clear-filters]').click();await expect(page.locator('#people-grid .photo-card')).toHaveCount(17);
     if(width<1100){await page.locator('#filter-toggle').click();await expect(page.locator('#discovery-filters')).toBeVisible();await page.keyboard.press('Escape');await expect(page.locator('#discovery-filters')).not.toBeVisible();await expect(page.locator('#filter-toggle')).toHaveAttribute('aria-expanded','false');}
     await page.locator('#people-grid .card-open').first().focus();await page.keyboard.press('Enter');await expect(page.locator('#profile-dialog')).toBeVisible();
     await expect(page.locator('#profile-dialog')).not.toHaveJSProperty('tagName','DIALOG');await expect(page.locator('#profile-dialog nav')).toHaveCount(0);await page.keyboard.press('Escape');await expect(page.locator('#profile-dialog')).not.toBeVisible();await expect(page).not.toHaveURL(/\/people\//);

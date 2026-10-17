@@ -82,7 +82,7 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
   await attempt('chat-gallery-empty',()=>page.locator(original?'.thread-gallery':'.asset-library').click());
   await page.locator(original?'.chat-gallery-heading button':'#asset-dialog .dialog-close').click();
   await nav('near');
-  await attempt('member-profile',()=>page.locator(original?'.card-open':'#people-grid [data-person]').first().click());
+  await attempt('member-profile',()=>page.locator(original?'.card-open':'#people-grid [data-person="demo-01"] .card-open').first().click());
   await attempt('member-gallery',()=>page.locator(original||modern?'.profile-gallery-top':'.member-profile-gallery-top').click());
   await attempt('gallery-post',()=>page.locator(original?'.ig-tile>button':'#dialog-gallery button').first().click());
   await attempt('own-profile',async()=>{await page.goto(target);await nav('profile');await page.getByRole('button',{name:original?'ดูโปรไฟล์และ Gallery':'ดูโปรไฟล์และแกลเลอรี',exact:true}).click();});

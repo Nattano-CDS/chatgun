@@ -11,18 +11,18 @@ window.ChatgunNearComponents = (() => {
   const brand = (title,extra='') => `<div class="page-header-identity ${extra}"><a class="toolbar-brand" href="/" aria-label="ChatGun"><img src="/logo.svg" alt="">ChatGun</a><strong>${title}</strong></div>`;
   const badge = (person,size=19) => Number(person.identity_verified)===1 ? `<button class="verify-badge" type="button" data-badge-info aria-label="ดูความหมายตรายืนยัน" title="ผ่านการตรวจหลักฐานตัวตน · ไม่ใช่การรับรองพฤติกรรม">${icon('badge',size)}</button>` : '';
   const action = (name, id, text, c, extra = '') => `<button class="${c || ''}" data-action="${name}" data-user="${id}" ${extra}>${text}</button>`;
-  function card({person:p,id,relation,incoming,context,html:h,portrait,distance,star,userPlus,canRate,rateDisabled}) {
+  function card({person:p,id,relation,incoming,context,html:h,portrait,distance,star,userPlus,canRate,rateDisabled,own=false,demo=false}) {
     const request = context === 'request' || context === 'sent';
     const body = `<article class="person photo-card person-card" data-person="${h(id)}">
       <button class="card-open" data-person-open="${h(id)}" aria-label="เปิดโปรไฟล์ ${h(p.name)}"></button>
       <div class="card-photo">${portrait(p,false)}</div><div class="photo-shade"></div>
-      <span class="card-distance">${icon('pin',14)}${h(distance)}</span>
-      ${incoming ? `<button class="incoming-bell" data-show-requests aria-label="${h(p.name)} ส่งคำขอเป็นเพื่อน">${userPlus}<span class="request-dot"></span></button>` : ''}
+      ${own ? '<span class="self-card-badge">คุณ</span>' : `<span class="card-distance">${icon('pin',14)}${h(distance)}</span>`}
+      ${!own && incoming ? `<button class="incoming-bell" data-show-requests aria-label="${h(p.name)} ส่งคำขอเป็นเพื่อน">${userPlus}<span class="request-dot"></span></button>` : ''}
       <div class="person-details"><div class="person-top"></div>
-        <div class="card-name-row"><button class="person-name" data-person-open="${h(id)}">${h(p.name)}</button>${badge(p)}</div>
+        <div class="card-name-row"><button class="person-name" data-person-open="${h(id)}">${h(p.name)}</button>${own?'':badge(p)}</div>
         <p class="person-bio">${h(p.bio || 'ยินดีที่ได้รู้จัก')}</p>
-        <div class="rating-line">${p.rating_count ? Number(p.rating).toFixed(1) : 'ยังไม่มีคะแนน'}</div>
-        <div class="card-actions">${canRate ? action('rate',h(id),star,'icon-button rate-button',`aria-label="ให้คะแนน" ${rateDisabled ? 'disabled' : ''}`) : ''}</div>
+        <div class="rating-line">${own ? (demo?'โปรไฟล์ของคุณ · ตัวอย่าง':'โปรไฟล์ของคุณ') : p.rating_count ? Number(p.rating).toFixed(1) : 'ยังไม่มีคะแนน'}</div>
+        <div class="card-actions">${own?`<button class="icon-button self-profile-open" data-person-open="${h(id)}" aria-label="ดูโปรไฟล์ของคุณ" title="ดูโปรไฟล์">${icon('next',22)}</button>`:canRate ? action('rate',h(id),star,'icon-button rate-button',`aria-label="ให้คะแนน" ${rateDisabled ? 'disabled' : ''}`) : ''}</div>
       </div></article>`;
     return request ? `<div class="request-card">${body}<div class="request-decisions">${context==='request' ? action('accept',h(id),'ยอมรับ','primary')+action('reject',h(id),'ปฏิเสธ','secondary') : action('cancel',h(id),'ยกเลิกคำขอ','secondary')}</div></div>` : body;
   }
