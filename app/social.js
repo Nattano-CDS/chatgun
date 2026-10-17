@@ -584,7 +584,7 @@ function renderUploadQuotas() {
 
 async function loadUploadQuotas() {
   if (!state.config.mediaUploadEnabled || state.demo) return renderUploadQuotas();
-  state.uploadQuotas = await api("/api/social/upload-quotas");
+  state.uploadQuotas = await api("/api/social/upload-quotas",{signal:AbortSignal.timeout(10000)});
   renderUploadQuotas();
 }
 
@@ -765,6 +765,9 @@ function closeProfileSurface({navigate=true}={}) {
   $$('.card-open').find(b=>b.dataset.personOpen===id)?.focus({preventScroll:true});
 }
 function renderPersonRoute(view='profile') {
+  // An asynchronous album refresh must not detach the form whose upload/retry
+  // handler is still running. Its own render updates the current controls.
+  if(view==='upload'&&uploadSelection.busy&&$('#approved-gallery-upload'))return;
   state.personRouteView=view;document.body.dataset.personRoute=view;
   const c={...profileContext(state.selectedPerson,state.personPhotos||[]),galleryLoadError:state.galleryLoadError};
   $('#profile-dialog-content').innerHTML=(view==='gallery'||view==='upload')?ChatgunGallery[view]({...c,management:ChatgunNearComponents.privateAlbum(c),quota:state.uploadQuotas.gallery,capacity:galleryCapacity(),uploading:view==='upload'}):ChatgunNearComponents[view](c);
@@ -887,7 +890,10 @@ async function showPerson(id, {historyMode='push',photo=null}={}) {
   if(!photo)state.privateAlbumOpen=false;
   state.selectedPerson=person;state.personPhotos=[];state.album=null;state.albumRequests=[];state.galleryLoadError=false;state.albumLoading=true;
   state.profileRequest=(state.profileRequest||0)+1;const generation=state.profileRequest;
-  renderPersonRoute(photo==='upload'?'upload':photo==='gallery'?'gallery':'profile');
+  if(photo==='upload'){
+    state.personRouteView='upload';document.body.dataset.personRoute='upload';
+    $('#profile-dialog-content').innerHTML='<main class="gallery-experience"><p role="status">กำลังตรวจสอบโควตาและพื้นที่อัลบั้ม…</p></main>';openProfileSurface();
+  }else renderPersonRoute(photo==='gallery'?'gallery':'profile');
   try{
     const result=await api('/api/social/gallery?user='+encodeURIComponent(id)+'&album='+(state.privateAlbumOpen?'private':'public'));
     const photos=result.photos;
