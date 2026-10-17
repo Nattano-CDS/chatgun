@@ -34,7 +34,7 @@ if(process.env.EXPECTED_SHA)assert.equal(release.commit,process.env.EXPECTED_SHA
 check('anonymous messages denied',(await fetch(origin+'/api/social/messages?target='+ids.owner)).status===401);
 check('stranger DM succeeds',(await call('viewer','messages',{action:'send',target:ids.owner,body:'สวัสดีจากการทดสอบ staging '+run})).status===200);
 check('no friendship rows',(await query('SELECT COUNT(*) n FROM social_relationships')).results[0].n===0);
-check('owner inbox contains actual conversation',(await (await call('owner','conversations')).json()).conversations.some(c=>c.other_user_id===ids.viewer&&c.unread_count===1));
+check('owner inbox contains actual conversation and authorized preview',(await (await call('owner','conversations')).json()).conversations.some(c=>c.other_user_id===ids.viewer&&c.unread_count===1&&c.last_message_body?.includes(run)&&c.last_message_sender_id===ids.viewer));
 check('existing counterpart can reply',(await call('owner','messages',{action:'send',target:ids.viewer,body:'reply '+run})).status===200);
 check('recipient can opt out',(await call('owner','profile',{action:'contact_privacy',enabled:false})).status===200);
 check('opt-out denies new sends',(await call('viewer','messages',{action:'send',target:ids.owner,body:'denied '+run})).status===403);

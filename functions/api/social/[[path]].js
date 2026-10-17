@@ -615,11 +615,17 @@ async function conversations(request,env) {
   const offset=Number(new URL(request.url).searchParams.get('offset')||0);
   if(!Number.isSafeInteger(offset)||offset<0||offset>10000) throw new SocialError('invalid_cursor','คำขอไม่ถูกต้อง');
   const rows=await env.DB.prepare(`WITH activity AS (
-    SELECT CASE WHEN sender_user_id=? THEN receiver_user_id ELSE sender_user_id END other_user_id,created_at
+    SELECT CASE WHEN sender_user_id=? THEN receiver_user_id ELSE sender_user_id END other_user_id,created_at,id activity_id,
+      json_object('body',CASE WHEN unsent_at IS NULL THEN body ELSE '' END,
+        'media_id',CASE WHEN unsent_at IS NULL THEN media_id ELSE NULL END,
+        'sender_user_id',sender_user_id,'unsent_at',unsent_at) payload
     FROM social_messages WHERE sender_user_id=? OR receiver_user_id=?
-    UNION ALL SELECT CASE WHEN album_owner_id=? THEN requester_id ELSE album_owner_id END,created_at
+    UNION ALL SELECT CASE WHEN album_owner_id=? THEN requester_id ELSE album_owner_id END,created_at,id,
+      json_object('body','อัลบั้มส่วนตัว','media_id',NULL,'sender_user_id',actor_user_id,'unsent_at',NULL)
     FROM chat_system_events WHERE album_owner_id=? OR requester_id=?
   ) SELECT p.user_id other_user_id,p.name,p.gender,p.bio,p.interests,p.selected_photo_id,p.direct_messages_enabled,MAX(a.created_at) last_message_at,
+    (SELECT recent.payload FROM activity recent WHERE recent.other_user_id=p.user_id
+      ORDER BY recent.created_at DESC,recent.activity_id DESC LIMIT 1) last_message_payload,
     (SELECT COUNT(*) FROM social_messages m WHERE m.sender_user_id=p.user_id AND m.receiver_user_id=? AND m.read_at IS NULL AND m.unsent_at IS NULL)
     +(SELECT COUNT(*) FROM chat_system_events e WHERE
       (e.album_owner_id=? AND e.requester_id=p.user_id AND e.owner_read_at IS NULL) OR
@@ -631,7 +637,11 @@ async function conversations(request,env) {
     GROUP BY p.user_id ORDER BY last_message_at DESC,p.user_id LIMIT 51 OFFSET ?`)
     .bind(...Array(10).fill(session.user_id),session.user_id,session.user_id,offset).all();
   const result=(rows.results||[]).slice(0,50);
-  for(const p of result) p.selected_photo_id=await publicPortrait(env.DB,p.selected_photo_id,p.other_user_id);
+  for(const p of result){
+    p.selected_photo_id=await publicPortrait(env.DB,p.selected_photo_id,p.other_user_id);
+    const latest=JSON.parse(p.last_message_payload||'null');delete p.last_message_payload;
+    if(latest)Object.assign(p,{last_message_body:latest.body,last_message_media_id:latest.media_id,last_message_sender_id:latest.sender_user_id,last_message_unsent_at:latest.unsent_at});
+  }
   return json({conversations:result,hasMore:(rows.results||[]).length>50,nextOffset:offset+result.length});
 }
 

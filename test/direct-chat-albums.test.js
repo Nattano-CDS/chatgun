@@ -34,11 +34,13 @@ test('direct DM creates inbox without friendship, persists text, read and unsend
   assert.equal((await call('viewer','messages',{action:'send',target:'owner',body:'สวัสดีครับ'})).status,200);
   assert.equal((await db.prepare('SELECT COUNT(*) n FROM social_relationships').first()).n,0);
   let inbox=await (await call('owner','conversations')).json();assert.equal(inbox.conversations.length,1);assert.equal(inbox.conversations[0].unread_count,1);
+  assert.equal(inbox.conversations[0].last_message_body,'สวัสดีครับ');assert.equal(inbox.conversations[0].last_message_sender_id,'viewer');
   const messages=(await (await call('owner','messages?target=viewer')).json()).messages;assert.equal(messages[0].body,'สวัสดีครับ');
   await call('owner','messages',{action:'read',target:'viewer'});
   inbox=await (await call('owner','conversations')).json();assert.equal(inbox.conversations[0].unread_count,0);
   assert.equal((await call('other','messages',{action:'unsend',id:messages[0].id})).status,404);
   assert.equal((await call('viewer','messages',{action:'unsend',id:messages[0].id})).status,200);
+  const unsent=(await (await call('owner','conversations')).json()).conversations[0];assert.equal(unsent.last_message_body,'');assert.ok(unsent.last_message_unsent_at);
 });
 test('DM denies anonymous/self/nonadult/inactive/opt-out/both block directions and CSRF',async t=>{
   const {db,call}=await fixture(t);
