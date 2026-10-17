@@ -1,7 +1,7 @@
 {
-  "run": "issue13-1ad9bbbf-4561-48dd-b14a-b290f5f24d1e",
+  "run": "issue13-6cd72aa3-ad4b-43b7-a344-8faa6a5e0d39",
   "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
-  "commit": "1a9c2a799ceefb21a75fea0604a749892cfe7ffb",
+  "commit": "a184dc29eb10d565309bd4243be786186764e475",
   "database": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
   "bucket": "chatgun-issue13-media",
   "syntheticOnly": true,
@@ -91,12 +91,33 @@
       "result": "PASS"
     },
     {
+      "name": "managed public R2 domain disabled",
+      "result": "PASS"
+    },
+    {
+      "name": "real R2 cleanup worker completes",
+      "result": "PASS"
+    },
+    {
+      "name": "deletion queue completion persisted",
+      "result": "PASS"
+    },
+    {
       "name": "foreign keys valid",
+      "result": "PASS"
+    },
+    {
+      "name": "browser fixture is private without owner consent",
       "result": "PASS"
     }
   ],
-  "passed": 22,
+  "passed": 26,
   "failed": 0,
-  "cleanup": "queued, object not yet deleted; do not claim worker completion",
+  "cleanup": {
+    "selected": 1,
+    "completed": 1,
+    "failed": 0,
+    "exhausted": 0
+  },
   "oauth": "not retested; synthetic session fixture only"
 }

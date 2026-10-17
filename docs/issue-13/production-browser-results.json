@@ -1,0 +1,15 @@
+{
+  "commit": "a184dc29eb10d565309bd4243be786186764e475",
+  "origin": "https://chatgun.social",
+  "deploymentId": "fe23654c-2cc1-4ab6-8833-3275f6bbcbb8",
+  "passed": 12,
+  "failed": 0,
+  "skipped": 6,
+  "apiMocks": false,
+  "serverWrites": 0,
+  "viewports": [
+    390,
+    768,
+    1440
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "run": "issue13-6cd72aa3-ad4b-43b7-a344-8faa6a5e0d39",
+  "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "commit": "a184dc29eb10d565309bd4243be786186764e475",
+  "database": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
+  "bucket": "chatgun-issue13-media",
+  "syntheticOnly": true,
+  "checks": [
+    {
+      "name": "anonymous messages denied",
+      "result": "PASS"
+    },
+    {
+      "name": "stranger DM succeeds",
+      "result": "PASS"
+    },
+    {
+      "name": "no friendship rows",
+      "result": "PASS"
+    },
+    {
+      "name": "owner inbox contains actual conversation",
+      "result": "PASS"
+    },
+    {
+      "name": "quarantine denies owner bytes",
+      "result": "PASS"
+    },
+    {
+      "name": "private listing hides IDs",
+      "result": "PASS"
+    },
+    {
+      "name": "private raw URL denies stranger",
+      "result": "PASS"
+    },
+    {
+      "name": "album request succeeds",
+      "result": "PASS"
+    },
+    {
+      "name": "duplicate pending request rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "cross-user approval rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "concurrent approval exactly once",
+      "result": "PASS"
+    },
+    {
+      "name": "grant permits private bytes",
+      "result": "PASS"
+    },
+    {
+      "name": "grant does not permit unrelated viewer",
+      "result": "PASS"
+    },
+    {
+      "name": "permitted comment persists",
+      "result": "PASS"
+    },
+    {
+      "name": "typed approval delivered",
+      "result": "PASS"
+    },
+    {
+      "name": "owner revoke succeeds",
+      "result": "PASS"
+    },
+    {
+      "name": "old raw URL denied after revoke",
+      "result": "PASS"
+    },
+    {
+      "name": "old photo comments denied after revoke",
+      "result": "PASS"
+    },
+    {
+      "name": "gallery deletion queues R2 cleanup",
+      "result": "PASS"
+    },
+    {
+      "name": "deleted media cannot be retrieved",
+      "result": "PASS"
+    },
+    {
+      "name": "R2 queue records exact object",
+      "result": "PASS"
+    },
+    {
+      "name": "managed public R2 domain disabled",
+      "result": "PASS"
+    },
+    {
+      "name": "real R2 cleanup worker completes",
+      "result": "PASS"
+    },
+    {
+      "name": "deletion queue completion persisted",
+      "result": "PASS"
+    },
+    {
+      "name": "foreign keys valid",
+      "result": "PASS"
+    },
+    {
+      "name": "browser fixture is private without owner consent",
+      "result": "PASS"
+    }
+  ],
+  "passed": 26,
+  "failed": 0,
+  "cleanup": {
+    "selected": 1,
+    "completed": 1,
+    "failed": 0,
+    "exhausted": 0
+  },
+  "oauth": "not retested; synthetic session fixture only"
+}
