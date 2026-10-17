@@ -137,7 +137,10 @@ async function uploadQuotas(request, env) {
     const reserved = Number(byCategory[name]?.reserved || 0);
     return { limit: MEDIA_UPLOAD_DAILY_LIMIT, used: completed, reserved, remaining: Math.max(0, MEDIA_UPLOAD_DAILY_LIMIT - completed - reserved) };
   };
-  return json({ ...window, chat: category("chat"), gallery: category("gallery") });
+  // Only the authenticated owner's aggregate; never expose another member's
+  // private album count. The insertion trigger remains the atomic backstop.
+  const capacity = await env.DB.prepare('SELECT COUNT(*) AS used FROM profile_photos WHERE owner_user_id = ?').bind(session.user_id).first();
+  return json({ ...window, chat: category("chat"), gallery: category("gallery"), galleryCapacity: {used:Number(capacity.used),limit:12,remaining:Math.max(0,12-Number(capacity.used))} });
 }
 
 export function moderationCoverage(timestampMs = Date.now()) {

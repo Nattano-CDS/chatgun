@@ -224,7 +224,7 @@ async function demoApi(path, options = {}) {
     await demoSave(); return { ok: true };
   }
   if (url.pathname === "/api/social/chat-assets") return { assets: state.demoAssets.map(({ id, created_at }) => ({ id, created_at })) };
-  if (url.pathname === "/api/social/upload-quotas") return state.uploadQuotas;
+  if (url.pathname === "/api/social/upload-quotas") return {...state.uploadQuotas,galleryCapacity:galleryCapacity()};
   if (url.pathname === "/api/social/ratings") {
     if (method === "GET") return { ratings: state.ratings };
     state.demoRatingsGiven.unshift({ id: crypto.randomUUID(), target: body.target, score: body.score, comment: body.comment, created_at: Math.floor(Date.now() / 1000) });
@@ -588,6 +588,11 @@ async function loadUploadQuotas() {
   renderUploadQuotas();
 }
 
+function galleryCapacity(){
+  if(state.demo){const used=state.demoGallery.filter(p=>p.owner===currentActor()).length;return {used,limit:12,remaining:Math.max(0,12-used)};}
+  return state.uploadQuotas.galleryCapacity||{used:0,limit:12,remaining:0}; // fail closed until loaded
+}
+
 async function loadOwnGallery() {
   const galleries=await Promise.all(['public','private'].map(album=>api(`/api/social/gallery?user=${encodeURIComponent(state.account.user.id)}&album=${album}`)));
   state.myGallery=galleries.flatMap(g=>g.photos);
@@ -762,42 +767,87 @@ function closeProfileSurface({navigate=true}={}) {
 function renderPersonRoute(view='profile') {
   state.personRouteView=view;document.body.dataset.personRoute=view;
   const c={...profileContext(state.selectedPerson,state.personPhotos||[]),galleryLoadError:state.galleryLoadError};
-  $('#profile-dialog-content').innerHTML=(view==='gallery'||view==='upload')?ChatgunGallery[view]({...c,management:ChatgunNearComponents.privateAlbum(c),quota:state.uploadQuotas.gallery}):ChatgunNearComponents[view](c);
+  $('#profile-dialog-content').innerHTML=(view==='gallery'||view==='upload')?ChatgunGallery[view]({...c,management:ChatgunNearComponents.privateAlbum(c),quota:state.uploadQuotas.gallery,capacity:galleryCapacity(),uploading:view==='upload'}):ChatgunNearComponents[view](c);
   if(view==='upload')mountGalleryUpload();
   if(view==='gallery'&&c.own&&c.config.mediaUploadEnabled)renderUploadQuotas();
   openProfileSurface();
 }
 let uploadSelection={path:'',items:[],busy:false};
+const unsavedUpload=()=>state.personRouteView==='upload'&&uploadSelection.items.some(p=>!p.done);
+const leaveUpload=()=>!uploadSelection.busy&&(!unsavedUpload()||confirm('ยังมีรูปที่ไม่ได้บันทึก ต้องการออกจากหน้านี้หรือไม่?'));
+// Guard client navigation as well as reload/closing. Only our own history
+// entries carry an index, allowing cancelled browser Back to preserve Forward.
+let routeStep=Number(history.state?.cgStep||0),restoringUpload=false,approvedUnload=false;
+history.replaceState({...history.state,cgStep:routeStep},'');
+for(const method of ['pushState','replaceState']){
+  const original=history[method].bind(history);
+  history[method]=(data,title,url)=>{if(method==='pushState')routeStep++;original({...data,cgStep:routeStep},title,url);};
+}
+document.addEventListener('click',e=>{
+  const navigation=e.target.closest('a[href],[data-gallery-return],[data-profile-return],[data-close-profile],[data-tab],[data-person-open],[data-demo-owner]');
+  if(navigation&&state.personRouteView==='upload'&&!navigation.hasAttribute('data-upload-again')&&!leaveUpload()){e.preventDefault();e.stopImmediatePropagation();}
+  else if(navigation?.matches('a[href]')&&unsavedUpload()){approvedUnload=true;setTimeout(()=>approvedUnload=false,1000);}
+},true);
+window.addEventListener('beforeunload',e=>{if(!approvedUnload&&(unsavedUpload()||uploadSelection.busy)){e.preventDefault();e.returnValue='';}});
+function keyboardViewport(){document.body.dataset.keyboardOpen=String(Boolean(window.visualViewport&&innerHeight-window.visualViewport.height>150));}
+window.visualViewport?.addEventListener('resize',keyboardViewport);
+document.addEventListener('focusout',()=>setTimeout(keyboardViewport,100));
 function mountGalleryUpload(){
   const form=$('#approved-gallery-upload');if(!form)return;
   const scope=state.privateAlbumOpen?'private':'public',actor=currentActor();
   if(uploadSelection.path!==location.pathname)uploadSelection={path:location.pathname,items:[],busy:false};
   const status=(message,error=false)=>{const el=$('#gallery-upload-status');if(!el)return;el.hidden=!message;el.textContent=message;el.setAttribute('role',error?'alert':'status');};
-  const render=()=>{const el=$('#gallery-upload-previews');if(!el)return;const count=$('[data-selected-count]');if(count){count.hidden=!uploadSelection.items.length;count.textContent=`เลือก ${uploadSelection.items.length} รูป · สำเร็จ ${uploadSelection.items.filter(p=>p.done).length} รูป`;}el.innerHTML=uploadSelection.items.map((p,i)=>`<div class="thumb-small"><img src="${escapeHtml(p.url)}" alt="ภาพตัวอย่าง ${i+1}"><button class="remove" type="button" data-remove-upload="${i}" aria-label="นำรูปที่ ${i+1} ออก" ${uploadSelection.busy?'disabled':''}>×</button><span class="upload-file-state">${escapeHtml(p.status||'พร้อมอัปโหลด')}</span></div>`).join('');};
+  const allowance=()=>Math.min(state.uploadQuotas.gallery.remaining,galleryCapacity().remaining);
+  const render=()=>{
+    if(!form.isConnected)return;
+    const pending=uploadSelection.items.filter(p=>!p.done),saved=uploadSelection.items.filter(p=>p.done).length,complete=saved>0&&!pending.length;
+    const capacity=galleryCapacity(),q=state.uploadQuotas.gallery;
+    $('[data-selected-count]').textContent=`เลือก ${uploadSelection.items.length} รูป · บันทึกแล้ว ${saved} · ยังไม่บันทึก ${pending.length}`;
+    $('#gallery-upload-previews').innerHTML=uploadSelection.items.map((p,i)=>`<div class="thumb-small ${p.done?'saved':''}"><img src="${escapeHtml(p.url)}" alt="ภาพตัวอย่าง ${i+1}">${p.done?'':`<button class="remove" type="button" data-remove-upload="${i}" aria-label="นำรูปที่ ${i+1} ออก" ${uploadSelection.busy?'disabled':''}>×</button>`}<span class="upload-file-state">${escapeHtml(p.done?'บันทึกแล้ว · รอผู้ดูแลตรวจสอบ':p.status||'พร้อมอัปโหลด')}</span></div>`).join('');
+    $('[data-approved-quota]').textContent=`${q.used} / 10 รูป`;
+    $('[data-album-capacity]').textContent=`${capacity.used} / 12 รูป`;
+    $('.quota-fill').className=`quota-fill used-${Math.min(10,q.used)}`;
+    $('[data-upload-allowance]').textContent=`เพิ่มได้อีก ${allowance()} รูป · เหลือ ${q.remaining} รูปวันนี้ · พื้นที่ว่าง ${capacity.remaining} รูป`;
+    // An attempted key may already have committed despite a lost response.
+    // Retrying that exact key must remain possible at full quota/capacity;
+    // the server decides whether it is a replay or a new reservation.
+    const replayOnly=pending.length>0&&pending.every(p=>p.attempted);
+    const submit=$('[data-upload-submit]');submit.hidden=complete;submit.disabled=uploadSelection.busy||!pending.length||(pending.length>allowance()&&!replayOnly);
+    submit.textContent=pending.some(p=>p.failed)?'ลองเฉพาะรูปที่ยังไม่สำเร็จ':uploadSelection.busy?'กำลังบันทึก…':'บันทึกรูป';
+    $('[data-upload-success]').hidden=!complete;
+    form.dataset.complete=String(complete);
+    if(complete)status('');
+    $('[data-upload-summary]').textContent=`ยังไม่บันทึก ${pending.length} รูป · เพิ่มได้อีก ${allowance()} รูป`;
+    $('[data-upload-again]').hidden=!complete;$('[data-upload-view]').hidden=!complete;
+    for(const el of form.querySelectorAll('input,textarea'))el.disabled=uploadSelection.busy||complete;
+    if(pending.length>allowance()&&!replayOnly)status(`เลือก ${pending.length} รูป แต่เพิ่มได้อีก ${allowance()} รูป (พื้นที่ว่าง ${capacity.remaining} รูป / โควตาวันนี้ ${q.remaining} รูป) กรุณานำรูปที่ยังไม่บันทึกออกก่อน`,true);
+  };
   const choose=async files=>{
     if(uploadSelection.busy)return;
     for(const file of files){
       if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size<1||file.size>8*1024*1024){status('รองรับ JPG, PNG และ WebP ไม่เกิน 8 MB ต่อรูป',true);continue;}
-      if(uploadSelection.items.filter(p=>!p.done).length>=state.uploadQuotas.gallery.remaining){status('จำนวนรูปเกินโควตาที่เหลือวันนี้',true);break;}
       try{const bitmap=await createImageBitmap(file);bitmap.close();uploadSelection.items.push({file,url:await fileDataUrl(file),key:crypto.randomUUID(),status:'พร้อมอัปโหลด'});}catch{status('ไฟล์รูปไม่ถูกต้องหรืออ่านไม่ได้',true);}
     }render();
   };
   form.querySelector('input[type=file]').onchange=e=>choose(e.target.files);
   const zone=$('#gallery-dropzone');zone.ondragover=e=>{e.preventDefault();zone.classList.add('drag');};zone.ondragleave=()=>zone.classList.remove('drag');zone.ondrop=e=>{e.preventDefault();zone.classList.remove('drag');choose(e.dataTransfer.files);};
-  form.onclick=e=>{const b=e.target.closest('[data-remove-upload]');if(b&&!uploadSelection.busy){uploadSelection.items.splice(Number(b.dataset.removeUpload),1);render();}};
+  form.onclick=e=>{const b=e.target.closest('[data-remove-upload]');if(b&&!uploadSelection.busy&&!uploadSelection.items[Number(b.dataset.removeUpload)]?.done){uploadSelection.items.splice(Number(b.dataset.removeUpload),1);status('');render();}if(e.target.closest('[data-upload-again]')){uploadSelection.items=[];form.reset();status('');render();$('#gallery-file-picker').focus();}};
   form.onsubmit=async e=>{
     e.preventDefault();if(uploadSelection.busy)return;
     const pending=uploadSelection.items.filter(p=>!p.done);
     if(!pending.length){status('กรุณาเลือกรูปภาพก่อน',true);return;}
     uploadSelection.busy=true;form.querySelectorAll('button,input,textarea').forEach(el=>el.disabled=true);
     try{
+      await loadUploadQuotas();
+      if(pending.length>allowance()&&!pending.every(p=>p.attempted)){status(`เพิ่มได้อีก ${allowance()} รูปเท่านั้น กรุณาปรับจำนวนรูปก่อนบันทึก`,true);return;}
       for(const [i,p] of pending.entries()){
+        try{
         status(`กำลังอัปโหลด ${i+1}/${pending.length}…`);p.status='กำลังอัปโหลด';render();
-        const optimized=await optimizeImage(p.file),caption=form.elements.caption.value;
+        const optimized=await optimizeImage(p.file),caption=form.elements.caption.value;p.attempted=true;
         if(state.demo){
           if(actor!==currentActor())throw Error('บัญชีปัจจุบันเปลี่ยน กรุณาเปิดหน้าใหม่');
-          if(state.demoGallery.filter(p=>p.owner===actor).length>=12)throw Error('อัปโหลดได้สูงสุด 12 รูปรวมทั้งสองอัลบั้ม');
           if(!state.demoGallery.some(photo=>photo.id===p.key)){
+            if(state.demoGallery.filter(p=>p.owner===actor).length>=12)throw Error('อัปโหลดได้สูงสุด 12 รูปรวมทั้งสองอัลบั้ม');
             const url=await fileDataUrl(optimized),beforeQuota=structuredClone(state.uploadQuotas);consumeDemoUpload('gallery');
             state.demoGallery.unshift({id:p.key,owner:actor,visibility:scope,caption,url,like_count:0,comments:[],review_status:'pending',created_at:Math.floor(Date.now()/1000)});
             try{await demoSave();}catch(error){state.demoGallery=state.demoGallery.filter(photo=>photo.id!==p.key);state.uploadQuotas=beforeQuota;throw error;}
@@ -807,15 +857,16 @@ function mountGalleryUpload(){
           const response=await fetch('/api/social/gallery',{method:'POST',credentials:'same-origin',headers:{'x-csrf-token':decodeURIComponent(cookie('__Host-cg_csrf')),'idempotency-key':p.key,accept:'application/json'},body:data});
           const result=await response.json();if(!response.ok)throw Error(result.message||'อัปโหลดไม่สำเร็จ');
         }
-        p.done=true;p.status='รอผู้ดูแลตรวจสอบ';render();
+        p.done=true;p.failed=false;p.status='รอผู้ดูแลตรวจสอบ';
+        }catch(error){p.failed=true;p.status=error instanceof TypeError?'เชื่อมต่อหรืออ่านรูปไม่สำเร็จ กรุณาลองอีกครั้ง':error.message;}
+        render();
       }
-      status('บันทึกรูปแล้ว · Pending Moderation · รอผู้ดูแลตรวจสอบก่อนให้สมาชิกอื่นเห็น');
+      const failed=pending.filter(p=>!p.done).length;
+      status(failed?`บันทึกแล้ว ${pending.length-failed} รูป · ไม่สำเร็จ ${failed} รูป กดลองอีกครั้งเพื่อบันทึกเฉพาะรูปที่ยังไม่สำเร็จ`:'บันทึกรูปเรียบร้อยแล้ว · สถานะ: รอผู้ดูแลตรวจสอบ',!!failed);
     }catch(error){status(error.message+' · กดปุ่มอัปโหลดเพื่อลองเฉพาะรูปที่ยังไม่สำเร็จอีกครั้ง',true);}
     finally{
+      try{await loadUploadQuotas();}catch{status('ตรวจสอบโควตาไม่สำเร็จ กรุณาลองใหม่',true);}
       uploadSelection.busy=false;form.querySelectorAll('button,input,textarea').forEach(el=>el.disabled=false);render();
-      await loadUploadQuotas();const q=state.uploadQuotas.gallery;
-      const quota=$('[data-approved-quota]');if(quota)quota.textContent=`${q.used} / 10 รูป`; const track=$('.quota-fill');if(track)track.className=`quota-fill used-${Math.min(10,q.used)}`;
-      form.querySelector('button.primary').disabled=q.remaining<=0;
     }
   };render();
 }
@@ -841,6 +892,7 @@ async function showPerson(id, {historyMode='push',photo=null}={}) {
     if(generation!==state.profileRequest)return;
     state.personPhotos=photos;state.album=result.album;
     if(id===currentActor())state.albumRequests=(await api('/api/social/albums/access')).requests;
+    if(photo==='upload')await loadUploadQuotas();
   }catch(error){if(generation!==state.profileRequest)return;state.galleryLoadError=true;toast('โหลด Gallery ไม่สำเร็จ โปรดลองอีกครั้ง',true);}
   state.albumLoading=false;
   if(!state.album?.granted&&id!==currentActor()&&state.privateAlbumOpen){state.privateAlbumOpen=false;state.personPhotos=[];state.galleryLoadError=true;updateProfileRoute(id,null,'replace');state.personRouteView='profile';}
@@ -889,6 +941,10 @@ function renderGalleryPost(){
   state.personRouteView='post';document.body.dataset.personRoute='post';openProfileSurface();
   $('.gallery-experience>.topbar').inert=true;$('.gallery-experience>.page').inert=true;
   $('.lightbox-close')?.focus({preventScroll:true});
+  const image=$('.lightbox-art img'),art=$('.lightbox-art');
+  const feedback=document.createElement('span');feedback.className='image-load-status';feedback.setAttribute('role','status');art.append(feedback);
+  const imageStatus=()=>{feedback.textContent=image.complete?(image.naturalWidth?'':'โหลดรูปไม่สำเร็จ กรุณาเปิดรูปอีกครั้ง'):'กำลังโหลดรูป…';art.setAttribute('aria-busy',String(!image.complete));};
+  image.addEventListener('load',imageStatus);image.addEventListener('error',imageStatus);imageStatus();
 }
 function postFeedback(message='',error=false){
   const feedback=$('[data-post-feedback]');if(!feedback)return false;
@@ -1571,7 +1627,13 @@ window.addEventListener("pagehide", () => {
   if (state.locationWatch !== null && navigator.geolocation) navigator.geolocation.clearWatch(state.locationWatch);
   if (state.locationPermission) state.locationPermission.onchange = null;
 });
-window.addEventListener("popstate", () => {
+window.addEventListener("popstate", event => {
+  if(restoringUpload){restoringUpload=false;return;}
+  const next=Number(event.state?.cgStep||0);
+  if(state.personRouteView==='upload'&&!leaveUpload()){
+    restoringUpload=true;history.go(routeStep-next);return;
+  }
+  routeStep=next;
   if(location.pathname==='/app/photos')openOwnGallery(false);
   else delete document.body.dataset.ownGallery;
   const route = routedProfile();

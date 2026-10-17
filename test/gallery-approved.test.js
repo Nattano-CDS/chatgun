@@ -56,14 +56,23 @@ test('separate upload scopes share quota, preserve quarantine, and reject cross-
   assert.deepEqual((await (await call('viewer','gallery?user=owner')).json()).photos,[]);
 });
 test('shared 12-photo capacity is transaction-enforced and releases failed upload reservations',async t=>{
-  const {db,upload,objects}=await fixture(t);
+  const {db,upload,objects,call}=await fixture(t);
   for(let i=0;i<12;i++)db.exec(`INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,created_at) VALUES('cap${i}','owner','cap${i}','gallery','image/png',1,1);INSERT INTO profile_photos(media_id,owner_user_id,visibility,created_at) VALUES('cap${i}','owner','${i%2?'private':'public'}',1)`);
   assert.equal((await upload('public')).status,409);assert.equal(objects.size,0);
+  assert.deepEqual((await (await call('owner','upload-quotas')).json()).galleryCapacity,{used:12,limit:12,remaining:0});
+  assert.deepEqual((await (await call('viewer','upload-quotas')).json()).galleryCapacity,{used:0,limit:12,remaining:12},'capacity is only the authenticated owner aggregate');
   assert.equal((await db.prepare("SELECT count(*) n FROM media_upload_quota_attempts WHERE status='completed'").first()).n,0);
   assert.equal((await db.prepare('SELECT count(*) n FROM profile_photos').first()).n,12);
   db.exec("DELETE FROM profile_photos WHERE media_id='cap0'");
   assert.equal((await upload('private')).status,201);assert.equal((await db.prepare('SELECT count(*) n FROM profile_photos').first()).n,12);
   assert.equal((await upload('private')).status,201,'replay succeeds even at full capacity');
+});
+test('simultaneous public/private uploads cannot exceed one remaining album space',async t=>{
+  const {db,upload,objects,call}=await fixture(t);
+  for(let i=0;i<11;i++)db.exec(`INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,created_at) VALUES('race${i}','owner','race${i}','gallery','image/png',1,1);INSERT INTO profile_photos(media_id,owner_user_id,visibility,created_at) VALUES('race${i}','owner','public',1)`);
+  const results=await Promise.all([upload('public','concurrent-public-001'),upload('private','concurrent-private-01')]);
+  assert.deepEqual(results.map(r=>r.status).sort(),[201,409]);assert.equal(objects.size,1);
+  const quota=await (await call('owner','upload-quotas')).json();assert.equal(quota.gallery.used,1);assert.equal(quota.galleryCapacity.used,12);
 });
 test('fictional gallery upgrade is bounded, additive, idempotent, and never restores deleted fixtures',()=>{
   const s={people:Array.from({length:20},(_,i)=>({user_id:'demo-'+String(i+1).padStart(2,'0')})),demoGallery:[{id:'legacy',owner:'demo-me',visibility:'private',caption:'edited'}],demoAlbumRequests:[],demoSystemEvents:[]};

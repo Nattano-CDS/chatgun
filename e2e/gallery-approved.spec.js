@@ -5,7 +5,7 @@ import {ONE_PIXEL_PNG} from '../test/helpers/image.js';
 
 for(const width of [390,768,1440])test(`approved Gallery: four destinations, uploads and bounded lightbox ${width}`,async({page},info)=>{
   test.skip(info.project.name!=='desktop-chromium','explicit owner reference viewport');test.setTimeout(90000);
-  await page.setViewportSize({width,height:width===390?844:1100});
+  await page.setViewportSize({width,height:width===390?844:width===768?1024:1100});
   const errors=[],writes=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&!['GET','HEAD'].includes(r.method()))writes.push(r.url());});
   const dir=resolve(process.env.GALLERY_EVIDENCE_DIR||'test-results/gallery-approved');mkdirSync(dir,{recursive:true});
   const shot=async name=>{await page.locator('button:focus').evaluateAll(bs=>bs.forEach(b=>b.blur()));await page.screenshot({path:resolve(dir,`${name}-${width}.png`),fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);};
@@ -33,7 +33,7 @@ for(const width of [390,768,1440])test(`approved Gallery: four destinations, upl
   const file={name:'fictional.png',mimeType:'image/png',buffer:Buffer.from(ONE_PIXEL_PNG)};
   await page.locator('#gallery-file-picker').setInputFiles([file,{...file,name:'second.png'}]);await expect(page.locator('.thumb-small')).toHaveCount(2);
   await page.locator('[data-remove-upload="1"]').click();await expect(page.locator('.thumb-small')).toHaveCount(1);
-  await page.locator('#gallery-caption').fill('รูปอัปโหลดสมมติ');await page.locator('#approved-gallery-upload button.primary').click();await expect(page.locator('#gallery-upload-status')).toContainText('Pending Moderation');await expect(page.locator('[data-approved-quota]')).toHaveText('1 / 10 รูป');await shot('upload-pending');
+  await page.locator('#gallery-caption').fill('รูปอัปโหลดสมมติ');await page.locator('[data-upload-submit]').click();await expect(page.locator('[data-upload-success]')).toContainText('รอผู้ดูแลตรวจสอบ');await expect(page.locator('[data-approved-quota]')).toHaveText('1 / 10 รูป');await shot('upload-pending');
   await page.locator('[data-gallery-return]').first().click();await expect(page).toHaveURL(/people\/demo-me\/gallery$/);await expect(page.locator('.review-status')).toHaveCount(3);
   expect(errors).toEqual([]);expect(writes).toEqual([]);
 });
@@ -49,12 +49,12 @@ test('gallery upload rejects invalid images and shows shared Bangkok quota exhau
   await page.goto('/app/me/private-gallery/upload');await page.locator('#gallery-file-picker').setInputFiles({name:'fake.png',mimeType:'image/png',buffer:Buffer.from('not an image')});await expect(page.locator('#gallery-upload-status')).toContainText('ไฟล์รูปไม่ถูกต้อง');await expect(page.locator('.thumb-small')).toHaveCount(0);
   await page.locator('#gallery-file-picker').setInputFiles({name:'large.png',mimeType:'image/png',buffer:Buffer.alloc(8*1024*1024+1)});await expect(page.locator('#gallery-upload-status')).toContainText('8 MB');
   await page.evaluate(async()=>{const db=await new Promise(resolve=>{const r=indexedDB.open('chatgun-demo',1);r.onsuccess=()=>resolve(r.result);});await new Promise(resolve=>{const tx=db.transaction('state','readwrite'),store=tx.objectStore('state'),r=store.get('chatgun-browser-demo-v1');r.onsuccess=()=>{const s=r.result;const d=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());s.uploadQuotas.localDay=d;s.uploadQuotas.gallery={used:10,remaining:0,limit:10,reserved:0};store.put(s,'chatgun-browser-demo-v1');};tx.oncomplete=resolve;});db.close();});
-  for(const scope of ['gallery','private-gallery']){await page.goto('/app/me/'+scope+'/upload');await expect(page.locator('#approved-gallery-upload button.primary')).toBeDisabled();await expect(page.locator('.quota-helper')).toContainText('เหลือ 0 รูปวันนี้');}
+  for(const scope of ['gallery','private-gallery']){await page.goto('/app/me/'+scope+'/upload');await expect(page.locator('[data-upload-submit]')).toBeDisabled();await expect(page.locator('[data-upload-allowance]')).toContainText('เหลือ 0 รูปวันนี้');}
 });
 
 test('optional demo reset requires confirmation and preserves uploads, original data and quota',async({page})=>{
   const writes=[];page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&!['GET','HEAD'].includes(r.method()))writes.push(r.url());});
-  await page.goto('/app/me/gallery/upload');await page.locator('#gallery-file-picker').setInputFiles({name:'keep.png',mimeType:'image/png',buffer:Buffer.from(ONE_PIXEL_PNG)});await page.locator('#approved-gallery-upload button.primary').click();await expect(page.locator('#gallery-upload-status')).toContainText('Pending Moderation');
+  await page.goto('/app/me/gallery/upload');await page.locator('#gallery-file-picker').setInputFiles({name:'keep.png',mimeType:'image/png',buffer:Buffer.from(ONE_PIXEL_PNG)});await page.locator('[data-upload-submit]').click();await expect(page.locator('[data-upload-success]')).toContainText('รอผู้ดูแลตรวจสอบ');
   await page.locator('[data-gallery-return]').first().click();await expect(page.locator('.gallery-grid .tile')).toHaveCount(7);
   page.once('dialog',d=>d.accept());await page.locator('.gallery-experience [data-gallery-action=delete][data-photo^="chatgun-gallery-approved-v1-demo-me-public-"]').first().click();await expect(page.locator('.gallery-grid .tile')).toHaveCount(6);
   await page.locator('#primary-nav [data-tab=chat]').click();page.once('dialog',d=>d.dismiss());await page.locator('[data-reset-gallery-fixtures]').click();

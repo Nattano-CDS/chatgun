@@ -25,3 +25,46 @@
 :is(#profile-dialog,#app) .gallery-experience .brand{min-height:44px}:is(#profile-dialog,#app) .gallery-experience .round-soft{min-width:44px;min-height:44px}:is(#profile-dialog,#app) .gallery-experience .breadcrumbs button,:is(#profile-dialog,#app) .gallery-experience .tile-owner-controls button{min-width:44px}:is(#profile-dialog,#app) .gallery-experience .lightbox-like{min-height:44px}:is(#profile-dialog,#app) .gallery-experience .comment-compose button{min-width:44px}
 
 :is(#profile-dialog,#app) .gallery-experience .breadcrumbs{height:16px;align-items:center}:is(#profile-dialog,#app) .gallery-experience .field-label span{color:#a296ae;font-weight:400}
+
+:is(#profile-dialog,#app) .gallery-experience .thumb-small.saved{outline:2px solid var(--lime)}
+:is(#profile-dialog,#app) .gallery-experience .upload-file-state{max-height:65%;overflow:auto;overflow-wrap:anywhere}
+:is(#profile-dialog,#app) .gallery-experience .thumb-small{width:112px;height:112px;flex:none}
+:is(#profile-dialog,#app) .gallery-experience .thumb-strip{overflow-x:auto;gap:10px;padding:4px}
+:is(#profile-dialog,#app) .gallery-experience [data-upload-success]{padding:12px;background:var(--lavender,#f5efff);border-radius:14px}
+:is(#profile-dialog,#app) .gallery-experience .action-bar{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));z-index:45;display:flex;flex-wrap:wrap;justify-content:center;background:#fff;padding:10px 16px;box-shadow:0 -3px 16px #21143912;border-top:1px solid var(--line);gap:8px}
+:is(#profile-dialog,#app) .gallery-experience [data-upload-summary]{flex-basis:100%;text-align:center;font-size:12px;color:var(--muted)}
+:is(#profile-dialog,#app) .gallery-experience .upload-panel[data-complete=true] .dropzone,:is(#profile-dialog,#app) .gallery-experience .upload-panel[data-complete=true] .form-row,:is(#profile-dialog,#app) .gallery-experience .upload-panel[data-complete=true] .privacy-note,:is(#profile-dialog,#app) .gallery-experience .upload-panel[data-complete=true] [data-upload-cancel]{display:none}
+:is(#profile-dialog,#app) .gallery-experience .upload-panel{margin-bottom:70px}
+:is(#profile-dialog,#app) .gallery-experience .upload-limits{padding:12px 20px;background:#fff;border-bottom:1px solid var(--line)}
+:is(#profile-dialog,#app) .gallery-experience .upload-limits .quota{margin:6px 0}
+:is(#profile-dialog,#app) .gallery-experience .upload-limits .quota-helper{margin:6px 0;font-size:12px}
+:is(#profile-dialog,#app) .gallery-experience .lightbox-caption,:is(#profile-dialog,#app) .gallery-experience .comment{overflow-wrap:anywhere}
+:is(#profile-dialog,#app) .gallery-experience .lightbox-art{position:relative;min-width:0;background:#eee9f5}
+:is(#profile-dialog,#app) .gallery-experience .lightbox-art img{object-fit:contain}
+:is(#profile-dialog,#app) .gallery-experience .image-load-status{position:absolute;inset:0;display:grid;place-content:center;padding:24px;text-align:center;pointer-events:none}
+@media(max-width:800px){
+body[data-person-route=upload] #profile-dialog :is(#profile-dialog,#app) .gallery-experience{padding-bottom:calc(160px + env(safe-area-inset-bottom))}
+:is(#profile-dialog,#app) .gallery-experience .topbar{height:56px;padding:0 16px;justify-content:space-between}
+:is(#profile-dialog,#app) .gallery-experience .page{padding:16px}
+:is(#profile-dialog,#app) .gallery-experience .page-head{margin:12px 0 16px}
+:is(#profile-dialog,#app) .gallery-experience .page-head h2{font-size:24px}
+:is(#profile-dialog,#app) .gallery-experience .page-intro{font-size:13px}
+:is(#profile-dialog,#app) .gallery-experience .dropzone{padding:12px;min-height:0;gap:4px}
+:is(#profile-dialog,#app) .gallery-experience .drop-icon{width:36px;height:36px;margin-bottom:6px}
+:is(#profile-dialog,#app) .gallery-experience .dropzone p{margin:6px 0 12px;font-size:12px}
+:is(#profile-dialog,#app) .gallery-experience .form-area{padding:14px}
+:is(#profile-dialog,#app) .gallery-experience .form-row{margin-bottom:12px}
+:is(#profile-dialog,#app) .gallery-experience .caption-field{min-height:66px}
+:is(#profile-dialog,#app) .gallery-experience .privacy-note{padding:10px;margin-bottom:12px}
+:is(#profile-dialog,#app) .gallery-experience .quota{margin-top:10px}
+:is(#profile-dialog,#app) .gallery-experience .quota-helper{margin:6px 0;font-size:12px}
+:is(#profile-dialog,#app) .gallery-experience .action-bar{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));z-index:45;background:#fff;padding:10px 16px;box-shadow:0 -3px 16px #21143912;border-top:1px solid var(--line);gap:8px;justify-content:flex-end}
+:is(#profile-dialog,#app) .gallery-experience .action-bar button{min-height:44px}
+:is(#profile-dialog,#app) .gallery-experience .lightbox{padding:8px;align-items:center}
+:is(#profile-dialog,#app) .gallery-experience .lightbox-shell{max-height:calc(100dvh - 16px);overflow:auto;grid-template-rows:minmax(160px,38dvh) auto}
+:is(#profile-dialog,#app) .gallery-experience .lightbox-art{height:38dvh;min-height:160px}
+:is(#profile-dialog,#app) .gallery-experience .lightbox-art img{max-height:100%;object-fit:contain}
+:is(#profile-dialog,#app) .gallery-experience .comment-compose{position:sticky;bottom:0;background:white;z-index:2}
+body[data-keyboard-open=true][data-person-route=upload] .sidebar{visibility:hidden}
+body[data-keyboard-open=true] :is(#profile-dialog,#app) .gallery-experience .action-bar{position:static;box-shadow:none}
+}

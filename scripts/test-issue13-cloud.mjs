@@ -98,6 +98,9 @@ await query("UPDATE media_safety_reviews SET status='released',category='general
 const publicList=await (await call('viewer','gallery?user='+ids.owner)).json();
 check('released public listing excludes private fixture metadata',publicList.photos.some(p=>p.id===publicPhoto)&&publicList.photos.every(p=>p.visibility==='public')&&!JSON.stringify(publicList).includes(uiPhoto));
 check('public and private uploads count against one gallery quota',(await (await call('owner','upload-quotas')).json()).gallery.used===3);
+const ownQuota=await (await call('owner','upload-quotas')).json();
+check('capacity counts both albums but excludes deleted photo',ownQuota.galleryCapacity.used===2&&ownQuota.galleryCapacity.remaining===10&&ownQuota.galleryCapacity.limit===12);
+check('quota endpoint never exposes another owners private capacity',(await (await call('viewer','upload-quotas')).json()).galleryCapacity.used===0);
 check('private next-photo list excludes public fixture',!(JSON.stringify(await (await call('owner','gallery?user='+ids.owner+'&album=private')).json())).includes(publicPhoto));
 await query("UPDATE media_safety_reviews SET status='rejected',category='prohibited',revision=revision+1 WHERE media_id=?",[publicPhoto]);
 check('moderation withdrawal removes public listing',!(JSON.stringify(await (await call('viewer','gallery?user='+ids.owner)).json())).includes(publicPhoto));
