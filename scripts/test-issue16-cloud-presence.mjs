@@ -14,6 +14,10 @@ if(response.status!==200||config?.onlineStatusEnabled!==true){
 }
 const release=await(await fetch(origin+'/release.json')).json();
 if(process.env.EXPECTED_SHA)assert.equal(release.commit,process.env.EXPECTED_SHA);
+if(!process.argv.includes('--component-fixtures')){
+  writeFileSync(output,JSON.stringify({checkedAt:new Date().toISOString(),origin,status:'BLOCKED',reason:'Genuine authorized human account journey required; synthetic component fixtures are not real OAuth evidence',configApiAvailable:true,fixturesCreated:0,productionWrites:0},null,2)+'\n');
+  console.error('BLOCKED: continue with authorized human OAuth accounts. Synthetic component tests require explicit --component-fixtures and cannot establish real-user readiness.');process.exit(2);
+}
 const {token}=JSON.parse(execFileSync('npx',['wrangler@4.151.1','auth','token','--json'],{encoding:'utf8'}));
 async function cf(path,body){const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}${path}`,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const j=await r.json();assert.equal(j.success,true);return j.result;}
 const project=await cf('/pages/projects/chatgun-issue13-staging');assert.equal(project.deployment_configs.preview.d1_databases.DB.id,database);

@@ -93,3 +93,13 @@ test('cached Online booleans expire even while the next request hangs',async()=>
   expire();assert.equal(statuses.member,false);
   controller.stop();release();await pending;assert.equal(statuses.member,false);
 });
+test('a delayed status response cannot restore badges in a backgrounded tab',async()=>{
+  const doc=new EventTarget();doc.visibilityState='visible';let statuses,hang=false,release;
+  const controller=createOnlinePresence({doc,every:()=>1,cancel:()=>{},targets:()=>['member'],apply:s=>{statuses=s;},request:async(path,options={})=>{
+    if(hang&&!options.method)await new Promise(resolve=>{release=resolve;});
+    return {showOnline:true,statuses:{member:true}};
+  }});
+  await controller.start();hang=true;const pending=controller.refresh();await Promise.resolve();
+  doc.visibilityState='hidden';doc.dispatchEvent(new Event('visibilitychange'));assert.equal(statuses.member,false);
+  release();await pending;assert.equal(statuses.member,false);controller.stop();
+});

@@ -15,7 +15,7 @@ export function createOnlinePresence({request,targets,apply,preference=()=>{},do
       else if(enabled)await offline();
       const ids=[...new Set(targets())].slice(0,50);
       const readStarted=now(),result=await request('/api/social/online?users='+encodeURIComponent(ids.join(',')));
-      if(stopped||generation!==revision)return;
+      if(stopped||generation!==revision||doc.visibilityState!=='visible')return;
       enabled=result.showOnline===true;preference(enabled);
       apply(Object.fromEntries(ids.map(id=>[id,result.statuses?.[id]===true])));
       // A positive boolean is valid for at most 30s from request start, including
