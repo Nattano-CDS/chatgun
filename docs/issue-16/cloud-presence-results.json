@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-10-17T18:21:05.519Z",
+  "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "status": "BLOCKED",
+  "reason": "Authenticated Functions E2E prerequisite unavailable",
+  "httpStatus": 404,
+  "fixturesCreated": 0,
+  "productionWrites": 0
+}

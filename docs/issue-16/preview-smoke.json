@@ -1,0 +1,76 @@
+{
+  "checkedAt": "2026-10-17T18:21:05.333Z",
+  "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "commit": "e7c7b09dc595ca240a25d5de44cb2594ffd21b49",
+  "status": "PASS-static-only",
+  "authenticatedPresence": "BLOCKED until real Functions E2E passes",
+  "configHttpStatus": 404,
+  "removed": [
+    {
+      "path": "/assets/demo/network.json",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/01.png",
+      "status": 404
+    },
+    {
+      "path": "/app/demo-network.js",
+      "status": 404
+    },
+    {
+      "path": "/app/demo-gallery.js",
+      "status": 404
+    },
+    {
+      "path": "/app/demo-bootstrap.js",
+      "status": 404
+    },
+    {
+      "path": "/playwright.issue16.config.js",
+      "status": 404
+    }
+  ],
+  "assets": [
+    {
+      "path": "app/social.js",
+      "sha256": "b5b2af11fbc6cb110efe431741b72532c1f143e783dbbcbc00dbeb47f1a7e041"
+    },
+    {
+      "path": "app/online-presence.js",
+      "sha256": "3035a389807fd73e42a2598db166ae2c32c198669d73a7bf97ec156552d4a7f7"
+    },
+    {
+      "path": "app/online-presence.css",
+      "sha256": "23f800ca5b82c8959b79ef5c996de1ce02eb3f1cbd0125c493e27dc9912cd73d"
+    },
+    {
+      "path": "app/retire-demo.js",
+      "sha256": "5047e37f0ab09d94f3dcffeb1a6e5359032a458c7d4e082044645f5415f6ec4d"
+    },
+    {
+      "path": "app/near-components.js",
+      "sha256": "5c933a65d7d84fbae8c173e22639b83938a093cf5f5c46a45bbb0c693c34d011"
+    }
+  ],
+  "screens": [
+    {
+      "width": 390,
+      "staticPrelaunch": "PASS",
+      "fictionalMembers": 0,
+      "onlineBadges": 0
+    },
+    {
+      "width": 768,
+      "staticPrelaunch": "PASS",
+      "fictionalMembers": 0,
+      "onlineBadges": 0
+    },
+    {
+      "width": 1440,
+      "staticPrelaunch": "PASS",
+      "fictionalMembers": 0,
+      "onlineBadges": 0
+    }
+  ]
+}
