@@ -1,0 +1,88 @@
+{
+  "checkedAt": "2026-10-17T11:55:34.846Z",
+  "production": "https://chatgun.social",
+  "deployedSha": "a2f6f5d5d42caa997c18495ccca2babfce3fbab8",
+  "deploymentId": "6a51db9b-c391-4b65-ad04-400add8474ff",
+  "preview": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "approvedDesignPackageSHA256": "44e675a91c7cb030a557235a9c9a521b1b4ae5c0aabe87e1af3c76d66df0bded",
+  "unit": {
+    "passed": 132,
+    "failed": 0,
+    "skipped": 0
+  },
+  "realCloudflare": {
+    "passed": 46,
+    "failed": 0,
+    "syntheticSessionsOnly": true
+  },
+  "previewPlaywright": {
+    "passed": 106,
+    "failed": 0,
+    "skipped": 40,
+    "flaky": 0
+  },
+  "productionPlaywright": {
+    "passed": 39,
+    "failed": 0,
+    "skipped": 9,
+    "flaky": 0
+  },
+  "previewSkipReasons": {
+    "protectedLegacyFixtureSuites": 16,
+    "duplicateExplicitViewportCases": 21,
+    "desktopProjectForMobileOnlyCase": 1,
+    "duplicateIsolatedLiveCase": 2
+  },
+  "productionSkips": "duplicate explicit viewport cases only",
+  "fictionalData": {
+    "origin": "https://chatgun.social",
+    "batch": "chatgun-gallery-approved-v1",
+    "photos": 210,
+    "photosByScope": {
+      "public": 106,
+      "private": 104
+    },
+    "newBatchPhotos": 168,
+    "ownerPhotos": 10,
+    "ownerAlbumCounts": {
+      "public": 6,
+      "private": 4
+    },
+    "owners": 21,
+    "privateAlbumOwners": 21,
+    "originalMessages": 120,
+    "conversations": 10,
+    "comments": 186,
+    "moderationExamples": {
+      "pending": 1,
+      "rejected": 1
+    },
+    "permissionExamples": [
+      "approved",
+      "pending",
+      "revoked",
+      "rejected"
+    ],
+    "automaticExpiry": false,
+    "persistence": "IndexedDB; additive versioned upgrade; no automatic reset; explicit batch-only reset in Demo Chat preserves uploads and quota"
+  },
+  "protectedStagingFingerprint": "6768cc6b45b2adfd4c508068250013d5c2bd1dcb717c80ddaa5157618a8f080b",
+  "productionDatabaseMigrationsAppliedByThisWork": 0,
+  "productionR2Bindings": 0,
+  "allRealProductionServicesDisabled": true,
+  "guardedFictionalDemo": "GO",
+  "realUserSocialLaunch": "NO-GO — separate operational/legal/service activation gates remain",
+  "limitations": [
+    "OAuth/CAPTCHA was not retested; all real Production OAuth providers remain disabled.",
+    "Browser demo media and permissions are fictional simulations, not confidential storage. Actual private D1/R2 behavior was tested separately in isolation.",
+    "Synthetic media release in cloud fixtures is not proof of staffed moderation or scanning. No vendor was activated.",
+    "Cleanup Worker was invoked against actual isolated D1/R2; this run does not prove a scheduled Cron firing.",
+    "Account deletion/account-linking regression is automated unit/integration coverage, not a fresh real-provider or Production account-deletion run.",
+    "Known new-run R2 objects and deletion queues verified; not an exhaustive inventory of every historical staging object."
+  ],
+  "rollback": {
+    "deployment": "33fee663-1026-4a02-b35a-dc34cbb58e37",
+    "sha": "591674d2400f709cbf9abcee438bb81c064c7300",
+    "databaseRollbackRequired": false
+  }
+}

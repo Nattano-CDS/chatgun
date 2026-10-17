@@ -1,0 +1,13 @@
+{
+  "sha": "a2f6f5d5d42caa997c18495ccca2babfce3fbab8",
+  "directory": "/var/folders/gd/r5f17fjx6rg1syk20hrwwzyc0000gn/T/chatgun-issue13-production-Gkszkc",
+  "baseline": "6b6af92ea34a75b5698751c43c6ec03e97d79e8d",
+  "backendUpdatedButLiveGatesClosed": true,
+  "productionSchemaMigration": false,
+  "productionConfigurationUnchanged": true,
+  "privateArtifactsExcluded": true,
+  "legalDraftsExcluded": true,
+  "fictionalDatasetPreserved": true,
+  "rollbackDeployment": "33fee663-1026-4a02-b35a-dc34cbb58e37",
+  "rollbackSha": "591674d2400f709cbf9abcee438bb81c064c7300"
+}

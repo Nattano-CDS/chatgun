@@ -8,3 +8,18 @@ test-results/
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+# Keep full redundant regression screenshots locally; commit the Gallery package
+# and actual isolated-cloud evidence rather than repeating older NEAR reports.
+/docs/gallery-approved/screens/preview/account/
+/docs/gallery-approved/screens/preview/cleanup/
+/docs/gallery-approved/screens/preview/icons/
+/docs/gallery-approved/screens/preview/owner/
+/docs/gallery-approved/screens/preview/self/
+/docs/gallery-approved/screens/preview/albums/*
+!/docs/gallery-approved/screens/preview/albums/real-owner-request-*.png
+/docs/gallery-approved/screens/production-tests/cleanup/
+/docs/gallery-approved/screens/production-tests/owner/
+/docs/gallery-approved/screens/production-tests/albums/
+/docs/gallery-approved/screens/production-tests/self/
+/docs/gallery-approved/screens/production-tests/icons/*
+!/docs/gallery-approved/screens/production-tests/icons/desktop-chromium-390-locked-unlocked.png

@@ -10,4 +10,4 @@ if((await query("SELECT COUNT(*) n FROM users WHERE id NOT LIKE 'issue13-%'")).r
 const result=await query("UPDATE sessions SET revoked_at=? WHERE revoked_at IS NULL AND user_id LIKE 'issue13-%'",[Math.floor(Date.now()/1000)]);
 const left=(await query('SELECT COUNT(*) n FROM sessions WHERE revoked_at IS NULL')).results[0].n;if(left!==0)throw Error('Sessions remain active');
 const evidence={database:db,revoked:Number(result.meta?.changes||0),activeSessions:0,usersDeleted:0,protectedStagingTouched:false};
-writeFileSync('docs/issue-13/test-session-revocation.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));
+writeFileSync((process.env.RELEASE_EVIDENCE_DIR||'docs/issue-13')+'/test-session-revocation.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));

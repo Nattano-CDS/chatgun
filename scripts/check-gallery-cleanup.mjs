@@ -9,7 +9,9 @@ const {token}=JSON.parse(execFileSync('npx',['wrangler@4.151.1','auth','token','
 async function cf(path,body){const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}${path}`,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const d=await r.json();if(!r.ok||!d.success)throw Error('Isolated cleanup check failed');return d.result;}
 const p=await cf('/pages/projects/chatgun-issue13-staging');assert.equal(p.deployment_configs.preview.d1_databases.DB.id,database);assert.equal(p.deployment_configs.preview.r2_buckets.MEDIA.name,bucket);
 async function query(sql,params=[]){return (await cf(`/d1/database/${database}/query`,{sql,params}))[0];}
-const db={prepare(sql){let params=[];return {bind(...v){params=v;return this;},async first(){return (await query(sql,params)).results[0]||null;},async all(){return query(sql,params);},async run(){return query(sql,params);}};}};
+// Diagnostic REST adapter only; application D1.batch atomicity is covered by
+// Worker integration tests. Retry operations here are intentionally idempotent.
+const db={async batch(statements){const results=[];for(const statement of statements)results.push(await statement.run());return results;},prepare(sql){let params=[];return {bind(...v){params=v;return this;},async first(){return (await query(sql,params)).results[0]||null;},async all(){return query(sql,params);},async run(){return query(sql,params);}};}};
 const cleanup=await drainMediaDeletionQueue({DB:db,MEDIA:{async delete(key){assert.match(key,/^(gallery|chat)\/[a-f0-9-]+$/);execFileSync('npx',['wrangler@4.151.1','r2','object','delete',bucket+'/'+key,'--remote'],{env:{...process.env,CLOUDFLARE_ACCOUNT_ID:account},stdio:'pipe'});}}});
 assert.equal(cleanup.failed,0);
 const bundle=JSON.parse(readFileSync('/tmp/chatgun-issue13-sessions.json'));
