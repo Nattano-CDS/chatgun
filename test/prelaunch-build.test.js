@@ -46,4 +46,9 @@ test('explicit closed prelaunch renders without relying on Cloudflare Functions'
   assert.deepEqual(JSON.parse(readFileSync(join(directory,'_routes.json'),'utf8')),
     {version:1,include:['/api/*'],exclude:[]});
   assert.equal(existsSync(join(directory,'assets/demo')),false);
+  for(const page of ['signup.html','account.html','acceptance.html']){
+    const notice=readFileSync(join(directory,page),'utf8');
+    assert.match(notice,/ChatGun กำลังเตรียมเปิดให้บริการ/);
+    assert.doesNotMatch(notice,/data-provider=/);
+  }
 });
