@@ -35,8 +35,16 @@ window.ChatgunNearComponents = (() => {
   function privateAlbum(c){
     const h=c.html,r=c.album?.request,granted=!!c.album?.granted;
     const button=(a,label,request)=>'<button data-album-action="'+a+'" data-owner="'+h(c.id)+'" data-request="'+h(request?.id||'')+'" data-revision="'+Number(request?.revision||0)+'">'+label+'</button>';
-    if(c.own)return '<section class="private-album"><h2>อัลบั้มส่วนตัว · จัดการสิทธิ์</h2><p>เฉพาะผู้ที่คุณอนุมัติ · การตรวจรูปโดยผู้ดูแลยังคงจำเป็น</p>'+(c.albumRequests||[]).map(r=>'<div class="album-access-row"><strong>'+h(r.requester_name)+'</strong><span>'+h({pending:'รออนุมัติ',approved:'อนุมัติแล้ว',rejected:'ปฏิเสธแล้ว',revoked:'เพิกถอนแล้ว',cancelled:'ยกเลิกแล้ว'}[r.status])+'</span>'+(r.status==='approved'?button('revoke','เพิกถอนสิทธิ์',r):r.status==='pending'?button('approve','อนุมัติ',r)+button('reject','ปฏิเสธ',r):'')+'</div>').join('')+'</section>';
-    return '<section class="private-album" aria-label="อัลบั้มส่วนตัว"><h2>อัลบั้มส่วนตัว</h2><p>'+(granted?'คุณได้รับสิทธิ์ดูรูปที่ผ่านการตรวจแล้ว':'ล็อก · เจ้าของต้องอนุมัติก่อนดูรูป')+'</p>'+(granted?'':r?.status==='pending'?'<p>ส่งคำขอแล้ว · รอเจ้าของอนุมัติในแชท</p>'+button('cancel','ยกเลิกคำขอ',r):button('request','ขอดูอัลบั้มส่วนตัว',r))+(c.demo?'<button data-demo-owner="'+h(c.id)+'">จำลองเป็นเจ้าของเพื่ออนุมัติในแชท</button>':'')+'</section>';
+    if(c.own)return c.privateAlbumOpen?'<section class="album-management" aria-label="จัดการสิทธิ์อัลบั้มส่วนตัว"><h2 class="album-heading">จัดการสิทธิ์</h2>'+(c.albumRequests||[]).map(r=>'<div class="album-access-row"><strong>'+h(r.requester_name)+'</strong><span>'+h({pending:'รออนุมัติ',approved:'อนุมัติแล้ว',rejected:'ปฏิเสธแล้ว',revoked:'เพิกถอนแล้ว',cancelled:'ยกเลิกแล้ว'}[r.status])+'</span>'+(r.status==='approved'?button('revoke','เพิกถอนสิทธิ์',r):r.status==='pending'?button('approve','อนุมัติ',r)+button('reject','ปฏิเสธ',r):'')+'</div>').join('')+'</section>':'';
+    const status={pending:'ส่งคำขอแล้ว · รออนุมัติในแชท',rejected:'คำขอถูกปฏิเสธ',revoked:'สิทธิ์ถูกเพิกถอน',cancelled:'ยกเลิกคำขอแล้ว'}[r?.status];
+    return '<div class="album-feedback">'+(status?'<span role="status">'+status+'</span>':'')+(r?.status==='pending'?button('cancel','ยกเลิกคำขอ',r):'')+(c.demo&&(r?.status==='pending'||granted)?'<button data-demo-owner="'+h(c.id)+'">จำลองเป็นเจ้าของเพื่ออนุมัติในแชท</button>':'')+'</div>';
+  }
+  // Lucide image / lock / lock-open paths (ISC); identical photo in both states.
+  function albumIconButton(c){
+    const unlocked=c.own||!!c.album?.granted,pending=c.album?.request?.status==='pending';
+    const label=unlocked?(c.own?'เปิดอัลบั้มส่วนตัวและจัดการสิทธิ์':'เปิดอัลบั้มส่วนตัวที่ได้รับอนุมัติ'):pending?'ส่งคำขอแล้ว รออนุมัติอัลบั้มส่วนตัว':'ขอดูอัลบั้มส่วนตัว';
+    const svg=body=>'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+body+'</svg>';
+    return '<button type="button" class="private-album-icon" data-private-album data-album-state="'+(unlocked?'unlocked':'locked')+'" aria-label="'+label+'" title="'+label+'" '+(pending||c.albumLoading||c.galleryLoadError?'disabled':'')+'><span class="album-icon-art">'+svg('<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>')+'<span class="album-lock-badge">'+svg('<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="'+(unlocked?'M7 11V7a5 5 0 0 1 9.9-1':'M7 11V7a5 5 0 0 1 10 0v4')+'"/>')+'</span></span></button>';
   }
   const chips = c => String(c.person.interests||'').split(',').map(i=>i.trim()).filter(Boolean).map(i=>`<span>${c.html(i)}</span>`).join('');
   const score = (c,gallery=false) => c.person.rating_count ? `${Number(c.person.rating).toFixed(1)}${gallery?' ★':''} · ${Number(c.person.rating_count)} คะแนน` : 'ยังไม่มีคะแนน';
@@ -51,7 +59,7 @@ window.ChatgunNearComponents = (() => {
         <p class="full-bio">${h(p.bio||'ยังไม่ได้เขียน Bio')}</p>
         <div class="profile-facts"><span>${h(p.gender||'ไม่ระบุเพศ')}</span>${p.distance!=null?`<span>${icon('pin',15)}${h(c.distance)}</span>`:''}<span>${c.star}${score(c)}</span></div>
         <div class="profile-interests">${chips(c)}</div>
-        <div class="full-profile-actions">${primary(c)}<button class="profile-gallery-button" data-profile-gallery>${c.grid}Gallery <span>${c.photos.length}</span></button>${c.canRate ? action('rate',h(c.id),c.star,'profile-rate',`aria-label="ให้คะแนน" ${c.rateDisabled?'disabled':''}`):''}</div>
+        <div class="full-profile-actions">${primary(c)}<button class="profile-gallery-button" data-profile-gallery>${c.grid}Gallery <span>${c.photos.filter(p=>p.visibility==='public').length}</span></button>${albumIconButton(c)}${c.canRate ? action('rate',h(c.id),c.star,'profile-rate',`aria-label="ให้คะแนน" ${c.rateDisabled?'disabled':''}`):''}</div>
         ${privateAlbum(c)}${peopleActions(c,true)}${c.demo?'<span class="fixture-label">บุคคลสมมติ · เฉพาะเบราว์เซอร์</span>':''}
       </div></main>`;
   }
@@ -64,10 +72,11 @@ window.ChatgunNearComponents = (() => {
       <div class="gallery-facts"><span>${h(p.gender||'ไม่ระบุเพศ')}</span>${p.distance!=null?`<span>${icon('pin',14)}${h(c.distance)}</span>`:''}<span>${c.own?'โปรไฟล์ของคุณ':'แชทโดยตรงได้'}</span></div>
       <div class="gallery-interests">${chips(c)}</div>${c.own?'':`<div class="gallery-actions">${primary(c,16)}${c.canRate?action('rate',h(c.id),c.star+'ให้คะแนน','',c.rateDisabled?'disabled':''):''}${action('block',h(c.id),'บล็อก','')}</div>`}</div></div>
       ${c.demo?'<p class="gallery-demo">รูปสมมติสำหรับทดลองหน้าจอ · บันทึกเฉพาะเบราว์เซอร์</p>':''}
+      <div class="album-gallery-nav"><button data-profile-gallery>Gallery</button>${albumIconButton(c)}</div>
       ${c.own&&c.config.mediaUploadEnabled&&(!c.demo||c.id==='demo-me')?`<form id="route-gallery-upload" class="gallery-upload"><input type="hidden" name="kind" value="gallery"><label>เพิ่มรูป Gallery<input name="file" type="file" accept="image/jpeg,image/png,image/webp" required></label><input name="caption" maxlength="300" aria-label="คำบรรยายรูป" placeholder="คำบรรยายรูป (ไม่บังคับ)"><button class="primary">${icon('upload',17)}${c.demo?'เพิ่มรูปตัวอย่าง':'เพิ่มรูป'}</button><small>เลือกรูปโปรไฟล์ได้ในหน้าจัดการรูป · JPG, PNG, WebP ไม่เกิน 8 MB</small><small data-route-gallery-quota></small></form>`:''}${privateAlbum(c)}${peopleActions(c)}
       ${c.galleryLoadError?'<p class="error" role="alert">โหลด Gallery ไม่สำเร็จ<button data-retry-gallery>ลองอีกครั้ง</button></p>':''}
-      <div id="dialog-gallery"><section aria-label="Gallery สาธารณะ"><h2 class="album-heading">Gallery สาธารณะ</h2>${albumTiles(c,c.photos.filter(p=>p.visibility==='public'))}</section>
-      ${c.own||c.album?.granted?`<section aria-label="รูปอัลบั้มส่วนตัว"><h2 class="album-heading">อัลบั้มส่วนตัว · เฉพาะผู้ได้รับสิทธิ์</h2>${albumTiles(c,c.photos.filter(p=>p.visibility!=='public'))}</section>`:''}</div>
+      <div id="dialog-gallery">${!c.privateAlbumOpen?`<section aria-label="Gallery สาธารณะ"><h2 class="album-heading">Gallery</h2>${albumTiles(c,c.photos.filter(p=>p.visibility==='public'))}</section>`:''}
+      ${c.privateAlbumOpen&&(c.own||c.album?.granted)?`<section aria-label="รูปอัลบั้มส่วนตัว">${albumTiles(c,c.photos.filter(p=>p.visibility!=='public'))}</section>`:''}</div>
       ${c.photos.length||c.galleryLoadError?'':`<div class="empty">${c.images}<h2>ยังไม่มีรูปใน Gallery</h2></div>`}</main>`;
   }
   function post(c) {

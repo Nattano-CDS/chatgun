@@ -720,7 +720,7 @@ async function refreshOpenThread() {
 // Canonical route composition; no modal or duplicated navigation.
 function profileContext(person, photos=[]) {
   const id=person.user_id||person.other_user_id||state.account.user.id,relation=relationshipFor(id);
-  return {person,id,relation,photos,own:id===currentActor(),album:state.album,albumRequests:state.albumRequests||[],
+  return {person,id,relation,photos,own:id===currentActor(),album:state.album,albumRequests:state.albumRequests||[],privateAlbumOpen:!!state.privateAlbumOpen,albumLoading:!!state.albumLoading,
     incoming:relation?.status==='pending'&&relation.requested_by!==state.account.user.id,
     config:state.config,demo:state.demo,html:escapeHtml,portrait:sourcePortrait,media:galleryMediaUrl,
     distance:formatDistance(person.distance,person.distance_label),star:starIcon,grid:gridIcon,images:imagesIcon,userPlus:userPlusIcon,
@@ -765,7 +765,8 @@ async function showPerson(id, {historyMode='push',photo=null}={}) {
     if(generation!==state.profileRequest)return;
   }
   if(!person){$('#profile-dialog-content').innerHTML='<main class="full-profile gallery-page"><div class="empty"><h2>ไม่พบโปรไฟล์นี้</h2><p>คุณอาจไม่มีสิทธิ์ดูบัญชีนี้</p><button data-close-profile>กลับ</button></div></main>';openProfileSurface();return;}
-  state.selectedPerson=person;state.personPhotos=[];state.album=null;state.albumRequests=[];state.galleryLoadError=false;
+  if(!photo||state.selectedPerson?.user_id!==id)state.privateAlbumOpen=false;
+  state.selectedPerson=person;state.personPhotos=[];state.album=null;state.albumRequests=[];state.galleryLoadError=false;state.albumLoading=true;
   state.profileRequest=(state.profileRequest||0)+1;const generation=state.profileRequest;
   renderPersonRoute(photo==='gallery'?'gallery':'profile');
   try{
@@ -775,11 +776,41 @@ async function showPerson(id, {historyMode='push',photo=null}={}) {
     state.personPhotos=photos;state.album=result.album;
     if(id===currentActor())state.albumRequests=(await api('/api/social/albums/access')).requests;
   }catch(error){if(generation!==state.profileRequest)return;state.galleryLoadError=true;toast('โหลด Gallery ไม่สำเร็จ โปรดลองอีกครั้ง',true);}
+  state.albumLoading=false;
+  if(!state.album?.granted&&id!==currentActor())state.privateAlbumOpen=false;
   if(state.personRouteView!=='post')renderPersonRoute(state.personRouteView);
   if(photo&&photo!=='gallery'){
     try{await openGalleryPhoto(id,photo,{historyMode:'none'});}
     catch(error){if(generation!==state.profileRequest)return;updateProfileRoute(id,'gallery','replace');renderPersonRoute('gallery');toast('ไม่พบรูปภาพหรือสิทธิ์การเข้าถึงเปลี่ยนแปลงแล้ว',true);}
   }
+}
+async function refreshAlbumPermission(){
+  if($('#profile-dialog').hidden||!state.selectedPerson||state.albumLoading||state.albumRefreshBusy)return;
+  const generation=state.profileRequest,id=profileContext(state.selectedPerson).id;
+  state.albumRefreshBusy=true;
+  try{
+    const result=await api('/api/social/gallery?user='+encodeURIComponent(id));
+    if(generation!==state.profileRequest||$('#profile-dialog').hidden)return;
+    const changed=JSON.stringify(result.album)!==JSON.stringify(state.album);
+    state.album=result.album;state.personPhotos=result.photos;state.galleryLoadError=false;
+    if(!result.album?.granted&&id!==currentActor()){
+      state.privateAlbumOpen=false;
+      if(state.personRouteView==='post'){
+        updateProfileRoute(id,'gallery','replace');renderPersonRoute('gallery');return;
+      }
+    }
+    if(changed&&state.personRouteView!=='post'){
+      const focused=document.activeElement?.hasAttribute('data-private-album');
+      renderPersonRoute(state.personRouteView);
+      if(focused)$('[data-private-album]')?.focus({preventScroll:true});
+    }
+  }catch{
+    if(generation!==state.profileRequest)return;
+    // Fail closed in the presentation too; never keep stale private bytes on screen.
+    state.album=null;state.personPhotos=[];state.privateAlbumOpen=false;state.galleryLoadError=true;
+    if(state.personRouteView==='post')updateProfileRoute(id,'gallery','replace');
+    renderPersonRoute(state.personRouteView==='profile'?'profile':'gallery');
+  }finally{state.albumRefreshBusy=false;}
 }
 function renderGalleryPost(){
   const c=profileContext(state.selectedPerson,state.galleryView.photos);
@@ -1143,6 +1174,21 @@ document.addEventListener("click", async (event) => {
   const mute=event.target.closest('[data-chat-mute]');
   if(mute){const target=mute.dataset.chatMute,muted=!state.conversations.find(p=>p.other_user_id===target)?.muted;try{await api('/api/social/chat-preferences',{method:'POST',body:{target,muted}});await loadRelationships();mute.textContent=muted?'เปิดการแจ้งเตือน':'ปิดการแจ้งเตือน';}catch(error){toast(error.message,true);}return;}
   const album=event.target.closest('[data-album-action]');if(album){event.preventDefault();return albumAction(album);}
+  const privateAlbum=event.target.closest('[data-private-album]');
+  if(privateAlbum){
+    if(privateAlbum.disabled||state.albumRefreshBusy)return;privateAlbum.disabled=true;
+    const id=profileContext(state.selectedPerson).id;
+    await refreshAlbumPermission();
+    if($('#profile-dialog').hidden||profileContext(state.selectedPerson).id!==id)return;
+    if(state.galleryLoadError){toast('ตรวจสอบสิทธิ์ไม่สำเร็จ โปรดลองอีกครั้ง',true);return;}
+    if(id===currentActor()||state.album?.granted){state.privateAlbumOpen=true;updateProfileRoute(id,'gallery');renderPersonRoute('gallery');}
+    else if(state.album?.request?.status!=='pending'){
+      await albumAction({disabled:false,dataset:{albumAction:'request',owner:id}});
+      const current=$('[data-private-album]');if(current&&state.album?.request?.status!=='pending')current.disabled=false;
+    }
+    else renderPersonRoute(state.personRouteView);
+    return;
+  }
   const simulation=event.target.closest('[data-demo-owner]');
   if(simulation&&state.demo){const viewer=currentActor();state.demoActor=simulation.dataset.demoOwner;renderDemoPerspective();await loadRelationships();closeProfileSurface();return openChat(viewer);}
   const visibility=event.target.closest('[data-photo-visibility]');
@@ -1162,6 +1208,7 @@ document.addEventListener("click", async (event) => {
   if(profileTab){closeProfileSurface();history.replaceState({},'', '/');switchTab(profileTab.dataset.profileTab);return;}
   const galleryReturn = event.target.closest('[data-gallery-return]');
   if (galleryReturn || event.target.closest('[data-profile-gallery]')) {
+    if(!galleryReturn)state.privateAlbumOpen=false;
     updateProfileRoute(profileContext(state.selectedPerson).id,'gallery');renderPersonRoute('gallery');return;
   }
   if(event.target.closest('[data-profile-return]')){updateProfileRoute(profileContext(state.selectedPerson).id);renderPersonRoute('profile');return;}
@@ -1423,8 +1470,10 @@ setInterval(() => {
   }
 }, 30_000);
 setInterval(() => {
-  if (document.visibilityState === "visible" && navigator.onLine) refreshOpenThread().catch(() => {});
+  if (document.visibilityState === "visible" && navigator.onLine) {refreshOpenThread().catch(() => {});refreshAlbumPermission().catch(()=>{});}
 }, 10_000);
+window.addEventListener('focus',()=>refreshAlbumPermission().catch(()=>{}));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshAlbumPermission().catch(()=>{});});
 window.addEventListener("pagehide", () => {
   if (state.locationWatch !== null && navigator.geolocation) navigator.geolocation.clearWatch(state.locationWatch);
   if (state.locationPermission) state.locationPermission.onchange = null;

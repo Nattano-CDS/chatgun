@@ -10,8 +10,8 @@ test('real isolated D1/R2 private-album cards, owner consent, revocation and log
   async function auth(c,role){await c.addCookies([{name:'__Host-cg_session',value:b.sessions[role].token,url:baseURL,secure:true,httpOnly:true,sameSite:'Lax'},{name:'__Host-cg_csrf',value:b.sessions[role].csrf,url:baseURL,secure:true,httpOnly:false,sameSite:'Lax'}]);}
   await auth(context,'other');
   await page.goto('/app/people/'+b.ids.owner);
-  await expect(page.locator('.private-album')).toContainText('ล็อก');
-  await page.locator('[data-album-action=request]').click();await expect(page.locator('.private-album')).toContainText('ส่งคำขอแล้ว');
+  await expect(page.locator('[data-private-album]')).toHaveAttribute('data-album-state','locked');
+  await page.locator('[data-private-album]').click();await expect(page.locator('.album-feedback')).toContainText('ส่งคำขอแล้ว');
   const ownerContext=await browser.newContext();await auth(ownerContext,'owner');const owner=await ownerContext.newPage();
   try{
     await owner.goto('/?tab=chat');await owner.locator('[data-chat="'+b.ids.other+'"]').click();
@@ -19,7 +19,7 @@ test('real isolated D1/R2 private-album cards, owner consent, revocation and log
     const dir=resolve(process.env.ISSUE13_EVIDENCE_DIR||'test-results/issue13-live-screens');mkdirSync(dir,{recursive:true});
     for(const width of [390,768,1440]){await owner.setViewportSize({width,height:width===390?844:1024});await owner.screenshot({path:resolve(dir,`real-owner-request-${width}.png`)});}
     await owner.locator('[data-album-action=approve]').click();await expect(owner.locator('[data-album-action=revoke]')).toBeVisible();
-    await page.reload();await expect(page.locator('.private-album')).toContainText('ได้รับสิทธิ์');await page.locator('.profile-gallery-top').click();
+    await expect(page.locator('[data-private-album]')).toHaveAttribute('data-album-state','unlocked',{timeout:15000});await page.locator('[data-private-album]').click();
     await expect(page.locator('[data-photo="'+b.photoId+'"][data-gallery-action=view] img')).toHaveJSProperty('naturalWidth',1);
     await page.locator('[data-photo="'+b.photoId+'"][data-gallery-action=view]').click();await expect(page.locator('.lightbox-image img')).toHaveJSProperty('naturalWidth',1);
     await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นสมมติทดสอบ D1 จริง');await page.locator('#gallery-comment button').click();await expect(page.locator('.post-comments')).toContainText('ความคิดเห็นสมมติทดสอบ D1 จริง');

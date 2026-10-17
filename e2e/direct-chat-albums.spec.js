@@ -20,8 +20,8 @@ for(const width of [390,768,1440])test(`direct DM and two-sided fictional album 
   await expect(page.locator('[data-chat=demo-01]')).toHaveCount(1);await shot('direct-chat');
   await page.locator('#primary-nav [data-tab=near]').click();
   await page.locator('[data-person=demo-01] .card-open').click();
-  await expect(page.locator('.private-album')).toContainText('ล็อก');
-  await page.locator('[data-album-action=request]').click();await expect(page.locator('.private-album')).toContainText('ส่งคำขอแล้ว');await shot('pending');
+  await expect(page.locator('[data-private-album]')).toHaveAttribute('data-album-state','locked');
+  await page.locator('[data-private-album]').click();await expect(page.locator('.album-feedback')).toContainText('ส่งคำขอแล้ว');await expect(page.locator('[data-private-album]')).toBeDisabled();await shot('pending');
   await page.locator('[data-demo-owner]').click();
   await expect(page.locator('#demo-actor')).toHaveValue('demo-01');
   await expect(page.locator('[data-album-action=approve]')).toBeVisible();await shot('owner-request');
@@ -29,8 +29,8 @@ for(const width of [390,768,1440])test(`direct DM and two-sided fictional album 
   await page.locator('#demo-actor').selectOption('demo-me');await page.locator('[data-chat=demo-01]').click();
   await expect(page.locator('#thread .album-system-card')).toHaveCount(2);await shot('viewer-approved');
   await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();
-  await expect(page.locator('.private-album')).toContainText('ได้รับสิทธิ์');await page.locator('.profile-gallery-top').click();
-  await expect(page.locator('.ig-tile')).toHaveCount(2);await shot('granted-gallery');
+  await expect(page.locator('[data-private-album]')).toHaveAttribute('data-album-state','unlocked');await page.locator('[data-private-album]').click();
+  await expect(page.locator('.ig-tile')).toHaveCount(1);await shot('granted-gallery');
   await page.locator('[data-demo-owner]').click();await page.locator('[data-album-action=revoke]').click();
   await page.locator('#demo-actor').selectOption('demo-me');await page.locator('[data-chat=demo-01]').click();
   await expect(page.locator('#thread')).toContainText('เพิกถอนสิทธิ์');
@@ -40,7 +40,7 @@ for(const width of [390,768,1440])test(`direct DM and two-sided fictional album 
   await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('[data-chat=demo-01]').click();
   await expect(page.locator('#thread .message')).toContainText('สวัสดี ตัวอย่างแชทโดยตรง');await expect(page.locator('.album-system-card')).toHaveCount(3);
   // A different pair exercises explicit rejection, without shortening real cooldowns.
-  await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-02] .card-open').click();await page.locator('[data-album-action=request]').click();await page.locator('[data-demo-owner]').click();await page.locator('[data-album-action=reject]').click();
+  await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-02] .card-open').click();await page.locator('[data-private-album]').click();await page.locator('[data-demo-owner]').click();await page.locator('[data-album-action=reject]').click();
   await page.locator('#demo-actor').selectOption('demo-me');await page.locator('[data-chat=demo-02]').click();await expect(page.locator('#thread')).toContainText('ปฏิเสธคำขออัลบั้มส่วนตัว');await shot('rejected');
   expect(errors).toEqual([]);expect(writes).toEqual([]);
 });
@@ -62,11 +62,12 @@ test('fictional owner media decisions persist and private portraits never become
   await page.goto('/?demo=1');await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('#demo-actor').selectOption('demo-01');
   await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();await page.locator('.profile-gallery-top').click();
   await page.locator('[data-photo-visibility=private][data-photo=demo-portrait-01]').click();
+  await page.locator('[data-private-album]').click();
   await expect(page.locator('section[aria-label="รูปอัลบั้มส่วนตัว"] .ig-tile')).toHaveCount(2);
   await page.locator('[data-close-profile]').click();await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('#demo-actor').selectOption('demo-me');await page.locator('#primary-nav [data-tab=near]').click();
   await expect(page.locator('[data-person=demo-01] .card-photo img')).toHaveCount(0);
   await page.reload();await expect(page.locator('[data-person=demo-01] .card-photo img')).toHaveCount(0);
-  await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('#demo-actor').selectOption('demo-01');await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();await page.locator('.profile-gallery-top').click();
+  await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('#demo-actor').selectOption('demo-01');await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();await page.locator('[data-private-album]').click();
   page.once('dialog',d=>d.accept());await page.locator('[data-gallery-action=delete][data-photo=demo-private-01]').click();await expect(page.locator('[data-gallery-action=view][data-photo=demo-private-01]')).toHaveCount(0);
-  await page.reload();await expect(page.locator('[data-gallery-action=view][data-photo=demo-private-01]')).toHaveCount(0);
+  await page.reload();await page.locator('[data-private-album]').click();await expect(page.locator('[data-gallery-action=view][data-photo=demo-private-01]')).toHaveCount(0);
 });
