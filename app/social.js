@@ -369,7 +369,8 @@ function personCard(person, context = "near") {
   return ChatgunNearComponents.card({person,id,relation,context,
     incoming:relation?.status==='pending'&&relation.requested_by!==state.account.user.id,
     html:escapeHtml,portrait:sourcePortrait,distance:formatDistance(person.distance,person.distance_label),
-    star:starIcon,userPlus:userPlusIcon,canRate:state.config.ratingsEnabled&&person.distance!=null&&person.distance<=100});
+    star:starIcon,userPlus:userPlusIcon,rateDisabled:!state.locationFresh,
+    canRate:state.config.ratingsEnabled&&(!state.demo||(person.distance!=null&&person.distance<=100))});
 }
 
 function renderPeople() {
@@ -652,7 +653,11 @@ function profileContext(person, photos=[]) {
     incoming:relation?.status==='pending'&&relation.requested_by!==state.account.user.id,
     config:state.config,demo:state.demo,html:escapeHtml,portrait:sourcePortrait,media:galleryMediaUrl,
     distance:formatDistance(person.distance,person.distance_label),star:starIcon,grid:gridIcon,images:imagesIcon,userPlus:userPlusIcon,
-    canRate:state.config.ratingsEnabled&&person.distance!=null&&person.distance<=100};
+    rateDisabled:!state.locationFresh,
+    // Live discovery deliberately returns coarse buckets (minimum 250m), not
+    // exact proximity. Never derive a 100m entitlement from that public value:
+    // keep the action and let the existing server enforce distance/daily limits.
+    canRate:id!==state.account.user.id&&state.config.ratingsEnabled&&(!state.demo||(person.distance!=null&&person.distance<=100))};
 }
 function openProfileSurface() {
   $('#profile-dialog').hidden=false;$('#app>main').inert=true;

@@ -108,6 +108,15 @@ test("member profile routes are deep-linkable and preserve browser history", asy
   await expect(page.locator("#profile-dialog")).toBeVisible();
 });
 
+test('coarse live distance does not silently remove the server-authorized rating workflow',async({page})=>{
+  // The live API never sends the exact 100m location threshold or can_rate.
+  await page.goto('/app/people/near-2');
+  await expect(page.locator('.full-profile-actions [data-action=rate]')).toBeEnabled();
+  await page.locator('.full-profile-actions [data-action=rate]').click();
+  await expect(page.locator('#rating-dialog')).toBeVisible();
+  await expect(page.locator('#rating-form input[name=target]')).toHaveValue('near-2');
+});
+
 test("optional demo remains browser-only and contains no game", async ({ page }) => {
   await page.unroute("**/api/**");
   await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false, demoModeEnabled: true }) }));
