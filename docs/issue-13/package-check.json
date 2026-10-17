@@ -1,6 +1,6 @@
 {
-  "sha": "a184dc29eb10d565309bd4243be786186764e475",
-  "directory": "/var/folders/gd/r5f17fjx6rg1syk20hrwwzyc0000gn/T/chatgun-issue13-production-rkmdAB",
+  "sha": "c1b04cc9e85a87dac5e824390840c03dfe14ec5d",
+  "directory": "/var/folders/gd/r5f17fjx6rg1syk20hrwwzyc0000gn/T/chatgun-issue13-production-OUcZ0D",
   "baseline": "6b6af92ea34a75b5698751c43c6ec03e97d79e8d",
   "backendUpdatedButLiveGatesClosed": true,
   "productionSchemaMigration": false,
@@ -8,6 +8,6 @@
   "privateArtifactsExcluded": true,
   "legalDraftsExcluded": true,
   "fictionalDatasetPreserved": true,
-  "rollbackDeployment": "f8206788-ecba-4999-a95f-bfcd3c47a69f",
-  "rollbackSha": "12e55fde423832152d7317c3e85bfd42f53eaf01"
+  "rollbackDeployment": "1b8f0e98-0ee5-4130-8f53-48d524b2762a",
+  "rollbackSha": "2d934f26db5c896bdce143ad2aac2522c613a758"
 }

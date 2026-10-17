@@ -1,7 +1,7 @@
 {
-  "run": "issue13-6cd72aa3-ad4b-43b7-a344-8faa6a5e0d39",
+  "run": "issue13-53a565c6-5ca4-4e76-98b1-9d850eb3b995",
   "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
-  "commit": "a184dc29eb10d565309bd4243be786186764e475",
+  "commit": "c1b04cc9e85a87dac5e824390840c03dfe14ec5d",
   "database": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
   "bucket": "chatgun-issue13-media",
   "syntheticOnly": true,
@@ -19,7 +19,27 @@
       "result": "PASS"
     },
     {
-      "name": "owner inbox contains actual conversation",
+      "name": "owner inbox contains actual conversation and authorized preview",
+      "result": "PASS"
+    },
+    {
+      "name": "existing counterpart can reply",
+      "result": "PASS"
+    },
+    {
+      "name": "recipient can opt out",
+      "result": "PASS"
+    },
+    {
+      "name": "opt-out denies new sends",
+      "result": "PASS"
+    },
+    {
+      "name": "opt-out preserves read receipts",
+      "result": "PASS"
+    },
+    {
+      "name": "recipient can restore contact",
       "result": "PASS"
     },
     {
@@ -52,6 +72,10 @@
     },
     {
       "name": "grant permits private bytes",
+      "result": "PASS"
+    },
+    {
+      "name": "granted album profile remains navigable after contact opt-out",
       "result": "PASS"
     },
     {
@@ -111,7 +135,7 @@
       "result": "PASS"
     }
   ],
-  "passed": 26,
+  "passed": 32,
   "failed": 0,
   "cleanup": {
     "selected": 1,

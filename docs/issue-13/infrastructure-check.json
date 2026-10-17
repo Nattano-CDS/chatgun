@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-17T09:15:12.445Z",
+  "checkedAt": "2026-10-17T09:51:43.054Z",
   "account": "23017b53386fb67fc62a52cdd017454c",
   "project": "chatgun",
   "domain": "active",
@@ -26,11 +26,12 @@
     "PUBLIC_DEMO_CANARY_ENABLED": "true"
   },
   "canonicalDeployment": {
-    "id": "fe23654c-2cc1-4ab6-8833-3275f6bbcbb8",
-    "sha": "a184dc29eb10d565309bd4243be786186764e475",
+    "id": "df2e3f0e-7ff3-46aa-9f20-896b9ba7e4d2",
+    "sha": "c1b04cc9e85a87dac5e824390840c03dfe14ec5d",
     "status": "success"
   },
   "foreignKeyViolations": 0,
   "databaseWrites": 0,
-  "originalAndStagingDataMutations": "none"
+  "protectedOriginalStagingMutations": "none",
+  "isolatedIssue13Staging": "separate project; authorized synthetic test writes"
 }

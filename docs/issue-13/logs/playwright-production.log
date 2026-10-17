@@ -1,28 +1,32 @@
 
-Running 18 tests using 1 worker
+Running 22 tests using 1 worker
 
-(node:11549) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(node:14955) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 (Use `node --trace-warnings ...` to show where the warning was created)
-  ✓   1 [desktop-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 390px (12.4s)
+  ✓   1 [desktop-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 390px (12.2s)
   ✓   2 [desktop-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 768px (3.3s)
-  ✓   3 [desktop-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 1440px (3.1s)
-  ✓   4 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 390 (7.4s)
-  ✓   5 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 768 (2.9s)
-  ✓   6 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440 (2.9s)
-  ✓   7 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px (3.5s)
-  ✓   8 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px (4.2s)
-  ✓   9 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px (4.9s)
-(node:11703) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+  ✓   3 [desktop-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 1440px (3.3s)
+  ✓   4 [desktop-chromium] › e2e/direct-chat-albums.spec.js:48:1 › legacy fictional inbox upgrade preserves read states, 120 messages and all 20 members (2.0s)
+  ✓   5 [desktop-chromium] › e2e/direct-chat-albums.spec.js:61:1 › fictional owner media decisions persist and private portraits never become public covers (1.7s)
+  ✓   6 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 390 (7.2s)
+  ✓   7 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 768 (2.7s)
+  ✓   8 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440 (3.0s)
+  ✓   9 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px (3.8s)
+  ✓  10 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px (4.3s)
+  ✓  11 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px (4.2s)
+(node:15124) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 (Use `node --trace-warnings ...` to show where the warning was created)
-  ✓  10 [mobile-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 390px (12.6s)
-  ✓  11 [mobile-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 768px (5.5s)
-  ✓  12 [mobile-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 1440px (7.1s)
-  -  13 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 390
-  -  14 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 768
-  -  15 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440
-  -  16 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px
-  -  17 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px
-  -  18 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px
+  ✓  12 [mobile-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 390px (12.6s)
+  ✓  13 [mobile-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 768px (6.1s)
+  ✓  14 [mobile-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 1440px (6.5s)
+  ✓  15 [mobile-chromium] › e2e/direct-chat-albums.spec.js:48:1 › legacy fictional inbox upgrade preserves read states, 120 messages and all 20 members (2.2s)
+  ✓  16 [mobile-chromium] › e2e/direct-chat-albums.spec.js:61:1 › fictional owner media decisions persist and private portraits never become public covers (2.1s)
+  -  17 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 390
+  -  18 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 768
+  -  19 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440
+  -  20 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px
+  -  21 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px
+  -  22 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px
 
   6 skipped
-  12 passed (1.2m)
+  16 passed (1.3m)

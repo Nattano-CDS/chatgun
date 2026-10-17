@@ -15,6 +15,8 @@ assert.equal(config.env.production.d1_databases[0].database_id,'9738a051-d914-42
 const infrastructure=JSON.parse(readFileSync('docs/issue-13/infrastructure-check.json'));
 assert.equal(infrastructure.productionR2Bindings,0);
 assert.equal(infrastructure.productionFlags.SOCIAL_APP_ENABLED,'false');
+assert.equal(infrastructure.canonicalDeployment.status,'success');
+assert.match(infrastructure.canonicalDeployment.sha,/^[a-f0-9]{40}$/);
 const cloud=JSON.parse(readFileSync('docs/issue-13/cloud-test-results.json'));
 assert.equal(cloud.commit,sha);assert.equal(cloud.failed,0);assert.ok(cloud.passed>=24);
 const directory=mkdtempSync(join(tmpdir(),'chatgun-issue13-production-'));
@@ -23,5 +25,5 @@ assert.equal(JSON.parse(readFileSync(join(directory,'release.json'))).commit,sha
 for(const page of ['privacy.html','terms.html','data-deletion.html'])assert.deepEqual(readFileSync(join(directory,page)),readFileSync('canary-notice.html'));
 for(const path of ['docs','scripts','test-results','test','e2e','.dev.vars','node_modules','migrations'])assert.equal(existsSync(join(directory,path)),false,path);
 assert.deepEqual(readFileSync(join(directory,'assets/demo/network.json')),execFileSync('git',['show',baseline+':assets/demo/network.json']));
-const evidence={sha,directory,baseline,backendUpdatedButLiveGatesClosed:true,productionSchemaMigration:false,productionConfigurationUnchanged:true,privateArtifactsExcluded:true,legalDraftsExcluded:true,fictionalDatasetPreserved:true,rollbackDeployment:'fe23654c-2cc1-4ab6-8833-3275f6bbcbb8',rollbackSha:'a184dc29eb10d565309bd4243be786186764e475'};
+const evidence={sha,directory,baseline,backendUpdatedButLiveGatesClosed:true,productionSchemaMigration:false,productionConfigurationUnchanged:true,privateArtifactsExcluded:true,legalDraftsExcluded:true,fictionalDatasetPreserved:true,rollbackDeployment:infrastructure.canonicalDeployment.id,rollbackSha:infrastructure.canonicalDeployment.sha};
 writeFileSync('docs/issue-13/package-check.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));

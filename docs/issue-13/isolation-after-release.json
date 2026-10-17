@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-17T09:15:19.875Z",
+  "checkedAt": "2026-10-17T09:51:50.252Z",
   "account": "23017b53386fb67fc62a52cdd017454c",
   "protectedDatabase": "5bbfd55d-eb22-4324-8a7d-57bef14110ea",
   "protectedCounts": {
@@ -17,6 +17,7 @@
   "isolatedDatabase": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
   "isolatedMigrationCount": 13,
   "foreignKeyViolations": 0,
+  "photoMediaOwnerMismatches": 0,
   "exactSourceTriggersVerified": 4,
   "privateVisibilityDefault": true,
   "managedR2PublicAccess": false,
