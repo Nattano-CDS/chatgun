@@ -340,12 +340,10 @@ async function refreshOpenThread() {
   if (state.activeTab !== "chat" || document.visibilityState !== "visible" || !navigator.onLine ||
       !state.selectedChat || state.threadPolling || !state.config?.messagingEnabled) return;
   state.threadPolling = !0;
-  {
-    try {
-      await loadMessagePage(state.selectedChat), await api("/api/social/messages", { method: "POST", body: { action: "read", target: state.selectedChat } });
-    } finally {
-      state.threadPolling = !1;
-    }
+  try {
+    await loadMessagePage(state.selectedChat), await api("/api/social/messages", { method: "POST", body: { action: "read", target: state.selectedChat } });
+  } finally {
+    state.threadPolling = !1;
   }
 }
 function profileContext(person, photos = []) {
@@ -1251,7 +1249,8 @@ window.addEventListener("online", () => {
   });
 });
 document.addEventListener("visibilitychange", () => {
-  document.visibilityState === "visible" && state.config?.socialAppEnabled && state.profile && (Promise.all([loadPeople(), loadRelationships(), refreshOpenThread()]).catch(() => {
+  document.visibilityState === "visible" && state.config?.socialAppEnabled && state.profile && (Promise.all(state.activeTab === "near" ? [loadPeople()] :
+    state.activeTab === "chat" ? [loadRelationships(), refreshOpenThread()] : []).catch(() => {
   }), state.locationWatch !== null && Date.now() - state.lastLocationPost > 55e3 && navigator.geolocation.getCurrentPosition(async ({ coords }) => {
     state.lastLocationPost = Date.now();
     try {
