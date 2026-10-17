@@ -1,0 +1,161 @@
+{
+  "checkedAt": "2026-10-17T17:20:28.355Z",
+  "checks": [
+    {
+      "host": "chatgun.social",
+      "path": "/",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "host": "chatgun.social",
+      "path": "/release.json",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "host": "chatgun.social",
+      "path": "/api/social/config",
+      "status": 404,
+      "type": "text/html; charset=utf-8",
+      "body": "<!doctype html><html lang=\"th\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>ไม่พบหน้านี้ | ChatGun</title><link rel=\"st"
+    },
+    {
+      "host": "chatgun.social",
+      "path": "/api/auth/config",
+      "status": 404,
+      "type": "text/html; charset=utf-8",
+      "body": "<!doctype html><html lang=\"th\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>ไม่พบหน้านี้ | ChatGun</title><link rel=\"st"
+    },
+    {
+      "host": "chatgun.social",
+      "path": "/app/social.js",
+      "status": 200,
+      "type": "application/javascript"
+    },
+    {
+      "host": "chatgun.social",
+      "path": "/app/demo-gallery.js",
+      "status": 200,
+      "type": "application/javascript"
+    },
+    {
+      "host": "54b67d01.chatgun.pages.dev",
+      "path": "/",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "host": "54b67d01.chatgun.pages.dev",
+      "path": "/release.json",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "host": "54b67d01.chatgun.pages.dev",
+      "path": "/api/social/config",
+      "status": 404,
+      "type": "text/html; charset=utf-8",
+      "body": "<!doctype html><html lang=\"th\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>ไม่พบหน้านี้ | ChatGun</title><link rel=\"st"
+    },
+    {
+      "host": "54b67d01.chatgun.pages.dev",
+      "path": "/api/auth/config",
+      "status": 404,
+      "type": "text/html; charset=utf-8",
+      "body": "<!doctype html><html lang=\"th\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>ไม่พบหน้านี้ | ChatGun</title><link rel=\"st"
+    },
+    {
+      "host": "54b67d01.chatgun.pages.dev",
+      "path": "/app/social.js",
+      "status": 200,
+      "type": "application/javascript"
+    },
+    {
+      "host": "54b67d01.chatgun.pages.dev",
+      "path": "/app/demo-gallery.js",
+      "status": 200,
+      "type": "application/javascript"
+    },
+    {
+      "host": "3e111666.chatgun.pages.dev",
+      "path": "/",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "host": "3e111666.chatgun.pages.dev",
+      "path": "/release.json",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "host": "3e111666.chatgun.pages.dev",
+      "path": "/api/social/config",
+      "status": 404,
+      "type": "text/html; charset=utf-8",
+      "body": "<!doctype html><html lang=\"th\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>ไม่พบหน้านี้ | ChatGun</title><link rel=\"st"
+    },
+    {
+      "host": "3e111666.chatgun.pages.dev",
+      "path": "/api/auth/config",
+      "status": 404,
+      "type": "text/html; charset=utf-8",
+      "body": "<!doctype html><html lang=\"th\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>ไม่พบหน้านี้ | ChatGun</title><link rel=\"st"
+    },
+    {
+      "host": "3e111666.chatgun.pages.dev",
+      "path": "/app/social.js",
+      "status": 200,
+      "type": "application/javascript"
+    },
+    {
+      "host": "3e111666.chatgun.pages.dev",
+      "path": "/app/demo-gallery.js",
+      "status": 200,
+      "type": "application/javascript"
+    },
+    {
+      "host": "6a51db9b.chatgun.pages.dev",
+      "path": "/",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "host": "6a51db9b.chatgun.pages.dev",
+      "path": "/release.json",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "host": "6a51db9b.chatgun.pages.dev",
+      "path": "/api/social/config",
+      "status": 404,
+      "type": "text/html; charset=utf-8",
+      "body": "<!doctype html><html lang=\"th\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>ไม่พบหน้านี้ | ChatGun</title><link rel=\"st"
+    },
+    {
+      "host": "6a51db9b.chatgun.pages.dev",
+      "path": "/api/auth/config",
+      "status": 404,
+      "type": "text/html; charset=utf-8",
+      "body": "<!doctype html><html lang=\"th\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>ไม่พบหน้านี้ | ChatGun</title><link rel=\"st"
+    },
+    {
+      "host": "6a51db9b.chatgun.pages.dev",
+      "path": "/app/social.js",
+      "status": 200,
+      "type": "application/javascript"
+    },
+    {
+      "host": "6a51db9b.chatgun.pages.dev",
+      "path": "/app/demo-gallery.js",
+      "status": 200,
+      "type": "application/javascript"
+    }
+  ],
+  "fresh": {
+    "text": "หาเพื่อน\nแชท\nความคิดเห็น\nโปรไฟล์\nไม่สามารถดำเนินการได้\nไม่สามารถดำเนินการได้",
+    "errors": []
+  }
+}

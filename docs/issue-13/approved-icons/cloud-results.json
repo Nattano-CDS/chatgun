@@ -1,0 +1,147 @@
+{
+  "run": "issue13-62c8270d-bf32-4b23-8b25-6a988fb478ec",
+  "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "commit": "b6ba87434a82e655bff0cea39ce637fca5488b4a",
+  "database": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
+  "bucket": "chatgun-issue13-media",
+  "syntheticOnly": true,
+  "checks": [
+    {
+      "name": "anonymous messages denied",
+      "result": "PASS"
+    },
+    {
+      "name": "stranger DM succeeds",
+      "result": "PASS"
+    },
+    {
+      "name": "no friendship rows",
+      "result": "PASS"
+    },
+    {
+      "name": "owner inbox contains actual conversation and authorized preview",
+      "result": "PASS"
+    },
+    {
+      "name": "existing counterpart can reply",
+      "result": "PASS"
+    },
+    {
+      "name": "recipient can opt out",
+      "result": "PASS"
+    },
+    {
+      "name": "opt-out denies new sends",
+      "result": "PASS"
+    },
+    {
+      "name": "opt-out preserves read receipts",
+      "result": "PASS"
+    },
+    {
+      "name": "recipient can restore contact",
+      "result": "PASS"
+    },
+    {
+      "name": "quarantine denies owner bytes",
+      "result": "PASS"
+    },
+    {
+      "name": "private listing hides IDs",
+      "result": "PASS"
+    },
+    {
+      "name": "private raw URL denies stranger",
+      "result": "PASS"
+    },
+    {
+      "name": "album request succeeds",
+      "result": "PASS"
+    },
+    {
+      "name": "duplicate pending request rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "cross-user approval rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "concurrent approval exactly once",
+      "result": "PASS"
+    },
+    {
+      "name": "grant permits private bytes",
+      "result": "PASS"
+    },
+    {
+      "name": "granted album profile remains navigable after contact opt-out",
+      "result": "PASS"
+    },
+    {
+      "name": "grant does not permit unrelated viewer",
+      "result": "PASS"
+    },
+    {
+      "name": "permitted comment persists",
+      "result": "PASS"
+    },
+    {
+      "name": "typed approval delivered",
+      "result": "PASS"
+    },
+    {
+      "name": "owner revoke succeeds",
+      "result": "PASS"
+    },
+    {
+      "name": "old raw URL denied after revoke",
+      "result": "PASS"
+    },
+    {
+      "name": "old photo comments denied after revoke",
+      "result": "PASS"
+    },
+    {
+      "name": "gallery deletion queues R2 cleanup",
+      "result": "PASS"
+    },
+    {
+      "name": "deleted media cannot be retrieved",
+      "result": "PASS"
+    },
+    {
+      "name": "R2 queue records exact object",
+      "result": "PASS"
+    },
+    {
+      "name": "managed public R2 domain disabled",
+      "result": "PASS"
+    },
+    {
+      "name": "real R2 cleanup worker completes",
+      "result": "PASS"
+    },
+    {
+      "name": "deletion queue completion persisted",
+      "result": "PASS"
+    },
+    {
+      "name": "foreign keys valid",
+      "result": "PASS"
+    },
+    {
+      "name": "browser fixture is private without owner consent",
+      "result": "PASS"
+    }
+  ],
+  "passed": 32,
+  "failed": 0,
+  "cleanup": {
+    "selected": 1,
+    "completed": 1,
+    "failed": 0,
+    "exhausted": 0
+  },
+  "oauth": "not retested; synthetic session fixture only"
+}

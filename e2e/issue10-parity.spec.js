@@ -29,19 +29,18 @@ test('failed portrait remains labelled; persistent auth navigation excludes Game
   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
   await page.route('**/assets/demo/01.png',r=>r.abort());
   await page.goto('/');await expect(page.locator('[data-image-error]').first()).toHaveAttribute('aria-label',/มะปราง/);
-  await page.goto('/signup');await expect(page.locator('.auth-navigation a')).toHaveCount(5);await expect(page.locator('.auth-navigation')).not.toContainText('เกม');
+  await page.goto('/signup');await expect(page.locator('.auth-navigation a')).toHaveCount(4);await expect(page.locator('.auth-navigation')).not.toContainText('เกม');
 });
-test('fictional friendship accept/reject/request/block/unblock persists without server writes',async({page})=>{
+test('fictional direct chat and block/unblock persist without server writes',async({page})=>{
   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
   const writes=[];page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&r.method()!=='GET')writes.push(r.url());});
-  await page.goto('/');await page.locator('#primary-nav [data-tab=friends]').click();
-  await page.locator('#requests-grid [data-action=accept]').first().click();await expect(page.locator('#friends-grid .person-card')).toHaveCount(11);
-  await page.locator('#requests-grid [data-action=reject]').first().click();await expect(page.locator('#requests-grid .person-card')).toHaveCount(3);
+  await page.goto('/');await page.locator('#people-grid [data-person=demo-01] .card-open').click();await page.locator('.full-profile-actions [data-action=chat]').click();
+  await page.locator('.composer input[name=body]').fill('คุยกับสมาชิกใหม่โดยตรง');await page.locator('.composer button[aria-label="ส่ง"]').click();
+  await expect(page.locator('#thread .message')).toContainText('คุยกับสมาชิกใหม่โดยตรง');
   await page.locator('#primary-nav [data-tab=near]').click();
-  await page.locator('#people-grid [data-person="demo-01"] .card-open').click();await page.locator('.full-profile-actions [data-action=request]').click();await page.locator('#people-grid [data-person="demo-01"] .card-open').click();await expect(page.locator('.full-profile-actions [data-action=request]')).toBeDisabled();await page.keyboard.press('Escape');
   await page.locator('#people-grid [data-person="demo-02"]').click();page.once('dialog',d=>d.accept());await page.locator('.full-profile-info [data-action=block]').click();
   await page.locator('#primary-nav [data-tab=profile]').click();await expect(page.locator('#blocked-list')).toContainText('ต้นน้ำ');
   await page.locator('#blocked-list [data-action=unblock]').click();await expect(page.locator('#blocked-list')).not.toContainText('ต้นน้ำ');
-  await page.reload();await page.locator('#primary-nav [data-tab=friends]').click();
-  await expect(page.locator('#requests-grid .person-card')).toHaveCount(4);expect(writes).toEqual([]);
+  await page.reload();await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('[data-chat=demo-01]').click();
+  await expect(page.locator('#thread .message')).toContainText('คุยกับสมาชิกใหม่โดยตรง');expect(writes).toEqual([]);
 });

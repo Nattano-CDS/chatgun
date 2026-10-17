@@ -1,4 +1,17 @@
 /* Isolated public fiction. No OAuth identities, sessions, locations or member API reads. */
+// Preserve legacy inbox read markers when moving from relationship-based demo rows
+// to actual message-derived conversations. Never replace IDs, bodies or explicit reads.
+window.chatgunUpgradeDemoReads=function(messages,relationships,alreadyCurrent,timestamp){
+  if(alreadyCurrent)return;
+  for(const [target,thread] of Object.entries(messages)){
+    const incoming=thread.filter(m=>m.receiver_user_id==='demo-me'&&!m.unsent_at).sort((a,b)=>a.created_at-b.created_at||a.id.localeCompare(b.id));
+    const unread=Math.max(0,Number(relationships.find(r=>r.other_user_id===target)?.unread_count)||0);
+    const unknown=incoming.filter(m=>!Object.hasOwn(m,'read_at'));
+    const explicitUnread=incoming.filter(m=>Object.hasOwn(m,'read_at')&&m.read_at===null).length;
+    const keep=Math.max(0,unread-explicitUnread);
+    unknown.forEach((m,index)=>{m.read_at=index<unknown.length-keep?timestamp:null;});
+  }
+};
 window.chatgunDemoNetwork = async function () {
   const response = await fetch("/assets/demo/network.json", { credentials: "omit" });
   if (!response.ok) throw new Error("โหลดข้อมูลตัวอย่างไม่สำเร็จ กรุณาลองใหม่");

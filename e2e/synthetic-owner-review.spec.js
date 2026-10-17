@@ -100,7 +100,7 @@ test("NEAR-style social pages render populated synthetic data on desktop and mob
   await page.locator('#primary-nav button[data-tab="reviews"]').click();
   await expect(page.locator("#reviews-list .review")).toHaveCount(15);
   await page.locator('#primary-nav button[data-tab="profile"]').click();
-  await expect(page.locator("#my-gallery img")).toHaveCount(2);
+  await expect(page.locator("#my-gallery img")).toHaveCount(8);
   await expect(page.locator("#moderation-notifications .notification-row")).toHaveCount(1);
   await page.screenshot({ path: resolve(evidenceDirectory, `profile-gallery-${testInfo.project.name}.png`), fullPage: true });
 });

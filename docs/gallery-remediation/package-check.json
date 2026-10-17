@@ -1,0 +1,13 @@
+{
+  "sha": "a555e0563c8f0e84f6f871d0f70c831262868883",
+  "directory": "/var/folders/gd/r5f17fjx6rg1syk20hrwwzyc0000gn/T/chatgun-issue13-production-PZZYYA",
+  "baseline": "6b6af92ea34a75b5698751c43c6ec03e97d79e8d",
+  "backendUpdatedButLiveGatesClosed": true,
+  "productionSchemaMigration": false,
+  "productionConfigurationUnchanged": true,
+  "privateArtifactsExcluded": true,
+  "legalDraftsExcluded": true,
+  "fictionalDatasetPreserved": true,
+  "rollbackDeployment": "3e111666-ad69-49ba-91ca-d2495c561076",
+  "rollbackSha": "d9a11c52722175b93236f8e09e74928430013fba"
+}

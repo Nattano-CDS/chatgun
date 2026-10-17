@@ -1,0 +1,35 @@
+import {test,expect} from '@playwright/test';
+import {mkdirSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {simulateChatCounterpart} from './helpers/demo-chat.js';
+for(const width of [390,768,1440])test(`approved album icons and keyboard consent journey ${width}px`,async({page,browser},info)=>{
+  test.setTimeout(90000);
+  const dir=resolve(process.env.ALBUM_ICONS_EVIDENCE_DIR||'test-results/album-icons');mkdirSync(dir,{recursive:true});
+  await page.setViewportSize({width,height:width===390?844:1024});
+  const errors=[],writes=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&!['GET','HEAD'].includes(r.method()))writes.push(r.url());});
+  await page.goto('/?demo=1');await page.locator('[data-person=demo-01] .card-open').click();
+  const button=page.locator('[data-private-album]');
+  await expect(button).toHaveAttribute('data-album-state','locked');await expect(button).toBeEnabled();
+  await expect(button).toHaveAccessibleName('ขอดูอัลบั้มส่วนตัว');await expect(button).toHaveText('');
+  expect(await button.evaluate(b=>b.previousElementSibling.hasAttribute('data-profile-gallery'))).toBe(true);
+  const geometry=await button.evaluate(b=>{const r=b.getBoundingClientRect(),art=b.querySelector('.album-icon-art').getBoundingClientRect(),badge=b.querySelector('.album-lock-badge').getBoundingClientRect(),photo=b.querySelector('.album-icon-art>svg').getBoundingClientRect(),gallery=b.previousElementSibling.getBoundingClientRect();return {width:r.width,height:r.height,overlap:badge.left<photo.right&&badge.top<photo.bottom&&badge.right>photo.right&&badge.bottom>photo.bottom,sameRow:Math.abs(gallery.y+gallery.height/2-(r.y+r.height/2))<2,badgeColor:getComputedStyle(b.querySelector('.album-lock-badge')).color};});
+  expect(geometry.width).toBeGreaterThanOrEqual(44);expect(geometry.height).toBeGreaterThanOrEqual(44);expect(geometry.overlap).toBe(true);expect(geometry.sameRow).toBe(true);
+  await expect(page.locator('#toast')).toBeHidden();const locked=await button.screenshot();
+  await page.screenshot({path:resolve(dir,`${info.project.name}-${width}-locked-profile.png`)});
+  await button.focus();await page.keyboard.press('Enter');await expect(button).toBeDisabled();await expect(button).toHaveAccessibleName('ส่งคำขอแล้ว รออนุมัติอัลบั้มส่วนตัว');await expect(page.locator('#profile-dialog .album-feedback,#profile-dialog [data-demo-owner],#profile-dialog [data-album-action]')).toHaveCount(0);
+  await simulateChatCounterpart(page);await page.locator('[data-album-action=approve]').click();
+  await page.locator('#demo-actor').selectOption('demo-me');await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();
+  await expect(button).toHaveAttribute('data-album-state','unlocked');await expect(button).toHaveAccessibleName('เปิดอัลบั้มส่วนตัวที่ได้รับอนุมัติ');
+  await expect(page.locator('#toast')).toBeHidden();const unlocked=await button.screenshot();expect(await button.locator('.album-lock-badge').evaluate(b=>getComputedStyle(b).color)).not.toBe(geometry.badgeColor);
+  await page.screenshot({path:resolve(dir,`${info.project.name}-${width}-unlocked-profile.png`)});
+  await button.focus();await page.keyboard.press('Space');await expect(page.locator('.gallery-experience .gallery-tile-wrap')).toHaveCount(5);await expect(page.locator('.gallery-experience [aria-label="Gallery สาธารณะ"]')).toHaveCount(0);
+  await simulateChatCounterpart(page);await page.locator('[data-album-action=revoke]').click();
+  await page.locator('#demo-actor').selectOption('demo-me');await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();
+  await expect(button).toHaveAttribute('data-album-state','locked');await expect(page.locator('#profile-dialog .album-feedback')).toHaveCount(0);
+  await page.keyboard.press('Escape');await page.locator('[data-person=demo-me] .card-open').click();await expect(button).toHaveAttribute('data-album-state','unlocked');await button.click();await expect(page.locator('.album-management')).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);expect(errors).toEqual([]);expect(writes).toEqual([]);
+  // Side-by-side report uses actual rendered Production/Preview button captures, not mockup paths.
+  const comparison=await browser.newPage({viewport:{width:360,height:130},deviceScaleFactor:2});
+  await comparison.setContent(`<html lang="en"><style>body{margin:0;background:#faf9fc;font:14px system-ui;display:flex;gap:40px;justify-content:center;padding:16px}figure{margin:0;text-align:center}img{display:block;width:46px;height:46px;margin:0 auto 10px}</style><figure><img src="data:image/png;base64,${locked.toString('base64')}"><figcaption>Locked</figcaption></figure><figure><img src="data:image/png;base64,${unlocked.toString('base64')}"><figcaption>Unlocked</figcaption></figure></html>`);
+  await comparison.screenshot({path:resolve(dir,`${info.project.name}-${width}-locked-unlocked.png`)});await comparison.close();
+});

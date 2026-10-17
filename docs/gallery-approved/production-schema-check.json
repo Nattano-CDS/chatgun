@@ -1,0 +1,18 @@
+{
+  "database": "chatgun-auth",
+  "migrations": [
+    "0001_auth.sql",
+    "0002_privacy_safety.sql",
+    "0003_social.sql",
+    "0004_moderation_audit.sql",
+    "0005_trust_safety.sql",
+    "0006_media_review_concurrency.sql",
+    "0007_controlled_beta.sql",
+    "0008_post_oauth_acceptance.sql",
+    "0009_media_moderation.sql",
+    "0010_moderation_access_management.sql",
+    "0011_daily_media_upload_quotas.sql",
+    "0012_synthetic_seed_batches.sql"
+  ],
+  "databaseWrites": 0
+}

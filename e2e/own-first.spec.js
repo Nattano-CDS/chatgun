@@ -18,8 +18,8 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
   await page.locator('#people-grid [data-clear-filters]').click();
   await first.locator('.card-open').focus();await page.keyboard.press('Enter');await expect(page).toHaveURL(/people\/demo-me$/);
   await expect(page.locator('.full-profile-actions [data-action],.people-management')).toHaveCount(0);
-  await page.locator('.profile-gallery-top').click();await page.locator('.ig-tile>button').first().click();await expect(page.locator('.post-layout')).toBeVisible();
-  await page.goBack();await expect(page.locator('.gallery-summary')).toBeVisible();await page.locator('[data-profile-return]').click();await page.locator('.profile-back').click();
+  await page.locator('[data-private-album]').click();await page.locator('.gallery-grid .tile').first().click();await expect(page.locator('.lightbox-shell')).toBeVisible();
+  await page.goBack();await expect(page.locator('.viewer-head')).toBeVisible();await page.locator('[data-profile-return]').first().click();await page.locator('.profile-back').click();
   await page.locator('#primary-nav [data-tab=profile]').click();
   await page.locator('#profile-form [name=name]').fill('ผู้ทดลองสมมติ');await page.locator('#profile-form [name=bio]').fill('กาแฟ หนังสือ และเพลงไทย');await page.locator('#profile-form button[type=submit]').click();await expect(page.locator('#toast')).toContainText('บันทึกโปรไฟล์แล้ว');
   await page.locator('#manage-gallery').click();await page.locator('#my-gallery [data-gallery-action=select]').nth(1).click();await expect(page.locator('#toast')).toContainText('ตั้งรูปหลักแล้ว');
@@ -31,7 +31,7 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
   await page.locator('#primary-nav [data-tab=profile]').click();await page.locator('#manage-gallery').click();
   const quota=await page.locator('#gallery-upload-quota').textContent();page.once('dialog',d=>d.accept());
   await page.locator('#my-gallery [data-gallery-action=delete][data-photo="demo-own-02"]').click();
-  await expect(page.locator('#gallery-count')).toHaveText('1 / 12');await expect(page.locator('#gallery-upload-quota')).toHaveText(quota);
+  await expect(page.locator('#gallery-count')).toHaveText('9 / 12');await expect(page.locator('#gallery-upload-quota')).toHaveText(quota);
   await page.locator('#gallery-settings-back').click();await page.locator('#primary-nav [data-tab=near]').click();
   await verify();await expect(first.locator('.portrait-fallback')).toBeVisible();await page.reload();await expect(first.locator('.portrait-fallback')).toBeVisible();
   expect(writes).toEqual([]);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);

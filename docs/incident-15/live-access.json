@@ -1,0 +1,90 @@
+{
+  "checkedAt": "2026-10-17T17:27:34.385Z",
+  "origin": "https://chatgun.social",
+  "release": {
+    "commit": "bb44dd90557da89f7dc5f6ff0ec81fcfda53ce6b",
+    "demoBatch": "chatgun-browser-demo-v1"
+  },
+  "http": [
+    {
+      "path": "/",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/app/",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/app/people/demo-01/gallery",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/release.json",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/app/social.js",
+      "status": 200,
+      "type": "application/javascript"
+    },
+    {
+      "path": "/app/demo-bootstrap.js",
+      "status": 200,
+      "type": "application/javascript"
+    },
+    {
+      "path": "/app/demo-gallery.js",
+      "status": 200,
+      "type": "application/javascript"
+    },
+    {
+      "path": "/assets/demo/canary-runtime.json",
+      "status": 200,
+      "type": "application/json"
+    },
+    {
+      "path": "/api/social/config",
+      "status": 404,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/api/auth/config",
+      "status": 404,
+      "type": "text/html; charset=utf-8"
+    }
+  ],
+  "checks": [
+    {
+      "width": 390,
+      "freshAccess": "PASS",
+      "returningAccess": "PASS",
+      "savedDataFingerprintUnchanged": true,
+      "gallery": "PASS",
+      "pageErrors": 0,
+      "remoteWrites": 0
+    },
+    {
+      "width": 768,
+      "freshAccess": "PASS",
+      "returningAccess": "PASS",
+      "savedDataFingerprintUnchanged": true,
+      "gallery": "PASS",
+      "pageErrors": 0,
+      "remoteWrites": 0
+    },
+    {
+      "width": 1440,
+      "freshAccess": "PASS",
+      "returningAccess": "PASS",
+      "savedDataFingerprintUnchanged": true,
+      "gallery": "PASS",
+      "pageErrors": 0,
+      "remoteWrites": 0
+    }
+  ],
+  "limitations": "Browser data assertions cover disposable synthetic contexts, not an export of owner private storage. Functions API availability is reported separately."
+}

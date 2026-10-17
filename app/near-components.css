@@ -34,8 +34,6 @@
 :is(#app .near-components,#profile-dialog) .tags { display: flex; flex-wrap: wrap; gap: 6px; min-height: 27px; }
 :is(#app .near-components,#profile-dialog) .tags span { background: rgb(242, 245, 238); border-radius: 6px; padding: 5px 8px; font-size: 12px; color: rgb(106, 121, 91); }
 :is(#app .near-components,#profile-dialog) .rating-line { display: flex; gap: 6px; align-items: center; color: rgb(123, 136, 110); font-size: 13px; margin-top: 18px; }
-:is(#app .near-components,#profile-dialog) .card-actions { display: flex; gap: 9px; margin-top: 18px; }
-:is(#app .near-components,#profile-dialog) .card-actions .primary { flex: 1 1 0%; }
 :is(#app .near-components,#profile-dialog) .empty { background: rgb(255, 255, 255); border: 1px dashed rgb(217, 224, 208); border-radius: 18px; padding: 44px 25px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 13px; color: rgb(109, 124, 94); }
 :is(#app .near-components,#profile-dialog) .empty h2 { color: rgb(51, 65, 42); margin: 0px; font-size: 23px; }
 :is(#app .near-components,#profile-dialog) .empty p { font-size: 15px; line-height: 1.8; max-width: 450px; margin: 0px 0px 7px; }
@@ -62,8 +60,6 @@
 :is(#app .near-components,#profile-dialog) .person-bio { font-size: 13px; }
 :is(#app .near-components,#profile-dialog) .rating-line { font-size: 11px; }
 :is(#app .near-components,#profile-dialog) .small { font-size: 12px; padding: 9px; }
-:is(#app .near-components,#profile-dialog) .card-actions { gap: 6px; }
-:is(#app .near-components,#profile-dialog) .card-actions .icon-button { width: 34px; }
 :is(#app .near-components,#profile-dialog) .empty { padding: 35px 17px; }
 :is(#app .near-components,#profile-dialog) .empty h2 { font-size: 21px; }
 :is(#app .near-components,#profile-dialog) .empty p { font-size: 14px; }
@@ -89,7 +85,6 @@
 :is(#app .near-components,#profile-dialog) .tags span { color: rgb(114, 98, 129); background: rgb(245, 242, 250); font-size: 12px; }
 :is(#app .near-components,#profile-dialog) .rating-line { color: rgb(121, 105, 133); font-size: 13px; }
 :is(#app .near-components,#profile-dialog) .rating-line svg { color: rgb(148, 113, 51); }
-:is(#app .near-components,#profile-dialog) .card-actions { margin-top: 16px; }
 :is(#app .near-components,#profile-dialog) .icon-button { min-width: 44px; min-height: 44px; background: rgb(255, 255, 255); border-color: rgb(230, 223, 241); }
 :is(#app .near-components,#profile-dialog) .rate-button { color: rgb(120, 80, 205); background: rgb(247, 243, 255); }
 :is(#app .near-components,#profile-dialog) .rate-button:disabled { color: rgb(139, 135, 144); background: rgb(243, 242, 245); opacity: 0.65; }
@@ -109,9 +104,6 @@
 :is(#app .near-components,#profile-dialog) .person-bio { font-size: 14px; line-height: 1.65; min-height: 66px; margin: 8px 0px 12px; }
 :is(#app .near-components,#profile-dialog) .tags span { font-size: 12px; padding: 5px 7px; }
 :is(#app .near-components,#profile-dialog) .rating-line { font-size: 12px; flex-wrap: wrap; }
-:is(#app .near-components,#profile-dialog) .card-actions .small { font-size: 13px; min-height: 44px; padding: 8px; }
-:is(#app .near-components,#profile-dialog) .card-actions { gap: 7px; align-items: stretch; }
-:is(#app .near-components,#profile-dialog) .card-actions .icon-button { width: 44px; min-width: 44px; }
 :is(#app .near-components,#profile-dialog) .compose .primary { padding: 12px; }
 }
 @media (max-width: 360px) {
@@ -134,7 +126,6 @@
 :is(#app .near-components,#profile-dialog) .photo-card .tags span { background: rgba(255, 255, 255, 0.14); color: rgb(255, 255, 255); border: 1px solid rgba(255, 255, 255, 0.094); backdrop-filter: blur(8px); font-size: 12px; }
 :is(#app .near-components,#profile-dialog) .photo-card .rating-line { color: rgb(255, 255, 255); margin-top: 12px; }
 :is(#app .near-components,#profile-dialog) .photo-card .rating-line svg { color: rgb(229, 207, 135); fill: rgb(229, 207, 135); }
-:is(#app .near-components,#profile-dialog) .photo-card .card-actions { margin-top: 15px; }
 :is(#app .near-components,#profile-dialog) .photo-card .primary { background: rgb(208, 241, 123); color: rgb(40, 54, 20); box-shadow: none; }
 :is(#app .near-components,#profile-dialog) .photo-card .primary:hover { background: rgb(188, 225, 95); }
 :is(#app .near-components,#profile-dialog) .photo-card .primary:disabled { background: rgba(255, 255, 255, 0.19); color: rgb(255, 255, 255); opacity: 0.8; }
@@ -152,8 +143,6 @@
 :is(#app .near-components,#profile-dialog) .photo-card .tags { gap: 4px; }
 :is(#app .near-components,#profile-dialog) .photo-card .tags span { font-size: 12px; padding: 4px 6px; }
 :is(#app .near-components,#profile-dialog) .photo-card .rating-line { font-size: 12px; margin-top: 10px; gap: 4px; }
-:is(#app .near-components,#profile-dialog) .photo-card .card-actions { margin-top: 12px; }
-:is(#app .near-components,#profile-dialog) .photo-card .card-actions .primary { font-size: 13px; }
 :is(#app .near-components,#profile-dialog) .photo-card .rating-hint { font-size: 12px; line-height: 1.5; min-height: 36px; }
 :is(#app .near-components,#profile-dialog) .photo-card .no-photo { font-size: 80px; }
 :is(#app .near-components,#profile-dialog) .people-grid:has(.photo-card) { gap: 12px; }
@@ -164,7 +153,6 @@
 :is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 26px; }
 :is(#app .near-components,#profile-dialog) .photo-card .person-bio { font-size: 15px; }
 :is(#app .near-components,#profile-dialog) .photo-card .rating-hint { min-height: 0px; }
-:is(#app .near-components,#profile-dialog) .photo-card .card-actions .primary { font-size: 15px; }
 }
 :is(#app .near-components,#profile-dialog) .photo-card .portrait-viewport { display: block; width: 100%; height: 100%; overflow: hidden; }
 :is(#app .near-components,#profile-dialog) .photo-card { padding: 0px; min-height: 0px; justify-content: flex-start; background: rgb(255, 255, 255); color: rgb(41, 36, 49); border: 1px solid rgb(229, 225, 236); gap: 0px; }
@@ -179,7 +167,6 @@
 :is(#app .near-components,#profile-dialog) .photo-card .tags span { background: rgb(245, 242, 250); color: rgb(117, 96, 132); border: 0px; backdrop-filter: none; }
 :is(#app .near-components,#profile-dialog) .photo-card .rating-line { color: rgb(118, 98, 134); margin: 12px 0px 0px; }
 :is(#app .near-components,#profile-dialog) .photo-card .rating-line svg { color: rgb(162, 131, 59); fill: none; }
-:is(#app .near-components,#profile-dialog) .photo-card .card-actions { margin-top: auto; padding-top: 14px; }
 :is(#app .near-components,#profile-dialog) .photo-card .primary { background: rgb(109, 66, 229); color: rgb(255, 255, 255); }
 :is(#app .near-components,#profile-dialog) .photo-card .primary:hover { background: rgb(89, 49, 197); }
 :is(#app .near-components,#profile-dialog) .photo-card .primary:disabled { background: rgb(238, 233, 246); color: rgb(127, 114, 140); }
@@ -194,7 +181,6 @@
 :is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 21px; }
 :is(#app .near-components,#profile-dialog) .photo-card .person-bio { font-size: 14px; min-height: 68px; margin: 5px 0px 9px; }
 :is(#app .near-components,#profile-dialog) .photo-card .tags { min-height: 50px; align-content: flex-start; }
-:is(#app .near-components,#profile-dialog) .photo-card .card-actions { padding-top: 12px; }
 :is(#app .near-components,#profile-dialog) .photo-card .rating-hint { min-height: 36px; }
 :is(#app .near-components,#profile-dialog) .photo-card .distance { font-size: 12px; }
 :is(#app .near-components,#profile-dialog) .photo-card .no-photo { font-size: 80px; }
@@ -218,8 +204,7 @@
 :is(#app .near-components,#profile-dialog) .photo-card .tags span { background: rgba(255, 255, 255, 0.125); color: rgb(245, 239, 250); font-size: 12px; border: 0px; padding: 4px 7px; flex-shrink: 0; }
 :is(#app .near-components,#profile-dialog) .photo-card .rating-line { color: rgb(233, 222, 239); font-size: 13px; margin-top: 9px; min-height: 18px; }
 :is(#app .near-components,#profile-dialog) .photo-card .rating-line svg { color: rgb(227, 207, 145); }
-:is(#app .near-components,#profile-dialog) .photo-card .card-actions { position: absolute; right: 15px; bottom: 17px; padding: 0px; margin: 0px; display: block; }
-:is(#app .near-components,#profile-dialog) .photo-card .rating-line { padding-right: 45px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line { padding-right: 0px; }
 :is(#app .near-components,#profile-dialog) .photo-card .rate-button { width: 40px; min-width: 40px; min-height: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.145); border: 1px solid rgba(255, 255, 255, 0.25); color: rgb(255, 255, 255); backdrop-filter: blur(10px); }
 :is(#app .near-components,#profile-dialog) .photo-card .rate-button:disabled { background: rgba(255, 255, 255, 0.082); color: rgb(217, 205, 224); opacity: 0.55; }
 :is(#app .near-components,#profile-dialog) .incoming-bell { position: absolute; top: 13px; right: 13px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.86); color: rgb(109, 66, 229); border: 1px solid rgba(255, 255, 255, 0.667); backdrop-filter: blur(10px); box-shadow: rgba(0, 0, 0, 0.067) 0px 3px 12px; }
@@ -236,8 +221,7 @@
 :is(#app .near-components,#profile-dialog) .photo-card .tags { margin-top: 5px; min-height: 0px; gap: 4px; }
 :is(#app .near-components,#profile-dialog) .photo-card .tags span { font-size: 12px; padding: 3px 5px; }
 :is(#app .near-components,#profile-dialog) .photo-card .tags span:nth-child(n+3) { display: none; }
-:is(#app .near-components,#profile-dialog) .photo-card .rating-line { font-size: 12px; line-height: 1.5; margin-top: 7px; gap: 4px; padding-right: 37px; flex-wrap: wrap; }
-:is(#app .near-components,#profile-dialog) .photo-card .card-actions { right: 10px; bottom: 11px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line { font-size: 12px; line-height: 1.5; margin-top: 7px; gap: 4px; padding-right: 0px; flex-wrap: wrap; }
 :is(#app .near-components,#profile-dialog) .photo-card .rate-button { width: 36px; min-width: 36px; height: 40px; min-height: 40px; border-radius: 12px; }
 :is(#app .near-components,#profile-dialog) .photo-card .rate-button svg { width: 17px; }
 :is(#app .near-components,#profile-dialog) .incoming-bell { top: 10px; right: 10px; width: 40px; height: 40px; }
@@ -291,7 +275,7 @@
 :is(#app .near-components,#profile-dialog) .card-open { inset: 0px; z-index: 1; border: 0px; background: transparent; border-radius: inherit; cursor: pointer; position: absolute !important; }
 :is(#app .near-components,#profile-dialog) .card-open:focus-visible { outline: rgb(208, 241, 123) solid 3px; outline-offset: -4px; }
 :is(#app .near-components,#profile-dialog) .photo-card .person-details,:is(#app .near-components,#profile-dialog) .photo-card .card-distance { z-index: 2; pointer-events: none; }
-:is(#app .near-components,#profile-dialog) .photo-card .person-details button { pointer-events: auto; }
+:is(#app .near-components,#profile-dialog) .photo-card .verify-badge { cursor: inherit; }
 :is(#app .near-components,#profile-dialog) .incoming-bell { z-index: 3; }
 :is(#app .near-components,#profile-dialog) .verify-badge { background: none; border: 0px; padding: 0px; min-height: 30px; min-width: 27px; cursor: pointer; }
 :is(#app .near-components,#profile-dialog) .card-name-row { display: flex; align-items: center; gap: 3px; }
@@ -305,9 +289,8 @@
 :is(#app .near-components,#profile-dialog) .full-profile-image .portrait-viewport { width: 100%; height: 100%; display: block; }
 :is(#app .near-components,#profile-dialog) .full-profile-image .profile-photo { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
 :is(#app .near-components,#profile-dialog) .full-profile-shade { position: absolute; inset: 0px; background: linear-gradient(rgba(17, 11, 29, 0.145) 0%, transparent 35%, rgba(17, 11, 29, 0.25) 52%, rgba(17, 11, 29, 0.88) 76%, rgba(17, 11, 29, 0.976) 100%); }
-:is(#app .near-components,#profile-dialog) .profile-back,:is(#app .near-components,#profile-dialog) .profile-gallery-top { position: absolute; top: max(20px,env(safe-area-inset-top)); border: 1px solid rgba(255, 255, 255, 0.208); background: rgba(34, 25, 47, 0.396); color: rgb(255, 255, 255); backdrop-filter: blur(15px); height: 44px; display: flex; align-items: center; justify-content: center; z-index: 2; }
+:is(#app .near-components,#profile-dialog) .profile-back { position: absolute; top: max(20px,env(safe-area-inset-top)); border: 1px solid rgba(255, 255, 255, 0.208); background: rgba(34, 25, 47, 0.396); color: rgb(255, 255, 255); backdrop-filter: blur(15px); height: 44px; display: flex; align-items: center; justify-content: center; z-index: 2; }
 :is(#app .near-components,#profile-dialog) .profile-back { left: 24px; width: 44px; border-radius: 50%; }
-:is(#app .near-components,#profile-dialog) .profile-gallery-top { right: 24px; padding: 0px 16px; gap: 8px; border-radius: 100px; font-size: 14px; }
 :is(#app .near-components,#profile-dialog) .full-profile-info { position: absolute; bottom: 0px; left: 50%; transform: translateX(-50%); width: min(740px, 100%); padding: 30px 35px max(25px,env(safe-area-inset-bottom)); max-height: 55dvh; overflow: auto; }
 :is(#app .near-components,#profile-dialog) .full-name-row { display: flex; align-items: center; gap: 10px; }
 :is(#app .near-components,#profile-dialog) .full-name-row h1 { font-size: 36px; letter-spacing: 0px; line-height: 1.4; }
@@ -368,7 +351,6 @@
 :is(#app .near-components,#profile-dialog) .full-profile-actions { margin-top: 16px; gap: 8px; }
 :is(#app .near-components,#profile-dialog) .full-profile-actions .primary,:is(#app .near-components,#profile-dialog) .profile-gallery-button { font-size: 14px; padding: 10px 13px; min-height: 46px; }
 :is(#app .near-components,#profile-dialog) .profile-back { left: 16px; top: max(16px,env(safe-area-inset-top)); }
-:is(#app .near-components,#profile-dialog) .profile-gallery-top { right: 16px; top: max(16px,env(safe-area-inset-top)); font-size: 13px; }
 :is(#app .near-components,#profile-dialog) .profile-rate { height: 46px; width: 46px; }
 :is(#app .near-components,#profile-dialog) .gallery-header { height: 60px; padding: 0px 10px; }
 :is(#app .near-components,#profile-dialog) .gallery-summary { padding: 22px 16px; gap: 17px; }
@@ -603,3 +585,28 @@ body[data-own-gallery="true"] #social-view>.toolbar,body[data-own-gallery="true"
 /* Owner-approved self shortcut: canonical card geometry, no self proximity. */
 #app .near-components .self-card-badge { position:absolute; top:12px; right:12px; z-index:2; padding:5px 10px; border-radius:20px; background:#ffffffed; color:#7750e5; font-size:12px; font-weight:800; pointer-events:none; }
 #app .near-components .self-profile-open { color:#7750e5; }
+/* Owner-approved direct-chat/private-album additions reuse NEAR tokens and geometry. */
+.album-heading{font-size:17px;font-weight:500;margin:0 0 10px}
+.album-management button,.album-system-card button{border:1px solid #ded7eb;border-radius:12px;padding:10px 14px;margin:4px;background:#fff;color:#6544a4;font:inherit;cursor:pointer}
+.album-management button:focus-visible,.album-system-card button:focus-visible{outline:3px solid #c5f15d;outline-offset:2px}
+.album-management{padding:16px 0}
+.album-gallery-nav{display:flex;align-items:center;gap:10px;margin:12px 0}
+.album-gallery-nav>[data-profile-gallery]{min-height:44px;padding:8px 16px;border:1px solid #ded7eb;border-radius:100px;background:#fff;color:#6544a4;font:inherit}
+:is(#app .near-components,#profile-dialog) .private-album-icon{flex:0 0 46px;box-sizing:border-box;width:46px;min-width:46px;height:46px;min-height:46px;padding:5px;border:1px solid #ded7eb;border-radius:50%;background:#fff;color:#303038;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.album-icon-art{display:block;position:relative;width:30px;height:30px}
+.album-icon-art>svg{display:block;width:30px;height:30px}
+.album-lock-badge{position:absolute;right:-4px;bottom:-4px;display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#f1f1f4;box-shadow:0 0 0 1.5px #fff;color:#303038}
+.album-lock-badge svg{width:16px;height:16px}
+[data-album-state="unlocked"] .album-lock-badge{background:#eee6f7;color:#6544a4}
+:is(#app .near-components,#profile-dialog) .private-album-icon:focus-visible{outline:3px solid #c5f15d;outline-offset:3px}
+:is(#app .near-components,#profile-dialog) .private-album-icon:disabled{cursor:default;opacity:1}
+.album-access-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0;border-top:1px solid #ded7eb}
+.album-system-card{padding:16px;border:1px solid #ded7eb;border-radius:17px;background:#f5f0fb;max-width:95%;margin:10px auto;color:#292333}
+.album-system-card strong,.album-system-card small{display:block}.album-system-card p{font-size:13px}
+.thread-contact-actions{display:flex;flex-wrap:wrap;gap:8px;padding:8px 16px;background:#fff}
+.thread-contact-actions button{font:inherit;font-size:12px;color:#6544a4;border:1px solid #ded7eb;background:#f5f0fb;border-radius:12px;padding:8px 12px;cursor:pointer}
+.thread-contact-actions button:focus-visible{outline:3px solid #c5f15d;outline-offset:2px}
+#demo-perspective{padding:12px 16px;background:#f5f0fb;border-radius:14px;margin-bottom:12px}
+#demo-perspective select{max-width:100%;font:inherit;margin:6px}#demo-perspective p{font-size:12px}
+#app .sidebar nav{grid-template-columns:repeat(4,minmax(0,1fr))}
+#profile-dialog .ig-tile>[data-photo-visibility]{position:absolute;bottom:4px;left:4px;max-width:85%;font:inherit;font-size:11px;background:#fff;border-radius:10px;padding:6px;z-index:2}

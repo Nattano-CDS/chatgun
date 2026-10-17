@@ -37,7 +37,7 @@ async function seedMedia(database, media, owner, id = "media-1") {
   const now = unixTime();
   const key = `gallery/${id}`;
   await database.prepare("INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,created_at) VALUES (?,?,?,'gallery','image/png',4,?)").bind(id, owner, key, now).run();
-  await database.prepare("INSERT INTO profile_photos(media_id,owner_user_id,created_at) VALUES (?,?,?)").bind(id, owner, now).run();
+  await database.prepare("INSERT INTO profile_photos(media_id,owner_user_id,created_at,visibility) VALUES (?,?,?,'public')").bind(id, owner, now).run();
   await database.prepare("INSERT INTO media_safety_reviews(media_id,status,source,created_at) VALUES (?,'pending','manual',?)").bind(id, now).run();
   media.objects.set(key, new Uint8Array([1, 2, 3, 4]));
 }

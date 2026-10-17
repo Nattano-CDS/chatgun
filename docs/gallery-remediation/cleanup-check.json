@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-10-17T16:49:30.373Z",
+  "database": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
+  "bucket": "chatgun-issue13-media",
+  "cleanup": {
+    "selected": 3,
+    "completed": 3,
+    "failed": 0,
+    "exhausted": 0
+  },
+  "knownActiveRunObjectsVerified": 2,
+  "pendingDeletions": 0,
+  "foreignKeyViolations": 0,
+  "protectedStagingTouched": false,
+  "productionTouched": false,
+  "scope": "known synthetic test-run objects and scheduled deletion queue; not an exhaustive bucket inventory"
+}

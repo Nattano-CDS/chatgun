@@ -1,0 +1,37 @@
+
+Running 122 tests using 1 worker
+
+(node:16417) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    1 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 390px (4.6s)
+  ✓    2 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 768px (2.2s)
+  ✓    3 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 1440px (2.5s)
+  ✓    4 [desktop-chromium] › e2e/auth.spec.js:14:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth (538ms)
+  ✓    5 [desktop-chromium] › e2e/auth.spec.js:72:1 › signup permits existing social login while public registration remains closed (557ms)
+  ✓    6 [desktop-chromium] › e2e/auth.spec.js:101:1 › post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations (641ms)
+  ✓    7 [desktop-chromium] › e2e/auth.spec.js:147:1 › privacy notice explains social identity data use (900ms)
+  ✓    8 [desktop-chromium] › e2e/auth.spec.js:156:1 › legal review pages disclose unresolved owner decisions (935ms)
+  ✓    9 [desktop-chromium] › e2e/auth.spec.js:166:1 › account page redirects unauthenticated users to signup (549ms)
+  ✓   10 [desktop-chromium] › e2e/auth.spec.js:172:1 › Pages Functions expose secure config and reject cross-origin mutations (281ms)
+  ✓   11 [desktop-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 390px (2.4s)
+  ✓   12 [desktop-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 768px (2.5s)
+  ✓   13 [desktop-chromium] › e2e/direct-chat-albums.spec.js:5:35 › direct DM and two-sided fictional album consent at 1440px (2.6s)
+  ✓   14 [desktop-chromium] › e2e/direct-chat-albums.spec.js:48:1 › legacy fictional inbox upgrade preserves read states, 120 messages and all 20 members (1.0s)
+  ✓   15 [desktop-chromium] › e2e/direct-chat-albums.spec.js:61:1 › fictional owner media decisions persist and private portraits never become public covers (1.7s)
+  -   16 [desktop-chromium] › e2e/isolated-albums-live.spec.js:5:1 › real isolated D1/R2 private-album cards, owner consent, revocation and logout
+  ✓   17 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 390px (729ms)
+  ✓   18 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 768px (718ms)
+  ✓   19 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 1440px (785ms)
+  ✓   20 [desktop-chromium] › e2e/issue10-parity.spec.js:28:1 › failed portrait remains labelled; persistent auth navigation excludes Game (428ms)
+  ✓   21 [desktop-chromium] › e2e/issue10-parity.spec.js:34:1 › fictional direct chat and block/unblock persist without server writes (854ms)
+  -   22 [desktop-chromium] › e2e/live-social.spec.js:81:1 › staging social APIs persist positive and negative non-media workflows
+  -   23 [desktop-chromium] › e2e/live-social.spec.js:159:1 › staging R2 gallery and chat media remain private and relationship-authorized
+  -   24 [desktop-chromium] › e2e/live-social.spec.js:261:1 › desktop and mobile render persisted staging profile, discovery, notifications, and reviews
+  -   25 [desktop-chromium] › e2e/live-social.spec.js:311:1 › synthetic account deletion queues owned R2 media and revokes access
+  ✓   26 [desktop-chromium] › e2e/moderation.spec.js:48:1 › admin dashboard opens routine overview automatically and requires justification for restricted evidence (706ms)
+  ✘   27 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 390 (30.1s)
+(node:16676) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   28 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 768 (30.1s)
+(node:16816) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

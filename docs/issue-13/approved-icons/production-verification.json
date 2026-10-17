@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-10-17T10:26:26.866Z",
+  "origin": "https://chatgun.social",
+  "commit": "b6ba87434a82e655bff0cea39ce637fca5488b4a",
+  "deploymentId": "76424279-5a53-41cb-b9c1-9028b602da2c",
+  "status": "PASS",
+  "assets": [
+    {
+      "file": "app/index.html",
+      "sha256": "620b1fab1b1e46bab2bffdcb987fc8abc18b1fcbbeac6baed3121e06b158eb58",
+      "matchesCommit": true
+    },
+    {
+      "file": "app/social.js",
+      "sha256": "605e51e07b384ec3e16e36852a922d7c5bdcc69ad2346bed3ed9ed26fe5217c4",
+      "matchesCommit": true
+    },
+    {
+      "file": "app/demo-network.js",
+      "sha256": "376bec1f21ea75248fe2643283c62fff679037b9be69cb98ee134c7a88cdc98c",
+      "matchesCommit": true
+    },
+    {
+      "file": "app/near-components.js",
+      "sha256": "11962b66f06e35781920cb85d847258ce8ac0a64c0332bf5096b693344f7f034",
+      "matchesCommit": true
+    },
+    {
+      "file": "app/near-components.css",
+      "sha256": "3525bc4e7b8e38e34b5708840f226da577a9b41052459b297531db1c7b170863",
+      "matchesCommit": true
+    },
+    {
+      "file": "auth-nav.js",
+      "sha256": "0470aae02cce6a97dbefa12b1372c63b22163e63cd815f7b22b14231377e2ed9",
+      "matchesCommit": true
+    },
+    {
+      "file": "assets/demo/network.json",
+      "sha256": "6fb65ee61a8352816330304e8c2c9c9f73f23bebc4e3dcbb2d27927d4b1fc8da",
+      "matchesCommit": true
+    }
+  ]
+}

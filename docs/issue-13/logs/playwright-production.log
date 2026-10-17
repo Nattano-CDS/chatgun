@@ -1,0 +1,44 @@
+
+Running 34 tests using 1 worker
+
+(node:20302) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop-chromium] › e2e/direct-chat-albums.spec.js:6:35 › direct DM and two-sided fictional album consent at 390px (11.5s)
+  ✓   2 [desktop-chromium] › e2e/direct-chat-albums.spec.js:6:35 › direct DM and two-sided fictional album consent at 768px (7.5s)
+  ✓   3 [desktop-chromium] › e2e/direct-chat-albums.spec.js:6:35 › direct DM and two-sided fictional album consent at 1440px (2.5s)
+  ✓   4 [desktop-chromium] › e2e/direct-chat-albums.spec.js:49:1 › legacy fictional inbox upgrade preserves read states, 120 messages and all 20 members (686ms)
+  ✓   5 [desktop-chromium] › e2e/direct-chat-albums.spec.js:62:1 › fictional owner media decisions persist and private portraits never become public covers (1.5s)
+  ✓   6 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 390 (6.3s)
+  ✓   7 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 768 (2.2s)
+  ✓   8 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440 (2.2s)
+  ✓   9 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px (6.3s)
+  ✓  10 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px (7.2s)
+  ✓  11 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px (3.1s)
+  ✓  12 [desktop-chromium] › e2e/private-album-icons.spec.js:5:35 › approved album icons and keyboard consent journey 390px (5.9s)
+  ✓  13 [desktop-chromium] › e2e/private-album-icons.spec.js:5:35 › approved album icons and keyboard consent journey 768px (5.9s)
+  ✓  14 [desktop-chromium] › e2e/private-album-icons.spec.js:5:35 › approved album icons and keyboard consent journey 1440px (6.2s)
+  ✓  15 [desktop-chromium] › e2e/ui-cleanup.spec.js:4:35 › owner cleanup: cards, single Gallery and chat-only consent 390 (10.3s)
+  ✓  16 [desktop-chromium] › e2e/ui-cleanup.spec.js:4:35 › owner cleanup: cards, single Gallery and chat-only consent 768 (10.6s)
+  ✓  17 [desktop-chromium] › e2e/ui-cleanup.spec.js:4:35 › owner cleanup: cards, single Gallery and chat-only consent 1440 (10.9s)
+(node:20471) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  18 [mobile-chromium] › e2e/direct-chat-albums.spec.js:6:35 › direct DM and two-sided fictional album consent at 390px (12.7s)
+  ✓  19 [mobile-chromium] › e2e/direct-chat-albums.spec.js:6:35 › direct DM and two-sided fictional album consent at 768px (9.2s)
+  ✓  20 [mobile-chromium] › e2e/direct-chat-albums.spec.js:6:35 › direct DM and two-sided fictional album consent at 1440px (6.8s)
+  ✓  21 [mobile-chromium] › e2e/direct-chat-albums.spec.js:49:1 › legacy fictional inbox upgrade preserves read states, 120 messages and all 20 members (847ms)
+  ✓  22 [mobile-chromium] › e2e/direct-chat-albums.spec.js:62:1 › fictional owner media decisions persist and private portraits never become public covers (1.5s)
+  -  23 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 390
+  -  24 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 768
+  -  25 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440
+  -  26 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px
+  -  27 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px
+  -  28 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px
+  ✓  29 [mobile-chromium] › e2e/private-album-icons.spec.js:5:35 › approved album icons and keyboard consent journey 390px (6.7s)
+  ✓  30 [mobile-chromium] › e2e/private-album-icons.spec.js:5:35 › approved album icons and keyboard consent journey 768px (7.8s)
+  ✓  31 [mobile-chromium] › e2e/private-album-icons.spec.js:5:35 › approved album icons and keyboard consent journey 1440px (8.8s)
+  ✓  32 [mobile-chromium] › e2e/ui-cleanup.spec.js:4:35 › owner cleanup: cards, single Gallery and chat-only consent 390 (11.6s)
+  ✓  33 [mobile-chromium] › e2e/ui-cleanup.spec.js:4:35 › owner cleanup: cards, single Gallery and chat-only consent 768 (14.4s)
+  ✓  34 [mobile-chromium] › e2e/ui-cleanup.spec.js:4:35 › owner cleanup: cards, single Gallery and chat-only consent 1440 (16.4s)
+
+  6 skipped
+  28 passed (3.3m)
