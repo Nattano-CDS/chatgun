@@ -1,0 +1,157 @@
+
+> chatgun@1.0.0 test
+> node --test --test-concurrency=1 test/*.test.js
+
+✔ signup defers age and policy confirmation until after OAuth (0.437583ms)
+✔ acceptance page exposes both unchecked confirmations, policy links, and decline (0.596375ms)
+✔ acceptance client sends versioned evidence with same-origin CSRF (0.065916ms)
+✔ pending OAuth account cannot bypass acceptance and underage declaration is rejected (24.935958ms)
+✔ acceptance evidence transitions to onboarding and onboarding alone activates social access (8.809959ms)
+✔ a Terms version change requires acceptance once without repeating onboarding (6.414125ms)
+✔ an existing account without a Beta enrollment can resume incomplete onboarding (5.268708ms)
+✔ declining acceptance revokes the session and preserves the pending account (5.419292ms)
+✔ acceptance endpoints enforce same-origin CSRF (4.747084ms)
+✔ age calculation uses the Bangkok calendar date and exact birthday boundary (10.771375ms)
+✔ age declaration rejects invalid, future, and implausibly old dates (0.589459ms)
+✔ invalid cross-origin POST is returned as JSON instead of escaping the handler (16.699834ms)
+✔ OTP endpoints are disabled by feature flag without removing the schema (5.604208ms)
+✔ email OTP is hashed, authenticates once, and establishes secure cookies (9.62375ms)
+✔ OTP expires after five minutes (5.458167ms)
+✔ OTP locks after five incorrect attempts (6.106291ms)
+✔ OTP request rate limit applies per normalized email (6.916708ms)
+✔ Google authorization uses state, nonce, and S256 PKCE (5.462791ms)
+✔ Turnstile verification requires the expected hostname and action (4.748ms)
+✔ provider denial validates state and consumes the OAuth flow (5.402667ms)
+✔ account linking requires the authenticated session and matching CSRF token (5.604416ms)
+✔ account linking callback attaches a new provider identity to the authenticated user (5.880417ms)
+{"event":"oauth_callback_failed","provider":"line","reason":"identity_already_linked"}
+✔ account linking callback rejects an identity owned by another user (6.038917ms)
+✔ LINE callback validates ID token claims, creates identity, and rejects replay (5.568208ms)
+✔ Google callback verifies the ID token signature, audience, and nonce (21.26725ms)
+✔ Facebook callback debugs the token and does not mark its email verified (6.170875ms)
+✔ Facebook unverified email cannot take over an existing verified email account (4.439ms)
+✔ invalid Beta invitation fails closed without persisting an OAuth flow (18.842459ms)
+✔ expired and revoked Beta invitations fail with the same generic response (11.1585ms)
+✔ multi-use invitation records are rejected even if inserted outside the issuer (5.547667ms)
+✔ existing identity can sign in without an invitation while public registration is closed (6.585625ms)
+{"event":"oauth_callback_failed","provider":"line","reason":"invitation_unavailable"}
+✔ one-time invitation is bound to OAuth, stored only as a hash, and consumed atomically (7.65675ms)
+✔ invited account must pass the server-side 18+ gate before Beta activation (16.489458ms)
+✔ legacy read conversations remain read without replacing message history (0.671167ms)
+✔ legacy unread count maps to newest incoming messages and preserves explicit reads (0.350375ms)
+✔ current consent-model snapshots are never reinterpreted using obsolete friendship counters (0.075583ms)
+✔ direct DM creates inbox without friendship, persists text, read and unsend (24.655458ms)
+✔ DM denies anonymous/self/nonadult/inactive/opt-out/both block directions and CSRF (8.090916ms)
+✔ duplicate and distinct-recipient spam guards are durable and atomic (9.26725ms)
+✖ album requests are durable typed events, duplicate-safe and owner-only with revision/CSRF (15.863667ms)
+✔ private gallery metadata, comments, likes and old raw URL deny until grant; revoke is immediate (14.583083ms)
+✔ block revokes grants permanently across unblock; account deletion cascades all new personal data (7.730667ms)
+✔ public publication is explicit; grants never override quarantine, prohibited or Sensitive denial (9.300959ms)
+✔ requester may cancel but not approve; owner may reject; no text or forged event grants access (7.570459ms)
+✔ Production closed gates deny new routes before touching migration-13 tables (5.643125ms)
+✔ unmigrated Production schema supports guarded fictional release without migration 0013 (4.022708ms)
+✔ real deletion transaction cascades album evidence and sessions, queues media, preserves unrelated users (6.893792ms)
+✔ blocking while request pending makes stale approval fail and cannot resurrect a grant (6.585208ms)
+✔ non-owner profiles omit presence-linked timestamps and require eligible viewers (5.385541ms)
+✔ contact opt-out stops sends, not history read receipts or explicitly granted album profiles (7.899916ms)
+✔ image sanitizer verifies structure, MIME, and dimensions (0.972875ms)
+✔ image sanitizer strips embedded PNG text metadata before storage (0.17475ms)
+✔ image sanitizer accepts decoded JPEG and strips WebP ICC metadata (0.143916ms)
+✔ media cleanup deletes due objects, records completion, and leaves future work (6.337208ms)
+✔ media cleanup backs off failed objects without logging or exposing their content (4.8135ms)
+✔ media cleanup surfaces exhausted retries without logging object identifiers (4.7745ms)
+✔ approved Bangkok moderation coverage opens exactly from 19:00 through 21:59 (11.277792ms)
+✔ single-operator overview prioritizes urgent queues and exposes aggregate workload health (20.897792ms)
+✔ media classification is role-gated, concurrency-safe, and revokes access immediately (11.554417ms)
+✔ media reports protect reporter privacy and appeals restore only after audited review (8.222917ms)
+✔ redirects the production pages.dev hostname to the canonical origin (10.323ms)
+✔ does not redirect Preview or custom hostnames (0.293125ms)
+✔ migration is idempotent and creates required tables and indexes (7.819625ms)
+✔ moderation is fail-closed, role-gated, purpose-logged, and supports report decisions (21.745458ms)
+✔ message audit requires safety_admin and records access purpose (6.672209ms)
+✔ message media audit is role-gated, private, purpose-logged, and hides unsent media (6.726083ms)
+✔ moderation purpose safely decodes non-Latin text for the audit trail (6.041916ms)
+✔ media quarantine hides pending objects and requires an audited safety-admin release (7.226167ms)
+✔ role administration is separated, recent-authenticated, audited, and revocable (7.856708ms)
+✔ Phase 2 auth and acceptance use the canonical compact NEAR shell (2.172ms)
+✔ Phase 2 onboarding and member profile retain state and authorization hooks (1.683958ms)
+✔ retention cleanup removes only expired or aged security records (7.270667ms)
+✔ account deletion requires CSRF and recent authentication (18.215959ms)
+✔ confirmed deletion erases account data, queues owned media, revokes access, and leaves a minimal receipt (7.789417ms)
+✔ deletion transaction rolls back completely on failure and can be retried (6.592375ms)
+✔ concurrent deletion confirmations produce one receipt (5.897667ms)
+{"event":"oauth_callback_failed","provider":"line","reason":"reauth_identity_mismatch"}
+✔ provider reauthentication refreshes only the matching active session (9.202875ms)
+{"event":"oauth_callback_failed","provider":"line","reason":"registration_closed"}
+✔ closed registration rejects an unknown provider identity without creating a user (5.663583ms)
+✔ closed registration cannot be bypassed by enabling the dormant OTP flag (5.088458ms)
+✔ approved locked and unlocked composition uses identical Lucide image with distinct standard locks (0.729083ms)
+✔ pending duplicate prevention, loading fail-closed and own-profile management remain explicit (0.341541ms)
+✔ public and private album rendering are separate, never inferred from an unlocked client flag (0.174167ms)
+✔ canary rejects OAuth initiation and callbacks before any provider or database access (11.957208ms)
+✔ public canary never publishes unapproved legal drafts (0.993583ms)
+✔ public fixture has only explicit fictional fields and 120 Thai messages (0.821375ms)
+✔ public build excludes test bundles, credentials, scripts and backups (74.664458ms)
+✔ all deployable root and app JavaScript parses before release (289.10225ms)
+✔ gallery validates bytes, stores private media, authorizes reads, and queues deletion (28.058792ms)
+✔ gallery rejects MIME spoofing and leaves no R2 object or D1 row (6.11025ms)
+✔ chat images require eligible participants, remain private, and retain only five active sender assets (10.666458ms)
+✔ received chat images require message participation and no block, not friendship (9.4615ms)
+✔ daily gallery quota allows ten, rejects eleven, and deletion or rejection does not restore it (10.950708ms)
+✔ chat and gallery quotas are independent and concurrent chat uploads cannot exceed ten (12.124375ms)
+{"event":"social_request_failed","reason":"synthetic_r2_failure"}
+✔ failed media storage releases a reservation and an idempotent retry is counted once (6.976375ms)
+✔ upload API requires idempotency and deleting an account cascades quota records (6.266458ms)
+✔ Bangkok upload window resets exactly at local midnight (0.104583ms)
+✔ completed uploads from the previous Bangkok day do not consume today's quota (6.153333ms)
+✔ social UI exposes only the approved non-game navigation (0.540875ms)
+✔ root is the authenticated discovery entry and marketing moved to welcome (0.106792ms)
+✔ Phase 1 uses the canonical NEAR tokens, typography, navigation and portrait cards (0.244166ms)
+✔ social client uses same-origin APIs, CSRF, escaped rendering, and fail-closed config (0.364541ms)
+✔ responsive social route receives only the required geolocation permission (0.074958ms)
+✔ moderation UI auto-loads routine overview, justifies restricted evidence, and renders untrusted data as text (0.11625ms)
+✔ staging social and private media activation remain isolated from production (0.163125ms)
+✔ social capabilities fail closed and never expose a game capability (19.097417ms)
+✔ adult onboarding requires CSRF, recent auth, registration flag, and matching notice (18.479291ms)
+✔ discovery preserves proximity behavior without returning precise coordinates (8.728958ms)
+✔ discovery throttles repeated reads used for location inference (11.351708ms)
+✔ direct messaging, blocking, and reports require no friendship (8.892792ms)
+✔ message cursor pagination is stable when many messages share a timestamp (10.331708ms)
+✔ proximity ratings are recipient-private and limited to once per Bangkok day (7.475292ms)
+✔ self shortcut never fabricates proximity, ratings, verification or self-social actions (0.576667ms)
+✔ source card has one semantic full-card link, original hierarchy and no action buttons (0.187583ms)
+✔ full profile and gallery are source route structures, never duplicated modal/footer compositions (0.450541ms)
+✔ server-authorized photo comments render independently of historical friendship (0.214708ms)
+✔ old card/profile/gallery adapter selectors are removed, not patched with another overlay (0.644542ms)
+✔ owner-review manifest contains complete fictional Thai social fixtures (5.157333ms)
+✔ seed infrastructure is staging-only, batch-traceable, and not a public quota bypass (0.168667ms)
+✔ cleanup defaults to dry-run and requires exact confirmation for deletion (0.061584ms)
+✔ verification evidence is private, reviewed by role, and queued for deletion after decision (23.900583ms)
+✔ verification remains server-disabled when its feature flag is false (5.511125ms)
+ℹ tests 121
+ℹ suites 0
+ℹ pass 120
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2183.111875
+
+✖ failing tests:
+
+test at test/direct-chat-albums.test.js:77:1
+✖ album requests are durable typed events, duplicate-safe and owner-only with revision/CSRF (15.863667ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///Users/nattano/.codex/worktrees/chatgun-release-candidate/test/direct-chat-albums.test.js:86:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

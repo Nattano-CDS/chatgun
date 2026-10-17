@@ -1,0 +1,11 @@
+{
+  "beforeRuntime": "b6ba87434a82e655bff0cea39ce637fca5488b4a",
+  "afterRuntime": "591674d2400f709cbf9abcee438bb81c064c7300",
+  "beforeDiscoveryAndInitialProfile": "Actual Production captures before this release",
+  "beforePendingProfile": "Unmodified archived actual Production B6 captures from docs/issue-13/approved-icons/screens/production/workflow/desktop-chromium-{width}-pending.png",
+  "archiveEvidenceCommit": "a53d7bd52bf77a1d14d3eb77f06f846cf04b8884",
+  "after": "Actual current Production Playwright captures, confirmed pending state and decoded visible portraits",
+  "retouched": false,
+  "comparison": "HTML side-by-side layout of original captures, labels outside images",
+  "viewports": [390,768,1440]
+}
