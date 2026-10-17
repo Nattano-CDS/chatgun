@@ -19,6 +19,7 @@ for(const width of [390,768,1440])test(`approved Gallery: four destinations, upl
   await expect(page.locator('.lightbox')).toBeVisible();await expect(page.locator('.lightbox-close')).toBeFocused();
   await page.locator('.post-like').click();await expect(page.locator('.post-like')).toHaveAttribute('aria-pressed','true');
   await page.locator('#gallery-comment input[name=comment]').fill('ภาพวาดสมมติสวยมาก');await page.locator('#gallery-comment button').click();await expect(page.locator('.post-comments')).toContainText('ภาพวาดสมมติสวยมาก');
+  await page.locator('[data-media-report]').click();await expect(page.locator('#media-report-dialog')).toBeVisible();await page.keyboard.press('Escape');await expect(page.locator('#media-report-dialog')).toBeHidden();await expect(page.locator('.lightbox')).toBeVisible();
   await page.locator('.lightbox-close').focus();await page.keyboard.press('ArrowRight');await expect(page.locator('.lightbox-arrows')).toContainText('3 / 5');await shot('public-lightbox');
   await page.keyboard.press('Escape');await expect(page).toHaveURL(/demo-01\/gallery$/);await expect(page.locator('.lightbox')).toHaveCount(0);
   await page.goto('/app/people/demo-08/private-gallery');await expect(page.locator('.gallery-grid .tile')).toHaveCount(5);await expect(page.locator('.private-summary')).toContainText('คุณได้รับสิทธิ์');await shot('private-view');
