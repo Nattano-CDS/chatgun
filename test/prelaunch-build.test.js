@@ -7,7 +7,7 @@ import {join} from 'node:path';
 test('all builds exclude fictional assets, demo generators and canary fallback',()=>{
   for(const canary of [false,true]){
     const directory=mkdtempSync(join(tmpdir(),'chatgun-prelaunch-test-'));
-    execFileSync(process.execPath,['scripts/build-pages.mjs'],{env:{...process.env,CF_PAGES_BRANCH:'preview',CHATGUN_CANARY_BUILD:String(canary),CHATGUN_BUILD_DIR:directory},stdio:'pipe'});
+    execFileSync(process.execPath,['scripts/build-pages.mjs'],{env:{...process.env,CF_PAGES_BRANCH:'preview',CHATGUN_CANARY_BUILD:String(canary),CHATGUN_RELEASE_MODE:'default',CHATGUN_BUILD_DIR:directory},stdio:'pipe'});
     for(const path of ['assets/demo','app/demo-network.js','app/demo-gallery.js','app/demo-bootstrap.js','test','scripts','docs','e2e-retired','playwright.config.js','playwright.issue16.config.js'])assert.equal(existsSync(join(directory,path)),false,path);
     assert.deepEqual(JSON.parse(readFileSync(join(directory,'_routes.json'))),{version:1,include:['/api/*'],exclude:[]});
     assert.equal(JSON.parse(readFileSync(join(directory,'release.json'))).fictionalDemoEnabled,false);
@@ -26,4 +26,24 @@ test('runtime only polls the member\'s visible social surface',()=>{
   assert.match(source,/if \(state\.activeTab === "near"\) void loadPeople\(\)/);
   assert.match(source,/else if \(state\.activeTab === "chat"\) void loadRelationships\(\)/);
   assert.doesNotMatch(source,/setInterval\(\(\) => \{\s*document\.visibilityState === "visible" && navigator\.onLine && state\.config\?\.socialAppEnabled && state\.profile && Promise\.all\(\[loadPeople\(\), loadRelationships\(\)\]\)/);
+});
+
+test('explicit closed prelaunch renders without relying on Cloudflare Functions',()=>{
+  const directory=mkdtempSync(join(tmpdir(),'chatgun-closed-release-'));
+  execFileSync(process.execPath,['scripts/build-pages.mjs'],{
+    env:{...process.env,CF_PAGES_BRANCH:'main',CHATGUN_CANARY_BUILD:'true',
+      CHATGUN_RELEASE_MODE:'closed-prelaunch',CHATGUN_BUILD_DIR:directory},stdio:'pipe'});
+  const html=readFileSync(join(directory,'app/index.html'),'utf8');
+  const app=readFileSync(join(directory,'app/social.js'),'utf8');
+  const release=JSON.parse(readFileSync(join(directory,'release.json'),'utf8'));
+  assert.match(html,/<body data-static-prelaunch="true">/);
+  assert.equal(release.staticPrelaunch,true);
+  assert.equal(release.fictionalDemoEnabled,false);
+  assert.match(app,/if \(document\.body\.dataset\.staticPrelaunch === "true"\)/);
+  const bootstrap=app.slice(app.indexOf('async function initialize()'),app.indexOf('$("#primary-nav").addEventListener'));
+  assert.ok(bootstrap.indexOf('dataset.staticPrelaunch')>=0);
+  assert.ok(bootstrap.indexOf('dataset.staticPrelaunch')<bootstrap.indexOf('"/api/social/config"'));
+  assert.deepEqual(JSON.parse(readFileSync(join(directory,'_routes.json'),'utf8')),
+    {version:1,include:['/api/*'],exclude:[]});
+  assert.equal(existsSync(join(directory,'assets/demo')),false);
 });
