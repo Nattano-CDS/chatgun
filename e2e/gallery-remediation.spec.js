@@ -9,7 +9,7 @@ async function edit(page,update){await page.evaluate(async update=>{
   await new Promise((resolve,reject)=>{const tx=db.transaction('state','readwrite'),s=tx.objectStore('state'),q=s.get('chatgun-browser-demo-v1');q.onsuccess=()=>{const data=q.result;
     if(update.capacity!==undefined){const own=data.gallery.filter(p=>p.owner==='demo-me');data.gallery=data.gallery.filter(p=>p.owner!=='demo-me');for(let i=0;i<update.capacity;i++)data.gallery.push({...own[i%own.length],id:'boundary-'+i,owner:'demo-me'});}
     if(update.used!==undefined){data.uploadQuotas.gallery={used:update.used,remaining:10-update.used,limit:10,reserved:0};}
-    if(update.viewer){const p=data.gallery.find(p=>p.owner==='demo-01'&&p.visibility==='public');p.url=update.viewer.url;p.caption=update.viewer.caption;p.comments=Array.from({length:20},(_,i)=>({id:'long-'+i,sender_name:'เพื่อนสมมติ',body:'ข้อความภาษาไทยที่ยาวสำหรับทดสอบการเลื่อนและการแสดงความคิดเห็น '+i,created_at:1}));}
+    if(update.viewer){const p=data.gallery.find(p=>p.owner==='demo-01'&&p.visibility==='public');p.url=update.viewer.url;p.caption=update.viewer.caption;p.comments=Array.from({length:update.viewer.count??20},(_,i)=>({id:'long-'+i,sender_name:'เพื่อนสมมติ',body:'ข้อความภาษาไทยที่ยาวสำหรับทดสอบการเลื่อนและการแสดงความคิดเห็น '+i,created_at:1}));}
     s.put(data,'chatgun-browser-demo-v1');};tx.oncomplete=resolve;tx.onerror=()=>reject(Error('fixture transaction failed'));});db.close();
 },update);}
 const evidence=process.env.REMEDIATION_EVIDENCE_DIR||'test-results/gallery-remediation';
@@ -68,6 +68,14 @@ test('partial IndexedDB failure retries only failed file with no duplicate quota
   await expect(page.locator('.thumb-small.saved')).toHaveCount(1);await expect(page.locator('[data-remove-upload]')).toHaveCount(1);await expect(page.locator('[data-approved-quota]')).toHaveText('1 / 10 รูป');await shot(page,info.project.name+'-partial-failure');
   await page.locator('[data-upload-submit]').click();await expect(page.locator('[data-upload-success]')).toBeVisible();await expect(page.locator('[data-approved-quota]')).toHaveText('2 / 10 รูป');await expect(page.locator('[data-album-capacity]')).toHaveText('12 / 12 รูป');
   await page.reload();await expect(page.locator('[data-approved-quota]')).toHaveText('2 / 10 รูป');
+});
+
+test('slow photo load and empty caption/comments recover without blocking navigation',async({page})=>{
+  await page.goto('/app/people/demo-01/gallery');await expect(page.locator('.gallery-grid')).toBeVisible();await edit(page,{viewer:{url:'/test-slow-media.png',caption:'',count:0}});
+  let release;const gate=new Promise(r=>release=r);
+  await page.route('**/test-slow-media.png',async route=>{await gate;await route.fulfill({contentType:'image/png',body:Buffer.from(ONE_PIXEL_PNG)});});
+  await page.reload({waitUntil:'domcontentloaded'});await page.locator('.gallery-grid .tile').first().click();await expect(page.locator('.image-load-status')).toContainText('กำลังโหลดรูป');await expect(page.locator('.post-comments .comment')).toHaveCount(0);
+  release();await expect(page.locator('.image-load-status')).toBeEmpty();await page.keyboard.press('ArrowRight');await expect(page.locator('.lightbox-arrows')).toContainText('2 / 5');await page.keyboard.press('Escape');await expect(page).toHaveURL(/demo-01\/gallery$/);
 });
 
 for(const width of [390,768,1440])test(`upload and viewer visual usability ${width}`,async({page},info)=>{

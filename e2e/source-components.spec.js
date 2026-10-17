@@ -68,7 +68,7 @@ for(const [width,height] of widths){
   await page.locator('#gallery-file-picker').setInputFiles({name:'fictional-landscape.png',mimeType:'image/png',buffer:Buffer.from(bytes,'base64')});
   await expect(page.locator('.thumb-small img')).toHaveAttribute('src',/^data:image\/png/);
   await expect(page.locator('.thumb-small img')).toHaveJSProperty('naturalWidth',640);
-  await page.locator('#approved-gallery-upload button.primary').click();await expect(page.locator('#gallery-upload-status')).toContainText('Pending Moderation');
+  await page.locator('[data-upload-submit]').click();await expect(page.locator('[data-upload-success]')).toContainText('รอผู้ดูแลตรวจสอบ');
   await expect(page.locator('#gallery-upload-quota')).toContainText('9/10');
   expect(await page.locator('.thumb-small img').evaluate(i=>i.naturalWidth/i.naturalHeight)).toBe(2);
   await page.locator('[data-gallery-return]').first().click();await expect(page.locator('.gallery-grid .tile')).toBeDisabled();await expect(page.locator('.review-status')).toContainText('รอผู้ดูแลตรวจสอบ');

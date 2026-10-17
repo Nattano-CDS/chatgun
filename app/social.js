@@ -843,7 +843,9 @@ function mountGalleryUpload(){
       for(const [i,p] of pending.entries()){
         try{
         status(`กำลังอัปโหลด ${i+1}/${pending.length}…`);p.status='กำลังอัปโหลด';render();
-        const optimized=await optimizeImage(p.file),caption=form.elements.caption.value;p.attempted=true;
+        // Prepare once: retries must preserve both the key and exact image bytes.
+        // Avoid decoding/re-encoding a File again after an interrupted request.
+        const optimized=p.optimized||=await optimizeImage(p.file),caption=form.elements.caption.value;p.attempted=true;
         if(state.demo){
           if(actor!==currentActor())throw Error('บัญชีปัจจุบันเปลี่ยน กรุณาเปิดหน้าใหม่');
           if(!state.demoGallery.some(photo=>photo.id===p.key)){
@@ -854,7 +856,7 @@ function mountGalleryUpload(){
           }
         }else{
           const data=new FormData();data.set('file',optimized);data.set('caption',caption);data.set('visibility',scope);
-          const response=await fetch('/api/social/gallery',{method:'POST',credentials:'same-origin',headers:{'x-csrf-token':decodeURIComponent(cookie('__Host-cg_csrf')),'idempotency-key':p.key,accept:'application/json'},body:data});
+          const response=await fetch('/api/social/gallery',{method:'POST',credentials:'same-origin',headers:{'x-csrf-token':decodeURIComponent(cookie('__Host-cg_csrf')),'idempotency-key':p.key,accept:'application/json'},body:data,signal:AbortSignal.timeout(20000)});
           const result=await response.json();if(!response.ok)throw Error(result.message||'อัปโหลดไม่สำเร็จ');
         }
         p.done=true;p.failed=false;p.status='รอผู้ดูแลตรวจสอบ';
