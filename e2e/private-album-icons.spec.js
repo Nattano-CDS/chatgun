@@ -13,13 +13,13 @@ for(const width of [390,768,1440])test(`approved album icons and keyboard consen
   expect(await button.evaluate(b=>b.previousElementSibling.hasAttribute('data-profile-gallery'))).toBe(true);
   const geometry=await button.evaluate(b=>{const r=b.getBoundingClientRect(),art=b.querySelector('.album-icon-art').getBoundingClientRect(),badge=b.querySelector('.album-lock-badge').getBoundingClientRect(),photo=b.querySelector('.album-icon-art>svg').getBoundingClientRect(),gallery=b.previousElementSibling.getBoundingClientRect();return {width:r.width,height:r.height,overlap:badge.left<photo.right&&badge.top<photo.bottom&&badge.right>photo.right&&badge.bottom>photo.bottom,sameRow:Math.abs(gallery.y+gallery.height/2-(r.y+r.height/2))<2,badgeColor:getComputedStyle(b.querySelector('.album-lock-badge')).color};});
   expect(geometry.width).toBeGreaterThanOrEqual(44);expect(geometry.height).toBeGreaterThanOrEqual(44);expect(geometry.overlap).toBe(true);expect(geometry.sameRow).toBe(true);
-  const locked=await button.screenshot();
+  await expect(page.locator('#toast')).toBeHidden();const locked=await button.screenshot();
   await page.screenshot({path:resolve(dir,`${info.project.name}-${width}-locked-profile.png`)});
   await button.focus();await page.keyboard.press('Enter');await expect(button).toBeDisabled();await expect(page.locator('.album-feedback')).toContainText('ส่งคำขอแล้ว');
   await page.locator('[data-demo-owner]').click();await page.locator('[data-album-action=approve]').click();
   await page.locator('#demo-actor').selectOption('demo-me');await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();
   await expect(button).toHaveAttribute('data-album-state','unlocked');await expect(button).toHaveAccessibleName('เปิดอัลบั้มส่วนตัวที่ได้รับอนุมัติ');
-  const unlocked=await button.screenshot();expect(await button.locator('.album-lock-badge').evaluate(b=>getComputedStyle(b).color)).not.toBe(geometry.badgeColor);
+  await expect(page.locator('#toast')).toBeHidden();const unlocked=await button.screenshot();expect(await button.locator('.album-lock-badge').evaluate(b=>getComputedStyle(b).color)).not.toBe(geometry.badgeColor);
   await page.screenshot({path:resolve(dir,`${info.project.name}-${width}-unlocked-profile.png`)});
   await button.focus();await page.keyboard.press('Space');await expect(page.locator('section[aria-label="รูปอัลบั้มส่วนตัว"] .ig-tile')).toHaveCount(1);await expect(page.locator('section[aria-label="Gallery สาธารณะ"]')).toHaveCount(0);
   await page.locator('[data-demo-owner]').click();await page.locator('[data-album-action=revoke]').click();

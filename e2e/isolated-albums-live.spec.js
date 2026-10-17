@@ -23,8 +23,10 @@ test('real isolated D1/R2 private-album cards, owner consent, revocation and log
     await expect(page.locator('[data-photo="'+b.photoId+'"][data-gallery-action=view] img')).toHaveJSProperty('naturalWidth',1);
     await page.locator('[data-photo="'+b.photoId+'"][data-gallery-action=view]').click();await expect(page.locator('.lightbox-image img')).toHaveJSProperty('naturalWidth',1);
     await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นสมมติทดสอบ D1 จริง');await page.locator('#gallery-comment button').click();await expect(page.locator('.post-comments')).toContainText('ความคิดเห็นสมมติทดสอบ D1 จริง');
+    await page.goto('/app/people/'+b.ids.owner);await expect(page.locator('[data-private-album]')).toHaveAttribute('data-album-state','unlocked');
     await owner.locator('[data-album-action=revoke]').click();await expect(owner.locator('#thread')).toContainText('เพิกถอนสิทธิ์');
     const old=await context.request.get(baseURL+'/api/social/media/'+b.photoId);expect(old.status()).toBe(404);
+    await expect(page.locator('[data-private-album]')).toHaveAttribute('data-album-state','locked',{timeout:15000});
     await page.reload();await expect(page.locator('.gallery-post-page')).toHaveCount(0);
     await page.goto('/?tab=chat');await page.locator('[data-chat="'+b.ids.owner+'"]').click();await expect(page.locator('#thread')).toContainText('เพิกถอนสิทธิ์');
     const logout=await context.request.post(baseURL+'/api/auth/logout',{headers:{origin:baseURL,'x-csrf-token':b.sessions.other.csrf}});expect(logout.status()).toBe(200);
