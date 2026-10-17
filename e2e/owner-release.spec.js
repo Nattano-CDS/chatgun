@@ -74,6 +74,7 @@ for (const width of [390,768,1440]) {
     await page.locator("#gallery-comment button").click();
     await expect(page.locator('[data-post-feedback]')).toHaveText('ส่งคอมเมนต์แล้ว');
     await expect(page.locator(".post-comments")).toContainText("ภาพตัวอย่างน่ารักดี");await shot("gallery-post");
+    await expect(page.locator('.post-comments>div').first()).toContainText('ภาพตัวอย่างน่ารักดี');
     await page.locator('#profile-dialog [data-gallery-return]').click();
     await page.locator('#profile-dialog [data-close-profile]').click();
     await page.reload();await expect(page.locator("#demo-banner")).toBeVisible();

@@ -38,6 +38,8 @@ test('private comments stay absent for strangers and visible for owners/accepted
  assert.match(ui.post({...context,view,own:true}),/private-fixture/);
  assert.match(ui.post({...context,view,relation:{status:'accepted'}}),/private-fixture/);
  assert.match(ui.post({...context,view}),/<button disabled>ส่ง<\/button>/);
+ const ordered={...view,comments:[{sender_name:'เก่า',body:'old-message',created_at:1},{sender_name:'ใหม่',body:'new-message',created_at:2}]};
+ const out=ui.post({...context,view:ordered,own:true});assert.ok(out.indexOf('new-message')<out.indexOf('old-message'));assert.equal(ordered.comments[0].body,'old-message');
 });
 test('old card/profile/gallery adapter selectors are removed, not patched with another overlay',()=>{
  const legacy=['app/social.css','app/restoration.css','app/near-v91.css'].map(p=>readFileSync(p,'utf8')).join('\n');
