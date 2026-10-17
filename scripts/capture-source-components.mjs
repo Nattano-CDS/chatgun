@@ -23,7 +23,7 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
     await page.evaluate(async()=>{await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,5000))]);await Promise.race([Promise.all([...document.images].filter(i=>{const r=i.getBoundingClientRect();return r.width>0&&r.height>0&&r.top<innerHeight&&r.bottom>0;}).map(i=>i.decode().catch(()=>{}))),new Promise(r=>setTimeout(r,5000))]);});
     await page.waitForTimeout(200);
     await page.screenshot({path:resolve(output,`${name}-${width}.png`),fullPage:false});
-    const selector={'member-card':original?'.photo-card':'#people-grid [data-person="demo-01"]',discovery:original||modern?'.photo-card':'.person-card',friends:'.request-card .photo-card','member-profile':original||modern?'.full-profile-info':'.member-profile-info','member-gallery':'.gallery-summary','gallery-post':'.post-layout','own-profile':original||modern?'.full-profile-info':'.member-profile-info','own-gallery':'.gallery-summary',profile:'.profile-form'}[name];
+    const selector={'gallery-comments':'.post-layout','member-card':original?'.photo-card':'#people-grid [data-person="demo-01"]',discovery:original||modern?'.photo-card':'.person-card',friends:'.request-card .photo-card','member-profile':original||modern?'.full-profile-info':'.member-profile-info','member-gallery':'.gallery-summary','gallery-post':'.post-layout','own-profile':original||modern?'.full-profile-info':'.member-profile-info','own-gallery':'.gallery-summary',profile:'.profile-form'}[name];
     if(selector){const element=page.locator(selector).first();if(await element.isVisible()){
       measurements.push({width,name,dom:await element.evaluate(e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect(),image=e.querySelector('img'),imageStyle=image&&getComputedStyle(image);return{tag:e.tagName,classes:e.className,width:r.width,height:r.height,x:r.x,y:r.y,font:s.fontFamily,fontSize:s.fontSize,lineHeight:s.lineHeight,padding:s.padding,borderRadius:s.borderRadius,image:image?{objectFit:imageStyle.objectFit,objectPosition:imageStyle.objectPosition,width:image.getBoundingClientRect().width,height:image.getBoundingClientRect().height}:null,children:[...e.children].map(c=>({tag:c.tagName,classes:c.className}))}})});
       await element.screenshot({path:resolve(output,`crop-${name}-${width}.png`)});
@@ -85,6 +85,16 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
   await attempt('member-profile',()=>page.locator(original?'.card-open':'#people-grid [data-person="demo-01"] .card-open').first().click());
   await attempt('member-gallery',()=>page.locator(original||modern?'.profile-gallery-top':'.member-profile-gallery-top').click());
   await attempt('gallery-post',()=>page.locator(original?'.ig-tile>button':'#dialog-gallery button').first().click());
+  await attempt('gallery-comments',async()=>{
+    await page.goto(target);await nav('near');
+    if(original)await page.getByRole('button',{name:'เปิดโปรไฟล์ '+fixture.profiles[1].name,exact:true}).click();
+    else await page.locator('#people-grid [data-person="demo-02"] .card-open').click();
+    await page.locator('.profile-gallery-top').click();await page.locator('.ig-tile>button').first().click();
+    await page.locator('.post-like').click();await page.locator('.post-like.liked').waitFor();
+    await page.locator('.post-comment input[aria-label="คอมเมนต์"]').fill('ภาพตัวอย่างน่ารักดี');await page.locator('.post-comment button').click();
+    await page.locator('.post-comments').getByText('ภาพตัวอย่างน่ารักดี',{exact:true}).waitFor();
+    if(original||process.env.AUDIT_INLINE_FEEDBACK==='true')await page.locator('.post-social [role="status"]').waitFor();
+  });
   await attempt('own-profile',async()=>{await page.goto(target);await nav('profile');await page.getByRole('button',{name:original?'ดูโปรไฟล์และ Gallery':'ดูโปรไฟล์และแกลเลอรี',exact:true}).click();});
   await attempt('own-gallery',()=>page.locator(original||modern?'.profile-gallery-top':'.member-profile-gallery-top').click());
   await page.goto(target);await nav('near');await page.locator(original?'.photo-card':'#people-grid .person-card').first().waitFor();

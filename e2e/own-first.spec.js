@@ -27,6 +27,13 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
   await expect(first.locator('.person-name')).toHaveText('ผู้ทดลองสมมติ');await expect(first.locator('.person-bio')).toHaveText('กาแฟ หนังสือ และเพลงไทย');await expect(first.locator('img')).toHaveAttribute('src',/02\.png$/);
   await page.reload();await verify();await expect(first.locator('img')).toHaveAttribute('src',/02\.png$/);
   const dir=process.env.SELF_EVIDENCE_DIR||'test-results/own-first';mkdirSync(dir,{recursive:true});await page.screenshot({path:`${dir}/self-first-${width}.png`,fullPage:false});
+  // Delete only this disposable browser's selected fictional photo, never staging media.
+  await page.locator('#primary-nav [data-tab=profile]').click();await page.locator('#manage-gallery').click();
+  const quota=await page.locator('#gallery-upload-quota').textContent();page.once('dialog',d=>d.accept());
+  await page.locator('#my-gallery [data-gallery-action=delete][data-photo="demo-own-02"]').click();
+  await expect(page.locator('#gallery-count')).toHaveText('1 / 12');await expect(page.locator('#gallery-upload-quota')).toHaveText(quota);
+  await page.locator('#gallery-settings-back').click();await page.locator('#primary-nav [data-tab=near]').click();
+  await verify();await expect(first.locator('.portrait-fallback')).toBeVisible();await page.reload();await expect(first.locator('.portrait-fallback')).toBeVisible();
   expect(writes).toEqual([]);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  });
 }

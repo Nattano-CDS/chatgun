@@ -72,6 +72,7 @@ for (const width of [390,768,1440]) {
     await expect(page.locator('.post-like')).toHaveAttribute('aria-pressed','true');
     await page.locator("#gallery-comment input[name=comment]").fill("ภาพตัวอย่างน่ารักดี");
     await page.locator("#gallery-comment button").click();
+    await expect(page.locator('[data-post-feedback]')).toHaveText('ส่งคอมเมนต์แล้ว');
     await expect(page.locator(".post-comments")).toContainText("ภาพตัวอย่างน่ารักดี");await shot("gallery-post");
     await page.locator('#profile-dialog [data-gallery-return]').click();
     await page.locator('#profile-dialog [data-close-profile]').click();

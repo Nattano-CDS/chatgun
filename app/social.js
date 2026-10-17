@@ -716,6 +716,10 @@ function renderGalleryPost(){
   $('#profile-dialog-content').innerHTML=ChatgunNearComponents.post({...c,view:state.galleryView});
   state.personRouteView='post';document.body.dataset.personRoute='post';openProfileSurface();
 }
+function postFeedback(message='',error=false){
+  const feedback=$('[data-post-feedback]');if(!feedback)return false;
+  feedback.hidden=!message;feedback.setAttribute('role',error?'alert':'status');feedback.textContent=message;return true;
+}
 async function openGalleryPhoto(owner,photo,{historyMode='push'}={}){
   const result=await api('/api/social/gallery?user='+encodeURIComponent(owner)+'&photo='+encodeURIComponent(photo));
   const index=result.photos.findIndex(p=>p.id===photo);
@@ -1121,6 +1125,7 @@ document.addEventListener("click", async (event) => {
       return;
     }
     if (name === "delete" && !confirm("ลบรูปนี้หรือไม่? การลบไฟล์จริงจะดำเนินการผ่านคิวอย่างปลอดภัย")) return;
+    if(name==='like'){setBusy(galleryAction,true);postFeedback();}
     try {
       await api("/api/social/gallery", { method: "POST", body: { action: name, id: photo } });
       if (["delete", "select"].includes(name)) {
@@ -1131,8 +1136,8 @@ document.addEventListener("click", async (event) => {
         if(!$('#profile-dialog').hidden){state.personPhotos=state.myGallery;renderPersonRoute('gallery');}
       }
       if (name === "like" && state.galleryView) await openGalleryPhoto(state.galleryView.owner, photo, { historyMode: "replace" });
-      toast(name === "delete" ? "ซ่อนรูปและส่งเข้าคิวลบแล้ว" : name === "select" ? "ตั้งรูปหลักแล้ว" : "บันทึกแล้ว");
-    } catch (error) { toast(error.message, true); }
+      if(name!=='like')toast(name === "delete" ? "ซ่อนรูปและส่งเข้าคิวลบแล้ว" : "ตั้งรูปหลักแล้ว");
+    } catch (error) { if(name!=='like'||!postFeedback(error.message,true))toast(error.message, true); } finally { if(name==='like')setBusy(galleryAction,false); }
     return;
   }
   const action = event.target.closest("[data-action]");
@@ -1173,11 +1178,12 @@ $("#profile-dialog").addEventListener("submit", async (event) => {
   event.preventDefault();
   const data = new FormData(event.target);
   setBusy(event.submitter, true);
+  postFeedback();
   try {
     await api("/api/social/gallery", { method: "POST", body: { action: "comment", id: data.get("photo"), comment: data.get("comment") } });
-    toast("ส่งความคิดเห็นแล้ว");
     await openGalleryPhoto(data.get("owner"), data.get("photo"), { historyMode: "replace" });
-  } catch (error) { toast(error.message, true); } finally { setBusy(event.submitter, false); }
+    postFeedback('ส่งคอมเมนต์แล้ว');
+  } catch (error) { if(!postFeedback(error.message,true))toast(error.message, true); } finally { setBusy(event.submitter, false); }
 });
 $('#profile-dialog').addEventListener('input',event=>{
   if(event.target.matches('#gallery-comment input[name=comment]'))$('#gallery-comment button').disabled=!event.target.value.trim();

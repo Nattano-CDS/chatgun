@@ -73,6 +73,21 @@ test('authenticated shortcut is session-owned, deduplicated and independent of d
  await first.locator('.card-open').click();await expect(page).toHaveURL(/people\/me$/);await expect(page.locator('.full-name-row')).toContainText('นัท');
 });
 
+test('gallery failed comment keeps its draft and inline reason; likes are disabled while pending',async({page})=>{
+ let likes=0;
+ await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',photos:[{id:'fixture-photo',owner:'near-1',caption:'ภาพสมมติ',like_count:0}],comments:[]}}));
+ await page.route('**/api/social/gallery',async r=>{
+  const body=r.request().postDataJSON();
+  if(body.action==='comment')return r.fulfill({status:403,json:{error:'ไม่มีสิทธิ์ส่งความคิดเห็น'}});
+  likes++;await new Promise(resolve=>setTimeout(resolve,300));await r.fulfill({json:{ok:true}});
+ });
+ await page.goto('/app/people/near-1/gallery/fixture-photo');await expect(page.locator('.post-layout')).toBeVisible();
+ await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');await page.locator('#gallery-comment button').click();
+ await expect(page.locator('[data-post-feedback]')).toHaveAttribute('role','alert');await expect(page.locator('[data-post-feedback]')).toHaveText('ไม่มีสิทธิ์ส่งความคิดเห็น');
+ await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');
+ await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();await expect(page.locator('.post-like')).toBeEnabled();expect(likes).toBe(1);
+});
+
 test("desktop social shell preserves discovery, friends, chat, reviews, and profile without game", async ({ page }, testInfo) => {
   await page.goto("/app/");
   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();

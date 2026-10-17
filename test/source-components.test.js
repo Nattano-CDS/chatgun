@@ -45,4 +45,6 @@ test('old card/profile/gallery adapter selectors are removed, not patched with a
  const source=readFileSync('app/near-components.css','utf8');
  assert.match(source,/\.full-profile-info/);assert.match(source,/\.ig-tile > button:first-child/);
  assert.match(source,/\.manage-photo-grid/);assert.doesNotMatch(source,/member-profile-info/);
+ assert.match(source,/\[data-image-error\]::before\{content:none;/);
+ assert.match(source,/\[data-image-error\] img\[hidden\]\{display:none!important;/);
 });
