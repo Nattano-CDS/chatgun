@@ -747,9 +747,14 @@ function renderPersonRoute(view='profile') {
 }
 async function showPerson(id, {historyMode='push',photo=null}={}) {
   const own=id===state.account?.user?.id;
-  const person=own?state.profile:state.people.find(p=>p.user_id===id)||state.conversations.find(p=>p.other_user_id===id);
+  let person=own?state.profile:state.people.find(p=>p.user_id===id)||state.conversations.find(p=>p.other_user_id===id);
   if($('#profile-dialog').hidden&&!routedProfile())state.profileReturnPath=location.pathname+location.search;
   if(historyMode!=='none')updateProfileRoute(id,photo,historyMode);
+  if(!person&&!state.demo){
+    const generation=state.profileRequest=(state.profileRequest||0)+1;
+    try{person=(await api('/api/social/profile?user='+encodeURIComponent(id))).profile;}catch{person=null;}
+    if(generation!==state.profileRequest)return;
+  }
   if(!person){$('#profile-dialog-content').innerHTML='<main class="full-profile gallery-page"><div class="empty"><h2>ไม่พบโปรไฟล์นี้</h2><p>คุณอาจไม่มีสิทธิ์ดูบัญชีนี้</p><button data-close-profile>กลับ</button></div></main>';openProfileSurface();return;}
   state.selectedPerson=person;state.personPhotos=[];state.album=null;state.albumRequests=[];state.galleryLoadError=false;
   state.profileRequest=(state.profileRequest||0)+1;const generation=state.profileRequest;
@@ -832,7 +837,7 @@ async function loadMessagePage(id, before = null) {
 }
 
 async function openChat(id) {
-  const person = (id===state.profile?.user_id?state.profile:null)||state.people.find(p=>p.user_id===id)||state.conversations.find(p=>p.other_user_id===id);
+  const person = (id===state.profile?.user_id?state.profile:null)||state.people.find(p=>p.user_id===id)||state.conversations.find(p=>p.other_user_id===id)||(state.selectedPerson&&(state.selectedPerson.user_id||state.selectedPerson.other_user_id)===id?state.selectedPerson:null);
   if (!person || id===currentActor()) return;
   state.selectedChat = id;
   switchTab("chat");
@@ -862,6 +867,7 @@ async function openChat(id) {
   const send = $('.composer>.primary',thread);
   send.setAttribute('aria-label','ส่ง');
   send.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z M22 2 11 13"/></svg>';
+  if(person.direct_messages_enabled===0){$('.composer input[name=body]',thread).disabled=true;send.disabled=true;$('.composer',thread).insertAdjacentHTML('beforebegin','<p role="status">สมาชิกนี้ปิดรับข้อความใหม่ · คุณยังอ่านประวัติได้</p>');}
   requestAnimationFrame(sizeConversation);
   try {
     await loadMessagePage(id);

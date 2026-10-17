@@ -6,6 +6,7 @@ import {randomUUID} from 'node:crypto';
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {issueSession,unixTime} from '../functions/_lib/db.js';
 import {ONE_PIXEL_PNG} from '../test/helpers/image.js';
+import {drainMediaDeletionQueue} from '../workers/media-cleanup.js';
 const account='23017b53386fb67fc62a52cdd017454c',database='275d9820-6aec-494a-8bb5-b7ed9b8b74cc';
 const origin='https://issue13.chatgun-issue13-staging.pages.dev';
 if(process.env.CHATGUN_ISOLATED_STAGING!=='issue13')throw Error('Isolated staging acknowledgement required');
@@ -15,7 +16,8 @@ const project=await cf('/pages/projects/chatgun-issue13-staging');
 assert.equal(project.deployment_configs.preview.d1_databases.DB.id,database);
 assert.equal(project.deployment_configs.preview.r2_buckets.MEDIA.name,'chatgun-issue13-media');
 async function query(sql,params=[]){const result=await cf(`/d1/database/${database}/query`,{sql,params});assert.equal(result[0].success,true);return result[0];}
-const db={prepare(sql){let params=[];return {bind(...v){params=v;return this;},async first(){return (await query(sql,params)).results[0]||null;},async run(){return query(sql,params);}};}};
+// Sequential fixture-only adapter; application atomicity is exercised inside real D1.
+const db={async batch(statements){const results=[];for(const statement of statements)results.push(await statement.run());return results;},prepare(sql){let params=[];return {bind(...v){params=v;return this;},async first(){return (await query(sql,params)).results[0]||null;},async all(){return query(sql,params);},async run(){return query(sql,params);}};}};
 const run='issue13-'+randomUUID(),sessions={},ids={},evidence=[];
 const check=(name,condition)=>{assert.ok(condition,name);evidence.push({name,result:'PASS'});};
 for(const role of ['owner','viewer','other']){
@@ -58,9 +60,22 @@ check('gallery deletion queues R2 cleanup',(await call('owner','gallery',{action
 check('deleted media cannot be retrieved',(await call('owner','media/'+photo)).status===404);
 const key=(await query('SELECT object_key FROM social_media WHERE id=?',[photo])).results[0].object_key;
 check('R2 queue records exact object',(await query('SELECT COUNT(*) n FROM media_deletion_queue WHERE object_key=? AND completed_at IS NULL',[key])).results[0].n===1);
+const managed=await cf('/r2/buckets/chatgun-issue13-media/domains/managed');
+check('managed public R2 domain disabled',managed.enabled===false);
+const cleanup=await drainMediaDeletionQueue({DB:db,MEDIA:{async delete(objectKey){
+  execFileSync('npx',['wrangler@4.151.1','r2','object','delete','chatgun-issue13-media/'+objectKey,'--remote'],{env:{...process.env,CLOUDFLARE_ACCOUNT_ID:account},stdio:'pipe'});
+}}});
+check('real R2 cleanup worker completes',cleanup.completed>=1&&cleanup.failed===0);
+check('deletion queue completion persisted',(await query('SELECT COUNT(*) n FROM media_deletion_queue WHERE object_key=? AND completed_at IS NOT NULL',[key])).results[0].n===1);
 check('foreign keys valid',(await query('SELECT COUNT(*) n FROM pragma_foreign_key_check')).results[0].n===0);
-const summary={run,origin,commit:release.commit,database,bucket:'chatgun-issue13-media',syntheticOnly:true,checks:evidence,passed:evidence.length,failed:0,cleanup:'queued, object not yet deleted; do not claim worker completion',oauth:'not retested; synthetic session fixture only'};
+// A new, private, explicitly synthetic released fixture for real browser consent tests.
+const uiForm=new FormData();uiForm.set('file',new File([ONE_PIXEL_PNG],'synthetic-ui.png',{type:'image/png'}));
+const uiUpload=await fetch(origin+'/api/social/gallery',{method:'POST',headers:{...headers('owner'),'idempotency-key':run+'-ui-gallery'},body:uiForm});
+assert.equal(uiUpload.status,201);const {id:uiPhoto}=await uiUpload.json();
+await query("UPDATE media_safety_reviews SET status='released',category='general',revision=revision+1,reviewed_at=? WHERE media_id=?",[unixTime(),uiPhoto]);
+check('browser fixture is private without owner consent',(await call('other','media/'+uiPhoto)).status===404);
+const summary={run,origin,commit:release.commit,database,bucket:'chatgun-issue13-media',syntheticOnly:true,checks:evidence,passed:evidence.length,failed:0,cleanup,oauth:'not retested; synthetic session fixture only'};
 mkdirSync('docs/issue-13',{recursive:true});writeFileSync('docs/issue-13/cloud-test-results.json',JSON.stringify(summary,null,2)+'\n');
 // Session fixtures stay outside the repository, protected and short-lived operationally.
-writeFileSync('/tmp/chatgun-issue13-sessions.json',JSON.stringify({origin,run,ids,sessions}),{mode:0o600});
+writeFileSync('/tmp/chatgun-issue13-sessions.json',JSON.stringify({origin,run,ids,sessions,photoId:uiPhoto}),{mode:0o600});
 console.log(JSON.stringify(summary,null,2));
