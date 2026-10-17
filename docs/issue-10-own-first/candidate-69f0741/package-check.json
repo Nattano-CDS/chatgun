@@ -1,0 +1,13 @@
+{
+  "sha": "69f0741dd9e544f6406dea716acb4265c5a71d1c",
+  "directory": "/var/folders/gd/r5f17fjx6rg1syk20hrwwzyc0000gn/T/chatgun-own-first-production-gGaYg4",
+  "baseline": "0a4bd1d25c730d131615960e892c77b257b16947",
+  "backendInfrastructureAndMigrationsUnchanged": true,
+  "unapprovedLegalDraftsExcluded": true,
+  "privateArtifactsExcluded": true,
+  "publicFixtureBytesUnchanged": true,
+  "fictionalOtherMembers": 20,
+  "fictionalMessages": 120,
+  "rollbackDeployment": "94825247-c404-4eef-98cc-7fea8b378025",
+  "databaseRollbackRequired": false
+}

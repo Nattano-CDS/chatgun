@@ -1,0 +1,32 @@
+
+Running 2 tests using 1 worker
+
+(node:2848) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop-chromium] › e2e/social.spec.js:76:1 › gallery failed comment keeps its draft and inline reason; likes are disabled while pending (30.1s)
+(node:2907) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [mobile-chromium] › e2e/social.spec.js:76:1 › gallery failed comment keeps its draft and inline reason; likes are disabled while pending (1.4s)
+
+
+  1) [desktop-chromium] › e2e/social.spec.js:76:1 › gallery failed comment keeps its draft and inline reason; likes are disabled while pending 
+
+    Test timeout of 30000ms exceeded.
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/own-inline-negative-local/social-gallery-failed-comm-0e8df--are-disabled-while-pending-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/own-inline-negative-local/social-gallery-failed-comm-0e8df--are-disabled-while-pending-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/own-inline-negative-local/social-gallery-failed-comm-0e8df--are-disabled-while-pending-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/own-inline-negative-local/social-gallery-failed-comm-0e8df--are-disabled-while-pending-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [desktop-chromium] › e2e/social.spec.js:76:1 › gallery failed comment keeps its draft and inline reason; likes are disabled while pending 
+  1 passed (32.4s)

@@ -1,0 +1,11 @@
+
+Running 2 tests using 1 worker
+
+(node:3116) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop-chromium] › e2e/social.spec.js:76:1 › gallery failed comment keeps its draft and inline reason; likes are disabled while pending (1.2s)
+(node:3122) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [mobile-chromium] › e2e/social.spec.js:76:1 › gallery failed comment keeps its draft and inline reason; likes are disabled while pending (1.3s)
+
+  2 passed (3.1s)

@@ -1,0 +1,10 @@
+
+Running 3 tests using 1 worker
+
+(node:2237) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 390 (7.3s)
+  ✓  2 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 768 (2.9s)
+  ✓  3 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440 (3.6s)
+
+  3 passed (14.3s)

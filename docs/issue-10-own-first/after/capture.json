@@ -1,0 +1,21 @@
+{
+  "target": "https://codex-chatgun-release-candid.chatgun.pages.dev",
+  "commit": "12e55fde423832152d7317c3e85bfd42f53eaf01",
+  "kind": "live-site",
+  "fixture": "chatgun-browser-demo-v1; browser-only adapter and empty-state variations",
+  "viewports": [
+    [
+      390,
+      844
+    ],
+    [
+      768,
+      1024
+    ],
+    [
+      1440,
+      1100
+    ]
+  ],
+  "failures": []
+}

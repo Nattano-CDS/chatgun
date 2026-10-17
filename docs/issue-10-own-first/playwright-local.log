@@ -1,0 +1,340 @@
+
+> chatgun@1.0.0 test:e2e
+> playwright test --output=test-results/own-first-full-local
+
+
+Running 100 tests using 1 worker
+
+(node:98860) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    1 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 390px (1.8s)
+  ✓    2 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 768px (1.6s)
+  ✓    3 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 1440px (2.0s)
+  ✘    4 [desktop-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth (10.2s)
+(node:98908) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘    5 [desktop-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed (10.3s)
+(node:98930) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    6 [desktop-chromium] › e2e/auth.spec.js:93:1 › post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations (484ms)
+  ✓    7 [desktop-chromium] › e2e/auth.spec.js:139:1 › privacy notice explains social identity data use (838ms)
+  ✓    8 [desktop-chromium] › e2e/auth.spec.js:148:1 › legal review pages disclose unresolved owner decisions (637ms)
+  ✓    9 [desktop-chromium] › e2e/auth.spec.js:158:1 › account page redirects unauthenticated users to signup (264ms)
+  ✘   10 [desktop-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations (15ms)
+(node:98944) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   11 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 390px (668ms)
+  ✓   12 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 768px (605ms)
+  ✓   13 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 1440px (583ms)
+  ✓   14 [desktop-chromium] › e2e/issue10-parity.spec.js:28:1 › failed portrait remains labelled; persistent auth navigation excludes Game (319ms)
+  ✓   15 [desktop-chromium] › e2e/issue10-parity.spec.js:34:1 › fictional friendship accept/reject/request/block/unblock persists without server writes (1.1s)
+  -   16 [desktop-chromium] › e2e/live-social.spec.js:81:1 › staging social APIs persist positive and negative non-media workflows
+  -   17 [desktop-chromium] › e2e/live-social.spec.js:159:1 › staging R2 gallery and chat media remain private and relationship-authorized
+  -   18 [desktop-chromium] › e2e/live-social.spec.js:261:1 › desktop and mobile render persisted staging profile, discovery, notifications, and reviews
+  -   19 [desktop-chromium] › e2e/live-social.spec.js:311:1 › synthetic account deletion queues owned R2 media and revokes access
+  ✓   20 [desktop-chromium] › e2e/moderation.spec.js:48:1 › admin dashboard opens routine overview automatically and requires justification for restricted evidence (535ms)
+  ✓   21 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 390 (5.6s)
+  ✓   22 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 768 (1.3s)
+  ✓   23 [desktop-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440 (1.3s)
+  ✓   24 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px (2.3s)
+  ✓   25 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px (3.0s)
+  ✓   26 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px (2.8s)
+  ✓   27 [desktop-chromium] › e2e/social.spec.js:54:1 › root is the authenticated discovery entry while welcome retains marketing (1.1s)
+  ✓   28 [desktop-chromium] › e2e/social.spec.js:63:1 › authenticated shortcut is session-owned, deduplicated and independent of discovery visibility (357ms)
+  ✓   29 [desktop-chromium] › e2e/social.spec.js:75:1 › desktop social shell preserves discovery, friends, chat, reviews, and profile without game (364ms)
+  -   30 [desktop-chromium] › e2e/social.spec.js:93:1 › mobile social shell uses bottom navigation and remains usable
+  ✓   31 [desktop-chromium] › e2e/social.spec.js:103:1 › disabled social environment reveals no member features (144ms)
+  ✓   32 [desktop-chromium] › e2e/social.spec.js:111:1 › member profile routes are deep-linkable and preserve browser history (339ms)
+  ✓   33 [desktop-chromium] › e2e/social.spec.js:123:1 › coarse live distance does not silently remove the server-authorized rating workflow (266ms)
+  ✓   34 [desktop-chromium] › e2e/social.spec.js:132:1 › source header switches out discovery controls; gallery distinguishes loading failure from empty and retries (381ms)
+  ✓   35 [desktop-chromium] › e2e/social.spec.js:151:1 › optional demo remains browser-only and contains no game (336ms)
+  ✓   36 [desktop-chromium] › e2e/social.spec.js:161:1 › profile names cannot break out of text or media attributes (650ms)
+  ✓   37 [desktop-chromium] › e2e/social.spec.js:182:1 › browser-only demo supports local gallery and chat image workflows (4.7s)
+  ✓   38 [desktop-chromium] › e2e/social.spec.js:214:1 › social shell reports offline state and recovers when connectivity returns (271ms)
+  ✓   39 [desktop-chromium] › e2e/social.spec.js:225:1 › daily image quota disables only the exhausted category while chat text remains available (317ms)
+  ✓   40 [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 390 (5.3s)
+  ✓   41 [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 390 (5.4s)
+  ✓   42 [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 768 (1.5s)
+  ✓   43 [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 768 (1.0s)
+  ✓   44 [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 1440 (1.4s)
+  ✓   45 [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 1440 (1.1s)
+  ✓   46 [desktop-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus (328ms)
+  -   47 [desktop-chromium] › e2e/staging-readonly.spec.js:5:1 › preserved staging batch and private media remain accessible only to authorized sessions
+  -   48 [desktop-chromium] › e2e/synthetic-owner-review.spec.js:42:1 › synthetic staging APIs expose the complete traceable owner-review network
+  -   49 [desktop-chromium] › e2e/synthetic-owner-review.spec.js:78:1 › NEAR-style social pages render populated synthetic data on desktop and mobile
+  -   50 [desktop-chromium] › e2e/synthetic-owner-review.spec.js:108:1 › admin overview and urgent queues render synthetic moderation samples
+(node:99404) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -   51 [mobile-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 390px
+  -   52 [mobile-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 768px
+  -   53 [mobile-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 1440px
+  ✘   54 [mobile-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth (10.4s)
+(node:99464) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   55 [mobile-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed (10.4s)
+(node:99500) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   56 [mobile-chromium] › e2e/auth.spec.js:93:1 › post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations (634ms)
+  ✓   57 [mobile-chromium] › e2e/auth.spec.js:139:1 › privacy notice explains social identity data use (782ms)
+  ✓   58 [mobile-chromium] › e2e/auth.spec.js:148:1 › legal review pages disclose unresolved owner decisions (730ms)
+  ✓   59 [mobile-chromium] › e2e/auth.spec.js:158:1 › account page redirects unauthenticated users to signup (467ms)
+  ✘   60 [mobile-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations (20ms)
+(node:99534) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -   61 [mobile-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 390px
+  -   62 [mobile-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 768px
+  -   63 [mobile-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 1440px
+  ✓   64 [mobile-chromium] › e2e/issue10-parity.spec.js:28:1 › failed portrait remains labelled; persistent auth navigation excludes Game (483ms)
+  ✓   65 [mobile-chromium] › e2e/issue10-parity.spec.js:34:1 › fictional friendship accept/reject/request/block/unblock persists without server writes (1.2s)
+  -   66 [mobile-chromium] › e2e/live-social.spec.js:81:1 › staging social APIs persist positive and negative non-media workflows
+  -   67 [mobile-chromium] › e2e/live-social.spec.js:159:1 › staging R2 gallery and chat media remain private and relationship-authorized
+  -   68 [mobile-chromium] › e2e/live-social.spec.js:261:1 › desktop and mobile render persisted staging profile, discovery, notifications, and reviews
+  -   69 [mobile-chromium] › e2e/live-social.spec.js:311:1 › synthetic account deletion queues owned R2 media and revokes access
+  ✓   70 [mobile-chromium] › e2e/moderation.spec.js:48:1 › admin dashboard opens routine overview automatically and requires justification for restricted evidence (646ms)
+  -   71 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 390
+  -   72 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 768
+  -   73 [mobile-chromium] › e2e/own-first.spec.js:4:2 › viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440
+  -   74 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px
+  -   75 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px
+  -   76 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px
+  ✓   77 [mobile-chromium] › e2e/social.spec.js:54:1 › root is the authenticated discovery entry while welcome retains marketing (1.1s)
+  ✓   78 [mobile-chromium] › e2e/social.spec.js:63:1 › authenticated shortcut is session-owned, deduplicated and independent of discovery visibility (512ms)
+  ✓   79 [mobile-chromium] › e2e/social.spec.js:75:1 › desktop social shell preserves discovery, friends, chat, reviews, and profile without game (465ms)
+  ✓   80 [mobile-chromium] › e2e/social.spec.js:93:1 › mobile social shell uses bottom navigation and remains usable (471ms)
+  ✓   81 [mobile-chromium] › e2e/social.spec.js:103:1 › disabled social environment reveals no member features (227ms)
+  ✓   82 [mobile-chromium] › e2e/social.spec.js:111:1 › member profile routes are deep-linkable and preserve browser history (552ms)
+  ✓   83 [mobile-chromium] › e2e/social.spec.js:123:1 › coarse live distance does not silently remove the server-authorized rating workflow (522ms)
+  ✓   84 [mobile-chromium] › e2e/social.spec.js:132:1 › source header switches out discovery controls; gallery distinguishes loading failure from empty and retries (504ms)
+  ✓   85 [mobile-chromium] › e2e/social.spec.js:151:1 › optional demo remains browser-only and contains no game (566ms)
+  ✓   86 [mobile-chromium] › e2e/social.spec.js:161:1 › profile names cannot break out of text or media attributes (941ms)
+  ✓   87 [mobile-chromium] › e2e/social.spec.js:182:1 › browser-only demo supports local gallery and chat image workflows (4.8s)
+  ✓   88 [mobile-chromium] › e2e/social.spec.js:214:1 › social shell reports offline state and recovers when connectivity returns (422ms)
+  ✓   89 [mobile-chromium] › e2e/social.spec.js:225:1 › daily image quota disables only the exhausted category while chat text remains available (326ms)
+  -   90 [mobile-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 390
+  -   91 [mobile-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 390
+  -   92 [mobile-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 768
+  -   93 [mobile-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 768
+  -   94 [mobile-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 1440
+  -   95 [mobile-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 1440
+  ✓   96 [mobile-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus (493ms)
+  -   97 [mobile-chromium] › e2e/staging-readonly.spec.js:5:1 › preserved staging batch and private media remain accessible only to authorized sessions
+  -   98 [mobile-chromium] › e2e/synthetic-owner-review.spec.js:42:1 › synthetic staging APIs expose the complete traceable owner-review network
+  -   99 [mobile-chromium] › e2e/synthetic-owner-review.spec.js:78:1 › NEAR-style social pages render populated synthetic data on desktop and mobile
+  -  100 [mobile-chromium] › e2e/synthetic-owner-review.spec.js:108:1 › admin overview and urgent queues render synthetic moderation samples
+
+
+  1) [desktop-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "ไม่สามารถเชื่อมต่อระบบยืนยันความปลอดภัยได้"
+    Received string:    "ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย"
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 10000ms
+      - waiting for getByRole('status')
+        24 × locator resolved to <p id="message" role="status" aria-live="polite" class="auth-message">ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย</p>
+           - unexpected value "ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย"
+
+
+      54 |
+      55 |   await page.goto("/signup.html");
+    > 56 |   await expect(page.getByRole("status")).toContainText("ไม่สามารถเชื่อมต่อระบบยืนยันความปลอดภัยได้");
+         |                                          ^
+      57 |   const retry = page.getByRole("button", { name: "ลองโหลดระบบยืนยันอีกครั้ง" });
+      58 |   await expect(retry).toBeVisible();
+      59 |   await retry.click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:56:42
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/own-first-full-local/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/own-first-full-local/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/own-first-full-local/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/own-first-full-local/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [desktop-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed 
+
+    Error: expect(locator).toBeAttached() failed
+
+    Locator: locator('#turnstile input[name="cf-turnstile-response"]')
+    Expected: attached
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeAttached" locator('#turnstile input[name="cf-turnstile-response"]') with timeout 10000ms
+      - waiting for locator('#turnstile input[name="cf-turnstile-response"]')
+
+
+      82 |   await expect(page.getByText(/OTP/u)).toHaveCount(0);
+      83 |   await expect(page.locator('input[type="email"], input[inputmode="tel"]')).toHaveCount(0);
+    > 84 |   await expect(page.locator('#turnstile input[name="cf-turnstile-response"]')).toBeAttached();
+         |                                                                                ^
+      85 |   await expect(page.getByRole("status")).toBeEmpty();
+      86 |   expect(cspErrors).toEqual([]);
+      87 |   await page.screenshot({
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:84:80
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/own-first-full-local/auth-signup-permits-existi-9a111-registration-remains-closed-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/own-first-full-local/auth-signup-permits-existi-9a111-registration-remains-closed-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/own-first-full-local/auth-signup-permits-existi-9a111-registration-remains-closed-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/own-first-full-local/auth-signup-permits-existi-9a111-registration-remains-closed-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [desktop-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations 
+
+    TypeError: expect(received).toMatch(expected)
+
+    Matcher error: received value must be a string
+
+    Received has value: null
+
+      179 |     minorRegistrationEnabled: false,
+      180 |   });
+    > 181 |   expect(config.turnstileSiteKey).toMatch(/^0x[\w-]+$/u);
+          |                                   ^
+      182 |
+      183 |   const disabledOtpResponse = await request.post("/api/auth/otp/start", {
+      184 |     headers: { origin: baseURL, "content-type": "application/json" },
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:181:35
+
+    Error Context: test-results/own-first-full-local/auth-Pages-Functions-expos-0d0a0-ject-cross-origin-mutations-desktop-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/own-first-full-local/auth-Pages-Functions-expos-0d0a0-ject-cross-origin-mutations-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/own-first-full-local/auth-Pages-Functions-expos-0d0a0-ject-cross-origin-mutations-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [mobile-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('status')
+    Expected substring: "ไม่สามารถเชื่อมต่อระบบยืนยันความปลอดภัยได้"
+    Received string:    "ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย"
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('status') with timeout 10000ms
+      - waiting for getByRole('status')
+        24 × locator resolved to <p id="message" role="status" aria-live="polite" class="auth-message">ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย</p>
+           - unexpected value "ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย"
+
+
+      54 |
+      55 |   await page.goto("/signup.html");
+    > 56 |   await expect(page.getByRole("status")).toContainText("ไม่สามารถเชื่อมต่อระบบยืนยันความปลอดภัยได้");
+         |                                          ^
+      57 |   const retry = page.getByRole("button", { name: "ลองโหลดระบบยืนยันอีกครั้ง" });
+      58 |   await expect(retry).toBeVisible();
+      59 |   await retry.click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:56:42
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/own-first-full-local/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/own-first-full-local/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/own-first-full-local/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/own-first-full-local/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [mobile-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed 
+
+    Error: expect(locator).toBeAttached() failed
+
+    Locator: locator('#turnstile input[name="cf-turnstile-response"]')
+    Expected: attached
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeAttached" locator('#turnstile input[name="cf-turnstile-response"]') with timeout 10000ms
+      - waiting for locator('#turnstile input[name="cf-turnstile-response"]')
+
+
+      82 |   await expect(page.getByText(/OTP/u)).toHaveCount(0);
+      83 |   await expect(page.locator('input[type="email"], input[inputmode="tel"]')).toHaveCount(0);
+    > 84 |   await expect(page.locator('#turnstile input[name="cf-turnstile-response"]')).toBeAttached();
+         |                                                                                ^
+      85 |   await expect(page.getByRole("status")).toBeEmpty();
+      86 |   expect(cspErrors).toEqual([]);
+      87 |   await page.screenshot({
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:84:80
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/own-first-full-local/auth-signup-permits-existi-9a111-registration-remains-closed-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/own-first-full-local/auth-signup-permits-existi-9a111-registration-remains-closed-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/own-first-full-local/auth-signup-permits-existi-9a111-registration-remains-closed-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/own-first-full-local/auth-signup-permits-existi-9a111-registration-remains-closed-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [mobile-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations 
+
+    TypeError: expect(received).toMatch(expected)
+
+    Matcher error: received value must be a string
+
+    Received has value: null
+
+      179 |     minorRegistrationEnabled: false,
+      180 |   });
+    > 181 |   expect(config.turnstileSiteKey).toMatch(/^0x[\w-]+$/u);
+          |                                   ^
+      182 |
+      183 |   const disabledOtpResponse = await request.post("/api/auth/otp/start", {
+      184 |     headers: { origin: baseURL, "content-type": "application/json" },
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:181:35
+
+    Error Context: test-results/own-first-full-local/auth-Pages-Functions-expos-0d0a0-ject-cross-origin-mutations-mobile-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/own-first-full-local/auth-Pages-Functions-expos-0d0a0-ject-cross-origin-mutations-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/own-first-full-local/auth-Pages-Functions-expos-0d0a0-ject-cross-origin-mutations-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6 failed
+    [desktop-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth 
+    [desktop-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed 
+    [desktop-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations 
+    [mobile-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth 
+    [mobile-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed 
+    [mobile-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations 
+  35 skipped
+  59 passed (1.9m)

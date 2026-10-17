@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-10-17T08:30:26.272Z",
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "project": "chatgun",
+  "domain": "active",
+  "productionD1": "9738a051-d914-42d0-8e7b-8098ef2b959d",
+  "previewD1": "5bbfd55d-eb22-4324-8a7d-57bef14110ea",
+  "productionR2Bindings": 0,
+  "previewR2": "chatgun-media-staging",
+  "productionFlags": {
+    "OAUTH_LOGIN_ENABLED": "false",
+    "SOCIAL_APP_ENABLED": "false",
+    "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
+    "MEDIA_UPLOAD_ENABLED": "false",
+    "MODERATION_TOOLS_ENABLED": "false",
+    "SENSITIVE_CONTENT_ENABLED": "false",
+    "FRIEND_REQUESTS_ENABLED": "false",
+    "PUBLIC_DISCOVERY_ENABLED": "false",
+    "MESSAGING_ENABLED": "false",
+    "RATINGS_ENABLED": "false",
+    "IDENTITY_VERIFICATION_ENABLED": "false",
+    "EMAIL_OTP_ENABLED": "false",
+    "MOBILE_OTP_ENABLED": "false",
+    "DEMO_MODE_ENABLED": "true",
+    "DEMO_AUTO_START_ENABLED": "true",
+    "PUBLIC_DEMO_CANARY_ENABLED": "true"
+  },
+  "canonicalDeployment": {
+    "id": "8087749a-d052-4867-a1dd-f64160470f15",
+    "sha": "69f0741dd9e544f6406dea716acb4265c5a71d1c",
+    "status": "success"
+  },
+  "foreignKeyViolations": 0,
+  "databaseWrites": 0,
+  "originalAndStagingDataMutations": "none"
+}
