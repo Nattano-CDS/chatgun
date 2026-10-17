@@ -13,14 +13,13 @@ window.ChatgunNearComponents = (() => {
   const action = (name, id, text, c, extra = '') => `<button class="${c || ''}" data-action="${name}" data-user="${id}" ${extra}>${text}</button>`;
   function card({person:p,id,relation,incoming,context,html:h,portrait,distance,star,userPlus,canRate,rateDisabled,own=false,demo=false,messagingEnabled=false}) {
     const body = `<article class="person photo-card person-card" data-person="${h(id)}">
-      <button class="card-open" data-person-open="${h(id)}" aria-label="เปิดโปรไฟล์ ${h(p.name)}"></button>
+      <a class="card-open" href="/app/people/${encodeURIComponent(id)}" data-person-open="${h(id)}" aria-label="เปิดโปรไฟล์ ${h(p.name)}"></a>
       <div class="card-photo">${portrait(p,false)}</div><div class="photo-shade"></div>
       ${own ? '<span class="self-card-badge">คุณ</span>' : `<span class="card-distance">${icon('pin',14)}${h(distance)}</span>`}
       <div class="person-details"><div class="person-top"></div>
-        <div class="card-name-row"><button class="person-name" data-person-open="${h(id)}">${h(p.name)}</button>${own?'':badge(p)}</div>
+        <div class="card-name-row"><span class="person-name">${h(p.name)}</span>${!own&&Number(p.identity_verified)===1?'<span class="verify-badge" role="img" aria-label="ผ่านการตรวจหลักฐานตัวตน · ไม่ใช่การรับรองพฤติกรรม">'+icon('badge',19)+'</span>':''}</div>
         <p class="person-bio">${h(p.bio || 'ยินดีที่ได้รู้จัก')}</p>
         <div class="rating-line">${!own&&canRate?star:''}${own ? (demo?'โปรไฟล์ของคุณ · ตัวอย่าง':'โปรไฟล์ของคุณ') : p.rating_count ? Number(p.rating).toFixed(1) : 'ยังไม่มีคะแนน'}</div>
-        <div class="card-actions">${!own&&messagingEnabled?action("chat",h(id),icon("chat",19),"icon-button direct-chat",'aria-label="แชท"'):""}${own?`<button class="icon-button self-profile-open" data-person-open="${h(id)}" aria-label="ดูโปรไฟล์ของคุณ" title="ดูโปรไฟล์">${icon('next',22)}</button>`:canRate ? action('rate',h(id),star,'icon-button rate-button',`aria-label="ให้คะแนน" ${rateDisabled ? 'disabled' : ''}`) : ''}</div>
       </div></article>`;
     return body;
   }
@@ -33,11 +32,10 @@ window.ChatgunNearComponents = (() => {
     return !c.own&&c.config.messagingEnabled?action('chat',c.html(c.id),icon('chat',size)+'แชท','primary'):'';
   }
   function privateAlbum(c){
-    const h=c.html,r=c.album?.request,granted=!!c.album?.granted;
+    const h=c.html;
     const button=(a,label,request)=>'<button data-album-action="'+a+'" data-owner="'+h(c.id)+'" data-request="'+h(request?.id||'')+'" data-revision="'+Number(request?.revision||0)+'">'+label+'</button>';
     if(c.own)return c.privateAlbumOpen?'<section class="album-management" aria-label="จัดการสิทธิ์อัลบั้มส่วนตัว"><h2 class="album-heading">จัดการสิทธิ์</h2>'+(c.albumRequests||[]).map(r=>'<div class="album-access-row"><strong>'+h(r.requester_name)+'</strong><span>'+h({pending:'รออนุมัติ',approved:'อนุมัติแล้ว',rejected:'ปฏิเสธแล้ว',revoked:'เพิกถอนแล้ว',cancelled:'ยกเลิกแล้ว'}[r.status])+'</span>'+(r.status==='approved'?button('revoke','เพิกถอนสิทธิ์',r):r.status==='pending'?button('approve','อนุมัติ',r)+button('reject','ปฏิเสธ',r):'')+'</div>').join('')+'</section>':'';
-    const status={pending:'ส่งคำขอแล้ว · รออนุมัติในแชท',rejected:'คำขอถูกปฏิเสธ',revoked:'สิทธิ์ถูกเพิกถอน',cancelled:'ยกเลิกคำขอแล้ว'}[r?.status];
-    return '<div class="album-feedback">'+(status?'<span role="status">'+status+'</span>':'')+(r?.status==='pending'?button('cancel','ยกเลิกคำขอ',r):'')+(c.demo&&(r?.status==='pending'||granted)?'<button data-demo-owner="'+h(c.id)+'">จำลองเป็นเจ้าของเพื่ออนุมัติในแชท</button>':'')+'</div>';
+    return '';
   }
   // Lucide image / lock / lock-open paths (ISC); identical photo in both states.
   function albumIconButton(c){
@@ -54,13 +52,12 @@ window.ChatgunNearComponents = (() => {
       <div class="full-profile-image">${c.portrait(p,false)}</div><div class="full-profile-shade"></div>
       <button class="profile-back" data-close-profile aria-label="กลับ">${icon('back',24)}</button>
       ${brand('โปรไฟล์','profile-page-brand')}
-      <button class="profile-gallery-top" data-profile-gallery>${c.images}Gallery</button>
       <div class="full-profile-info"><div class="full-name-row"><h1>${h(p.name)}</h1>${badge(p,25)}</div>
         <p class="full-bio">${h(p.bio||'ยังไม่ได้เขียน Bio')}</p>
         <div class="profile-facts"><span>${h(p.gender||'ไม่ระบุเพศ')}</span>${p.distance!=null?`<span>${icon('pin',15)}${h(c.distance)}</span>`:''}<span>${c.star}${score(c)}</span></div>
         <div class="profile-interests">${chips(c)}</div>
         <div class="full-profile-actions">${primary(c)}<button class="profile-gallery-button" data-profile-gallery>${c.grid}Gallery <span>${c.photos.filter(p=>p.visibility==='public').length}</span></button>${albumIconButton(c)}${c.canRate ? action('rate',h(c.id),c.star,'profile-rate',`aria-label="ให้คะแนน" ${c.rateDisabled?'disabled':''}`):''}</div>
-        ${privateAlbum(c)}${peopleActions(c,true)}${c.demo?'<span class="fixture-label">บุคคลสมมติ · เฉพาะเบราว์เซอร์</span>':''}
+        ${peopleActions(c,true)}${c.demo?'<span class="fixture-label">บุคคลสมมติ · เฉพาะเบราว์เซอร์</span>':''}
       </div></main>`;
   }
   function albumTiles(c,photos){const h=c.html;return `<div class="ig-grid">${photos.map((photo,i)=>`<div class="ig-tile"><button data-gallery-action="view" data-user="${h(c.id)}" data-photo="${h(photo.id)}" aria-label="ดูรูป ${h(photo.caption||i+1)}"><img src="${h(c.media(photo.id))}" alt="${h(photo.caption||'รูป Gallery')}" loading="lazy"><span class="tile-likes">${icon('heart',12)}${Number(photo.like_count||0)}</span></button>${c.own?`<button data-photo-visibility="${photo.visibility==='public'?'private':'public'}" data-photo="${h(photo.id)}">${photo.visibility==='public'?'ย้ายเป็นส่วนตัว':'เผยแพร่สาธารณะ'}</button><button class="delete-photo" data-gallery-action="delete" data-photo="${h(photo.id)}" aria-label="ลบรูป">${icon('trash',15)}</button>`:''}</div>`).join('')}</div>`;}

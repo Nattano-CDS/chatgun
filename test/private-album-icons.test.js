@@ -22,7 +22,7 @@ test('approved locked and unlocked composition uses identical Lucide image with 
 });
 test('pending duplicate prevention, loading fail-closed and own-profile management remain explicit',()=>{
   const pending=profile({album:{granted:false,request:{status:'pending',id:'r',revision:1}}});
-  assert.match(pending,/data-album-state="locked"[^>]+disabled/);assert.match(pending,/ส่งคำขอแล้ว · รออนุมัติในแชท/);assert.match(pending,/data-album-action="cancel"/);
+  assert.match(pending,/data-album-state="locked"[^>]+disabled/);assert.match(pending,/aria-label="ส่งคำขอแล้ว รออนุมัติอัลบั้มส่วนตัว"/);assert.doesNotMatch(pending,/album-feedback|data-album-action="cancel"|data-demo-owner/);
   assert.match(profile({albumLoading:true}),/data-album-state="locked"[^>]+disabled/);
   assert.match(profile({galleryLoadError:true}),/data-album-state="locked"[^>]+disabled/);
   assert.match(profile({own:true}),/data-album-state="unlocked"/);

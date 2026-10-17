@@ -11,7 +11,7 @@ test('real isolated D1/R2 private-album cards, owner consent, revocation and log
   await auth(context,'other');
   await page.goto('/app/people/'+b.ids.owner);
   await expect(page.locator('[data-private-album]')).toHaveAttribute('data-album-state','locked');
-  await page.locator('[data-private-album]').click();await expect(page.locator('.album-feedback')).toContainText('ส่งคำขอแล้ว');
+  await page.locator('[data-private-album]').click();await expect(page.locator('[data-private-album]')).toHaveAccessibleName('ส่งคำขอแล้ว รออนุมัติอัลบั้มส่วนตัว');await expect(page.locator('#profile-dialog [data-demo-owner]')).toHaveCount(0);
   const ownerContext=await browser.newContext();await auth(ownerContext,'owner');const owner=await ownerContext.newPage();
   try{
     await owner.goto('/?tab=chat');await owner.locator('[data-chat="'+b.ids.other+'"]').click();

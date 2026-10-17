@@ -11,15 +11,15 @@ for(const [width,height] of widths){
   const card=page.locator('#people-grid [data-person="demo-01"]');
   await expect(card.locator(':scope > .card-open')).toHaveCount(1);
   await expect(card.locator(':scope > .card-photo > .profile-photo')).toHaveCount(1);
-  await expect(card.locator(':scope > .person-details > .card-name-row > button')).toHaveCount(1);
+  await expect(card.locator(':scope > .person-details > .card-name-row > span.person-name')).toHaveCount(1);
   await expect(card.locator('[data-action=request]')).toHaveCount(0);
-  await expect(card.locator('[data-action=chat]')).toHaveCount(1);
+  await expect(card.locator('button,[data-action]')).toHaveCount(0);
   await card.locator('.card-open').focus();await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/app\/people\/demo-01$/);
   await expect(page.locator('#profile-dialog')).not.toHaveJSProperty('tagName','DIALOG');
   await expect(page.locator('.full-profile-image>.profile-photo')).toBeVisible();
   await expect(page.locator('#profile-dialog nav')).toHaveCount(0);
-  await page.locator('.profile-gallery-top').click();await expect(page).toHaveURL(/\/demo-01\/gallery$/);
+  await page.locator('.profile-gallery-button').click();await expect(page).toHaveURL(/\/demo-01\/gallery$/);
   await expect(page.locator('.ig-grid>.ig-tile>button').first()).toBeVisible();
   expect(await page.locator('.ig-grid').evaluate(e=>getComputedStyle(e).gridTemplateColumns.split(' ').length)).toBe(3);
   await page.reload();await expect(page.locator('.gallery-summary')).toBeVisible();

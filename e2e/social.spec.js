@@ -169,7 +169,7 @@ test('source header switches out discovery controls; gallery distinguishes loadi
   await page.route('**/api/social/gallery?**',r=>r.fulfill(fail?{status:503,json:{message:'temporarily unavailable'}}:{json:{photos:[],comments:[],owner:'near-2'}}));
   await page.locator('#people-grid [data-person="near-2"] .card-open').click();
   await expect(page.locator('#toast')).toContainText('โหลด Gallery ไม่สำเร็จ');
-  await page.locator('.profile-gallery-top').click();await expect(page.locator('.gallery-page [role=alert]')).toBeVisible();
+  await page.locator('.profile-gallery-button').click();await expect(page.locator('.gallery-page [role=alert]')).toBeVisible();
   await expect(page.locator('.gallery-page .empty')).toHaveCount(0);
   fail=false;await page.locator('[data-retry-gallery]').click();
   await expect(page.locator('.gallery-page [role=alert]')).toHaveCount(0);

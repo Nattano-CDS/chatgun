@@ -54,10 +54,9 @@ for (const width of [390,768,1440]) {
     await expect(page.locator(".full-profile-info .fixture-label")).toContainText("สมมติ");
     const back=await page.locator('.profile-back').boundingBox();
     const brand=await page.locator('.profile-page-brand').boundingBox();
-    const galleryControl=await page.locator('.profile-gallery-top').boundingBox();
     expect(back.x+back.width).toBeLessThanOrEqual(brand.x);
-    expect(brand.x+brand.width).toBeLessThanOrEqual(galleryControl.x);
-    await page.locator(".profile-gallery-top").click();
+    await expect(page.locator('#profile-dialog [data-profile-gallery]')).toHaveCount(1);
+    await page.locator(".profile-gallery-button").click();
     await expect(page.locator('.gallery-summary [data-action="chat"]')).toBeVisible();
     await expect(page.locator('.gallery-page [data-action="report"]')).toBeVisible();
     await expect(page.locator(".gallery-page")).toBeVisible();await shot("member-gallery");

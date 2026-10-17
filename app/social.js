@@ -904,6 +904,7 @@ async function openChat(id) {
   const safety=document.createElement('div');safety.className='thread-contact-actions';
   safety.innerHTML=`<button data-chat-mute="${escapeHtml(id)}">${state.conversations.find(p=>p.other_user_id===id)?.muted?'เปิดการแจ้งเตือน':'ปิดการแจ้งเตือน'}</button><button data-action="report" data-user="${escapeHtml(id)}">รายงาน</button><button data-action="block" data-user="${escapeHtml(id)}">บล็อก</button>`;
   $('.thread-head',thread).after(safety);
+  if(state.demo)safety.insertAdjacentHTML('beforeend',`<button type="button" data-demo-owner="${escapeHtml(id)}">จำลองเป็นคู่สนทนา · ตัวอย่างเท่านั้น</button>`);
   const library = $('.asset-library',thread);
   if (library) {library.innerHTML=imagesIcon;$('.thread-head',thread).append(library);}
   state.chosenAsset=null;
@@ -1196,7 +1197,7 @@ document.addEventListener("click", async (event) => {
   if(simulation&&state.demo){const viewer=currentActor();state.demoActor=simulation.dataset.demoOwner;renderDemoPerspective();await loadRelationships();closeProfileSurface();return openChat(viewer);}
   const visibility=event.target.closest('[data-photo-visibility]');
   if(visibility){try{await api('/api/social/gallery',{method:'POST',body:{action:'visibility',id:visibility.dataset.photo,visibility:visibility.dataset.photoVisibility}});renderPeople();await showPerson(profileContext(state.selectedPerson).id,{photo:'gallery',historyMode:'replace'});}catch(error){toast(error.message,true);}return;}
-  const profileOpen=event.target.closest('[data-person-open]');if(profileOpen){await showPerson(profileOpen.dataset.personOpen);return;}
+  const profileOpen=event.target.closest('[data-person-open]');if(profileOpen){event.preventDefault();await showPerson(profileOpen.dataset.personOpen);return;}
   if(event.target.closest('.picker-toggle')){
     const picker=$('#thread .chat-image-picker');picker.hidden=!picker.hidden;$('#thread .picker-toggle').setAttribute('aria-expanded',String(!picker.hidden));
     if(picker.hidden){state.chosenAsset=null;$('#thread input[name=body]').disabled=false;}
@@ -1335,6 +1336,7 @@ document.addEventListener("click", async (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  if(event.key===' '&&event.target.matches('.card-open[data-person-open]')){event.preventDefault();event.target.click();return;}
   if (event.key === 'Escape' && !$('#profile-dialog').hidden && !$('dialog[open]')){closeProfileSurface();return;}
   if (event.key === 'Escape') { $('.toolbar')?.classList.remove('filters-open'); $('#filter-toggle')?.setAttribute('aria-expanded','false'); }
   if (!['Enter', ' '].includes(event.key) || event.target.closest("button, a, input, select, textarea")) return;

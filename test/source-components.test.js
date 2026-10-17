@@ -15,10 +15,11 @@ test('self shortcut never fabricates proximity, ratings, verification or self-so
  assert.doesNotMatch(out,/card-distance|verify-badge|incoming-bell|data-action=|4\.0/);
  assert.ok(out.includes('&lt;script&gt;'));
 });
-test('source card has real overlay/name buttons, original hierarchy and no marketing shortcuts',()=>{
+test('source card has one semantic full-card link, original hierarchy and no action buttons',()=>{
  const out=ui.card({...context,context:'near'});
  for(const name of ['card-open','card-photo','photo-shade','card-distance','person-details','card-name-row','rating-line'])assert.ok(out.includes(`class="${name}"`));
  assert.doesNotMatch(out,/data-action="(?:request|chat)"/);
+ assert.match(out,/<a class="card-open" href="\/app\/people\/fixture"/);assert.match(out,/<span class="person-name">/);assert.doesNotMatch(out,/<button|card-actions/);
  assert.ok(out.includes('&quot; onerror=&quot;'));
  assert.doesNotMatch(out,/<script>|<img>/);
 });

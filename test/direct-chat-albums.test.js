@@ -83,7 +83,9 @@ test('album requests are durable typed events, duplicate-safe and owner-only wit
   assert.equal((await decide(r)).status,409);
   const events=(await (await call('viewer','messages?target=owner')).json()).messages.filter(m=>m.system);
   assert.equal(events.length,2);assert.equal(events[0].request_revision,2);
-  assert.equal((await db.prepare('SELECT COUNT(*) n FROM album_access_grants WHERE revoked_at IS NULL').first()).n,1);
+  const approved=raced[0].status===200;
+  assert.equal((await db.prepare('SELECT status FROM album_access_requests WHERE id=?').bind(r.id).first()).status,approved?'approved':'rejected');
+  assert.equal((await db.prepare('SELECT COUNT(*) n FROM album_access_grants WHERE revoked_at IS NULL').first()).n,approved?1:0);
 });
 test('private gallery metadata, comments, likes and old raw URL deny until grant; revoke is immediate',async t=>{
   const {db,call,request,decide,photo}=await fixture(t);photo();

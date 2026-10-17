@@ -34,7 +34,7 @@ test('failed portrait remains labelled; persistent auth navigation excludes Game
 test('fictional direct chat and block/unblock persist without server writes',async({page})=>{
   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
   const writes=[];page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&r.method()!=='GET')writes.push(r.url());});
-  await page.goto('/');await page.locator('#people-grid [data-person=demo-01] [data-action=chat]').click();
+  await page.goto('/');await page.locator('#people-grid [data-person=demo-01] .card-open').click();await page.locator('.full-profile-actions [data-action=chat]').click();
   await page.locator('.composer input[name=body]').fill('คุยกับสมาชิกใหม่โดยตรง');await page.locator('.composer button[aria-label="ส่ง"]').click();
   await expect(page.locator('#thread .message')).toContainText('คุยกับสมาชิกใหม่โดยตรง');
   await page.locator('#primary-nav [data-tab=near]').click();
