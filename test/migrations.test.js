@@ -9,6 +9,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
   database.exec(readFileSync("migrations/0002_privacy_safety.sql", "utf8"));
   database.exec(readFileSync("migrations/0003_social.sql", "utf8"));
   database.exec(readFileSync("migrations/0004_moderation_audit.sql", "utf8"));
+  database.exec(readFileSync("migrations/0015_authenticated_online_presence.sql", "utf8"));
   const tables = database.database.prepare(
     "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name",
   ).all().map(({ name }) => name);
@@ -16,7 +17,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
     "album_access_grants", "album_access_requests", "chat_initiations", "chat_preferences", "chat_system_events", "account_acceptances", "account_deletion_requests", "age_assurance_events", "beta_enrollments", "beta_invitations", "deletion_receipts", "identities",
     "identity_verification_requests", "independent_age_assurances", "media_appeals", "media_deletion_queue", "media_moderation_decisions", "media_reports",
     "media_safety_audit_events", "media_safety_reviews", "media_upload_quota_attempts", "member_profiles", "moderation_access_grants", "moderation_audit_events", "moderation_notifications", "moderation_role_events", "moderation_roles",
-    "oauth_flows", "oauth_reauth_contexts", "otp_challenges",
+    "member_presence_preferences", "member_presence_leases", "oauth_flows", "oauth_reauth_contexts", "otp_challenges",
     "photo_comments", "photo_likes", "profile_photos", "proximity_ratings", "rate_limits",
     "session_auth_evidence", "sessions", "social_blocks", "social_media", "social_messages",
     "social_relationships", "social_reports", "synthetic_seed_batches", "synthetic_seed_objects", "synthetic_seed_records", "users",
@@ -33,7 +34,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
     "idx_moderation_role_events_created", "idx_moderation_role_events_target",
     "idx_oauth_expiry", "idx_oauth_reauth_expiry", "idx_otp_email_created", "idx_otp_expiry",
     "idx_otp_ip_created", "idx_photo_comments_created", "idx_profile_photos_owner",
-    "idx_profiles_discovery", "idx_rate_limits_expiry", "idx_ratings_receiver",
+    "idx_presence_user_fresh", "idx_presence_expiry", "idx_profiles_discovery", "idx_rate_limits_expiry", "idx_ratings_receiver",
     "idx_relationships_high_status", "idx_relationships_low_status", "idx_reports_reason_status", "idx_reports_status",
     "idx_session_auth_evidence_expiry", "idx_sessions_expiry", "idx_sessions_user", "idx_synthetic_seed_objects_media", "idx_synthetic_seed_records_type",
   ].sort());

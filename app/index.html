@@ -11,10 +11,10 @@
   <link rel="stylesheet" href="/app/restoration.css">
   <link rel="stylesheet" href="/app/near-components.css">
   <link rel="stylesheet" href="/app/gallery-approved.css">
+  <link rel="stylesheet" href="/app/online-presence.css">
   <script defer src="/app/gallery-approved.js"></script>
   <script defer src="/app/near-icons.js"></script>
   <script defer src="/app/near-components.js"></script>
-  <script defer src="/app/demo-network.js"></script>
   <script type="module" src="/app/social.js"></script>
 </head>
 <body>
@@ -36,11 +36,11 @@
 
       <section id="disabled-view" class="empty" hidden>
         <img src="/logo.svg" alt="" width="72">
-        <h1>ChatGun Social ยังไม่เปิดใช้งาน</h1>
-        <p>ระบบอยู่ระหว่างการทดสอบในสภาพแวดล้อม Preview ที่แยกจาก Production</p>
-        <button id="demo-start" class="secondary" type="button" hidden>ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์</button>
-        <a class="primary" href="/account.html">กลับไปบัญชี</a>
+        <h1>ChatGun กำลังเตรียมเปิดให้บริการ</h1>
+        <p id="service-status">ยังไม่เปิดรับสมาชิกหรือใช้งานบริการสังคมออนไลน์ ไม่มีการแสดงสมาชิกหรือบทสนทนาตัวอย่าง</p>
+        <a class="primary" href="/welcome">เกี่ยวกับ ChatGun</a>
       </section>
+      <section id="retired-demo" class="panel retired-demo" hidden aria-label="สำรองและลบข้อมูลตัวอย่างเดิม"></section>
 
       <section id="onboarding-view" class="onboarding" hidden>
         <div class="onboarding-panel">
@@ -72,7 +72,6 @@
           </div>
         </header>
         <div id="discovery-control-storage" hidden></div>
-        <div id="demo-banner" class="demo-banner" hidden><div><strong>โหมดตัวอย่าง</strong><span>บุคคลและบทสนทนาสมมติ · บันทึกเฉพาะในเบราว์เซอร์</span></div><a class="secondary" href="/signup">บัญชี</a><button class="demo-info" type="button" aria-label="ข้อมูลเกี่ยวกับโหมดตัวอย่าง">ข้อมูลสมมติ</button></div>
 
         <div id="near-tab" class="tab-view">
           <section id="location-banner" class="location-banner">
@@ -88,7 +87,7 @@
 
 
         <div id="chat-tab" class="tab-view" hidden>
-          <div id="demo-perspective" hidden></div><div class="chat-layout"><aside id="conversation-list" class="conversation-list"></aside><section id="thread" class="thread"><div class="empty"><h2>เลือกสมาชิกเพื่อเริ่มแชท</h2></div></section></div>
+          <div class="chat-layout"><aside id="conversation-list" class="conversation-list"></aside><section id="thread" class="thread"><div class="empty"><h2>เลือกสมาชิกเพื่อเริ่มแชท</h2></div></section></div>
         </div>
 
         <div id="reviews-tab" class="tab-view" hidden><p class="subtitle">▣ มีเพียงคุณที่อ่านความคิดเห็นเหล่านี้ได้</p><div id="reviews-list"></div></div>
@@ -105,6 +104,7 @@
             <button id="profile-verification" class="verify-cta" type="button" disabled title="การส่งหลักฐานยังไม่เปิดใช้งาน">ยืนยันตัวตน รับตรา Verify</button>
             <button id="hide-discovery" class="secondary" type="button">ปิดการหาเพื่อนและลบตำแหน่ง</button>
             <label class="wide"><input id="direct-contact-toggle" type="checkbox" checked> รับข้อความโดยตรงจากสมาชิกที่มีสิทธิ์ (ปิดได้ทุกเมื่อ)</label>
+            <label class="wide" id="online-preference" hidden><input id="online-status-toggle" type="checkbox"> แสดงสถานะออนไลน์ <small>ปิดไว้เป็นค่าเริ่มต้น แยกจากการแชร์ตำแหน่ง</small></label>
             <button id="notification-toggle" class="secondary wide" type="button">เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้</button>
             <div id="blocked-list" class="blocked-users"></div>
           </form>
@@ -112,7 +112,6 @@
           <section class="gallery-panel upload-page">
             <header class="upload-header"><button id="gallery-settings-back" type="button" aria-label="กลับไปโปรไฟล์">←</button><a class="toolbar-brand" href="/"><img src="/logo.svg" alt="">ChatGun</a><h1>จัดการรูป</h1></header>
             <div class="upload-content">
-              <p class="upload-demo" id="manage-demo-notice" hidden>โหมดตัวอย่าง · รูปบันทึกเฉพาะในเบราว์เซอร์</p>
               <section class="upload-profile-panel"><div class="upload-cover" id="manage-cover"></div><div><h2 id="manage-owner"></h2><p>รูปโปรไฟล์ของคุณ</p><button class="secondary" data-choose-profile type="button">เปลี่ยนรูปโปรไฟล์</button></div></section>
               <section class="upload-editor">
                 <div class="upload-kind" role="group" aria-label="ประเภทของรูป"><button type="button" class="selected" data-upload-kind="profile" aria-pressed="true">รูปโปรไฟล์</button><button type="button" data-upload-kind="gallery" aria-pressed="false">Gallery</button></div>

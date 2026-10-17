@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync, readFileSync, statSync } from "node:fs";
+import { createHash } from 'node:crypto';
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 
@@ -17,6 +18,20 @@ const confirmation = confirmFlag >= 0 ? process.argv[confirmFlag + 1] : "";
 if (!batchId) throw new Error("Usage: node scripts/cleanup-social-staging.mjs --batch <batch-id> [--execute --confirm <batch-id>]");
 if (!/^[a-z0-9-]{8,80}$/u.test(batchId)) throw new Error("Invalid batch ID");
 if (execute && confirmation !== batchId) throw new Error("Execution requires --confirm with the exact batch ID");
+// A dry run is not a backup or a cascade/provenance review. Never accept the old
+// confirmation-only destructive invocation, especially for untracked audit data.
+if(execute){
+  const auditFlag=process.argv.indexOf('--audit'),backupFlag=process.argv.indexOf('--backup-sql');
+  if(auditFlag<0||backupFlag<0)throw Error('Execution requires --audit and --backup-sql after a protected backup and cascade review');
+  const audit=JSON.parse(readFileSync(process.argv[auditFlag+1],'utf8'));
+  const backup=process.argv[backupFlag+1];
+  if((statSync(backup).mode&0o077)!==0)throw Error('Backup must have private 0600 permissions');
+  const digest=createHash('sha256').update(readFileSync(backup)).digest('hex');
+  const checkedAt=Date.parse(audit.checkedAt),age=Date.now()-checkedAt;
+  if(audit.batch!==batchId||audit.databaseId!==DATABASE_ID||audit.backupSha256!==digest
+    ||audit.safeToExecute!==true||audit.r2BackupVerified!==true
+    ||!Number.isFinite(checkedAt)||age<0||age>15*60*1000)throw Error('Cleanup blocked: backup, R2 recovery, freshness, or untracked-record provenance not approved');
+}
 
 function sql(value) { return `'${String(value).replaceAll("'", "''")}'`; }
 function runWrangler(args, options = {}) { return execFileSync("npx", [WRANGLER, ...args], { encoding: "utf8", ...options }); }

@@ -4,7 +4,7 @@ import {TestD1,environment} from './helpers/d1.js';
 import {issueSession} from '../functions/_lib/db.js';
 import {onRequest} from '../functions/api/social/[[path]].js';
 import {ONE_PIXEL_PNG} from './helpers/image.js';
-import {initializeGallery,galleryBatch,resetGalleryBatch} from '../app/demo-gallery.js';
+import {initializeGallery,galleryBatch,resetGalleryBatch} from './fixtures/retired-demo/demo-gallery.js';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 

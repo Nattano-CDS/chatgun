@@ -11,14 +11,11 @@ if (existsSync(output) && readdirSync(output).length) {
 mkdirSync(output, { recursive: true, mode: 0o700 });
 writeFileSync(resolve(output,".chatgun-public-build"),"generated-public-assets\n");
 for (const file of readdirSync(".", { withFileTypes: true })) {
-  if (file.isFile() && (/\.(html|css|js|svg|ico|png|webp)$/u.test(file.name) || ["_headers", "_redirects"].includes(file.name))) copyFileSync(file.name, resolve(output, file.name));
+  if (file.isFile() && !file.name.startsWith('playwright.') && (/\.(html|css|js|svg|ico|png|webp)$/u.test(file.name) || ["_headers", "_redirects", "_routes.json"].includes(file.name))) copyFileSync(file.name, resolve(output, file.name));
 }
-for (const directory of ["app", "assets"]) cpSync(directory, resolve(output, directory), { recursive: true });
+for (const directory of ["app", "assets"]) cpSync(directory, resolve(output, directory), { recursive: true, filter: source => !/\/(?:assets\/demo|app\/demo-(?:network|gallery|bootstrap)\.js)(?:\/|$)/u.test(source) });
 if (process.env.CF_PAGES_BRANCH === "main" || process.env.CHATGUN_CANARY_BUILD === "true") {
   for (const page of ["privacy.html","terms.html","data-deletion.html"]) copyFileSync("canary-notice.html",resolve(output,page));
-  // Only the guarded public demo build can recover independently of Pages Functions.
-  // This file contains no service credentials or live capability flags.
-  writeFileSync(resolve(output,"assets/demo/canary-runtime.json"),JSON.stringify({mode:"fictional-only-v1",demoBatch:"chatgun-browser-demo-v1"})+"\n");
 }
-writeFileSync(resolve(output,"release.json"),JSON.stringify({commit:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),demoBatch:"chatgun-browser-demo-v1"})+"\n");
+writeFileSync(resolve(output,"release.json"),JSON.stringify({commit:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),fictionalDemoEnabled:false})+"\n");
 console.log(`Public asset package: ${output}`);

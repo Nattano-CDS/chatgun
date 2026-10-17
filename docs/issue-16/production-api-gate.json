@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-10-17T18:00:23.197Z",
+  "origin": "https://chatgun.social",
+  "ready": false,
+  "checks": [
+    {
+      "path": "/api/social/config",
+      "status": 404,
+      "json": false,
+      "valid": false
+    },
+    {
+      "path": "/api/auth/config",
+      "status": 404,
+      "json": false,
+      "valid": false
+    }
+  ],
+  "productionDeploymentAuthorizedByThisScript": false
+}

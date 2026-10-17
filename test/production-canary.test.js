@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readFileSync, mkdtempSync, readdirSync } from "node:fs";
+import { readFileSync, mkdtempSync, readdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
@@ -27,12 +27,8 @@ test("public canary never publishes unapproved legal drafts", async () => {
   }
 });
 
-test("public fixture has only explicit fictional fields and 120 Thai messages",()=>{
-  const fixture=JSON.parse(readFileSync("assets/demo/network.json","utf8"));
-  assert.equal(fixture.fictional,true);assert.equal(fixture.profiles.length,20);
-  assert.equal(fixture.conversations.length,10);assert.equal(fixture.conversations.reduce((n,c)=>n+c.messages.length,0),120);
-  assert.ok(fixture.profiles.every(p=>Object.keys(p).sort().join(",")==="bio,gender,interests,name,slug"));
-  assert.doesNotMatch(JSON.stringify(fixture),/token|csrf|subject|latitude|longitude|@/iu);
+test("public fictional network asset is removed",()=>{
+  assert.equal(existsSync('assets/demo/network.json'),false);
 });
 
 test("public build excludes test bundles, credentials, scripts and backups",()=>{

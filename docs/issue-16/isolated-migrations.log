@@ -1,0 +1,22 @@
+
+ ⛅️ wrangler 4.151.1
+────────────────────
+Resource location: remote 
+
+Migrations to be applied:
+┌────────────────────────────────────────┐
+│ name                                   │
+├────────────────────────────────────────┤
+│ 0015_authenticated_online_presence.sql │
+└────────────────────────────────────────┘
+? About to apply 1 migration(s)
+Your database may not be available to serve requests during the migration, continue?
+🤖 Using fallback value in non-interactive context: yes
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 6 commands in 1.81ms
+┌────────────────────────────────────────┬────────┐
+│ name                                   │ status │
+├────────────────────────────────────────┼────────┤
+│ 0015_authenticated_online_presence.sql │ ✅     │
+└────────────────────────────────────────┴────────┘

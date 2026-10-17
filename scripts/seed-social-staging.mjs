@@ -15,6 +15,7 @@ const manifestSource = readFileSync(manifestPath, "utf8");
 const manifest = JSON.parse(manifestSource);
 const manifestHash = createHash("sha256").update(manifestSource).digest("hex");
 const dryRun = process.argv.includes("--dry-run");
+if(!dryRun)throw Error('Owner-review demo seeding is retired under Issue #16. No reseeding is permitted by this script.');
 const outputFlag = process.argv.indexOf("--output");
 const output = resolve(outputFlag >= 0 ? process.argv[outputFlag + 1] : "test-results/staging-social-sessions.json");
 const now = Math.floor(Date.now() / 1000);

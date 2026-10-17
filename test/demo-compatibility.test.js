@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
-const window={};vm.runInNewContext(readFileSync('app/demo-network.js','utf8'),{window});
+const window={};vm.runInNewContext(readFileSync('test/fixtures/retired-demo/demo-network.js','utf8'),{window});
 const upgrade=window.chatgunUpgradeDemoReads;
 function thread(){return {other:[1,2,3].map(n=>({id:'m'+n,sender_user_id:'other',receiver_user_id:'demo-me',body:'body'+n,created_at:n}))};}
 test('legacy read conversations remain read without replacing message history',()=>{

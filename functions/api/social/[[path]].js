@@ -1,4 +1,5 @@
 import { safeUuid } from "../../_lib/crypto.js";
+import { onlineStatuses, writeOnlineHeartbeat } from '../../_lib/online-presence.js';
 import { getSession, hasRecentAuthentication, rateLimit, requireCsrf, unixTime } from "../../_lib/db.js";
 import { RequestError, failure, json, readJson, requireSameOrigin } from "../../_lib/http.js";
 import { sanitizeImage } from "../../_lib/image.js";
@@ -327,12 +328,46 @@ async function config(env) {
     ratingsEnabled: enabled(env.RATINGS_ENABLED),
     identityVerificationEnabled: enabled(env.IDENTITY_VERIFICATION_ENABLED),
     sensitiveContentEnabled: enabled(env.SENSITIVE_CONTENT_ENABLED),
-    demoModeEnabled: enabled(env.DEMO_MODE_ENABLED),
-    demoAutoStartEnabled: enabled(env.DEMO_MODE_ENABLED) && enabled(env.DEMO_AUTO_START_ENABLED),
+    demoModeEnabled: false,
+    demoAutoStartEnabled: false,
+    onlineStatusEnabled: socialAppEnabled && enabled(env.PRESENCE_ENABLED),
     gameEnabled: false,
     emailOtpEnabled: false,
     mobileOtpEnabled: false,
   });
+}
+
+async function onlinePresence(request,env) {
+  capability(env,'SOCIAL_APP_ENABLED');capability(env,'PRESENCE_ENABLED');
+  const session=await authenticated(request,env,{csrf:request.method==='POST'});
+  await requireProfile(env.DB,session.user_id);
+  if(request.method==='GET') {
+    await limited(env,'online_read_minute',session.user_id,120,60);
+    const raw=new URL(request.url).searchParams.get('users')||'';
+    const ids=raw?raw.split(','):[];
+    if(ids.length>50||ids.some(id=>!id||id.length>128))throw new SocialError('invalid_input','ข้อมูลไม่ถูกต้อง');
+    const pref=await env.DB.prepare('SELECT show_online FROM member_presence_preferences WHERE user_id=?').bind(session.user_id).first();
+    return json({showOnline:pref?.show_online===1,statuses:await onlineStatuses(env.DB,session.user_id,ids)});
+  }
+  const body=await readJson(request);
+  if(body.action==='preference') {
+    if(typeof body.enabled!=='boolean')throw new SocialError('invalid_input','ข้อมูลไม่ถูกต้อง');
+    await limited(env,'online_preference_minute',session.user_id,10,60);
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO member_presence_preferences(user_id,show_online) VALUES (?,?)
+        ON CONFLICT(user_id) DO UPDATE SET show_online=excluded.show_online`).bind(session.user_id,body.enabled?1:0),
+      env.DB.prepare('DELETE FROM member_presence_leases WHERE user_id=?').bind(session.user_id),
+    ]);
+    return json({ok:true,showOnline:body.enabled});
+  }
+  if(!/^[a-zA-Z0-9_-]{16,64}$/.test(body.tabId||''))throw new SocialError('invalid_input','ข้อมูลไม่ถูกต้อง');
+  await limited(env,'online_heartbeat_minute',session.user_id,12,60);
+  if(body.action==='offline') {
+    await env.DB.prepare('DELETE FROM member_presence_leases WHERE session_token_hash=? AND tab_id=?').bind(session.token_hash,body.tabId).run();
+  } else if(body.action==='heartbeat'&&body.foreground===true) {
+    await writeOnlineHeartbeat(env.DB,session,body.tabId);
+  } else throw new SocialError('invalid_input','ข้อมูลไม่ถูกต้อง');
+  return json({ok:true});
 }
 
 async function memberOnboarding(request, env) {
@@ -439,6 +474,7 @@ async function getProfile(request, env) {
   const profile = await profileFor(env.DB, target);
   if (!profile) throw new SocialError("not_found", "ไม่พบโปรไฟล์", 404);
   if (target !== session.user_id) profile.selected_photo_id=await publicPortrait(env.DB,profile.selected_photo_id,target);
+  profile.is_online=enabled(env.PRESENCE_ENABLED)?(await onlineStatuses(env.DB,session.user_id,[target]))[target]:false;
   return json({ profile: visibleProfile(profile, target === session.user_id) });
 }
 
@@ -566,6 +602,7 @@ async function discovery(request, env) {
     .sort((a, b) => a.distance - b.distance || String(a.user_id).localeCompare(String(b.user_id)))
     .map(({ _distance, ...person }) => person);
   for (const person of people) person.selected_photo_id=await publicPortrait(env.DB,person.selected_photo_id,person.user_id);
+  if(enabled(env.PRESENCE_ENABLED))for(let start=0;start<people.length;start+=50){const group=people.slice(start,start+50),statuses=await onlineStatuses(env.DB,session.user_id,group.map(p=>p.user_id));for(const person of group)person.is_online=statuses[person.user_id];}
   return json({ people, locationFresh: true });
 }
 
@@ -645,6 +682,7 @@ async function conversations(request,env) {
     const latest=JSON.parse(p.last_message_payload||'null');delete p.last_message_payload;
     if(latest)Object.assign(p,{last_message_body:latest.body,last_message_media_id:latest.media_id,last_message_sender_id:latest.sender_user_id,last_message_unsent_at:latest.unsent_at});
   }
+  if(enabled(env.PRESENCE_ENABLED)){const statuses=await onlineStatuses(env.DB,session.user_id,result.map(p=>p.other_user_id));for(const person of result)person.is_online=statuses[person.other_user_id];}
   return json({conversations:result,hasMore:(rows.results||[]).length>50,nextOffset:offset+result.length});
 }
 
@@ -1973,6 +2011,7 @@ export async function onRequest({ request, env }) {
     if (!env.DB) throw new Error("missing_db_binding");
     const path = new URL(request.url).pathname;
     if (request.method === "GET" && path === "/api/social/config") return config(env);
+    if (path === '/api/social/online' && ['GET','POST'].includes(request.method)) return await onlinePresence(request,env);
     if (path === '/api/social/conversations' && request.method === 'GET') return await conversations(request,env);
     if (path === '/api/social/albums/access' && ['GET','POST'].includes(request.method)) return await albumAccess(request,env);
     if (path === '/api/social/chat-preferences' && request.method==='POST') return await chatPreferences(request,env);
