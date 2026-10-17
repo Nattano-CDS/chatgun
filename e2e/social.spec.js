@@ -5,7 +5,7 @@ const config = {
   adultOnboardingEnabled: true,
   adultNoticeVersion: "adult-preview-v1",
   publicDiscoveryEnabled: true,
-  friendRequestsEnabled: true,
+  friendRequestsEnabled: false,
   messagingEnabled: true,
   mediaUploadEnabled: false,
   ratingsEnabled: true,
@@ -33,7 +33,7 @@ async function mockSocialApi(page) {
         { user_id: "near-1", name: "มิน", gender: "หญิง", bio: "ชอบคาเฟ่และถ่ายรูป", interests: "กาแฟ, ถ่ายรูป", distance: 82, rating: 4.8, rating_count: 12 },
         { user_id: "near-2", name: "ต้น", gender: "ชาย", bio: "วิ่งและท่องเที่ยว", interests: "วิ่ง, ท่องเที่ยว", distance: 640, rating: 4.5, rating_count: 6 },
       ] },
-      "/api/social/relationships": { relationships: [
+      "/api/social/conversations": { conversations: [
         { id: "r1", other_user_id: "friend-1", requested_by: "friend-1", status: "accepted", name: "พลอย", gender: "หญิง", bio: "เพื่อนใน ChatGun", last_message_at: 1_790_000_100, last_message_body: "เจอกันที่คาเฟ่", last_message_sender_id: "me", unread_count: 0 },
       ] },
       "/api/social/ratings": { ratings: [{ id: "v1", score: 5, comment: "สุภาพและเป็นมิตร", sender_name: "พลอย", created_at: 1_790_000_000 }] },
@@ -75,7 +75,7 @@ test('authenticated shortcut is session-owned, deduplicated and independent of d
 
 test('gallery failed comment keeps its draft and inline reason; likes are disabled while pending',async({page})=>{
  let likes=0;
- await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',photos:[{id:'fixture-photo',owner:'near-1',caption:'ภาพสมมติ',like_count:0}],comments:[]}}));
+ await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',photos:[{id:'fixture-photo',visibility:'public',owner:'near-1',caption:'ภาพสมมติ',like_count:0}],comments:[]}}));
  await page.route('**/api/social/gallery',async r=>{
   const body=r.request().postDataJSON();
   if(body.action==='comment')return r.fulfill({status:403,json:{error:'ไม่มีสิทธิ์ส่งความคิดเห็น'}});
@@ -97,14 +97,12 @@ test('gallery failed comment keeps its draft and inline reason; likes are disabl
   await expect(page.locator('#profile-dialog')).toBeHidden();await expect(page).not.toHaveURL(/\/people\//);
 });
 
-test("desktop social shell preserves discovery, friends, chat, reviews, and profile without game", async ({ page }, testInfo) => {
+test("desktop social shell preserves discovery, direct chat, reviews, and profile without game", async ({ page }, testInfo) => {
   await page.goto("/app/");
   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();
   await expect(page.getByText("มิน")).toBeVisible();
   await expect(page.getByText("ต้น")).toBeVisible();
   await expect(page.getByRole("button", { name: "เกม" })).toHaveCount(0);
-  await page.locator('#primary-nav button[data-tab="friends"]').click();
-  await expect(page.locator("#friends-grid").getByText("พลอย")).toBeVisible();
   await page.locator('#primary-nav button[data-tab="reviews"]').click();
   await expect(page.locator("#reviews-list").getByText("สุภาพและเป็นมิตร")).toBeVisible();
   await page.locator('#primary-nav button[data-tab="chat"]').click();
@@ -155,9 +153,9 @@ test('coarse live distance does not silently remove the server-authorized rating
 });
 
 test('source header switches out discovery controls; gallery distinguishes loading failure from empty and retries',async({page})=>{
-  await page.goto('/app/');await page.locator('#primary-nav [data-tab=friends]').click();
+  await page.goto('/app/');await page.locator('#primary-nav [data-tab=chat]').click();
   await expect(page.locator('.toolbar .discovery-controls')).toHaveCount(0);
-  await expect(page.locator('.toolbar>.toolbar-page')).toHaveText('เพื่อน');
+  await expect(page.locator('.toolbar>.toolbar-page')).toHaveText('แชท');
   await page.locator('#primary-nav [data-tab=profile]').click();
   await expect(page.locator('.toolbar .discovery-controls')).toHaveCount(0);
   await page.locator('#primary-nav [data-tab=near]').click();

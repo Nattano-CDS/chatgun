@@ -12,7 +12,8 @@ for(const [width,height] of widths){
   await expect(card.locator(':scope > .card-open')).toHaveCount(1);
   await expect(card.locator(':scope > .card-photo > .profile-photo')).toHaveCount(1);
   await expect(card.locator(':scope > .person-details > .card-name-row > button')).toHaveCount(1);
-  await expect(card.locator('[data-action=request],[data-action=chat]')).toHaveCount(0);
+  await expect(card.locator('[data-action=request]')).toHaveCount(0);
+  await expect(card.locator('[data-action=chat]')).toHaveCount(1);
   await card.locator('.card-open').focus();await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/app\/people\/demo-01$/);
   await expect(page.locator('#profile-dialog')).not.toHaveJSProperty('tagName','DIALOG');
@@ -24,15 +25,15 @@ for(const [width,height] of widths){
   await page.reload();await expect(page.locator('.gallery-summary')).toBeVisible();
   await page.locator('.ig-tile>button').first().click();await expect(page).toHaveURL(/\/gallery\/demo-portrait-01$/);
   await page.locator('.post-like').click();await expect(page.locator('.post-like')).toHaveAttribute('aria-pressed','true');
-  await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นสมมติที่ไม่เปิดให้คนแปลกหน้าอ่าน');
+  await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นรูปสาธารณะที่ผู้มีสิทธิ์อ่านได้');
   await page.locator('#gallery-comment button').click();
-  // Source comments are private to the owner and accepted friends, not strangers.
-  await expect(page.locator('.post-comments')).toHaveCount(0);
+  // Issue 13: photo visibility/grants, never friendship, govern all comments.
+  await expect(page.locator('.post-comments')).toContainText('ความคิดเห็นรูปสาธารณะที่ผู้มีสิทธิ์อ่านได้');
   await page.locator('[data-gallery-return]').click();await page.locator('[data-profile-return]').click();
   await expect(page.locator('.full-profile:not(.gallery-page)')).toBeVisible();
   await page.locator('.profile-back').click();await expect(page.locator('#people-grid')).toBeVisible();
-  await page.locator('#primary-nav [data-tab=friends]').click();
-  await page.locator('#friends-grid .card-open').first().click();await expect(page.locator('.full-profile-actions [data-action=chat]')).toBeVisible();
+  await page.locator('#primary-nav [data-tab=near]').click();
+  await page.locator('#people-grid [data-person=demo-02] .card-open').click();await expect(page.locator('.full-profile-actions [data-action=chat]')).toBeVisible();
   await page.keyboard.press('Escape');await page.locator('#primary-nav [data-tab=profile]').click();
   await page.locator('#manage-gallery').click();await expect(page).toHaveURL(/\/app\/photos$/);
   const second=page.locator('#my-gallery [data-gallery-action=select]').nth(1);

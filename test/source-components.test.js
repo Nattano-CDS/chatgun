@@ -7,7 +7,7 @@ vm.runInNewContext(readFileSync('app/near-components.js','utf8'),{window});
 const ui=window.ChatgunNearComponents;
 const html=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const person={name:'x" onerror="alert(1)',bio:'<script>bad</script>',gender:'ไม่ระบุ',interests:'กาแฟ,<img>',rating:4,rating_count:2};
-const context={person,id:'fixture',html,portrait:()=>'<img class="profile-photo" alt="fiction">',media:()=>'/assets/demo/01.png',distance:'ระยะสมมติ',photos:[{id:'photo',caption:'สมมติ',like_count:0}],config:{friendRequestsEnabled:true,messagingEnabled:true},star:'<svg></svg>',images:'<svg></svg>',grid:'<svg></svg>',userPlus:'<svg></svg>',demo:true};
+const context={person,id:'fixture',html,portrait:()=>'<img class="profile-photo" alt="fiction">',media:()=>'/assets/demo/01.png',distance:'ระยะสมมติ',photos:[{id:'photo',visibility:'public',caption:'สมมติ',like_count:0}],config:{friendRequestsEnabled:true,messagingEnabled:true},star:'<svg></svg>',images:'<svg></svg>',grid:'<svg></svg>',userPlus:'<svg></svg>',demo:true};
 test('self shortcut never fabricates proximity, ratings, verification or self-social actions',()=>{
  const out=ui.card({...context,person:{...person,identity_verified:1},own:true,canRate:true,incoming:true});
  assert.match(out,/self-card-badge">คุณ/);assert.match(out,/โปรไฟล์ของคุณ · ตัวอย่าง/);
@@ -30,11 +30,11 @@ test('full profile and gallery are source route structures, never duplicated mod
  assert.match(gallery,/4\.0 ★ · 2 คะแนน/);
  assert.doesNotMatch(profile+gallery,/<dialog|<nav|member-profile-view|profile-navigation/);
  assert.doesNotMatch(gallery,/delete-photo|route-gallery-upload/);
- assert.match(ui.gallery({...context,own:true,config:{mediaUploadEnabled:true}}),/id="route-gallery-upload"/);
+ assert.match(ui.gallery({...context,own:true,demo:false,config:{mediaUploadEnabled:true}}),/id="route-gallery-upload"/);
 });
-test('private comments stay absent for strangers and visible for owners/accepted friends only',()=>{
+test('server-authorized photo comments render independently of historical friendship',()=>{
  const view={photos:context.photos,index:0,comments:[{sender_name:'เพื่อน',body:'private-fixture'}]};
- assert.doesNotMatch(ui.post({...context,view}),/private-fixture|class="post-comments"/);
+ assert.match(ui.post({...context,view}),/private-fixture|class="post-comments"/);
  assert.match(ui.post({...context,view,own:true}),/private-fixture/);
  assert.match(ui.post({...context,view,relation:{status:'accepted'}}),/private-fixture/);
  assert.match(ui.post({...context,view}),/<button disabled>ส่ง<\/button>/);

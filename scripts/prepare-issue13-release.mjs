@@ -1,0 +1,27 @@
+// Guarded fictional Production package. Live routes remain disabled on the OLD schema.
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {mkdtempSync,readFileSync,existsSync,writeFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+const baseline='6b6af92ea34a75b5698751c43c6ec03e97d79e8d';
+const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+execFileSync('git',['diff','--exit-code','HEAD','--','app','assets','functions','migrations','wrangler.jsonc','auth-nav.js'],{stdio:'pipe'});
+const config=JSON.parse(readFileSync('wrangler.jsonc','utf8'));
+const previous=JSON.parse(execFileSync('git',['show',baseline+':wrangler.jsonc'],{encoding:'utf8'}));
+assert.deepEqual(config.env.production,previous.env.production,'Production configuration must not change');
+assert.equal(config.env.production.r2_buckets.length,0);
+assert.equal(config.env.production.d1_databases[0].database_id,'9738a051-d914-42d0-8e7b-8098ef2b959d');
+const infrastructure=JSON.parse(readFileSync('docs/issue-13/infrastructure-check.json'));
+assert.equal(infrastructure.productionR2Bindings,0);
+assert.equal(infrastructure.productionFlags.SOCIAL_APP_ENABLED,'false');
+const cloud=JSON.parse(readFileSync('docs/issue-13/cloud-test-results.json'));
+assert.equal(cloud.commit,sha);assert.equal(cloud.failed,0);assert.ok(cloud.passed>=24);
+const directory=mkdtempSync(join(tmpdir(),'chatgun-issue13-production-'));
+execFileSync('node',['scripts/build-pages.mjs'],{env:{...process.env,CHATGUN_CANARY_BUILD:'true',CHATGUN_BUILD_DIR:directory},stdio:'pipe'});
+assert.equal(JSON.parse(readFileSync(join(directory,'release.json'))).commit,sha);
+for(const page of ['privacy.html','terms.html','data-deletion.html'])assert.deepEqual(readFileSync(join(directory,page)),readFileSync('canary-notice.html'));
+for(const path of ['docs','scripts','test-results','test','e2e','.dev.vars','node_modules','migrations'])assert.equal(existsSync(join(directory,path)),false,path);
+assert.deepEqual(readFileSync(join(directory,'assets/demo/network.json')),execFileSync('git',['show',baseline+':assets/demo/network.json']));
+const evidence={sha,directory,baseline,backendUpdatedButLiveGatesClosed:true,productionSchemaMigration:false,productionConfigurationUnchanged:true,privateArtifactsExcluded:true,legalDraftsExcluded:true,fictionalDatasetPreserved:true,rollbackDeployment:'f8206788-ecba-4999-a95f-bfcd3c47a69f',rollbackSha:'12e55fde423832152d7317c3e85bfd42f53eaf01'};
+writeFileSync('docs/issue-13/package-check.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));

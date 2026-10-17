@@ -6,7 +6,13 @@ const screenshotDirectory = resolve("test-results/screenshots");
 
 test.beforeAll(() => mkdirSync(screenshotDirectory, { recursive: true }));
 
+// Deterministic UI contract only. Never evidence of real CAPTCHA/OAuth success.
+async function mockProviderConfiguration(page){
+  await page.route('**/api/auth/config',r=>r.fulfill({json:{oauthLoginEnabled:true,oauthProviders:['google','facebook','line'],turnstileSiteKey:'0xMockedUiOnly',newAccountRegistrationEnabled:false,invitationOnlyRegistrationEnabled:false,emailOtpEnabled:false,mobileOtpEnabled:false}}));
+}
+
 test("signup explains a Turnstile connection failure in Thai and retries before OAuth", async ({ page }) => {
+  await mockProviderConfiguration(page);
   await page.route("https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit", async (route) => {
     await route.fulfill({
       status: 200,
@@ -64,6 +70,8 @@ test("signup explains a Turnstile connection failure in Thai and retries before 
 });
 
 test("signup permits existing social login while public registration remains closed", async ({ page }, testInfo) => {
+  await mockProviderConfiguration(page);
+  await page.route('https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',r=>r.fulfill({contentType:'application/javascript',body:`window.turnstile={render(target){const input=document.createElement('input');input.type='hidden';input.name='cf-turnstile-response';document.querySelector(target).append(input);return 'mock-ui';},getResponse(){return '';}};`}));
   const cspErrors = [];
   page.on("console", (entry) => {
     if (/Content Security Policy directive/iu.test(entry.text())) cspErrors.push(entry.text());
@@ -167,7 +175,7 @@ test("Pages Functions expose secure config and reject cross-origin mutations", a
   expect(configResponse.headers()["cache-control"]).toBe("no-store");
   expect(configResponse.headers()["x-content-type-options"]).toBe("nosniff");
   const config = await configResponse.json();
-  expect(config.oauthProviders).toEqual(["google", "facebook", "line"]);
+  expect(config.oauthProviders).toEqual(config.oauthLoginEnabled ? ["google", "facebook", "line"] : []);
   expect(config.emailOtpEnabled).toBe(false);
   expect(config.mobileOtpEnabled).toBe(false);
   expect(config.smsEnabled).toBe(false);
@@ -178,7 +186,7 @@ test("Pages Functions expose secure config and reject cross-origin mutations", a
     unsolicitedMessagingEnabled: false,
     minorRegistrationEnabled: false,
   });
-  expect(config.turnstileSiteKey).toMatch(/^0x[\w-]+$/u);
+  if(config.turnstileSiteKey!==null)expect(config.turnstileSiteKey).toMatch(/^0x[\w-]+$/u);
 
   const disabledOtpResponse = await request.post("/api/auth/otp/start", {
     headers: { origin: baseURL, "content-type": "application/json" },

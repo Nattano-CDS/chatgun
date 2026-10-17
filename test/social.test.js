@@ -194,45 +194,20 @@ test("discovery throttles repeated reads used for location inference", async () 
   database.close();
 });
 
-test("friendship, messaging, blocking, and reports enforce server-side relationship rules", async () => {
-  const database = new TestD1();
-  const env = socialEnvironment(database);
-  const alice = await addUser(database, "rel-alice", "Alice");
-  const bob = await addUser(database, "rel-bob", "Bob");
-  await onboard(env, alice, "Alice");
-  await onboard(env, bob, "Bob");
-
-  const premature = await call(env, request("/api/social/messages", alice, {
-    method: "POST", body: { action: "send", target: "rel-bob", body: "hello" },
-  }));
-  assert.equal(premature.status, 403);
-
-  assert.equal((await call(env, request("/api/social/relationships", alice, {
-    method: "POST", body: { action: "request", target: "rel-bob" },
-  }))).status, 200);
-  assert.equal((await call(env, request("/api/social/relationships", bob, {
-    method: "POST", body: { action: "accept", target: "rel-alice" },
-  }))).status, 200);
-
-  const sent = await call(env, request("/api/social/messages", alice, {
-    method: "POST", body: { action: "send", target: "rel-bob", body: "hello" },
-  }));
-  assert.equal(sent.status, 200, await sent.text());
-  const thread = await call(env, request("/api/social/messages?target=rel-alice", bob));
-  const payload = await thread.json();
-  assert.equal(payload.messages[0].body, "hello");
-  const inbox = await call(env, request("/api/social/relationships", alice));
-  const conversation = (await inbox.json()).relationships.find((item) => item.other_user_id === "rel-bob");
-  assert.equal(conversation.last_message_body, "hello");
-  assert.equal(conversation.last_message_sender_id, "rel-alice");
-  assert.ok(Number(conversation.last_message_at) > 0);
-  await database.prepare("UPDATE social_relationships SET status='pending' WHERE id=?").bind(conversation.id).run();
-  const pendingInbox = await call(env, request("/api/social/relationships", alice));
-  const pendingConversation = (await pendingInbox.json()).relationships.find((item) => item.other_user_id === "rel-bob");
-  assert.equal(pendingConversation.last_message_body, null, "pending relationships do not receive message previews");
-  assert.equal(pendingConversation.unread_count, 0);
-  await database.prepare("UPDATE social_relationships SET status='accepted' WHERE id=?").bind(conversation.id).run();
-
+test("direct messaging, blocking, and reports require no friendship", async () => {
+  const database=new TestD1(),env=socialEnvironment(database);
+  const alice=await addUser(database,"rel-alice","Alice"),bob=await addUser(database,"rel-bob","Bob");
+  await onboard(env,alice,"Alice");await onboard(env,bob,"Bob");
+  const sent=await call(env,request("/api/social/messages",alice,{method:"POST",body:{action:"send",target:"rel-bob",body:"hello"}}));
+  assert.equal(sent.status,200,await sent.text());
+  assert.equal((await call(env,request("/api/social/relationships",alice,{method:"POST",body:{action:"request",target:"rel-bob"}}))).status,410);
+  const thread=await call(env,request("/api/social/messages?target=rel-alice",bob));
+  assert.equal((await thread.json()).messages[0].body,"hello");
+  const inbox=await call(env,request("/api/social/conversations",bob));
+  const conversation=(await inbox.json()).conversations.find(p=>p.other_user_id==="rel-alice");
+  assert.equal(conversation.unread_count,1);
+  assert.ok(conversation.last_message_at>0);
+  assert.equal((await database.prepare("SELECT COUNT(*) n FROM social_relationships").first()).n,0);
   const report = await call(env, request("/api/social/reports", bob, {
     method: "POST",
     body: { target: "rel-alice", category: "harassment", details: "ข้อความไม่เหมาะสม" },

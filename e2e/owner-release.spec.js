@@ -20,11 +20,7 @@ for (const width of [390,768,1440]) {
     await expect(page.locator("#people-grid .person-card")).toHaveCount(5);
     await page.locator('[data-discovery-page="1"]').click();
     await shot("discovery");
-    await page.locator('#primary-nav [data-tab="friends"]').click();
-    await expect(page.locator("#friends-grid .person-card")).toHaveCount(10);
-    await expect(page.locator("#requests-grid .person-card")).toHaveCount(5);
-    const overlap=await page.locator("#friends-tab").evaluate(tab=>{const subtitle=tab.querySelector(".subtitle").getBoundingClientRect();const heading=tab.querySelector("h2").getBoundingClientRect();return subtitle.bottom>heading.top;});
-    expect(overlap).toBe(false);await shot("friends");
+    await expect(page.locator('#primary-nav [data-tab]')).toHaveCount(4);
     await page.locator('#primary-nav [data-tab="chat"]').click();
     await expect(page.locator(".conversation-list .conversation")).toHaveCount(10);
     await shot("inbox");

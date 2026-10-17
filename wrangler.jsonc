@@ -16,7 +16,7 @@
     "TERMS_VERSION": "controlled-beta-terms-v1",
     "PRIVACY_VERSION": "controlled-beta-privacy-v1",
     "PUBLIC_DISCOVERY_ENABLED": "true",
-    "FRIEND_REQUESTS_ENABLED": "true",
+    "FRIEND_REQUESTS_ENABLED": "false",
     "MESSAGING_ENABLED": "true",
     "MEDIA_UPLOAD_ENABLED": "true",
     "MEDIA_QUARANTINE_ENABLED": "true",

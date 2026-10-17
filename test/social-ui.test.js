@@ -13,7 +13,7 @@ const wrangler = readFileSync("wrangler.jsonc", "utf8");
 const welcome = readFileSync("welcome.html", "utf8");
 
 test("social UI exposes only the approved non-game navigation", () => {
-  for (const tab of ["near", "friends", "chat", "reviews", "profile"]) {
+  for (const tab of ["near", "chat", "reviews", "profile"]) {
     assert.match(html, new RegExp(`data-tab="${tab}"`, "u"));
   }
   assert.doesNotMatch(html, /data-tab="(?:game|estate|pet|garden|studio)"/u);
@@ -95,10 +95,11 @@ test("moderation UI auto-loads routine overview, justifies restricted evidence, 
 
 test("staging social and private media activation remain isolated from production", () => {
   const production = wrangler.split('"production"', 2)[1];
-  for (const capability of ["SOCIAL_APP_ENABLED", "PUBLIC_DISCOVERY_ENABLED", "FRIEND_REQUESTS_ENABLED", "MESSAGING_ENABLED", "RATINGS_ENABLED"]) {
+  for (const capability of ["SOCIAL_APP_ENABLED", "PUBLIC_DISCOVERY_ENABLED", "MESSAGING_ENABLED", "RATINGS_ENABLED"]) {
     assert.match(wrangler, new RegExp(`"${capability}": "true"`, "u"));
     assert.match(production, new RegExp(`"${capability}": "false"`, "u"));
   }
+  assert.match(wrangler, /"FRIEND_REQUESTS_ENABLED": "false"/u);
   assert.match(wrangler, /"MEDIA_UPLOAD_ENABLED": "true"/u);
   assert.match(wrangler, /"MEDIA_QUARANTINE_ENABLED": "true"/u);
   assert.match(wrangler, /"SENSITIVE_CONTENT_ENABLED": "false"/u);

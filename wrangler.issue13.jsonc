@@ -1,0 +1,16 @@
+{
+  "$schema":"node_modules/wrangler/config-schema.json",
+  "name":"chatgun-issue13-staging",
+  "pages_build_output_dir":"dist",
+  "compatibility_date":"2026-10-15",
+  "d1_databases":[{"binding":"DB","database_name":"chatgun-issue13-staging","database_id":"275d9820-6aec-494a-8bb5-b7ed9b8b74cc","migrations_dir":"migrations"}],
+  "r2_buckets":[{"binding":"MEDIA","bucket_name":"chatgun-issue13-media"}],
+  "vars":{
+    "SOCIAL_APP_ENABLED":"true","MESSAGING_ENABLED":"true","PUBLIC_DISCOVERY_ENABLED":"true",
+    "MEDIA_UPLOAD_ENABLED":"true","MEDIA_QUARANTINE_ENABLED":"true","RATINGS_ENABLED":"true",
+    "ACCEPTANCE_FLOW_ENABLED":"false","ADULT_ONBOARDING_ENABLED":"false","MODERATION_TOOLS_ENABLED":"false",
+    "SENSITIVE_CONTENT_ENABLED":"false","FRIEND_REQUESTS_ENABLED":"false","OAUTH_LOGIN_ENABLED":"false",
+    "NEW_ACCOUNT_REGISTRATION_ENABLED":"false","BETA_INVITATION_REGISTRATION_ENABLED":"false","LINE_EMAIL_ENABLED":"false","EMAIL_OTP_ENABLED":"false","MOBILE_OTP_ENABLED":"false",
+    "IDENTITY_VERIFICATION_ENABLED":"false","DEMO_MODE_ENABLED":"true","DEMO_AUTO_START_ENABLED":"true"
+  }
+}
