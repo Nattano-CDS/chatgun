@@ -250,6 +250,8 @@ function visibleProfile(profile, own) {
     discovery_visible: _discoveryVisible,
     adult_self_declared: _adultSelfDeclared,
     age_independently_verified: _ageVerified,
+    created_at: _createdAt,
+    updated_at: _updatedAt,
     ...visible
   } = profile;
   return visible;
@@ -418,6 +420,7 @@ async function getProfile(request, env) {
   const session = await authenticated(request, env);
   const target = new URL(request.url).searchParams.get("user") || session.user_id;
   if (target !== session.user_id) {
+    await requireProfile(env.DB,session.user_id);
     if(!await env.DB.prepare(`SELECT 1 ok WHERE ${eligibleSql('?')}`).bind(target).first()) throw new SocialError('not_found','ไม่พบโปรไฟล์',404);
     if (await isBlocked(env.DB, session.user_id, target)) {
       throw new SocialError("not_found", "ไม่พบโปรไฟล์", 404);

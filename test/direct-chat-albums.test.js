@@ -175,3 +175,11 @@ test('blocking while request pending makes stale approval fail and cannot resurr
   assert.equal((await decide({...r,revision:2})).status,409);
   assert.equal((await db.prepare('SELECT COUNT(*) n FROM album_access_grants WHERE revoked_at IS NULL').first()).n,0);
 });
+
+test('non-owner profiles omit presence-linked timestamps and require eligible viewers',async t=>{
+  const {db,call}=await fixture(t);
+  const p=(await (await call('viewer','profile?user=owner')).json()).profile;
+  for(const key of ['latitude','longitude','accuracy','located_at','updated_at','created_at'])assert.equal(p[key],undefined,key);
+  db.exec("UPDATE age_assurance_events SET revoked_at=1 WHERE user_id='viewer'");
+  assert.equal((await call('viewer','profile?user=owner')).status,403);
+});
