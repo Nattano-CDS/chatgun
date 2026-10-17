@@ -183,3 +183,14 @@ test('non-owner profiles omit presence-linked timestamps and require eligible vi
   db.exec("UPDATE age_assurance_events SET revoked_at=1 WHERE user_id='viewer'");
   assert.equal((await call('viewer','profile?user=owner')).status,403);
 });
+
+test('contact opt-out stops sends, not history read receipts or explicitly granted album profiles',async t=>{
+  const {db,call,request,decide}=await fixture(t);
+  assert.equal((await call('owner','messages',{action:'send',target:'viewer',body:'existing history'})).status,200);
+  await decide(await request());
+  await call('owner','profile',{action:'contact_privacy',enabled:false});
+  assert.equal((await call('viewer','messages',{action:'send',target:'owner',body:'must deny'})).status,403);
+  assert.equal((await call('viewer','messages',{action:'read',target:'owner'})).status,200);
+  assert.ok((await db.prepare("SELECT read_at FROM social_messages WHERE sender_user_id='owner'").first()).read_at);
+  assert.equal((await call('viewer','profile?user=owner')).status,200,'an explicit album grant remains navigable when discovery/contact are off');
+});

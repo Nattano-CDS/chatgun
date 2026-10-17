@@ -429,7 +429,7 @@ async function getProfile(request, env) {
       SELECT 1 visible FROM member_profiles
       WHERE user_id = ? AND discovery_visible = 1 AND located_at > ?
     `).bind(target, unixTime() - LOCATION_FRESH_SECONDS).first());
-    if (!visible && !await canContact(env.DB, session.user_id, target)) {
+    if (!visible && !await canContact(env.DB, session.user_id, target) && !await albumGrant(env.DB,session.user_id,target)) {
       throw new SocialError("not_found", "ไม่พบโปรไฟล์", 404);
     }
   }
@@ -789,7 +789,7 @@ async function messages(request, env) {
     return json({ ok: true });
   }
   const target = String(body.target || "");
-  if (!await canContact(env.DB, session.user_id, target)) throw new SocialError('contact_unavailable','ไม่สามารถติดต่อบัญชีนี้',403);
+  if (!await canContact(env.DB, session.user_id, target,{send:body.action!=='read'})) throw new SocialError('contact_unavailable','ไม่สามารถติดต่อบัญชีนี้',403);
   if (body.action === "read") {
     await env.DB.prepare(`UPDATE chat_system_events SET
       owner_read_at=CASE WHEN album_owner_id=? THEN ? ELSE owner_read_at END,

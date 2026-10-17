@@ -6,9 +6,9 @@ const unit=readFileSync('/tmp/chatgun-issue13-unit-frozen.log','utf8'),browser=r
 const number=(text,pattern)=>Number(text.match(pattern)?.[1]||0);
 const units={total:number(unit,/ℹ tests (\d+)/),passed:number(unit,/ℹ pass (\d+)/),failed:number(unit,/ℹ fail (\d+)/),skipped:number(unit,/ℹ skipped (\d+)/)};
 const browsers={passed:number(browser,/\n\s+(\d+) passed \(/),skipped:number(browser,/\n\s+(\d+) skipped/),failed:number(browser,/\n\s+(\d+) failed/)};
-assert.equal(units.total,117);assert.equal(units.passed,117);assert.equal(units.failed,0);assert.equal(browsers.passed,80);assert.equal(browsers.failed,0);assert.equal(browsers.skipped,36);
+assert.equal(units.total,118);assert.equal(units.passed,118);assert.equal(units.failed,0);assert.equal(browsers.passed,80);assert.equal(browsers.failed,0);assert.equal(browsers.skipped,36);
 assert.match(browser,/✓.*real isolated D1\/R2 private-album cards, owner consent, revocation and logout/);
-const cloud=JSON.parse(readFileSync('docs/issue-13/cloud-test-results.json'));assert.equal(cloud.commit,sha);assert.equal(cloud.passed,26);assert.equal(cloud.failed,0);
+const cloud=JSON.parse(readFileSync('docs/issue-13/cloud-test-results.json'));assert.equal(cloud.commit,sha);assert.equal(cloud.passed,32);assert.equal(cloud.failed,0);
 const audit=JSON.parse(readFileSync('docs/issue-13/dependency-audit.json'));assert.equal(audit.metadata.vulnerabilities.total,0);
 const stage=await(await fetch('https://issue13.chatgun-issue13-staging.pages.dev/release.json',{cache:'no-store'})).json();assert.equal(stage.commit,sha);
 const summary={commit:sha,checkedAt:new Date().toISOString(),unitIntegrationSecurity:units,playwright:{...browsers,total:browsers.passed+browsers.skipped+browsers.failed,viewports:[390,768,1440],skipReasons:{protectedLegacyFixtureSuites:16,duplicateExplicitViewportCases:18,desktopInapplicableMobileCase:1,realIsolatedCaseRunOnce:1}},realCloudflare:cloud.passed,realTwoSessionBrowser:'PASS',dependencyVulnerabilities:0,oauth:'No real provider flow rerun; UI mocks are not provider/CAPTCHA E2E proof',preview:stage,guardedFictionalRelease:'GO',realProductionServices:'NO-GO / disabled'};

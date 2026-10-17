@@ -35,6 +35,11 @@ check('anonymous messages denied',(await fetch(origin+'/api/social/messages?targ
 check('stranger DM succeeds',(await call('viewer','messages',{action:'send',target:ids.owner,body:'สวัสดีจากการทดสอบ staging '+run})).status===200);
 check('no friendship rows',(await query('SELECT COUNT(*) n FROM social_relationships')).results[0].n===0);
 check('owner inbox contains actual conversation',(await (await call('owner','conversations')).json()).conversations.some(c=>c.other_user_id===ids.viewer&&c.unread_count===1));
+check('existing counterpart can reply',(await call('owner','messages',{action:'send',target:ids.viewer,body:'reply '+run})).status===200);
+check('recipient can opt out',(await call('owner','profile',{action:'contact_privacy',enabled:false})).status===200);
+check('opt-out denies new sends',(await call('viewer','messages',{action:'send',target:ids.owner,body:'denied '+run})).status===403);
+check('opt-out preserves read receipts',(await call('viewer','messages',{action:'read',target:ids.owner})).status===200);
+check('recipient can restore contact',(await call('owner','profile',{action:'contact_privacy',enabled:true})).status===200);
 const form=new FormData();form.set('file',new File([ONE_PIXEL_PNG],'synthetic.png',{type:'image/png'}));
 const upload=await fetch(origin+'/api/social/gallery',{method:'POST',headers:{...headers('owner'),'idempotency-key':run+'-gallery'},body:form});
 assert.equal(upload.status,201,await upload.clone().text());const {id:photo}=await upload.json();
@@ -50,6 +55,9 @@ check('cross-user approval rejected',(await call('other','albums/access',{action
 const decisions=await Promise.all([call('owner','albums/access',{action:'approve',...r}),call('owner','albums/access',{action:'approve',...r})]);
 check('concurrent approval exactly once',decisions.map(x=>x.status).sort().join(',')==='200,409');
 check('grant permits private bytes',(await call('viewer','media/'+photo)).status===200);
+await call('owner','profile',{action:'contact_privacy',enabled:false});
+check('granted album profile remains navigable after contact opt-out',(await call('viewer','profile?user='+ids.owner)).status===200);
+await call('owner','profile',{action:'contact_privacy',enabled:true});
 check('grant does not permit unrelated viewer',(await call('other','media/'+photo)).status===404);
 check('permitted comment persists',(await call('viewer','gallery',{action:'comment',id:photo,comment:'ข้อความสมมติ'})).status===200);
 check('typed approval delivered',(await (await call('viewer','messages?target='+ids.owner)).json()).messages.some(e=>e.system&&e.event_type==='approved'));
