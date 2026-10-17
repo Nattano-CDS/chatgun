@@ -833,9 +833,12 @@ async function openGalleryPhoto(owner,photo,{historyMode='push',preserveComment=
   const generation=state.profileRequest,draft=preserveComment&&samePost(owner,photo)?$('#gallery-comment input[name=comment]')?.value:null;
   const result=await api('/api/social/gallery?user='+encodeURIComponent(owner)+'&photo='+encodeURIComponent(photo));
   if(generation!==state.profileRequest||$('#profile-dialog').hidden)return;
-  const index=result.photos.findIndex(p=>p.id===photo);
-  if(index<0)throw new Error('ไม่พบรูปหรือคุณไม่มีสิทธิ์ดูรูปนี้');
-  state.galleryView={...result,index};state.personPhotos=result.photos;
+  const item=result.photos.find(p=>p.id===photo);
+  if(!item)throw new Error('ไม่พบรูปหรือคุณไม่มีสิทธิ์ดูรูปนี้');
+  state.privateAlbumOpen=item.visibility!=='public';
+  const photos=result.photos.filter(p=>(p.visibility!=='public')===state.privateAlbumOpen);
+  const index=photos.findIndex(p=>p.id===photo);
+  state.galleryView={...result,photos,index};state.personPhotos=result.photos;
   if(historyMode!=='none')updateProfileRoute(owner,photo,historyMode);
   renderGalleryPost();
   if(draft!=null){$('#gallery-comment input[name=comment]').value=draft;galleryBusy(Boolean(state.galleryBusy));}

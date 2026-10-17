@@ -18,7 +18,7 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
   await page.locator('#people-grid [data-clear-filters]').click();
   await first.locator('.card-open').focus();await page.keyboard.press('Enter');await expect(page).toHaveURL(/people\/demo-me$/);
   await expect(page.locator('.full-profile-actions [data-action],.people-management')).toHaveCount(0);
-  await page.locator('.profile-gallery-top').click();await page.locator('.ig-tile>button').first().click();await expect(page.locator('.post-layout')).toBeVisible();
+  await page.locator('[data-private-album]').click();await page.locator('.ig-tile>button').first().click();await expect(page.locator('.post-layout')).toBeVisible();
   await page.goBack();await expect(page.locator('.gallery-summary')).toBeVisible();await page.locator('[data-profile-return]').click();await page.locator('.profile-back').click();
   await page.locator('#primary-nav [data-tab=profile]').click();
   await page.locator('#profile-form [name=name]').fill('ผู้ทดลองสมมติ');await page.locator('#profile-form [name=bio]').fill('กาแฟ หนังสือ และเพลงไทย');await page.locator('#profile-form button[type=submit]').click();await expect(page.locator('#toast')).toContainText('บันทึกโปรไฟล์แล้ว');

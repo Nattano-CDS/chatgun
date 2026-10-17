@@ -41,7 +41,7 @@ for(const [width,height] of widths){
   await expect(page.locator('#my-gallery .cover-label')).toHaveCount(1);
   await page.locator('#gallery-settings-back').click();await page.locator('#view-own-profile').click();
   await expect(page.locator('.full-profile-image img')).toHaveAttribute('src',/02\.png$/);
-  await page.locator('.profile-gallery-top').click();await expect(page.locator('.gallery-summary')).toContainText('โปรไฟล์ของคุณ');
+  await page.locator('[data-private-album]').click();await expect(page.locator('.gallery-summary')).toContainText('โปรไฟล์ของคุณ');
   await expect(page.locator('.gallery-actions')).toHaveCount(0);
   await page.locator('.ig-tile>button').first().click();await expect(page.locator('.lightbox-nav')).toContainText('1 / 2');
   await page.locator('[data-gallery-action=next]').click();await expect(page.locator('.lightbox-nav')).toContainText('2 / 2');
@@ -69,7 +69,7 @@ for(const [width,height] of widths){
   await expect(page.locator('[data-upload-preview] img')).toHaveJSProperty('naturalWidth',640);
   await page.locator('#gallery-upload button[type=submit]').click();await expect(page.locator('#gallery-count')).toHaveText('1 / 12');
   await expect(page.locator('#gallery-upload-quota')).toContainText('9/10');
-  await page.locator('#gallery-settings-back').click();await page.locator('#view-own-profile').click();await page.locator('.profile-gallery-top').click();
+  await page.locator('#gallery-settings-back').click();await page.locator('#view-own-profile').click();await page.locator('[data-private-album]').click();
   await page.locator('.ig-tile>button').first().click();expect(await page.locator('.lightbox-image img').evaluate(i=>i.naturalWidth/i.naturalHeight)).toBe(2);
   await page.locator('[data-gallery-return]').click();await page.locator('.delete-photo').click();await expect(page.locator('.gallery-page .empty')).toBeVisible();
   await page.locator('[data-close-profile]').click();await page.locator('#manage-gallery').click();await expect(page.locator('#gallery-upload-quota')).toContainText('9/10');
