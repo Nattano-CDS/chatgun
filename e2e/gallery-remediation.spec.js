@@ -20,6 +20,7 @@ test('upload navigation preserves scope, warns on leaving, browser Back/Forward 
     await page.goto('/app/people/demo-me/'+scope);await expect(page.locator('.gallery-grid')).toBeVisible();
     await page.locator('[data-gallery-upload-route]').click();await expect(page).toHaveURL(new RegExp('/'+scope+'/upload$'));
     await page.locator('#gallery-file-picker').setInputFiles(file(1));await expect(page.locator('.thumb-small')).toHaveCount(1);
+    page.once('dialog',d=>d.dismiss());await page.keyboard.press('Escape');await expect(page).toHaveURL(/upload$/);
     page.once('dialog',d=>d.dismiss());await page.locator('.go-back').click();await expect(page).toHaveURL(/upload$/);
     page.once('dialog',d=>d.dismiss());await page.goBack();await expect(page).toHaveURL(/upload$/);
     page.once('dialog',d=>d.accept());await page.locator('.go-back').click();await expect(page).toHaveURL(new RegExp('demo-me/'+scope+'$'));

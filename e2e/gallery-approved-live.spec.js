@@ -12,7 +12,14 @@ test('real isolated owner uploads use distinct server scopes, shared quota and q
   const initialQuota=await (await context.request.get(baseURL+'/api/social/upload-quotas')).json();expect(initialQuota.gallery.remaining).toBeGreaterThanOrEqual(retryOnly?1:3);
   try{
     for(const scope of retryOnly?[]:['public','private']){
-      await page.goto('/app/me/'+(scope==='public'?'gallery':'private-gallery')+'/upload');await expect(page.locator('#approved-gallery-upload')).toBeVisible();
+      let releaseInitial;
+      if(scope==='public'){
+        const gate=new Promise(r=>releaseInitial=r);let held=false;
+        await page.route('**/api/social/albums/access',async route=>{if(route.request().method()==='GET'&&!held){held=true;await gate;}await route.continue();});
+      }
+      await page.goto('/app/me/'+(scope==='public'?'gallery':'private-gallery')+'/upload',{waitUntil:'domcontentloaded'});
+      if(releaseInitial){await expect(page.getByText('กำลังตรวจสอบโควตาและพื้นที่อัลบั้ม…')).toBeVisible();await expect(page.locator('#approved-gallery-upload')).toHaveCount(0);releaseInitial();}
+      await expect(page.locator('#approved-gallery-upload')).toBeVisible();
       await page.locator('#gallery-file-picker').setInputFiles({name:'isolated-synthetic.png',mimeType:'image/png',buffer:Buffer.from(ONE_PIXEL_PNG)});await expect(page.locator('.thumb-small')).toHaveCount(1);
       const response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/social/gallery'&&r.request().method()==='POST');await page.locator('[data-upload-submit]').click();const r=await response;expect(r.status()).toBe(201);const {id}=await r.json();uploaded.push(id);
       await expect(page.locator('[data-upload-success]')).toContainText('รอผู้ดูแลตรวจสอบ');expect((await context.request.get(baseURL+'/api/social/media/'+id)).status()).toBe(404);

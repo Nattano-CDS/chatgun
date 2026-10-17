@@ -1481,6 +1481,9 @@ document.addEventListener("click", async (event) => {
 
 document.addEventListener("keydown", (event) => {
   if(event.key===' '&&event.target.matches('.card-open[data-person-open]')){event.preventDefault();event.target.click();return;}
+  if(event.key==='Escape'&&state.personRouteView==='upload'&&!$('#profile-dialog').hidden&&!$('dialog[open]')){
+    event.preventDefault();if(leaveUpload())showPerson(currentActor(),{photo:'gallery'});return;
+  }
   if(state.personRouteView==='post'&&!$('#profile-dialog').hidden&&!$('dialog[open]')){
     if(event.key==='Escape'){event.preventDefault();showPerson(state.galleryView.owner,{photo:'gallery'});return;}
     if(['ArrowLeft','ArrowRight'].includes(event.key)&&!event.target.matches('input,textarea')){event.preventDefault();$(`[data-gallery-action=${event.key==='ArrowLeft'?'previous':'next'}]`)?.click();return;}
