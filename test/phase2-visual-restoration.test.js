@@ -21,10 +21,12 @@ test("Phase 2 onboarding and member profile retain state and authorization hooks
   const [html, css, client] = await Promise.all([read("app/index.html"), read("app/social.css"), read("app/social.js")]);
   assert.match(html, /class="onboarding-panel"/u);
   assert.match(client, /document\.body\.dataset\.flow = "onboarding"/u);
-  assert.match(client, /member-profile-view/u);
+  const components=await read('app/near-components.js');
+  const sourceCss=await read('app/near-components.css');
+  assert.match(components, /full-profile profile-route/u);
   assert.match(client, /data-profile-gallery/u);
-  assert.match(client, /api\(`\/api\/social\/gallery\?user=/u);
-  assert.match(css, /NEAR v91 visual restoration — Phase 2/u);
-  assert.match(css, /#profile-dialog \{ inset: 0; width: 100vw/u);
-  assert.match(css, /background: #d0f17b/u);
+  assert.match(client, /api\('\/api\/social\/gallery\?user=/u);
+  assert.match(sourceCss, /NEAR 98bb83e source component/u);
+  assert.match(components, /class="ig-tile"/u);
+  assert.doesNotMatch(html, /<dialog id="profile-dialog"/u);
 });

@@ -55,9 +55,46 @@ test("root is the authenticated discovery entry while welcome retains marketing"
   await page.goto("/");
   await expect(page).toHaveURL(/\/$/u);
   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();
-  await expect(page.locator("#people-grid .person-card")).toHaveCount(2);
+  await expect(page.locator("#people-grid .person-card")).toHaveCount(3);
   await page.goto("/welcome");
   await expect(page.getByRole("heading", { name: /เรื่องดี ๆ เริ่มต้นจาก/u })).toBeVisible();
+});
+
+test('authenticated shortcut is session-owned, deduplicated and independent of discovery visibility',async({page})=>{
+ await page.route('**/api/social/profile',r=>r.fulfill({json:{profile:{user_id:'me',name:'นัท',bio:'โปรไฟล์ส่วนตัว',discovery_visible:0}}}));
+ await page.route('**/api/social/discovery',r=>r.fulfill({json:{locationFresh:true,people:[{user_id:'me',name:'stale API copy',distance:1},{user_id:'other',name:'สมาชิกอื่น',distance:250}]}}));
+ await page.goto('/');
+ const first=page.locator('#people-grid .person-card').first();
+ await expect(first).toHaveAttribute('data-person','me');await expect(first.locator('.person-name')).toHaveText('นัท');
+ await expect(page.locator('#people-grid [data-person=me]')).toHaveCount(1);
+ await expect(first.locator('.card-distance,[data-action],.verify-badge')).toHaveCount(0);
+ await expect(page.locator('#people-count')).toHaveText('1');
+ await page.locator('#people-search').fill('ไม่ตรงกับชื่อของคุณ');await expect(page.locator('#people-grid .person-card')).toHaveCount(1);
+ await first.locator('.card-open').click();await expect(page).toHaveURL(/people\/me$/);await expect(page.locator('.full-name-row')).toContainText('นัท');
+});
+
+test('gallery failed comment keeps its draft and inline reason; likes are disabled while pending',async({page})=>{
+ let likes=0;
+ await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',photos:[{id:'fixture-photo',owner:'near-1',caption:'ภาพสมมติ',like_count:0}],comments:[]}}));
+ await page.route('**/api/social/gallery',async r=>{
+  const body=r.request().postDataJSON();
+  if(body.action==='comment')return r.fulfill({status:403,json:{error:'ไม่มีสิทธิ์ส่งความคิดเห็น'}});
+  likes++;await new Promise(resolve=>setTimeout(resolve,300));await r.fulfill(likes===1?{status:503,json:{error:'บันทึก Like ไม่สำเร็จ กรุณาลองอีกครั้ง'}}:{json:{ok:true}});
+ });
+ await page.goto('/app/people/near-1/gallery/fixture-photo');await expect(page.locator('.post-layout')).toBeVisible();
+ await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');await page.locator('#gallery-comment button').click();
+ await expect(page.locator('[data-post-feedback]')).toHaveAttribute('role','alert');await expect(page.locator('[data-post-feedback]')).toHaveText('ไม่มีสิทธิ์ส่งความคิดเห็น');
+ await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');
+  await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();await expect(page.locator('.post-like')).toBeEnabled();expect(likes).toBe(1);
+  await expect(page.locator('.post-like svg')).toHaveCount(1);await expect(page.locator('[data-post-feedback]')).toHaveText('บันทึก Like ไม่สำเร็จ กรุณาลองอีกครั้ง');
+  await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();
+  await page.locator('#gallery-comment input[name=comment]').fill('ร่างที่แก้ระหว่างกด Like');await expect(page.locator('#gallery-comment button')).toBeDisabled();
+  await expect(page.locator('.post-like')).toBeEnabled();await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ร่างที่แก้ระหว่างกด Like');
+  await expect(page.locator('[data-post-feedback]')).toBeHidden();
+  const response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/social/gallery'&&r.request().method()==='POST');
+  await page.locator('.post-like').click();await page.keyboard.press('Escape');await response;
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  await expect(page.locator('#profile-dialog')).toBeHidden();await expect(page).not.toHaveURL(/\/people\//);
 });
 
 test("desktop social shell preserves discovery, friends, chat, reviews, and profile without game", async ({ page }, testInfo) => {
@@ -82,7 +119,7 @@ test("mobile social shell uses bottom navigation and remains usable", async ({ p
   test.skip(testInfo.project.name !== "mobile-chromium", "mobile-only layout check");
   await page.goto("/app/");
   await expect(page.locator(".sidebar")).toBeVisible();
-  await expect(page.locator("#people-grid .person-card")).toHaveCount(2);
+  await expect(page.locator("#people-grid .person-card")).toHaveCount(3);
   await page.locator('#primary-nav button[data-tab="profile"]').click();
   await expect(page.getByRole("button", { name: "บันทึกโปรไฟล์" })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("social-mobile.png"), fullPage: true });
@@ -100,12 +137,40 @@ test("member profile routes are deep-linkable and preserve browser history", asy
   await page.goto("/app/people/near-1");
   await expect(page).toHaveURL(/\/app\/people\/near-1$/u);
   await expect(page.locator("#profile-dialog")).toBeVisible();
-  await expect(page.locator("#profile-dialog").getByRole("heading", { name: "มิน" })).toBeVisible();
-  await page.locator("#profile-dialog .dialog-close").click();
-  await expect(page).toHaveURL(/\/app\/$/u);
+  await expect(page.locator("#profile-dialog").getByRole("heading", { name: "มิน",exact:true })).toBeVisible();
+  await page.locator("#profile-dialog [data-close-profile]").click();
+  await expect(page).toHaveURL(/\/$/u);
   await page.goBack();
   await expect(page).toHaveURL(/\/app\/people\/near-1$/u);
   await expect(page.locator("#profile-dialog")).toBeVisible();
+});
+
+test('coarse live distance does not silently remove the server-authorized rating workflow',async({page})=>{
+  // The live API never sends the exact 100m location threshold or can_rate.
+  await page.goto('/app/people/near-2');
+  await expect(page.locator('.full-profile-actions [data-action=rate]')).toBeEnabled();
+  await page.locator('.full-profile-actions [data-action=rate]').click();
+  await expect(page.locator('#rating-dialog')).toBeVisible();
+  await expect(page.locator('#rating-form input[name=target]')).toHaveValue('near-2');
+});
+
+test('source header switches out discovery controls; gallery distinguishes loading failure from empty and retries',async({page})=>{
+  await page.goto('/app/');await page.locator('#primary-nav [data-tab=friends]').click();
+  await expect(page.locator('.toolbar .discovery-controls')).toHaveCount(0);
+  await expect(page.locator('.toolbar>.toolbar-page')).toHaveText('เพื่อน');
+  await page.locator('#primary-nav [data-tab=profile]').click();
+  await expect(page.locator('.toolbar .discovery-controls')).toHaveCount(0);
+  await page.locator('#primary-nav [data-tab=near]').click();
+  await expect(page.locator('.toolbar .discovery-controls')).toBeVisible();
+  let fail=true;
+  await page.route('**/api/social/gallery?**',r=>r.fulfill(fail?{status:503,json:{message:'temporarily unavailable'}}:{json:{photos:[],comments:[],owner:'near-2'}}));
+  await page.locator('#people-grid [data-person="near-2"] .card-open').click();
+  await expect(page.locator('#toast')).toContainText('โหลด Gallery ไม่สำเร็จ');
+  await page.locator('.profile-gallery-top').click();await expect(page.locator('.gallery-page [role=alert]')).toBeVisible();
+  await expect(page.locator('.gallery-page .empty')).toHaveCount(0);
+  fail=false;await page.locator('[data-retry-gallery]').click();
+  await expect(page.locator('.gallery-page [role=alert]')).toHaveCount(0);
+  await expect(page.locator('.gallery-page .empty')).toContainText('ยังไม่มีรูป');
 });
 
 test("optional demo remains browser-only and contains no game", async ({ page }) => {
@@ -126,15 +191,15 @@ test("profile names cannot break out of text or media attributes", async ({ page
   await page.locator('#primary-nav [data-tab="profile"]').click();
   await page.locator('#manage-gallery').click();
   await page.locator('#my-gallery button[data-gallery-action="select"]').first().click();
-  await expect(page.locator('#my-gallery .selected')).toHaveCount(1);
+  await expect(page.locator('#my-gallery .cover-label')).toHaveCount(1);
   await page.locator('#gallery-settings-back').click();
   const payload='x" onerror="alert(1)';
   await page.locator('#profile-form input[name="name"]').fill(payload);
   await page.getByRole("button",{name:"บันทึกโปรไฟล์",exact:true}).click();
   await expect(page.locator("#toast")).toContainText("บันทึกโปรไฟล์แล้ว");
   await page.getByRole("button",{name:"ดูโปรไฟล์และแกลเลอรี"}).click();
-  await expect(page.locator(".member-profile-info h2")).toHaveText(payload);
-  await expect(page.locator(".member-profile-image img")).toHaveAttribute("alt",`รูปของ ${payload}`);
+  await expect(page.locator(".full-name-row h1")).toHaveText(payload);
+  await expect(page.locator(".full-profile-image img")).toHaveAttribute("alt",`รูปของ ${payload}`);
   await expect(page.locator("#profile-dialog img[onerror]")).toHaveCount(0);
   await expect(page.locator("#profile-dialog [onmouseover],#profile-dialog [onfocus]")).toHaveCount(0);
 });
@@ -150,7 +215,7 @@ test("browser-only demo supports local gallery and chat image workflows", async 
   await page.locator('#manage-gallery').click();
   await page.locator('#gallery-upload input[type="file"]').setInputFiles({ name: "demo.png", mimeType: "image/png", buffer: png });
   await page.locator('#gallery-upload input[name="caption"]').fill("รูปตัวอย่างในเครื่อง");
-  await page.getByRole("button", { name: "อัปโหลดรูป" }).click();
+  await page.getByRole("button", { name: "บันทึกรูป" }).click();
   await expect(page.locator("#gallery-count")).toHaveText("3 / 12");
   await expect(page.locator("#my-gallery img").first()).toHaveAttribute("src", /^data:image\//u);
 

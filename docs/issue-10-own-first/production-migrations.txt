@@ -1,0 +1,15 @@
+
+ ⛅️ wrangler 4.151.1
+────────────────────
+Resource location: remote
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mProcessing wrangler.jsonc configuration:[0m
+
+
+    - "env.production" environment configuration
+      - There is a r2_buckets binding with name "MEDIA" at the top level, but not on "env.production".
+        This is not what you probably want, since "r2_buckets" configuration is not inherited by environments.
+        Please add a binding for "MEDIA" to "env.production.r2_buckets.bindings".
+
+
+✅ No migrations to apply!

@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-10-17T08:31:06.817Z",
+  "origin": "https://chatgun.social",
+  "sha": "12e55fde423832152d7317c3e85bfd42f53eaf01",
+  "assets": [
+    {
+      "path": "app/social.js",
+      "sha256": "870ec1b6ec8ce8bb7e12176fcb370a3dcd44819d1e875e78100370add2e37394",
+      "match": true
+    },
+    {
+      "path": "app/near-components.js",
+      "sha256": "780aa933c4ba2ecd59b6580044b090b565c1af4587cdac7cb6579379cc7fa3d5",
+      "match": true
+    },
+    {
+      "path": "app/near-components.css",
+      "sha256": "81dbf77427cff483d7bf75a478486e67500389922c733cc7a89478f48de63124",
+      "match": true
+    },
+    {
+      "path": "app/restoration.css",
+      "sha256": "d9942a8d29143c53b7991539cfdc76bd07480cfaed813eba75db80dbfe71c592",
+      "match": true
+    }
+  ]
+}

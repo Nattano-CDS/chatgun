@@ -1,0 +1,146 @@
+[
+  {
+    "width": 390,
+    "name": "discovery",
+    "changedPercent": 4.7221234743453016,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 390,
+    "name": "friends",
+    "changedPercent": 4.405418364900504,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 390,
+    "name": "profile",
+    "changedPercent": 4.8165685776596066,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 390,
+    "name": "member-profile",
+    "changedPercent": 6.131147540983607,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 390,
+    "name": "own-profile",
+    "changedPercent": 3.4832506203473947,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 390,
+    "name": "member-gallery",
+    "changedPercent": 4.948462390322855,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 390,
+    "name": "own-gallery",
+    "changedPercent": 4.288077513883965,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 390,
+    "name": "gallery-post",
+    "changedPercent": 1.6026537564999104,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 768,
+    "name": "discovery",
+    "changedPercent": 2.3769525493663424,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 768,
+    "name": "friends",
+    "changedPercent": 2.759339473411883,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 768,
+    "name": "profile",
+    "changedPercent": 3.5443185120604475,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 768,
+    "name": "member-profile",
+    "changedPercent": 3.3837683837683836,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 768,
+    "name": "own-profile",
+    "changedPercent": 1.873506159220445,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 768,
+    "name": "member-gallery",
+    "changedPercent": 2.915534420289855,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 768,
+    "name": "own-gallery",
+    "changedPercent": 2.2517679663608563,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 768,
+    "name": "gallery-post",
+    "changedPercent": 0.9811156524371784,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 1440,
+    "name": "discovery",
+    "changedPercent": 2.6321678321678323,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 1440,
+    "name": "friends",
+    "changedPercent": 2.533187187918646,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 1440,
+    "name": "profile",
+    "changedPercent": 3.022377215925603,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 1440,
+    "name": "member-profile",
+    "changedPercent": 3.3572033572033573,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 1440,
+    "name": "own-profile",
+    "changedPercent": 1.8643132928847215,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 1440,
+    "name": "member-gallery",
+    "changedPercent": 2.6342710997442453,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 1440,
+    "name": "own-gallery",
+    "changedPercent": 2.0345385860766325,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  },
+  {
+    "width": 1440,
+    "name": "gallery-post",
+    "changedPercent": 0.6449551187365072,
+    "note": "Diagnostic, not acceptance score: branding, notices, coarse-distance labels and absent Game differ intentionally."
+  }
+]

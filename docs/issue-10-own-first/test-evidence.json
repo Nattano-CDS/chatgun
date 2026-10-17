@@ -1,0 +1,71 @@
+{
+  "checkedAt": "2026-10-17T08:31:57.860Z",
+  "runtimeSHA": "12e55fde423832152d7317c3e85bfd42f53eaf01",
+  "productionURL": "https://chatgun.social",
+  "deployment": {
+    "id": "f8206788-ecba-4999-a95f-bfcd3c47a69f",
+    "sha": "12e55fde423832152d7317c3e85bfd42f53eaf01",
+    "status": "success"
+  },
+  "tests": {
+    "unit": {
+      "passed": 101,
+      "failed": 0,
+      "skipped": 0
+    },
+    "previewBrowser": {
+      "passed": 67,
+      "failed": 0,
+      "skipped": 35
+    },
+    "productionBrowser": {
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    "additionalProductionControls": {
+      "passed": 3,
+      "failed": 0
+    },
+    "protectedLiveScenariosNotRun": 16
+  },
+  "visuals": {
+    "viewports": [
+      [
+        390,
+        844
+      ],
+      [
+        768,
+        1024
+      ],
+      [
+        1440,
+        1100
+      ]
+    ],
+    "comparisons": 36,
+    "measuredComponents": 30,
+    "dimensionAndVerticalPositionDiscrepancies": 0,
+    "pixelIdentityClaim": false,
+    "selfShortcutIsApprovedSourceException": true
+  },
+  "safety": {
+    "databaseMutations": 0,
+    "r2Mutations": 0,
+    "productionMediaBound": false,
+    "stagingSeedResetOrCleanup": false,
+    "realUserActivation": false
+  },
+  "assessment": {
+    "guardedFictionalFrontend": "GO",
+    "realUserBeta": "NO-GO",
+    "remaining": [
+      "Legal approval",
+      "Adult-assurance decisions",
+      "Location-risk acceptance",
+      "Moderation/scanning/appeals/emergency operations and backup operator",
+      "Intentionally unrun live authenticated scenarios"
+    ]
+  }
+}
