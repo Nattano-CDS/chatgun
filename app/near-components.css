@@ -3,6 +3,7 @@
    The small adapter below only covers branding, fiction notice and route mounting. */
 :is(#app .near-components,#profile-dialog) {font-family:Arial,'Noto Sans Thai',Tahoma,sans-serif;line-height:1.5;}
 :is(#app .near-components,#profile-dialog) :where(h1,h2,h3,p){margin:0;font-size:inherit;font-weight:inherit;}
+:is(#app .near-components,#profile-dialog) p{line-height:inherit;}
 :is(#app .near-components,#profile-dialog) :where(button,input,textarea,select){font:inherit;letter-spacing:inherit;color:inherit;}
 :is(#app .near-components,#profile-dialog) button{background:transparent;border:0;border-radius:0;padding:0;min-height:0;box-shadow:none;}
 :is(#app .near-components,#profile-dialog) svg{display:inline-block;vertical-align:middle;flex-shrink:0;}
@@ -19,6 +20,7 @@
 :is(#app .near-components,#profile-dialog) .avatar.large { width: 76px; height: 76px; font-size: 32px; }
 :is(#app .near-components,#profile-dialog) .icon-button { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; background: rgb(255, 255, 255); border: 1px solid rgb(227, 230, 222); }
 :is(#app .near-components,#profile-dialog) h1 { font-size: 40px; letter-spacing: -1px; line-height: 1.35; margin: 0px; font-weight: 700; }
+:is(#app .near-components,#profile-dialog) .subtitle { color: rgb(120, 129, 111); font-size: 16px; margin: 13px 0px 24px; }
 :is(#app .near-components,#profile-dialog) .location-banner .primary { margin-left: auto; white-space: nowrap; }
 :is(#app .near-components,#profile-dialog) .primary,:is(#app .near-components,#profile-dialog) .secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 11px; padding: 13px 21px; font-size: 15px; font-weight: 700; background: rgb(38, 54, 29); color: rgb(255, 255, 255); min-height: 44px; }
 :is(#app .near-components,#profile-dialog) .primary:hover { background: rgb(60, 81, 44); }
@@ -44,6 +46,8 @@
 :is(#app .near-components,#profile-dialog) textarea { min-height: 110px; resize: vertical; }
 :is(#app .near-components,#profile-dialog) .profile-form a { font-size: 14px; color: rgb(124, 136, 110); }
 :is(#app .near-components,#profile-dialog) .chat-window .empty { border: 0px; flex: 1 1 0%; }
+:is(#app .near-components,#profile-dialog) .error { padding: 20px; background: rgb(255, 240, 236); border-radius: 12px; color: rgb(161, 73, 53); margin-top: 15px; }
+:is(#app .near-components,#profile-dialog) .error button { background: none; text-decoration: underline; margin-left: 10px; }
 @media (max-width: 1100px) {
 :is(#app .near-components,#profile-dialog) h1 { font-size: 35px; }
 }
@@ -89,10 +93,12 @@
 :is(#app .near-components,#profile-dialog) .icon-button { min-width: 44px; min-height: 44px; background: rgb(255, 255, 255); border-color: rgb(230, 223, 241); }
 :is(#app .near-components,#profile-dialog) .rate-button { color: rgb(120, 80, 205); background: rgb(247, 243, 255); }
 :is(#app .near-components,#profile-dialog) .rate-button:disabled { color: rgb(139, 135, 144); background: rgb(243, 242, 245); opacity: 0.65; }
+:is(#app .near-components,#profile-dialog) .subtitle { color: rgb(123, 110, 137); }
 :is(#app .near-components,#profile-dialog) .empty { border-color: rgb(222, 212, 238); color: rgb(139, 115, 164); }
 :is(#app .near-components,#profile-dialog) .empty h2 { color: rgb(71, 51, 91); }
 :is(#app .near-components,#profile-dialog) .profile-form,:is(#app .near-components,#profile-dialog) .panel { border-color: rgb(229, 224, 237); }
 :is(#app .near-components,#profile-dialog) input,:is(#app .near-components,#profile-dialog) textarea { background: rgb(252, 251, 255); border-color: rgb(223, 215, 235); outline-color: rgb(141, 102, 218); }
+:is(#app .near-components,#profile-dialog) .error { font-size: 14px; }
 @media (max-width: 700px) {
 :is(#app .near-components,#profile-dialog) .location-banner .primary { min-height: 44px; }
 :is(#app .near-components,#profile-dialog) .person { padding: 15px; }
@@ -553,6 +559,7 @@
 :is(#app .near-components,#profile-dialog) .request-card .person { border: 0px; border-radius: 0px; margin: 0px; }
 :is(#app .near-components,#profile-dialog) .request-decisions { display: flex; gap: 8px; padding: 12px; }
 :is(#app .near-components,#profile-dialog) .request-decisions button { flex: 1 1 0%; min-width: 0px; padding: 10px 8px; }
+:is(#app .near-components,#profile-dialog) .register-form .error { margin: 0px; }
 @media (max-width: 700px) {
 :is(#app .near-components,#profile-dialog) .request-decisions { padding: 9px; gap: 6px; }
 :is(#app .near-components,#profile-dialog) .request-decisions button { font-size: 12px; }
@@ -563,12 +570,14 @@
 :is(#app .near-components,#profile-dialog) .garden-controls > .primary { padding: 10px 8px; font-size: 12px; }
 }
 :is(#app .near-components,#profile-dialog) .object-menu > .primary,:is(#app .near-components,#profile-dialog) .object-menu > .secondary { display: block; width: 100%; margin-top: 14px; }
+:is(#app .near-components,#profile-dialog) .garden-shop .error { margin-bottom: 0px; }
 :is(#app .near-components,#profile-dialog) .placement-confirm .primary { padding: 12px; font-size: 16px; }
 @media (max-height: 620px) {
 :is(#app .near-components,#profile-dialog) .placement-confirm .primary { padding: 9px; font-size: 14px; }
 }
 
 /* ChatGun-only functional adapters; no card/profile/gallery geometry overrides. */
+#app .toolbar>.toolbar-page{margin-left:auto;font-size:14px;font-weight:700;line-height:21px;white-space:nowrap;}
 #profile-dialog.near-components{display:contents;}
 #profile-dialog[hidden]{display:none;}
 body[data-member-route] #app{display:contents;}

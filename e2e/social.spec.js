@@ -117,6 +117,25 @@ test('coarse live distance does not silently remove the server-authorized rating
   await expect(page.locator('#rating-form input[name=target]')).toHaveValue('near-2');
 });
 
+test('source header switches out discovery controls; gallery distinguishes loading failure from empty and retries',async({page})=>{
+  await page.goto('/app/');await page.locator('#primary-nav [data-tab=friends]').click();
+  await expect(page.locator('.toolbar .discovery-controls')).toHaveCount(0);
+  await expect(page.locator('.toolbar>.toolbar-page')).toHaveText('เพื่อน');
+  await page.locator('#primary-nav [data-tab=profile]').click();
+  await expect(page.locator('.toolbar .discovery-controls')).toHaveCount(0);
+  await page.locator('#primary-nav [data-tab=near]').click();
+  await expect(page.locator('.toolbar .discovery-controls')).toBeVisible();
+  let fail=true;
+  await page.route('**/api/social/gallery?**',r=>r.fulfill(fail?{status:503,json:{message:'temporarily unavailable'}}:{json:{photos:[],comments:[],owner:'near-2'}}));
+  await page.locator('#people-grid [data-person="near-2"] .card-open').click();
+  await expect(page.locator('#toast')).toContainText('โหลด Gallery ไม่สำเร็จ');
+  await page.locator('.profile-gallery-top').click();await expect(page.locator('.gallery-page [role=alert]')).toBeVisible();
+  await expect(page.locator('.gallery-page .empty')).toHaveCount(0);
+  fail=false;await page.locator('[data-retry-gallery]').click();
+  await expect(page.locator('.gallery-page [role=alert]')).toHaveCount(0);
+  await expect(page.locator('.gallery-page .empty')).toContainText('ยังไม่มีรูป');
+});
+
 test("optional demo remains browser-only and contains no game", async ({ page }) => {
   await page.unroute("**/api/**");
   await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false, demoModeEnabled: true }) }));

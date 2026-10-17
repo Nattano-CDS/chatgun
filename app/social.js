@@ -678,7 +678,7 @@ function closeProfileSurface({navigate=true}={}) {
 }
 function renderPersonRoute(view='profile') {
   state.personRouteView=view;document.body.dataset.personRoute=view;
-  const c=profileContext(state.selectedPerson,state.personPhotos||[]);
+  const c={...profileContext(state.selectedPerson,state.personPhotos||[]),galleryLoadError:state.galleryLoadError};
   $('#profile-dialog-content').innerHTML=ChatgunNearComponents[view](c);
   if(view==='gallery'&&c.own&&c.config.mediaUploadEnabled)renderUploadQuotas();
   openProfileSurface();
@@ -689,14 +689,14 @@ async function showPerson(id, {historyMode='push',photo=null}={}) {
   if($('#profile-dialog').hidden&&!routedProfile())state.profileReturnPath=location.pathname+location.search;
   if(historyMode!=='none')updateProfileRoute(id,photo,historyMode);
   if(!person){$('#profile-dialog-content').innerHTML='<main class="full-profile gallery-page"><div class="empty"><h2>ไม่พบโปรไฟล์นี้</h2><p>คุณอาจไม่มีสิทธิ์ดูบัญชีนี้</p><button data-close-profile>กลับ</button></div></main>';openProfileSurface();return;}
-  state.selectedPerson=person;state.personPhotos=[];
+  state.selectedPerson=person;state.personPhotos=[];state.galleryLoadError=false;
   state.profileRequest=(state.profileRequest||0)+1;const generation=state.profileRequest;
   renderPersonRoute(photo==='gallery'?'gallery':'profile');
   try{
     const photos=(await api('/api/social/gallery?user='+encodeURIComponent(id))).photos;
     if(generation!==state.profileRequest)return;
     state.personPhotos=photos;
-  }catch(error){if(generation!==state.profileRequest)return;toast('โหลด Gallery ไม่สำเร็จ โปรดลองอีกครั้ง',true);}
+  }catch(error){if(generation!==state.profileRequest)return;state.galleryLoadError=true;toast('โหลด Gallery ไม่สำเร็จ โปรดลองอีกครั้ง',true);}
   if(state.personRouteView!=='post')renderPersonRoute(state.personRouteView);
   if(photo&&photo!=='gallery')await openGalleryPhoto(id,photo,{historyMode:'none'});
 }
@@ -773,6 +773,10 @@ function switchTab(tab) {
   delete document.body.dataset.ownGallery;
   state.activeTab = tab;
   document.body.dataset.activeTab = tab;
+  const controls=$('.discovery-controls'),heading=$('#page-title');
+  if(tab==='near'){$('.toolbar-context').append(heading);$('.toolbar').append(controls);}
+  else{$('#discovery-control-storage').append(controls);$('.toolbar').append(heading);}
+  heading.classList.toggle('toolbar-page',tab!=='near');
   $(".toolbar")?.classList.remove("filters-open");
   $("#filter-toggle")?.setAttribute("aria-expanded", "false");
   const labels = { near: "หาเพื่อน", friends: "เพื่อน", chat: "แชท", reviews: "ความคิดเห็น", profile: "โปรไฟล์" };
@@ -1026,6 +1030,7 @@ document.addEventListener("click", async (event) => {
     updateProfileRoute(profileContext(state.selectedPerson).id,'gallery');renderPersonRoute('gallery');return;
   }
   if(event.target.closest('[data-profile-return]')){updateProfileRoute(profileContext(state.selectedPerson).id);renderPersonRoute('profile');return;}
+  if(event.target.closest('[data-retry-gallery]')){await showPerson(profileContext(state.selectedPerson).id,{photo:'gallery',historyMode:'replace'});return;}
   if(event.target.closest('[data-show-requests]')){switchTab('friends');return;}
   const personOpen=event.target.closest('[data-person-open]');
   if(personOpen){await showPerson(personOpen.dataset.personOpen);return;}

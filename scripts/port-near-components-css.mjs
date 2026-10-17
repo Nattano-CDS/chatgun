@@ -7,7 +7,7 @@ const browser=await chromium.launch();const page=await browser.newPage();
 await page.goto(process.env.NEAR_URL||'http://127.0.0.1:5173/');
 await page.locator('.photo-card').first().waitFor();
 const roots=`person photo-card card-open card-photo photo-shade card-distance person-details person-name person-bio person-top card-name-row rating-line card-actions tags rate-button incoming-bell request-dot request-card request-decisions full-profile profile-route full-profile-image full-profile-shade full-profile-info full-name-row full-bio profile-facts profile-interests full-profile-actions profile-back profile-page-brand profile-gallery-top profile-gallery-button profile-rate page-header-identity gallery-page gallery-header gallery-back gallery-summary gallery-avatar gallery-facts gallery-interests gallery-actions gallery-demo gallery-upload ig-grid ig-tile delete-photo tile-likes gallery-post-page post-layout post-owner post-avatar lightbox-image post-social post-like post-comment post-comments lightbox-nav gallery-atlas profile-photo portrait-viewport no-photo people-management safety-actions primary secondary small icon-button empty panel profile-form blocked-users avatar upload-page upload-header upload-content upload-demo upload-profile-panel upload-cover upload-editor upload-kind photo-drop upload-caption upload-save upload-success upload-gallery-title manage-photo-grid cover-label upload-empty toolbar-brand sr-only`.split(' ');
-roots.push('portrait-fallback','verify-cta','verify-badge','badge-info','badge-explainer','gallery-verified','gallery-badge-note');
+roots.push('portrait-fallback','verify-cta','verify-badge','badge-info','badge-explainer','gallery-verified','gallery-badge-note','subtitle','error');
 const css=await page.evaluate(roots=>{
  const names=new Set(roots),base=new Set(['button','button:disabled','button:focus-visible','a','a:focus-visible','input','textarea','select','svg','h1','h2','p']);
  function visit(rules){return [...rules].map(r=>{
@@ -36,12 +36,14 @@ const preflight=`/* NEAR 98bb83e source component rules, original order/media qu
    The small adapter below only covers branding, fiction notice and route mounting. */
 :is(#app,#profile-dialog) :where(.near-components) {font-family:Arial,'Noto Sans Thai',Tahoma,sans-serif;line-height:1.5;}
 :is(#app,#profile-dialog) :where(.near-components) :where(h1,h2,h3,p){margin:0;font-size:inherit;font-weight:inherit;}
+:is(#app,#profile-dialog) :where(.near-components) p{line-height:inherit;}
 :is(#app,#profile-dialog) :where(.near-components) :where(button,input,textarea,select){font:inherit;letter-spacing:inherit;color:inherit;}
 :is(#app,#profile-dialog) :where(.near-components) button{background:transparent;border:0;border-radius:0;padding:0;min-height:0;box-shadow:none;}
 :is(#app,#profile-dialog) :where(.near-components) svg{display:inline-block;vertical-align:middle;flex-shrink:0;}
 `;
 const adapter=`
 /* ChatGun-only functional adapters; no card/profile/gallery geometry overrides. */
+#app .toolbar>.toolbar-page{margin-left:auto;font-size:14px;font-weight:700;line-height:21px;white-space:nowrap;}
 #profile-dialog.near-components{display:contents;}
 #profile-dialog[hidden]{display:none;}
 body[data-member-route] #app{display:contents;}

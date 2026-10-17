@@ -64,8 +64,9 @@ window.ChatgunNearComponents = (() => {
       <div class="gallery-interests">${chips(c)}</div>${c.own?'':`<div class="gallery-actions">${primary(c,16)}${c.canRate?action('rate',h(c.id),c.star+'ให้คะแนน','',c.rateDisabled?'disabled':''):''}${action('block',h(c.id),'บล็อก','')}</div>`}</div></div>
       ${c.demo?'<p class="gallery-demo">รูปสมมติสำหรับทดลองหน้าจอ · บันทึกเฉพาะเบราว์เซอร์</p>':''}
       ${c.own&&c.config.mediaUploadEnabled?`<form id="route-gallery-upload" class="gallery-upload"><input type="hidden" name="kind" value="gallery"><label>เพิ่มรูป Gallery<input name="file" type="file" accept="image/jpeg,image/png,image/webp" required></label><input name="caption" maxlength="300" aria-label="คำบรรยายรูป" placeholder="คำบรรยายรูป (ไม่บังคับ)"><button class="primary">${icon('upload',17)}${c.demo?'เพิ่มรูปตัวอย่าง':'เพิ่มรูป'}</button><small>เลือกรูปโปรไฟล์ได้ในหน้าจัดการรูป · JPG, PNG, WebP ไม่เกิน 8 MB</small><small data-route-gallery-quota></small></form>`:''}${peopleActions(c)}
+      ${c.galleryLoadError?'<p class="error" role="alert">โหลด Gallery ไม่สำเร็จ<button data-retry-gallery>ลองอีกครั้ง</button></p>':''}
       <div id="dialog-gallery" class="ig-grid">${c.photos.map((photo,i)=>`<div class="ig-tile"><button data-gallery-action="view" data-user="${h(c.id)}" data-photo="${h(photo.id)}" aria-label="ดูรูป ${h(photo.caption||i+1)}"><img src="${h(c.media(photo.id))}" alt="${h(photo.caption||'รูป Gallery')}" loading="lazy"><span class="tile-likes">${icon('heart',12)}${Number(photo.like_count||0)}</span></button>${c.own?`<button class="delete-photo" data-gallery-action="delete" data-photo="${h(photo.id)}" aria-label="ลบรูป">${icon('trash',15)}</button>`:''}</div>`).join('')}</div>
-      ${c.photos.length?'':`<div class="empty">${c.images}<h2>ยังไม่มีรูปใน Gallery</h2></div>`}</main>`;
+      ${c.photos.length||c.galleryLoadError?'':`<div class="empty">${c.images}<h2>ยังไม่มีรูปใน Gallery</h2></div>`}</main>`;
   }
   function post(c) {
     const {photos,index,comments}=c.view,item=photos[index],h=c.html;
