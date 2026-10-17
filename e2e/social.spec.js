@@ -86,7 +86,7 @@ test('gallery failed comment keeps its draft and inline reason; likes are disabl
   if(body.action==='comment')return r.fulfill({status:403,json:{error:'ไม่มีสิทธิ์ส่งความคิดเห็น'}});
   likes++;await new Promise(resolve=>setTimeout(resolve,300));await r.fulfill(likes===1?{status:503,json:{error:'บันทึก Like ไม่สำเร็จ กรุณาลองอีกครั้ง'}}:{json:{ok:true}});
  });
- await page.goto('/app/people/near-1/gallery/fixture-photo');await expect(page.locator('.post-layout')).toBeVisible();
+ await page.goto('/app/people/near-1/gallery/fixture-photo');await expect(page.locator('.lightbox-shell')).toBeVisible();
  await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');await page.locator('#gallery-comment button').click();
  await expect(page.locator('[data-post-feedback]')).toHaveAttribute('role','alert');await expect(page.locator('[data-post-feedback]')).toHaveText('ไม่มีสิทธิ์ส่งความคิดเห็น');
  await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');
@@ -169,11 +169,11 @@ test('source header switches out discovery controls; gallery distinguishes loadi
   await page.route('**/api/social/gallery?**',r=>r.fulfill(fail?{status:503,json:{message:'temporarily unavailable'}}:{json:{photos:[],comments:[],owner:'near-2'}}));
   await page.locator('#people-grid [data-person="near-2"] .card-open').click();
   await expect(page.locator('#toast')).toContainText('โหลด Gallery ไม่สำเร็จ');
-  await page.locator('.profile-gallery-button').click();await expect(page.locator('.gallery-page [role=alert]')).toBeVisible();
-  await expect(page.locator('.gallery-page .empty')).toHaveCount(0);
+  await page.locator('.profile-gallery-button').click();await expect(page.locator('.gallery-experience [role=alert]')).toBeVisible();
+  await expect(page.locator('.gallery-experience .viewer-hint')).toHaveCount(0);
   fail=false;await page.locator('[data-retry-gallery]').click();
-  await expect(page.locator('.gallery-page [role=alert]')).toHaveCount(0);
-  await expect(page.locator('.gallery-page .empty')).toContainText('ยังไม่มีรูป');
+  await expect(page.locator('.gallery-experience [role=alert]')).toHaveCount(0);
+  await expect(page.locator('.gallery-experience .viewer-hint')).toContainText('ยังไม่มีรูป');
 });
 
 test("optional demo remains browser-only and contains no game", async ({ page }) => {
@@ -219,8 +219,8 @@ test("browser-only demo supports local gallery and chat image workflows", async 
   await page.locator('#gallery-upload input[type="file"]').setInputFiles({ name: "demo.png", mimeType: "image/png", buffer: png });
   await page.locator('#gallery-upload input[name="caption"]').fill("รูปตัวอย่างในเครื่อง");
   await page.getByRole("button", { name: "บันทึกรูป" }).click();
-  await expect(page.locator("#gallery-count")).toHaveText("3 / 12");
-  await expect(page.locator("#my-gallery img").first()).toHaveAttribute("src", /^data:image\//u);
+  await expect(page.locator("#gallery-count")).toHaveText("11 / 12");
+  await expect(page.locator("#my-gallery .pending-media-placeholder").first()).toContainText("รอผู้ดูแลตรวจสอบ");
 
   await page.locator('#primary-nav button[data-tab="chat"]').click();
   await page.getByRole("button", { name: /ต้นน้ำ/u }).click();

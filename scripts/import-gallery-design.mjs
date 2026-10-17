@@ -1,0 +1,18 @@
+// Mechanical import of the owner-approved CSS, scoped to Gallery only.
+import {readFileSync,writeFileSync} from 'node:fs';
+const html=readFileSync('docs/gallery-approved/reference/chatgun-gallery-design/chatgun_gallery_ux_prototype.html','utf8');
+let css=html.match(/<style>([\s\S]*?)<\/style>/)[1];
+css=css.replace(/:root/g,'.gallery-experience').replace(/font-family:Arial,"Noto Sans Thai",Tahoma,sans-serif/,'font-family:"Noto Sans Thai",sans-serif');
+// Every selector, including responsive rules, is isolated from the NEAR shell.
+css=css.replace(/([^{}]+)\{/g,(match,selectors)=>{
+  if(selectors.trim().startsWith('@'))return match;
+  return selectors.split(',').map(s=>{s=s.trim();return s.startsWith('.gallery-experience')?s:'.gallery-experience '+s;}).join(',')+'{';
+});
+css+='\n.gallery-experience{min-height:100dvh;padding-bottom:100px;background:var(--bg);color:var(--ink)}\n.gallery-experience .tile img{width:100%;height:100%;object-fit:cover;display:block}.gallery-experience .avatar img{height:100%;width:100%;object-fit:cover}.gallery-experience .breadcrumbs button{background:none;border:0;padding:0;min-height:44px;color:inherit}.gallery-experience .tile-owner-controls{display:flex;gap:6px;flex-wrap:wrap;font-size:11px}.gallery-experience .tile-owner-controls button{min-height:44px;background:white;border:1px solid var(--line);border-radius:10px}.gallery-experience .review-status{color:#775e8a}.gallery-experience .thumb-small .remove{min-width:44px;min-height:44px}.gallery-experience .upload-picker:focus-within{outline:3px solid #a58cfc;outline-offset:3px}.gallery-experience .upload-picker input{display:block;position:absolute;width:1px;height:1px;opacity:0}.gallery-experience [hidden]{display:none!important}.gallery-experience .quota-fill{max-width:100%}.gallery-experience .brand{color:var(--ink)}\n';
+css+='\n.gallery-experience .lightbox-image img{width:100%;height:100%;object-fit:contain;max-height:90vh}.gallery-experience .lightbox-nav{position:static;transform:none;width:auto}.gallery-experience .lightbox button{min-height:44px;min-width:44px}.gallery-experience .upload-file-state{position:absolute;bottom:0;left:0;right:0;background:#fffD;color:#61566c;font-size:11px;padding:5px}.gallery-experience .lightbox-art{display:flex;align-items:center}.gallery-experience .post-comments p{display:inline}.gallery-experience .album-management{margin-top:24px;padding:16px;background:white;border:1px solid var(--line);border-radius:14px}\n';
+css+='\n.gallery-experience{padding:0 0 100px;margin:0;width:100%}.gallery-experience .page h2{font-weight:700}.gallery-experience .like-pill svg{width:12px;height:12px}.gallery-experience .tile{width:100%}.gallery-experience .scope-icon{align-self:center}\n';
+for(let i=0;i<=10;i++)css+=`\n.gallery-experience .quota-fill.used-${i}{width:${i*10}%}`;
+css+='\n.gallery-experience .lightbox{z-index:10000}.gallery-experience .lightbox-shell{min-height:0;margin:0;border:0}.gallery-experience .lightbox-art img{width:100%;height:100%;object-fit:contain;max-height:90vh}.gallery-experience .lightbox-arrows{padding:0;position:static;transform:none;width:auto}.gallery-experience .lightbox-arrows button{min-width:44px;min-height:44px;border-radius:9px}\n';
+css+='\n.gallery-experience .brand{min-height:44px}.gallery-experience .round-soft{min-width:44px;min-height:44px}.gallery-experience .breadcrumbs button,.gallery-experience .tile-owner-controls button{min-width:44px}.gallery-experience .lightbox-like{min-height:44px}.gallery-experience .comment-compose button{min-width:44px}\n';
+css=css.replaceAll('.gallery-experience',':is(#profile-dialog,#app) .gallery-experience');
+writeFileSync('app/gallery-approved.css',css);

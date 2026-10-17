@@ -1,3 +1,5 @@
 / /app/ 200
 /app/photos /app/ 200
+/app/me/gallery/upload /app/ 200
+/app/me/private-gallery/upload /app/ 200
 /app/people/* /app/ 200

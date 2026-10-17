@@ -55,6 +55,11 @@ check('cross-user approval rejected',(await call('other','albums/access',{action
 const decisions=await Promise.all([call('owner','albums/access',{action:'approve',...r}),call('owner','albums/access',{action:'approve',...r})]);
 check('concurrent approval exactly once',decisions.map(x=>x.status).sort().join(',')==='200,409');
 check('grant permits private bytes',(await call('viewer','media/'+photo)).status===200);
+check('granted viewer public list still hides private IDs',!(JSON.stringify(await (await call('viewer','gallery?user='+ids.owner)).json())).includes(photo));
+check('granted viewer dedicated private list includes only private photos',(await (await call('viewer','gallery?user='+ids.owner+'&album=private')).json()).photos.every(p=>p.visibility==='private')&&(await (await call('viewer','gallery?user='+ids.owner+'&album=private')).json()).photos.some(p=>p.id===photo));
+check('unrelated dedicated private listing denied',(await call('other','gallery?user='+ids.owner+'&album=private')).status===404);
+check('private comments cannot be requested through public scope',(await call('viewer','gallery?user='+ids.owner+'&photo='+photo)).status===404);
+check('cross-scope comment rejected',(await call('viewer','gallery',{action:'comment',id:photo,album:'public',comment:'scope test'})).status===404);
 await call('owner','profile',{action:'contact_privacy',enabled:false});
 check('granted album profile remains navigable after contact opt-out',(await call('viewer','profile?user='+ids.owner)).status===200);
 await call('owner','profile',{action:'contact_privacy',enabled:true});
@@ -82,8 +87,19 @@ const uiUpload=await fetch(origin+'/api/social/gallery',{method:'POST',headers:{
 assert.equal(uiUpload.status,201);const {id:uiPhoto}=await uiUpload.json();
 await query("UPDATE media_safety_reviews SET status='released',category='general',revision=revision+1,reviewed_at=? WHERE media_id=?",[unixTime(),uiPhoto]);
 check('browser fixture is private without owner consent',(await call('other','media/'+uiPhoto)).status===404);
+const publicForm=new FormData();publicForm.set('file',new File([ONE_PIXEL_PNG],'synthetic-public.png',{type:'image/png'}));publicForm.set('visibility','public');
+const publicResponse=await fetch(origin+'/api/social/gallery',{method:'POST',headers:{...headers('owner'),'idempotency-key':run+'-public-gallery'},body:publicForm});
+assert.equal(publicResponse.status,201);const {id:publicPhoto}=await publicResponse.json();
+check('explicit public upload persists public scope',(await query('SELECT visibility FROM profile_photos WHERE media_id=?',[publicPhoto])).results[0].visibility==='public');
+check('unreleased public photo hidden from viewer',!(JSON.stringify(await (await call('viewer','gallery?user='+ids.owner)).json())).includes(publicPhoto));
+check('quarantine still denies public bytes',(await call('viewer','media/'+publicPhoto)).status===404);
+await query("UPDATE media_safety_reviews SET status='released',category='general',revision=revision+1,reviewed_at=? WHERE media_id=?",[unixTime(),publicPhoto]);
+const publicList=await (await call('viewer','gallery?user='+ids.owner)).json();
+check('released public listing excludes private fixture metadata',publicList.photos.some(p=>p.id===publicPhoto)&&publicList.photos.every(p=>p.visibility==='public')&&!JSON.stringify(publicList).includes(uiPhoto));
+check('public and private uploads count against one gallery quota',(await (await call('owner','upload-quotas')).json()).gallery.used===3);
+check('private next-photo list excludes public fixture',!(JSON.stringify(await (await call('owner','gallery?user='+ids.owner+'&album=private')).json())).includes(publicPhoto));
 const summary={run,origin,commit:release.commit,database,bucket:'chatgun-issue13-media',syntheticOnly:true,checks:evidence,passed:evidence.length,failed:0,cleanup,oauth:'not retested; synthetic session fixture only'};
-mkdirSync('docs/issue-13',{recursive:true});writeFileSync('docs/issue-13/cloud-test-results.json',JSON.stringify(summary,null,2)+'\n');
+const evidenceDirectory=process.env.RELEASE_EVIDENCE_DIR||'docs/issue-13';mkdirSync(evidenceDirectory,{recursive:true});writeFileSync(evidenceDirectory+'/cloud-test-results.json',JSON.stringify(summary,null,2)+'\n');
 // Session fixtures stay outside the repository, protected and short-lived operationally.
 writeFileSync('/tmp/chatgun-issue13-sessions.json',JSON.stringify({origin,run,ids,sessions,photoId:uiPhoto}),{mode:0o600});
 console.log(JSON.stringify(summary,null,2));

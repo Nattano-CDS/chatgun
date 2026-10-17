@@ -20,17 +20,17 @@ for(const [width,height] of widths){
   await expect(page.locator('.full-profile-image>.profile-photo')).toBeVisible();
   await expect(page.locator('#profile-dialog nav')).toHaveCount(0);
   await page.locator('.profile-gallery-button').click();await expect(page).toHaveURL(/\/demo-01\/gallery$/);
-  await expect(page.locator('.ig-grid>.ig-tile>button').first()).toBeVisible();
-  expect(await page.locator('.ig-grid').evaluate(e=>getComputedStyle(e).gridTemplateColumns.split(' ').length)).toBe(3);
-  await page.reload();await expect(page.locator('.gallery-summary')).toBeVisible();
-  await page.locator('.ig-tile>button').first().click();await expect(page).toHaveURL(/\/gallery\/demo-portrait-01$/);
+  await expect(page.locator('.gallery-grid .tile').first()).toBeVisible();
+  expect(await page.locator('.gallery-grid').evaluate(e=>getComputedStyle(e).gridTemplateColumns.split(' ').length)).toBe(3);
+  await page.reload();await expect(page.locator('.viewer-head')).toBeVisible();
+  await page.locator('.gallery-grid .tile').first().click();await expect(page).toHaveURL(/\/gallery\/demo-portrait-01$/);
   await page.locator('.post-like').click();await expect(page.locator('.post-like')).toHaveAttribute('aria-pressed','true');
   await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นรูปสาธารณะที่ผู้มีสิทธิ์อ่านได้');
   await page.locator('#gallery-comment button').click();
   // Issue 13: photo visibility/grants, never friendship, govern all comments.
   await expect(page.locator('.post-comments')).toContainText('ความคิดเห็นรูปสาธารณะที่ผู้มีสิทธิ์อ่านได้');
-  await page.locator('[data-gallery-return]').click();await page.locator('[data-profile-return]').click();
-  await expect(page.locator('.full-profile:not(.gallery-page)')).toBeVisible();
+  await page.locator('[data-gallery-return]').click();await page.locator('[data-profile-return]').first().click();
+  await expect(page.locator('.full-profile:not(.gallery-experience)')).toBeVisible();
   await page.locator('.profile-back').click();await expect(page.locator('#people-grid')).toBeVisible();
   await page.locator('#primary-nav [data-tab=near]').click();
   await page.locator('#people-grid [data-person=demo-02] .card-open').click();await expect(page.locator('.full-profile-actions [data-action=chat]')).toBeVisible();
@@ -41,13 +41,13 @@ for(const [width,height] of widths){
   await expect(page.locator('#my-gallery .cover-label')).toHaveCount(1);
   await page.locator('#gallery-settings-back').click();await page.locator('#view-own-profile').click();
   await expect(page.locator('.full-profile-image img')).toHaveAttribute('src',/02\.png$/);
-  await page.locator('[data-private-album]').click();await expect(page.locator('.gallery-summary')).toContainText('โปรไฟล์ของคุณ');
+  await page.locator('[data-private-album]').click();await expect(page.locator('.private-summary')).toContainText('อัลบั้มส่วนตัวของคุณ');
   await expect(page.locator('.gallery-actions')).toHaveCount(0);
-  await page.locator('.ig-tile>button').first().click();await expect(page.locator('.lightbox-nav')).toContainText('1 / 2');
-  await page.locator('[data-gallery-action=next]').click();await expect(page.locator('.lightbox-nav')).toContainText('2 / 2');
-  await expect(page.locator('[data-gallery-action=next]')).toBeDisabled();
-  await page.locator('[data-gallery-action=previous]').click();await expect(page.locator('.lightbox-nav')).toContainText('1 / 2');
-  await page.reload();await expect(page.locator('.post-layout')).toBeVisible();
+  await page.locator('.gallery-grid .tile').first().click();await expect(page.locator('.lightbox-arrows')).toContainText('1 / 4');
+  await page.locator('[data-gallery-action=next]').click();await expect(page.locator('.lightbox-arrows')).toContainText('2 / 4');
+  await expect(page.locator('[data-gallery-action=next]')).toBeEnabled();
+  await page.locator('[data-gallery-action=previous]').click();await expect(page.locator('.lightbox-arrows')).toContainText('1 / 4');
+  await page.reload();await expect(page.locator('.lightbox-shell')).toBeVisible();
   expect(selectedId).toBeTruthy();expect(writes).toEqual([]);expect(errors).toEqual([]);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  });
@@ -58,21 +58,22 @@ for(const [width,height] of widths){
   await page.goto('/');await page.locator('#primary-nav [data-tab=profile]').click();await page.locator('#manage-gallery').click();
   const before=await page.locator('#gallery-upload-quota').textContent();
   page.on('dialog',d=>d.accept());
-  await page.locator('#my-gallery [data-gallery-action=delete]').first().click();
-  await page.locator('#my-gallery [data-gallery-action=delete]').first().click();await expect(page.locator('.upload-empty')).toBeVisible();
+  const initial=await page.locator('#my-gallery [data-gallery-action=delete]').count();
+  for(let remaining=initial;remaining>0;remaining--){await page.locator('#my-gallery [data-gallery-action=delete]').first().click();await expect(page.locator('#my-gallery [data-gallery-action=delete]')).toHaveCount(remaining-1);}
+  await expect(page.locator('.upload-empty')).toBeVisible();
   await expect(page.locator('#gallery-upload-quota')).toHaveText(before);
   // Landscape synthetic pixels exist only in this disposable browser context.
   const bytes=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=640;c.height=320;const x=c.getContext('2d');x.fillStyle='#645574';x.fillRect(0,0,640,320);x.fillStyle='#d0f17b';x.fillRect(30,30,200,260);return c.toDataURL('image/png').split(',')[1];});
-  await page.locator('[data-upload-kind=gallery]').click();
-  await page.locator('#gallery-upload input[type=file]').setInputFiles({name:'fictional-landscape.png',mimeType:'image/png',buffer:Buffer.from(bytes,'base64')});
-  await expect(page.locator('[data-upload-preview] img')).toHaveAttribute('src',/^data:image\/png/);
-  await expect(page.locator('[data-upload-preview] img')).toHaveJSProperty('naturalWidth',640);
-  await page.locator('#gallery-upload button[type=submit]').click();await expect(page.locator('#gallery-count')).toHaveText('1 / 12');
+  await page.goto('/app/me/private-gallery/upload');
+  await page.locator('#gallery-file-picker').setInputFiles({name:'fictional-landscape.png',mimeType:'image/png',buffer:Buffer.from(bytes,'base64')});
+  await expect(page.locator('.thumb-small img')).toHaveAttribute('src',/^data:image\/png/);
+  await expect(page.locator('.thumb-small img')).toHaveJSProperty('naturalWidth',640);
+  await page.locator('#approved-gallery-upload button.primary').click();await expect(page.locator('#gallery-upload-status')).toContainText('Pending Moderation');
   await expect(page.locator('#gallery-upload-quota')).toContainText('9/10');
-  await page.locator('#gallery-settings-back').click();await page.locator('#view-own-profile').click();await page.locator('[data-private-album]').click();
-  await page.locator('.ig-tile>button').first().click();expect(await page.locator('.lightbox-image img').evaluate(i=>i.naturalWidth/i.naturalHeight)).toBe(2);
-  await page.locator('[data-gallery-return]').click();await page.locator('.delete-photo').click();await expect(page.locator('.gallery-page .empty')).toBeVisible();
-  await page.locator('[data-close-profile]').click();await page.locator('#manage-gallery').click();await expect(page.locator('#gallery-upload-quota')).toContainText('9/10');
+  expect(await page.locator('.thumb-small img').evaluate(i=>i.naturalWidth/i.naturalHeight)).toBe(2);
+  await page.locator('[data-gallery-return]').first().click();await expect(page.locator('.gallery-grid .tile')).toBeDisabled();await expect(page.locator('.review-status')).toContainText('รอผู้ดูแลตรวจสอบ');
+  await page.locator('.gallery-experience [data-gallery-action=delete]').click();await expect(page.locator('.gallery-experience .viewer-hint')).toBeVisible();
+  await page.locator('[data-close-profile]').click();await page.locator('#primary-nav [data-tab=profile]').click();await page.locator('#manage-gallery').click();await expect(page.locator('#gallery-upload-quota')).toContainText('9/10');
  });
 }
 test('source card handles long Thai text, failed portraits and keyboard return focus',async({page})=>{

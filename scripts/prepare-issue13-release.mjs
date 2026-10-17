@@ -12,12 +12,13 @@ const previous=JSON.parse(execFileSync('git',['show',baseline+':wrangler.jsonc']
 assert.deepEqual(config.env.production,previous.env.production,'Production configuration must not change');
 assert.equal(config.env.production.r2_buckets.length,0);
 assert.equal(config.env.production.d1_databases[0].database_id,'9738a051-d914-42d0-8e7b-8098ef2b959d');
-const infrastructure=JSON.parse(readFileSync('docs/issue-13/infrastructure-check.json'));
+const evidenceDirectory=process.env.RELEASE_EVIDENCE_DIR||'docs/issue-13';
+const infrastructure=JSON.parse(readFileSync(evidenceDirectory+'/infrastructure-check.json'));
 assert.equal(infrastructure.productionR2Bindings,0);
 assert.equal(infrastructure.productionFlags.SOCIAL_APP_ENABLED,'false');
 assert.equal(infrastructure.canonicalDeployment.status,'success');
 assert.match(infrastructure.canonicalDeployment.sha,/^[a-f0-9]{40}$/);
-const cloud=JSON.parse(readFileSync('docs/issue-13/cloud-test-results.json'));
+const cloud=JSON.parse(readFileSync(evidenceDirectory+'/cloud-test-results.json'));
 assert.equal(cloud.commit,sha);assert.equal(cloud.failed,0);assert.ok(cloud.passed>=24);
 const directory=mkdtempSync(join(tmpdir(),'chatgun-issue13-production-'));
 execFileSync('node',['scripts/build-pages.mjs'],{env:{...process.env,CHATGUN_CANARY_BUILD:'true',CHATGUN_BUILD_DIR:directory},stdio:'pipe'});
@@ -26,4 +27,4 @@ for(const page of ['privacy.html','terms.html','data-deletion.html'])assert.deep
 for(const path of ['docs','scripts','test-results','test','e2e','.dev.vars','node_modules','migrations'])assert.equal(existsSync(join(directory,path)),false,path);
 assert.deepEqual(readFileSync(join(directory,'assets/demo/network.json')),execFileSync('git',['show',baseline+':assets/demo/network.json']));
 const evidence={sha,directory,baseline,backendUpdatedButLiveGatesClosed:true,productionSchemaMigration:false,productionConfigurationUnchanged:true,privateArtifactsExcluded:true,legalDraftsExcluded:true,fictionalDatasetPreserved:true,rollbackDeployment:infrastructure.canonicalDeployment.id,rollbackSha:infrastructure.canonicalDeployment.sha};
-writeFileSync('docs/issue-13/package-check.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));
+writeFileSync(evidenceDirectory+'/package-check.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));

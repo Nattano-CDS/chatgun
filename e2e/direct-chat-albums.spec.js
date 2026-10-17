@@ -31,12 +31,12 @@ for(const width of [390,768,1440])test(`direct DM and two-sided fictional album 
   await expect(page.locator('#thread .album-system-card')).toHaveCount(2);await shot('viewer-approved');
   await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();
   await expect(page.locator('[data-private-album]')).toHaveAttribute('data-album-state','unlocked');await page.locator('[data-private-album]').click();
-  await expect(page.locator('.ig-tile')).toHaveCount(1);await shot('granted-gallery');
+  await expect(page.locator('.gallery-tile-wrap')).toHaveCount(5);await shot('granted-gallery');
   await simulateChatCounterpart(page);await page.locator('[data-album-action=revoke]').click();
   await page.locator('#demo-actor').selectOption('demo-me');await page.locator('[data-chat=demo-01]').click();
   await expect(page.locator('#thread')).toContainText('เพิกถอนสิทธิ์');
   await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();await page.locator('.profile-gallery-button').click();
-  await expect(page.locator('.ig-tile')).toHaveCount(1);await shot('revoked-gallery');
+  await expect(page.locator('.gallery-tile-wrap')).toHaveCount(5);await shot('revoked-gallery');
   await page.locator('[data-close-profile]').click();await page.reload();
   await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('[data-chat=demo-01]').click();
   await expect(page.locator('#thread .message')).toContainText('สวัสดี ตัวอย่างแชทโดยตรง');await expect(page.locator('.album-system-card')).toHaveCount(3);
@@ -63,8 +63,9 @@ test('fictional owner media decisions persist and private portraits never become
   await page.goto('/?demo=1');await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('#demo-actor').selectOption('demo-01');
   await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();await page.locator('.profile-gallery-button').click();
   await page.locator('[data-photo-visibility=private][data-photo=demo-portrait-01]').click();
+  await page.locator('[data-profile-return]').first().click();
   await page.locator('[data-private-album]').click();
-  await expect(page.locator('section[aria-label="รูปอัลบั้มส่วนตัว"] .ig-tile')).toHaveCount(2);
+  await expect(page.locator('.gallery-experience .gallery-tile-wrap')).toHaveCount(6);
   await page.locator('[data-close-profile]').click();await page.locator('#primary-nav [data-tab=chat]').click();await page.locator('#demo-actor').selectOption('demo-me');await page.locator('#primary-nav [data-tab=near]').click();
   await expect(page.locator('[data-person=demo-01] .card-photo img')).toHaveCount(0);
   await page.reload();await expect(page.locator('[data-person=demo-01] .card-photo img')).toHaveCount(0);

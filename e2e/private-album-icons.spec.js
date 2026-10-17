@@ -22,7 +22,7 @@ for(const width of [390,768,1440])test(`approved album icons and keyboard consen
   await expect(button).toHaveAttribute('data-album-state','unlocked');await expect(button).toHaveAccessibleName('เปิดอัลบั้มส่วนตัวที่ได้รับอนุมัติ');
   await expect(page.locator('#toast')).toBeHidden();const unlocked=await button.screenshot();expect(await button.locator('.album-lock-badge').evaluate(b=>getComputedStyle(b).color)).not.toBe(geometry.badgeColor);
   await page.screenshot({path:resolve(dir,`${info.project.name}-${width}-unlocked-profile.png`)});
-  await button.focus();await page.keyboard.press('Space');await expect(page.locator('section[aria-label="รูปอัลบั้มส่วนตัว"] .ig-tile')).toHaveCount(1);await expect(page.locator('section[aria-label="Gallery สาธารณะ"]')).toHaveCount(0);
+  await button.focus();await page.keyboard.press('Space');await expect(page.locator('.gallery-experience .gallery-tile-wrap')).toHaveCount(5);await expect(page.locator('.gallery-experience [aria-label="Gallery สาธารณะ"]')).toHaveCount(0);
   await simulateChatCounterpart(page);await page.locator('[data-album-action=revoke]').click();
   await page.locator('#demo-actor').selectOption('demo-me');await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();
   await expect(button).toHaveAttribute('data-album-state','locked');await expect(page.locator('#profile-dialog .album-feedback')).toHaveCount(0);

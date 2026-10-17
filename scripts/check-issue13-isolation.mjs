@@ -11,18 +11,20 @@ async function query(id,sql){const result=await api(`/d1/database/${id}/query`,{
 const protectedCounts={};
 for(const table of ['users','identities','member_profiles','social_messages','social_relationships','profile_photos','social_media','synthetic_seed_records','synthetic_seed_objects'])protectedCounts[table]=(await query(original,`SELECT COUNT(*) n FROM ${table}`))[0].n;
 assert.equal((await query(original,"SELECT COUNT(*) n FROM sqlite_master WHERE type='table' AND name='album_access_requests'"))[0].n,0,'Protected staging must not be migrated');
-const migrations=await query(isolated,'SELECT name FROM d1_migrations ORDER BY id');assert.equal(migrations.length,13);assert.equal(migrations.at(-1).name,'0013_direct_chat_private_albums.sql');
+const migrations=await query(isolated,'SELECT name FROM d1_migrations ORDER BY id');assert.equal(migrations.length,14);assert.equal(migrations.at(-1).name,'0014_gallery_capacity.sql');
 const columns=await query(isolated,"PRAGMA table_info('profile_photos')");assert.equal(columns.find(c=>c.name==='visibility').dflt_value,"'private'");
 const triggers=await query(isolated,"SELECT name,sql FROM sqlite_master WHERE type='trigger' AND name IN ('album_request_created','album_request_transition','album_block_revokes','direct_chat_spam_guard')");
 const sql=readFileSync('migrations/0013_direct_chat_private_albums.sql','utf8');
-const normalize=s=>s.trim().replace(/;$/,'').replace(/\s+/g,' ');
+const normalize=s=>s.trim().replace(/;$/,'').replace(/IF NOT EXISTS /g,'').replace(/\s+/g,' ');
 for(const t of triggers){const source=sql.match(new RegExp('CREATE TRIGGER '+t.name+'[\\s\\S]*?\\nEND;'))?.[0];assert.ok(source);assert.equal(normalize(t.sql),normalize(source),t.name);}
 assert.equal(triggers.length,4);
+const capacity=await query(isolated,"SELECT sql FROM sqlite_master WHERE type='trigger' AND name='gallery_capacity_guard'");
+assert.equal(capacity.length,1);assert.equal(normalize(capacity[0].sql),normalize(readFileSync('migrations/0014_gallery_capacity.sql','utf8').match(/CREATE TRIGGER[\s\S]*?END;/)[0]));
 const fk=(await query(isolated,'SELECT COUNT(*) n FROM pragma_foreign_key_check'))[0].n;assert.equal(fk,0);
 const mismatchedOwners=(await query(isolated,'SELECT COUNT(*) n FROM profile_photos p JOIN social_media m ON m.id=p.media_id WHERE p.owner_user_id<>m.owner_user_id'))[0].n;assert.equal(mismatchedOwners,0);
 const p=await api('/pages/projects/chatgun'),preview=p.deployment_configs.preview,prod=p.deployment_configs.production;
 assert.equal(preview.d1_databases.DB.id,original);assert.equal(preview.r2_buckets.MEDIA.name,'chatgun-media-staging');assert.equal(Object.keys(prod.r2_buckets||{}).length,0);
 const managed=await api('/r2/buckets/chatgun-issue13-media/domains/managed');assert.equal(managed.enabled,false);
-const evidence={checkedAt:new Date().toISOString(),account,protectedDatabase:original,protectedCounts,protectedAlbumMigrationApplied:false,isolatedDatabase:isolated,isolatedMigrationCount:13,foreignKeyViolations:fk,photoMediaOwnerMismatches:mismatchedOwners,exactSourceTriggersVerified:4,privateVisibilityDefault:true,managedR2PublicAccess:false,originalBindingsUnchanged:true,productionR2Bindings:0,aggregateFingerprint:createHash('sha256').update(JSON.stringify(protectedCounts)).digest('hex'),databaseWrites:0};
+const evidence={checkedAt:new Date().toISOString(),account,protectedDatabase:original,protectedCounts,protectedAlbumMigrationApplied:false,isolatedDatabase:isolated,isolatedMigrationCount:14,foreignKeyViolations:fk,photoMediaOwnerMismatches:mismatchedOwners,exactSourceTriggersVerified:5,privateVisibilityDefault:true,managedR2PublicAccess:false,originalBindingsUnchanged:true,productionR2Bindings:0,aggregateFingerprint:createHash('sha256').update(JSON.stringify(protectedCounts)).digest('hex'),databaseWrites:0};
 if(process.env.COMPARE_ISOLATION_FILE){const before=JSON.parse(readFileSync(process.env.COMPARE_ISOLATION_FILE));assert.equal(evidence.aggregateFingerprint,before.aggregateFingerprint);evidence.protectedCountsUnchangedSinceBaseline=true;}
 const output=process.env.ISOLATION_OUTPUT||'docs/issue-13/isolation-before-release.json';writeFileSync(output,JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));

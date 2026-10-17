@@ -87,5 +87,5 @@ window.ChatgunNearComponents = (() => {
       <small>ผู้ที่มีสิทธิ์ดูรูปนี้อ่านคอมเมนต์ได้</small><p data-post-feedback role="status" hidden></p>${true?`<div class="post-comments">${comments.slice().reverse().sort((a,b)=>Number(b.created_at||0)-Number(a.created_at||0)).map(comment=>`<div><strong>${h(comment.sender_name)}</strong><p>${h(comment.body)}</p></div>`).join('')||'<p>ยังไม่มีคอมเมนต์</p>'}</div>`:''}</div>
       <div class="lightbox-nav"><button data-gallery-action="previous" aria-label="รูปก่อนหน้า" ${index===0?'disabled':''}>${icon('previous',24)}</button><span>${index+1} / ${photos.length}</span><button data-gallery-action="next" aria-label="รูปถัดไป" ${index>=photos.length-1?'disabled':''}>${icon('next',24)}</button></div></div></article></main>`;
   }
-  return {card, profile, gallery, post, icon, brand};
+  return {card, profile, gallery, post, icon, brand, privateAlbum};
 })();

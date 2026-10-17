@@ -1624,11 +1624,17 @@ async function gallery(request, env) {
   if (request.method === "GET") {
     const url = new URL(request.url);
     const owner = String(url.searchParams.get("user") || session.user_id);
+    const scope = url.searchParams.get('album') || 'public';
+    if (!['public','private'].includes(scope)) throw new SocialError('invalid_input','ประเภทอัลบั้มไม่ถูกต้อง');
     if (!await mayViewProfile(env.DB, env, session.user_id, owner)) {
       throw new SocialError("not_found", "ไม่พบแกลเลอรี", 404);
     }
+    if (scope === 'private' && session.user_id !== owner && !await albumGrant(env.DB, session.user_id, owner)) {
+      throw new SocialError('not_found','ไม่พบแกลเลอรี',404);
+    }
     const rows = await env.DB.prepare(`
       SELECT p.media_id id, p.caption, p.visibility, p.created_at, m.content_type, m.byte_size,
+             (SELECT status FROM media_safety_reviews WHERE media_id=m.id) review_status,
              mp.selected_photo_id = p.media_id selected,
              (SELECT COUNT(*) FROM photo_likes l WHERE l.media_id = p.media_id) like_count,
              EXISTS(SELECT 1 FROM photo_likes l WHERE l.media_id = p.media_id AND l.user_id = ?) liked
@@ -1636,8 +1642,9 @@ async function gallery(request, env) {
       JOIN social_media m ON m.id = p.media_id AND m.state = 'active'
       JOIN member_profiles mp ON mp.user_id = p.owner_user_id
       WHERE p.owner_user_id = ?
-        AND (p.owner_user_id=? OR p.visibility='public' OR ?=1)
-        AND EXISTS (
+        AND p.visibility = ?
+        AND ((p.owner_user_id=? AND EXISTS(SELECT 1 FROM media_safety_reviews r WHERE r.media_id=m.id AND r.status IN ('pending','rejected')))
+        OR EXISTS (
           SELECT 1 FROM media_safety_reviews review
           WHERE review.media_id = m.id AND review.status = 'released'
             AND (
@@ -1649,9 +1656,9 @@ async function gallery(request, env) {
                   AND (assurance.expires_at IS NULL OR assurance.expires_at > ?)
               ))
             )
-        )
+        ))
       ORDER BY p.created_at DESC LIMIT 12
-    `).bind(session.user_id, owner,session.user_id,await albumGrant(env.DB,session.user_id,owner)?1:0, enabled(env.SENSITIVE_CONTENT_ENABLED) ? 1 : 0, session.user_id, unixTime()).all();
+    `).bind(session.user_id, owner, scope, session.user_id, enabled(env.SENSITIVE_CONTENT_ENABLED) ? 1 : 0, session.user_id, unixTime()).all();
     const photos = rows.results || [];
     if (url.searchParams.get("photo")) {
       const id = String(url.searchParams.get("photo"));
@@ -1674,18 +1681,18 @@ async function gallery(request, env) {
     if (!env.MEDIA) throw new Error("missing_media_binding");
     const idempotencyKey = uploadIdempotencyKey(request);
     const form = await request.formData();
+    const visibility = String(form.get('visibility') || 'private');
+    if (!['public','private'].includes(visibility)) throw new SocialError('invalid_input','ประเภทอัลบั้มไม่ถูกต้อง');
     const file = form.get("file");
     if (!(file instanceof File)) throw new SocialError("invalid_file", "กรุณาเลือกรูปภาพ");
     if (file.size < 1 || file.size > 8 * 1024 * 1024) throw new SocialError("invalid_file_size", "รูปภาพต้องมีขนาดไม่เกิน 8 MB");
-    const count = await env.DB.prepare(
-      "SELECT COUNT(*) count FROM profile_photos WHERE owner_user_id = ?",
-    ).bind(session.user_id).first();
-    if (Number(count?.count || 0) >= 12) throw new SocialError("gallery_full", "อัปโหลดได้สูงสุด 12 รูป", 409);
     let image;
     try { image = sanitizeImage(new Uint8Array(await file.arrayBuffer()), file.type); }
     catch { throw new SocialError("invalid_image", "รองรับเฉพาะ JPG, PNG และ WebP ที่ถูกต้อง"); }
     const reservation = await reserveMediaUpload(env.DB, session.user_id, "gallery", idempotencyKey);
     if (reservation.replay) {
+      const prior = await env.DB.prepare('SELECT visibility FROM profile_photos WHERE media_id=? AND owner_user_id=?').bind(reservation.result_id, session.user_id).first();
+      if (prior && prior.visibility !== visibility) throw new SocialError('idempotency_conflict','คำขอนี้ใช้กับอีกอัลบั้มแล้ว',409);
       return json({ id: reservation.result_id, reviewStatus: "pending", idempotentReplay: true }, 201);
     }
     const { bytes, contentType: detectedType } = image;
@@ -1700,8 +1707,8 @@ async function gallery(request, env) {
           VALUES (?, ?, ?, 'gallery', ?, ?, ?)
         `).bind(id, session.user_id, objectKey, detectedType, bytes.length, timestamp),
         env.DB.prepare(`
-          INSERT INTO profile_photos(media_id, owner_user_id, caption, created_at) VALUES (?, ?, ?, ?)
-        `).bind(id, session.user_id, cleanText(form.get("caption"), 300), timestamp),
+          INSERT INTO profile_photos(media_id, owner_user_id, caption, visibility, created_at) VALUES (?, ?, ?, ?, ?)
+        `).bind(id, session.user_id, cleanText(form.get("caption"), 300), visibility, timestamp),
         env.DB.prepare(`
           INSERT INTO media_safety_reviews(media_id,status,source,created_at)
           VALUES (?, 'pending', 'manual', ?)
@@ -1709,8 +1716,14 @@ async function gallery(request, env) {
         completeMediaUploadStatement(env.DB, session.user_id, "gallery", idempotencyKey, id, id, timestamp),
       ]);
     } catch (error) {
-      await env.MEDIA.delete(objectKey).catch(() => {});
+      try{await env.MEDIA.delete(objectKey);}catch{
+        // The media transaction rolled back, but R2 may already contain bytes.
+        // Persist a retryable deletion even when immediate object cleanup fails.
+        await env.DB.prepare(`INSERT OR IGNORE INTO media_deletion_queue(object_key,operation_id,next_attempt_at,created_at) VALUES(?,?,?,?)`)
+          .bind(objectKey,safeUuid(),timestamp,timestamp).run();
+      }
       await releaseMediaUpload(env.DB, session.user_id, "gallery", idempotencyKey).catch(() => {});
+      if(String(error).includes('gallery_capacity_exceeded'))throw new SocialError('gallery_full','อัปโหลดได้สูงสุด 12 รูปรวมทั้งสองอัลบั้ม',409);
       throw error;
     }
     return json({ id, reviewStatus: "pending" }, 201);
@@ -1726,6 +1739,7 @@ async function gallery(request, env) {
     WHERE p.media_id = ?
   `).bind(id).first();
   if (!photo) throw new SocialError("not_found", "ไม่พบรูปภาพ", 404);
+  if (body.album && body.album !== photo.visibility) throw new SocialError('not_found','ไม่พบรูปภาพ',404);
   if(body.action==='visibility'){
     await limited(env,'gallery_visibility_user_hour',session.user_id,60,3600);
     if(photo.owner_user_id!==session.user_id) throw new SocialError('forbidden','ไม่มีสิทธิ์เปลี่ยนรูปภาพ',403);
