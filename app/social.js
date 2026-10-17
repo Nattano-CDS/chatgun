@@ -335,8 +335,12 @@ async function monitorLocationPermission() {
     }
 }
 async function refreshOpenThread() {
-  if (!(!state.selectedChat || state.threadPolling || !state.config?.messagingEnabled)) {
-    state.threadPolling = !0;
+  // Poll only the conversation the member is actually viewing. Background and
+  // other-tab polling consumed Pages Functions quota with no visible benefit.
+  if (state.activeTab !== "chat" || document.visibilityState !== "visible" || !navigator.onLine ||
+      !state.selectedChat || state.threadPolling || !state.config?.messagingEnabled) return;
+  state.threadPolling = !0;
+  {
     try {
       await loadMessagePage(state.selectedChat), await api("/api/social/messages", { method: "POST", body: { action: "read", target: state.selectedChat } });
     } finally {
@@ -702,7 +706,12 @@ async function initialize() {
 }
 $("#primary-nav").addEventListener("click", (event) => {
   const button = event.target.closest("button[data-tab]");
-  button && switchTab(button.dataset.tab);
+  if (!button) return;
+  switchTab(button.dataset.tab);
+  if (!state.config?.socialAppEnabled || !state.profile || !navigator.onLine) return;
+  // Refresh when entering a surface instead of polling hidden tabs indefinitely.
+  if (button.dataset.tab === "near") void loadPeople().catch(() => {});
+  if (button.dataset.tab === "chat") void loadRelationships().catch(() => {});
 });
 $("#onboarding-form").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -1253,8 +1262,12 @@ document.addEventListener("visibilitychange", () => {
   }, () => revokeLocationPublication({ notifyServer: state.locationFresh }), { enableHighAccuracy: !0, timeout: 12e3, maximumAge: 0 }));
 });
 setInterval(() => {
-  document.visibilityState === "visible" && navigator.onLine && state.config?.socialAppEnabled && state.profile && Promise.all([loadPeople(), loadRelationships()]).catch(() => {
-  });
+  if (document.visibilityState !== "visible" || !navigator.onLine ||
+      !state.config?.socialAppEnabled || !state.profile) return;
+  // Each inactive screen used to call both APIs every 30 seconds.
+  // Keep visible Discovery/Chat fresh without paying for hidden surfaces.
+  if (state.activeTab === "near") void loadPeople().catch(() => {});
+  else if (state.activeTab === "chat") void loadRelationships().catch(() => {});
 }, 3e4);
 setInterval(() => {
   document.visibilityState === "visible" && navigator.onLine && (refreshOpenThread().catch(() => {
