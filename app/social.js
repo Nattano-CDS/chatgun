@@ -139,6 +139,8 @@ function demoConversations(){
 }
 function renderDemoPerspective(){
   if(!state.demo)return;const host=$('#demo-perspective');host.hidden=false;
+  let label=$('[data-demo-perspective-label]');if(!label){label=document.createElement('small');label.dataset.demoPerspectiveLabel='';label.setAttribute('aria-live','polite');$('#demo-banner').append(label);}
+  label.textContent='มุมมองสิทธิ์สมมติ: '+(demoPerson(currentActor())?.name||'คุณ')+' · ไม่ใช่บัญชีจริง';
   host.innerHTML=`<label>จำลองมุมมองในแชท (บุคคลสมมติเท่านั้น)<select id="demo-actor" aria-label="มุมมองสมมติ">${[state.profile,...state.people].map(p=>`<option value="${escapeHtml(p.user_id)}" ${p.user_id===currentActor()?'selected':''}>${escapeHtml(p.user_id==='demo-me'?'คุณ — ตัวอย่าง':p.name)}</option>`).join('')}</select></label><p>ไม่ใช่การเข้าสู่บัญชีจริงหรือการให้สิทธิ์ Admin · บันทึกเฉพาะเบราว์เซอร์</p>`;
 }
 async function demoAlbum(body,method){
@@ -767,7 +769,10 @@ async function showPerson(id, {historyMode='push',photo=null}={}) {
     if(id===currentActor())state.albumRequests=(await api('/api/social/albums/access')).requests;
   }catch(error){if(generation!==state.profileRequest)return;state.galleryLoadError=true;toast('โหลด Gallery ไม่สำเร็จ โปรดลองอีกครั้ง',true);}
   if(state.personRouteView!=='post')renderPersonRoute(state.personRouteView);
-  if(photo&&photo!=='gallery')await openGalleryPhoto(id,photo,{historyMode:'none'});
+  if(photo&&photo!=='gallery'){
+    try{await openGalleryPhoto(id,photo,{historyMode:'none'});}
+    catch(error){if(generation!==state.profileRequest)return;updateProfileRoute(id,'gallery','replace');renderPersonRoute('gallery');toast('ไม่พบรูปภาพหรือสิทธิ์การเข้าถึงเปลี่ยนแปลงแล้ว',true);}
+  }
 }
 function renderGalleryPost(){
   const c=profileContext(state.selectedPerson,state.galleryView.photos);
@@ -820,20 +825,24 @@ function renderThreadMessages() {
   const messages = $("#thread .messages");
   if (!messages) return;
   const loadMore = state.threadHasMore ? `<button class="secondary load-older" type="button">โหลดข้อความก่อนหน้า</button>` : "";
-  messages.innerHTML = state.threadMessages.length ? `${state.threadMessages.map((message) => {
+  const ordered=state.threadMessages.slice().sort((a,b)=>Number(a.created_at)-Number(b.created_at)||(a.system&&b.system&&a.request_id===b.request_id?a.revision-b.revision:Number(!!a.system)-Number(!!b.system)||a.id.localeCompare(b.id)));
+  messages.innerHTML = ordered.length ? `${loadMore}${ordered.map((message) => {
     if(message.system)return albumSystemCard(message);
     const media = message.media_id && !message.unsent_at ? chatMediaUrl(message.media_id) : "";
     const attachment = message.media_id && !message.unsent_at ? (media ? `<img class="chat-image" src="${escapeHtml(media)}" alt="รูปในแชท" loading="lazy">` : `<em>รูปนี้ไม่อยู่ในคลังแล้ว</em>`) : "";
     return `<div class="message ${message.sender_user_id === currentActor() ? "mine" : ""} ${message.unsent_at ? "unsent" : ""}">${attachment}${escapeHtml(message.unsent_at ? "ยกเลิกข้อความแล้ว" : message.body)}<time>${new Date(Number(message.created_at) * 1000).toLocaleTimeString("th-TH", {hour:"2-digit",minute:"2-digit"})}</time>${message.sender_user_id === currentActor() && !message.unsent_at ? `<span class="message-tools"><button type="button" data-message-action="unsend" data-message="${escapeHtml(message.id)}">ยกเลิกข้อความ</button></span>` : ""}</div>`;
-  }).join("")}${loadMore}` : `<div class="empty"><p>เริ่มบทสนทนาด้วยความสุภาพ</p></div>`;
+  }).join("")}` : `<div class="empty"><p>เริ่มบทสนทนาด้วยความสุภาพ</p></div>`;
 }
 
 async function loadMessagePage(id, before = null) {
+  const host=$('#thread .messages'),oldHeight=host?.scrollHeight||0,oldTop=host?.scrollTop||0;
+  const atEnd=!host||host.scrollHeight-host.scrollTop-host.clientHeight<80;
   const query = before ? `&before=${encodeURIComponent(before.created_at)}&beforeId=${encodeURIComponent(before.id)}` : "";
   const result = await api(`/api/social/messages?target=${encodeURIComponent(id)}${query}`);
   state.threadMessages = before ? [...state.threadMessages, ...result.messages] : result.messages;
   state.threadHasMore = result.hasMore;
   renderThreadMessages();
+  if(host){if(before)host.scrollTop=oldTop+host.scrollHeight-oldHeight;else if(atEnd)host.scrollTop=host.scrollHeight;}
 }
 
 async function openChat(id) {
@@ -953,6 +962,7 @@ async function initialize() {
     fillProfile();
     await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked(), loadOwnGallery(), loadUploadQuotas(), loadVerification(), loadMediaSafety()]);
     await monitorLocationPermission();
+    switchTab(state.activeTab);
     if (location.pathname === "/app/photos") openOwnGallery(false);
     const route = routedProfile();
     if (route) await showPerson(route.user, { historyMode: "none", photo: route.photo });

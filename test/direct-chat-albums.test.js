@@ -67,6 +67,10 @@ test('duplicate and distinct-recipient spam guards are durable and atomic',async
   for(let i=0;i<9;i++)await db.prepare("INSERT INTO social_messages(id,sender_user_id,receiver_user_id,body,created_at) VALUES(?,'viewer',?,?,?)").bind('spam'+i,'target'+i,'unique'+i,unixTime()).run();
   await assert.rejects(()=>db.prepare("INSERT INTO social_messages(id,sender_user_id,receiver_user_id,body,created_at) VALUES('overflow','viewer','target9','next',?)").bind(unixTime()).run(),/recipient_limit/);
   assert.equal((await db.prepare('SELECT COUNT(*) n FROM chat_initiations').first()).n,10);
+  db.exec("DELETE FROM social_messages WHERE id='spam8';DELETE FROM chat_initiations WHERE receiver_id='target8'");
+  const parallel=await Promise.all(['target8','target9'].map(target=>call('viewer','messages',{action:'send',target,body:'concurrent-'+target})));
+  assert.deepEqual(parallel.map(r=>r.status).sort(),[200,429]);
+  assert.equal((await db.prepare('SELECT COUNT(*) n FROM chat_initiations').first()).n,10);
 });
 test('album requests are durable typed events, duplicate-safe and owner-only with revision/CSRF',async t=>{
   const {db,call,request,decide}=await fixture(t);const r=await request();

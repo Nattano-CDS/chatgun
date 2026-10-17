@@ -51,6 +51,11 @@ test.beforeEach(async ({ page }) => {
   await mockSocialApi(page);
 });
 
+test('authenticated chat deep link opens the actual inbox immediately',async({page})=>{
+  await page.goto('/?tab=chat');await expect(page.locator('#chat-tab')).toBeVisible();
+  await expect(page.locator('#near-tab')).not.toBeVisible();await expect(page.locator('[data-chat="friend-1"]')).toBeVisible();
+});
+
 test("root is the authenticated discovery entry while welcome retains marketing", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/$/u);
