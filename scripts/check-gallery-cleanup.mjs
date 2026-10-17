@@ -20,4 +20,4 @@ for(const row of rows){const bytes=execFileSync('npx',['wrangler@4.151.1','r2','
 const fk=(await query('SELECT count(*) n FROM pragma_foreign_key_check')).results[0].n;assert.equal(fk,0);
 const pending=(await query('SELECT count(*) n FROM media_deletion_queue WHERE completed_at IS NULL')).results[0].n;assert.equal(pending,0);
 const result={checkedAt:new Date().toISOString(),database,bucket,cleanup,knownActiveRunObjectsVerified:rows.length,pendingDeletions:pending,foreignKeyViolations:fk,protectedStagingTouched:false,productionTouched:false,scope:'known synthetic test-run objects and scheduled deletion queue; not an exhaustive bucket inventory'};
-writeFileSync('docs/gallery-approved/cleanup-check.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));
+writeFileSync((process.env.RELEASE_EVIDENCE_DIR||'docs/gallery-approved')+'/cleanup-check.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));

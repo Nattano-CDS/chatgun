@@ -13,7 +13,7 @@ try{
     const page=await browser.newPage({...width===390?devices['iPhone 13']:{},viewport:{width,height:width===390?844:width===768?1024:1100},deviceScaleFactor:1});
     for(const [name,path] of [['public-view','/app/people/demo-01/gallery'],['private-view','/app/people/demo-08/private-gallery'],['upload-public','/app/me/gallery/upload'],['upload-private','/app/me/private-gallery/upload']]){
       await page.goto(origin+path);if(await page.locator('#app').count())await page.waitForFunction(()=>document.querySelector('#app')?.getAttribute('aria-busy')==='false');
-      if(stage==='after'){
+      {
         await page.evaluate(()=>document.fonts.ready);
         await page.waitForFunction(()=>[...document.querySelectorAll('.gallery-experience img')].every(i=>i.complete&&i.naturalWidth>0));
       }

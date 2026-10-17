@@ -1,0 +1,500 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ChatGun complete Gallery UX remediation</title><style>body{font:15px/1.65 system-ui,sans-serif;margin:auto;padding:28px;max-width:1280px;background:#f7f7fb;color:#21212a}a{color:#5931c5}table{border-collapse:collapse;width:100%}td,th{padding:12px;border:1px solid #ded6eb;text-align:left}.pair,.states{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}figure{margin:8px 0;min-width:0}img{width:100%;height:auto;border:1px solid #e9e7ef;border-radius:12px}summary{padding:16px;background:#eee8ff;cursor:pointer}details{margin:12px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}code{overflow-wrap:anywhere}@media(max-width:700px){body{padding:16px}.pair,.states{grid-template-columns:1fr}}</style><h1>ChatGun · Complete Gallery journey remediation</h1><p><a href="https://chatgun.social">Production fictional demo</a> · <a href="https://github.com/Nattano-CDS/chatgun/pull/14">Draft PR #14</a> · <a href="https://github.com/Nattano-CDS/chatgun/pull/14#issuecomment-6236325092">Owner UX audit</a></p><p><strong>GO: guarded fictional demo only. NO-GO: real-user services.</strong><br>Actual deployed commit: <code>a555e0563c8f0e84f6f871d0f70c831262868883</code><br>Cloudflare deployment: <code>54b67d01-b2a0-408e-a3dd-71cc34a1ad86</code></p><h2>All confirmed fixes</h2><ol><li>Upload Back and Cancel return to the same album; Gallery → Profile → Discovery remains intact. Direct URL, refresh, Back/Forward and unsaved-file warnings covered. No manual redesign.</li><li>Two visible constraints above selection: daily Gallery quota 10, combined Public/Private capacity 12. Oversized selections stay visible and editable, cannot submit, and consume no quota. Atomic server reservations and the existing capacity trigger remain.</li><li>Only unsent previews have X controls. Uploading disables removal. Saved previews say awaiting review; actual deletion remains a confirmed owner Gallery action.</li><li>Success replaces submit with ดู Gallery / เพิ่มรูปอีก. Partial success distinguishes per-file results, preserves keys, and retries unsaved files only. Lost acknowledgements can replay the same key even at full capacity.</li><li>Compact mobile composition; action bar sits above NEAR navigation with safe-area clearance. Selected/remaining count stays next to the action. VisualViewport keyboard handling avoids a fixed form footer when the viewport shrinks.</li><li>Concise Thai upload labels, shared-caption explanation, no faux top-right button. Pending remains pending, not publicly visible.</li><li>Bounded lightbox image/caption/comments; portrait, landscape, square and panoramic content uses contain. Navigation and Send remain visible with 20 comments; slow/broken/empty content states covered.</li></ol><h2>Actual tests</h2><table><tr><th>Suite</th><th>Pass</th><th>Fail</th><th>Skip</th></tr><tr><td>Unit / integration / security</td><td>133</td><td>0</td><td>0</td></tr><tr><td>Actual isolated Cloudflare D1/R2</td><td>48</td><td>0</td><td>0</td></tr><tr><td>Complete Preview Playwright</td><td>119</td><td>0</td><td>43</td></tr><tr><td>Actual Production fictional journeys</td><td>52</td><td>0</td><td>12</td></tr></table><p>Zero flaky cases. Skips are explicitly listed below, not counted as successes. Mocked auth/RBAC tests are not described as real OAuth success.</p><h2>Journeys verified</h2><ul><li>Discovery whole-card → Profile → public Gallery → photo → Like/comment persistence → previous/next → same Gallery → Profile; own card first and no Add Friend/action buttons.</li><li>Locked request → persistent Chat system card → simulated owner approval/rejection → confirmed unlock → separate private Gallery → revoke/deep-link denial. Actual server consent, bytes/comments/thumbnail denial are independently exercised in isolated D1/R2.</li><li>Both owner upload routes, 0/12, 10/12, 12/12 capacity and 0/10, 10/10 daily boundaries; invalid MIME, size/decode; partial write and lost HTTP response; retry/idempotency; delete and visibility changes. Normal actions never bypass quota or quarantine.</li><li>Session, CSRF, RBAC, moderation, location, account deletion and cleanup regression in the full suite. No Game introduced.</li></ul><h2>Production before / after comparisons</h2><p>Approved NEAR/ChatGun tokens, prototype component language and final Profile lock icons are preserved. These are actual rendered captures, not generated mockups. Open each image for full resolution. Fixed navigation appears at the original viewport edge in full-page screenshots; bottom-scroll captures also verify action clearance.</p><h3>390px · 844px high</h3><details><summary>public-view</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/public-view-390.png"><img loading="lazy" src="screens/before/public-view-390.png" alt="Before public-view 390"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/public-view-390.png"><img loading="lazy" src="screens/after/public-view-390.png" alt="After public-view 390"></a></figure></div></details><details><summary>private-view</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/private-view-390.png"><img loading="lazy" src="screens/before/private-view-390.png" alt="Before private-view 390"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/private-view-390.png"><img loading="lazy" src="screens/after/private-view-390.png" alt="After private-view 390"></a></figure></div></details><details><summary>upload-public</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/upload-public-390.png"><img loading="lazy" src="screens/before/upload-public-390.png" alt="Before upload-public 390"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/upload-public-390.png"><img loading="lazy" src="screens/after/upload-public-390.png" alt="After upload-public 390"></a></figure></div></details><details><summary>upload-private</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/upload-private-390.png"><img loading="lazy" src="screens/before/upload-private-390.png" alt="Before upload-private 390"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/upload-private-390.png"><img loading="lazy" src="screens/after/upload-private-390.png" alt="After upload-private 390"></a></figure></div></details><h3>768px · 1024px high</h3><details><summary>public-view</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/public-view-768.png"><img loading="lazy" src="screens/before/public-view-768.png" alt="Before public-view 768"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/public-view-768.png"><img loading="lazy" src="screens/after/public-view-768.png" alt="After public-view 768"></a></figure></div></details><details><summary>private-view</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/private-view-768.png"><img loading="lazy" src="screens/before/private-view-768.png" alt="Before private-view 768"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/private-view-768.png"><img loading="lazy" src="screens/after/private-view-768.png" alt="After private-view 768"></a></figure></div></details><details><summary>upload-public</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/upload-public-768.png"><img loading="lazy" src="screens/before/upload-public-768.png" alt="Before upload-public 768"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/upload-public-768.png"><img loading="lazy" src="screens/after/upload-public-768.png" alt="After upload-public 768"></a></figure></div></details><details><summary>upload-private</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/upload-private-768.png"><img loading="lazy" src="screens/before/upload-private-768.png" alt="Before upload-private 768"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/upload-private-768.png"><img loading="lazy" src="screens/after/upload-private-768.png" alt="After upload-private 768"></a></figure></div></details><h3>1440px · 1100px high</h3><details><summary>public-view</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/public-view-1440.png"><img loading="lazy" src="screens/before/public-view-1440.png" alt="Before public-view 1440"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/public-view-1440.png"><img loading="lazy" src="screens/after/public-view-1440.png" alt="After public-view 1440"></a></figure></div></details><details><summary>private-view</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/private-view-1440.png"><img loading="lazy" src="screens/before/private-view-1440.png" alt="Before private-view 1440"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/private-view-1440.png"><img loading="lazy" src="screens/after/private-view-1440.png" alt="After private-view 1440"></a></figure></div></details><details><summary>upload-public</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/upload-public-1440.png"><img loading="lazy" src="screens/before/upload-public-1440.png" alt="Before upload-public 1440"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/upload-public-1440.png"><img loading="lazy" src="screens/after/upload-public-1440.png" alt="After upload-public 1440"></a></figure></div></details><details><summary>upload-private</summary><div class="pair"><figure><figcaption>Before · a2f6f5d</figcaption><a href="screens/before/upload-private-1440.png"><img loading="lazy" src="screens/before/upload-private-1440.png" alt="Before upload-private 1440"></a></figure><figure><figcaption>After · actual Production</figcaption><a href="screens/after/upload-private-1440.png"><img loading="lazy" src="screens/after/upload-private-1440.png" alt="After upload-private 1440"></a></figure></div></details><h2>Success state · before / after</h2><div class="pair"><figure><figcaption>Before · a2f6f5d · saved image still had X / submit</figcaption><img loading="lazy" src="screens/before/upload-success-390.png" alt="Original Production upload success"></figure><figure><figcaption>Final Production · saved state, no X, Gallery / add more</figcaption><img loading="lazy" src="screens/production/remediation/mobile-chromium-success.png" alt="Final mobile success"></figure></div><details><summary>Late manual finding: preceding build thumbnail overlap</summary><img loading="lazy" src="screens/before/initial-success-overlap-mobile.png" alt="Preceding build overlap"><p>Fixed with wrapping preview layout and pairwise geometry assertions; complete final suites rerun.</p></details><h2>Actual Production result states</h2><div class="states"><figure><figcaption>capacity-exceeded · Production disposable browser</figcaption><a href="screens/production/remediation/mobile-chromium-capacity-exceeded.png"><img loading="lazy" src="screens/production/remediation/mobile-chromium-capacity-exceeded.png" alt="capacity-exceeded"></a></figure><figure><figcaption>success · Production disposable browser</figcaption><a href="screens/production/remediation/mobile-chromium-success.png"><img loading="lazy" src="screens/production/remediation/mobile-chromium-success.png" alt="success"></a></figure><figure><figcaption>partial-failure · Production disposable browser</figcaption><a href="screens/production/remediation/mobile-chromium-partial-failure.png"><img loading="lazy" src="screens/production/remediation/mobile-chromium-partial-failure.png" alt="partial-failure"></a></figure></div><p><a href="screens/production/remediation/viewer-portrait-390.png">Mobile portrait / long-caption viewer</a> · <a href="screens/production/remediation/viewer-panorama-768.png">Tablet panorama viewer</a> · <a href="screens/production/gallery/public-lightbox-1440.png">Desktop Gallery lightbox</a> · <a href="screens/production/icons/desktop-chromium-390-locked-unlocked.png">Locked / unlocked comparison</a></p><h2>Data and security preservation</h2><p>20 fictional members, original 120 messages and fresh-browser 210 Gallery items preserved. Existing owner-edited IndexedDB is not automatically reset, expired or reseeded. Tests use disposable browser contexts; they do not touch owner tabs. Original staging fingerprint remains <code>6768cc6b45b2adfd4c508068250013d5c2bd1dcb717c80ddaa5157618a8f080b</code>. No original staging fixture writes, Production D1 migration/user mutation or Production R2 binding. No PiggyPrice/NEAR modifications and no PR merge.</p><p>48 real Cloudflare checks use separately isolated synthetic D1/R2. Cleanup retries and foreign keys verified; all temporary test sessions revoked, synthetic accounts retained. Real OAuth, social services, uploads, registration, Sensitive Content and moderation tools remain disabled in Production. Unapproved legal drafts remain excluded from the public build.</p><h2>Release / rollback</h2><p>Exact candidate tested in Preview, static package checked for private artifacts, Production configuration compared against the guarded baseline, deployed once after gates, canonical release metadata and ten asset hashes verified. Rollback deployment: <code>3e111666-ad69-49ba-91ca-d2495c561076</code>, SHA <code>d9a11c52722175b93236f8e09e74928430013fba</code>. Restore that Pages deployment if a guarded-demo regression appears; do not run schema rollback or enable live flags.</p><h2>Real-user launch blockers (not waived)</h2><ul><li>Separate authorization and validation for Production migrations/service activation, provider-enabled authentication and real invitations.</li><li>Owner/qualified legal approval of policies and adult age-assurance model; current self-declaration is not independent age verification.</li><li>Operational support/alert and emergency routes, appeals independence, scanning/manual-review plan and deletion monitoring.</li><li>Only the owner covers daily 19:00–22:00 Asia/Bangkok; no confirmed backup or guaranteed immediate/24-hour response.</li><li>Approved location/privacy residual-risk decisions and physical-device keyboard/accessibility acceptance before real-user activation.</li></ul><h2>Exact results, skipped scenarios and limitations</h2><details><summary>Machine-readable evidence</summary><pre>{
+  &quot;checkedAt&quot;: &quot;2026-10-17T16:55:39.013Z&quot;,
+  &quot;production&quot;: &quot;https://chatgun.social&quot;,
+  &quot;deployedSha&quot;: &quot;a555e0563c8f0e84f6f871d0f70c831262868883&quot;,
+  &quot;deploymentId&quot;: &quot;54b67d01-b2a0-408e-a3dd-71cc34a1ad86&quot;,
+  &quot;preview&quot;: &quot;https://issue13.chatgun-issue13-staging.pages.dev&quot;,
+  &quot;unit&quot;: {
+    &quot;passed&quot;: 133,
+    &quot;failed&quot;: 0,
+    &quot;skipped&quot;: 0
+  },
+  &quot;realCloudflare&quot;: {
+    &quot;passed&quot;: 48,
+    &quot;failed&quot;: 0
+  },
+  &quot;previewPlaywright&quot;: {
+    &quot;passed&quot;: 119,
+    &quot;failed&quot;: 0,
+    &quot;skipped&quot;: 43,
+    &quot;flaky&quot;: 0
+  },
+  &quot;productionPlaywright&quot;: {
+    &quot;passed&quot;: 52,
+    &quot;failed&quot;: 0,
+    &quot;skipped&quot;: 12,
+    &quot;flaky&quot;: 0
+  },
+  &quot;skipped&quot;: {
+    &quot;preview&quot;: [
+      {
+        &quot;title&quot;: &quot;account and protected Admin visual fixtures at 390px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewports run once&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;account and protected Admin visual fixtures at 768px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewports run once&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;account and protected Admin visual fixtures at 1440px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewports run once&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;real isolated owner uploads use distinct server scopes, shared quota and quarantine&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires isolated synthetic sessions; no real OAuth bypass claimed&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;approved Gallery: four destinations, uploads and bounded lightbox 390&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit owner reference viewport&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;approved Gallery: four destinations, uploads and bounded lightbox 768&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit owner reference viewport&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;approved Gallery: four destinations, uploads and bounded lightbox 1440&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit owner reference viewport&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;upload and viewer visual usability 390&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewport comparison&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;upload and viewer visual usability 768&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewport comparison&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;upload and viewer visual usability 1440&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewport comparison&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;real isolated D1/R2 private-album cards, owner consent, revocation and logout&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit isolated synthetic fixture bundle required; three viewports run once&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;v91 measured layout, pagination, keyboard and failure recovery 390px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit reference viewports&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;v91 measured layout, pagination, keyboard and failure recovery 768px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit reference viewports&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;v91 measured layout, pagination, keyboard and failure recovery 1440px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit reference viewports&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;staging social APIs persist positive and negative non-media workflows&quot;,
+        &quot;project&quot;: &quot;desktop-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires an explicitly generated staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;staging R2 gallery and chat media remain private and relationship-authorized&quot;,
+        &quot;project&quot;: &quot;desktop-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires an explicitly generated staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;desktop and mobile render persisted staging profile, discovery, notifications, and reviews&quot;,
+        &quot;project&quot;: &quot;desktop-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires an explicitly generated staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;synthetic account deletion queues owned R2 media and revokes access&quot;,
+        &quot;project&quot;: &quot;desktop-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires an explicitly generated staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;staging social APIs persist positive and negative non-media workflows&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires an explicitly generated staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;staging R2 gallery and chat media remain private and relationship-authorized&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires an explicitly generated staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;desktop and mobile render persisted staging profile, discovery, notifications, and reviews&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires an explicitly generated staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;synthetic account deletion queues owned R2 media and revokes access&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires an explicitly generated staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;viewer self shortcut, filters, pagination, edit, primary photo and recovery 390&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit reference sizes&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;viewer self shortcut, filters, pagination, edit, primary photo and recovery 768&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit reference sizes&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit reference sizes&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;owner package: isolated fictional network and layout at 390px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewports run once&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;owner package: isolated fictional network and layout at 768px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewports run once&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;owner package: isolated fictional network and layout at 1440px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewports run once&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;mobile social shell uses bottom navigation and remains usable&quot;,
+        &quot;project&quot;: &quot;desktop-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;mobile-only layout check&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;canonical components: complete routed member and own-gallery journey 390&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit source viewports&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;canonical gallery: empty, image failure, landscape, delete and no quota refund 390&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit source viewports&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;canonical components: complete routed member and own-gallery journey 768&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit source viewports&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;canonical gallery: empty, image failure, landscape, delete and no quota refund 768&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit source viewports&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;canonical components: complete routed member and own-gallery journey 1440&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit source viewports&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;canonical gallery: empty, image failure, landscape, delete and no quota refund 1440&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit source viewports&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;preserved staging batch and private media remain accessible only to authorized sessions&quot;,
+        &quot;project&quot;: &quot;desktop-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit read-only synthetic session required; run once&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;preserved staging batch and private media remain accessible only to authorized sessions&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit read-only synthetic session required; run once&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;synthetic staging APIs expose the complete traceable owner-review network&quot;,
+        &quot;project&quot;: &quot;desktop-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires the explicitly generated synthetic staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;NEAR-style social pages render populated synthetic data on desktop and mobile&quot;,
+        &quot;project&quot;: &quot;desktop-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires the explicitly generated synthetic staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;admin overview and urgent queues render synthetic moderation samples&quot;,
+        &quot;project&quot;: &quot;desktop-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires the explicitly generated synthetic staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;synthetic staging APIs expose the complete traceable owner-review network&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires the explicitly generated synthetic staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;NEAR-style social pages render populated synthetic data on desktop and mobile&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires the explicitly generated synthetic staging session bundle&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;admin overview and urgent queues render synthetic moderation samples&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;requires the explicitly generated synthetic staging session bundle&quot;
+        ]
+      }
+    ],
+    &quot;production&quot;: [
+      {
+        &quot;title&quot;: &quot;approved Gallery: four destinations, uploads and bounded lightbox 390&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit owner reference viewport&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;approved Gallery: four destinations, uploads and bounded lightbox 768&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit owner reference viewport&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;approved Gallery: four destinations, uploads and bounded lightbox 1440&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit owner reference viewport&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;upload and viewer visual usability 390&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewport comparison&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;upload and viewer visual usability 768&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewport comparison&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;upload and viewer visual usability 1440&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewport comparison&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;viewer self shortcut, filters, pagination, edit, primary photo and recovery 390&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit reference sizes&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;viewer self shortcut, filters, pagination, edit, primary photo and recovery 768&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit reference sizes&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;three explicit reference sizes&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;owner package: isolated fictional network and layout at 390px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewports run once&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;owner package: isolated fictional network and layout at 768px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewports run once&quot;
+        ]
+      },
+      {
+        &quot;title&quot;: &quot;owner package: isolated fictional network and layout at 1440px&quot;,
+        &quot;project&quot;: &quot;mobile-chromium&quot;,
+        &quot;reasons&quot;: [
+          &quot;explicit viewports run once&quot;
+        ]
+      }
+    ]
+  },
+  &quot;data&quot;: {
+    &quot;origin&quot;: &quot;https://chatgun.social&quot;,
+    &quot;batch&quot;: &quot;chatgun-gallery-approved-v1&quot;,
+    &quot;photos&quot;: 210,
+    &quot;photosByScope&quot;: {
+      &quot;public&quot;: 106,
+      &quot;private&quot;: 104
+    },
+    &quot;newBatchPhotos&quot;: 168,
+    &quot;ownerPhotos&quot;: 10,
+    &quot;ownerAlbumCounts&quot;: {
+      &quot;public&quot;: 6,
+      &quot;private&quot;: 4
+    },
+    &quot;owners&quot;: 21,
+    &quot;privateAlbumOwners&quot;: 21,
+    &quot;originalMessages&quot;: 120,
+    &quot;conversations&quot;: 10,
+    &quot;comments&quot;: 186,
+    &quot;moderationExamples&quot;: {
+      &quot;pending&quot;: 1,
+      &quot;rejected&quot;: 1
+    },
+    &quot;permissionExamples&quot;: [
+      &quot;approved&quot;,
+      &quot;pending&quot;,
+      &quot;revoked&quot;,
+      &quot;rejected&quot;
+    ],
+    &quot;automaticExpiry&quot;: false,
+    &quot;persistence&quot;: &quot;IndexedDB; additive versioned upgrade; no automatic reset; explicit batch-only reset in Demo Chat preserves uploads and quota&quot;
+  },
+  &quot;protectedStagingFingerprint&quot;: &quot;6768cc6b45b2adfd4c508068250013d5c2bd1dcb717c80ddaa5157618a8f080b&quot;,
+  &quot;productionDatabaseMigrationsApplied&quot;: 0,
+  &quot;productionR2Bindings&quot;: 0,
+  &quot;realServicesEnabled&quot;: false,
+  &quot;guardedFictionalDemo&quot;: &quot;GO&quot;,
+  &quot;realUserLaunch&quot;: &quot;NO-GO&quot;,
+  &quot;rollback&quot;: {
+    &quot;id&quot;: &quot;3e111666-ad69-49ba-91ca-d2495c561076&quot;,
+    &quot;sha&quot;: &quot;d9a11c52722175b93236f8e09e74928430013fba&quot;
+  },
+  &quot;limitations&quot;: [
+    &quot;No real provider/CAPTCHA E2E rerun; OAuth implementation unchanged and Production login remains disabled.&quot;,
+    &quot;Browser IndexedDB fixtures and permissions are fictional; real D1/R2 authorization tested separately using explicit synthetic sessions.&quot;,
+    &quot;Desktop Chromium and emulated mobile/tablet tested, not physical Safari/iOS/Android keyboards. VisualViewport handling needs device acceptance before real-user launch.&quot;,
+    &quot;Cleanup invoked directly against isolated D1/R2; not evidence that a Cron fired or a full historical bucket inventory passed.&quot;,
+    &quot;No scanner or staffed moderation readiness is claimed; synthetic moderation releases are fixtures.&quot;,
+    &quot;Account deletion/linking regression is automated coverage, not a new Production deletion or interactive provider-linking run.&quot;,
+    &quot;Setup initially stopped on an abbreviated expected-SHA assertion; subsequent final-cloud checks use the exact full SHA. New synthetic fixture accounts retained; all test sessions revoked.&quot;
+  ],
+  &quot;r2PublicAccess&quot;: {
+    &quot;checkedAt&quot;: &quot;2026-10-17T16:53:58.813Z&quot;,
+    &quot;account&quot;: &quot;23017b53386fb67fc62a52cdd017454c&quot;,
+    &quot;bucket&quot;: &quot;chatgun-issue13-media&quot;,
+    &quot;managedPublic&quot;: false,
+    &quot;customDomains&quot;: 0,
+    &quot;readonly&quot;: true
+  },
+  &quot;resolvedPreReleaseIssues&quot;: [
+    {
+      &quot;issue&quot;: &quot;Final Production screenshot review found narrow-screen thumbnail overlap&quot;,
+      &quot;fix&quot;: &quot;Wrap the fixed-size previews in a flex layout instead of undersized grid tracks.&quot;,
+      &quot;evidence&quot;: &quot;Pairwise non-overlap assertion plus final mobile Production screenshots; preceding guarded release was d9a11c52722175b93236f8e09e74928430013fba, with 52 browser passes but this manual visual finding.&quot;
+    },
+    {
+      &quot;issue&quot;: &quot;Initial album/quota response detached an already-interactive upload form, leaving retry controls disabled&quot;,
+      &quot;fix&quot;: &quot;Render a loading state until initial checks finish; never detach an active upload form. Reuse prepared bytes and bound network waits.&quot;,
+      &quot;evidence&quot;: &quot;Final isolated live test holds the initial response, checks no interactive form exists, then saves, loses acknowledgement and retries the same key.&quot;
+    },
+    {
+      &quot;issue&quot;: &quot;Long captions/comments pushed viewer controls outside viewport&quot;,
+      &quot;fix&quot;: &quot;One-column mobile viewer and bounded image/caption/comment regions; fixed controls within visible shell.&quot;,
+      &quot;evidence&quot;: &quot;390/768/1440 screenshots plus actual geometry assertions.&quot;
+    },
+    {
+      &quot;issue&quot;: &quot;Two-pixel upload footer / navigation overlap&quot;,
+      &quot;fix&quot;: &quot;Match actual 72px NEAR navigation plus safe-area clearance.&quot;,
+      &quot;evidence&quot;: &quot;Bounding-box assertions and Production screenshots.&quot;
+    }
+  ]
+}</pre></details><p><a href="preview-playwright.json">Full Preview report</a> · <a href="production-playwright.json">Production report</a> · <a href="cloud-test-results.json">Actual D1/R2 checks</a> · <a href="unit-tests.tap">133 unit/security cases</a> · <a href="production-verification.json">SHA / asset hashes</a> · <a href="cleanup-check.json">Cleanup</a> · <a href="isolation-after-release.json">Isolation</a> · <a href="production-schema-check.json">Production schema (read-only)</a></p></html>

@@ -23,3 +23,6 @@ test-results/
 /docs/gallery-approved/screens/production-tests/self/
 /docs/gallery-approved/screens/production-tests/icons/*
 !/docs/gallery-approved/screens/production-tests/icons/desktop-chromium-390-locked-unlocked.png
+/docs/gallery-remediation/screens/local/
+/docs/gallery-remediation/screens/preview/albums/*
+!/docs/gallery-remediation/screens/preview/albums/real-owner-request-*.png
