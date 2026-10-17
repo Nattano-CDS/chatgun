@@ -1,0 +1,821 @@
+[
+  {
+    "width": 390,
+    "name": "discovery",
+    "dom": {
+      "tag": "ARTICLE",
+      "classes": "person person-card photo-card context-near",
+      "width": 174,
+      "height": 290,
+      "x": 16,
+      "y": 213.5,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "17px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "card-photo"
+        },
+        {
+          "tag": "DIV",
+          "classes": "photo-shade"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "card-distance"
+        },
+        {
+          "tag": "DIV",
+          "classes": "person-info"
+        },
+        {
+          "tag": "DIV",
+          "classes": "card-actions"
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "profile",
+    "dom": {
+      "tag": "FORM",
+      "classes": "panel form-grid profile-form",
+      "width": 358,
+      "height": 911,
+      "x": 16,
+      "y": -0.25,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "24px",
+      "borderRadius": "17px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "avatar large"
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary wide"
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "member-profile",
+    "dom": {
+      "tag": "SECTION",
+      "classes": "member-profile-info",
+      "width": 390,
+      "height": 304.75,
+      "x": 0,
+      "y": 451.25,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "20px 22px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "H2",
+          "classes": ""
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-bio"
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "member-profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "dialog-actions profile-primary-actions"
+        },
+        {
+          "tag": "DIV",
+          "classes": "people-management"
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "member-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 390,
+      "height": 302.78125,
+      "x": 0,
+      "y": 60,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "22px 16px 20px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "gallery-post",
+    "dom": {
+      "tag": "DIV",
+      "classes": "post-layout",
+      "width": 390,
+      "height": 919.78125,
+      "x": 0,
+      "y": 0,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "post-owner"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-image"
+        },
+        {
+          "tag": "DIV",
+          "classes": "post-social"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-nav"
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "own-profile",
+    "dom": {
+      "tag": "SECTION",
+      "classes": "member-profile-info",
+      "width": 390,
+      "height": 260.75,
+      "x": 0,
+      "y": 495.25,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "20px 22px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "H2",
+          "classes": ""
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-bio"
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "member-profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "dialog-actions profile-primary-actions"
+        },
+        {
+          "tag": "DIV",
+          "classes": "people-management"
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "own-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 390,
+      "height": 216.390625,
+      "x": 0,
+      "y": 60,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "22px 16px 20px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "discovery",
+    "dom": {
+      "tag": "ARTICLE",
+      "classes": "person person-card photo-card context-near",
+      "width": 347.5,
+      "height": 390,
+      "x": 28,
+      "y": 198,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "22px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "card-photo"
+        },
+        {
+          "tag": "DIV",
+          "classes": "photo-shade"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "card-distance"
+        },
+        {
+          "tag": "DIV",
+          "classes": "person-info"
+        },
+        {
+          "tag": "DIV",
+          "classes": "card-actions"
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "profile",
+    "dom": {
+      "tag": "FORM",
+      "classes": "panel form-grid profile-form",
+      "width": 600,
+      "height": 911,
+      "x": 28,
+      "y": 113.390625,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "24px",
+      "borderRadius": "17px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "avatar large"
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary wide"
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "member-profile",
+    "dom": {
+      "tag": "SECTION",
+      "classes": "member-profile-info",
+      "width": 740,
+      "height": 347.578125,
+      "x": 14,
+      "y": 588.421875,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "30px 35px 25px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "H2",
+          "classes": ""
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-bio"
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "member-profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "dialog-actions profile-primary-actions"
+        },
+        {
+          "tag": "DIV",
+          "classes": "people-management"
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "member-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 768,
+      "height": 277.390625,
+      "x": 0,
+      "y": 76,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "26px 22px 22px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "gallery-post",
+    "dom": {
+      "tag": "DIV",
+      "classes": "post-layout",
+      "width": 768,
+      "height": 1305.78125,
+      "x": 0,
+      "y": 0,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "post-owner"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-image"
+        },
+        {
+          "tag": "DIV",
+          "classes": "post-social"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-nav"
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "own-profile",
+    "dom": {
+      "tag": "SECTION",
+      "classes": "member-profile-info",
+      "width": 740,
+      "height": 302.078125,
+      "x": 14,
+      "y": 633.921875,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "30px 35px 25px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "H2",
+          "classes": ""
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-bio"
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "member-profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "dialog-actions profile-primary-actions"
+        },
+        {
+          "tag": "DIV",
+          "classes": "people-management"
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "own-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 768,
+      "height": 217.390625,
+      "x": 0,
+      "y": 76,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "26px 22px 22px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "discovery",
+    "dom": {
+      "tag": "ARTICLE",
+      "classes": "person person-card photo-card context-near",
+      "width": 274.75,
+      "height": 390,
+      "x": 145,
+      "y": 206,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "22px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "card-photo"
+        },
+        {
+          "tag": "DIV",
+          "classes": "photo-shade"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "card-distance"
+        },
+        {
+          "tag": "DIV",
+          "classes": "person-info"
+        },
+        {
+          "tag": "DIV",
+          "classes": "card-actions"
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "profile",
+    "dom": {
+      "tag": "FORM",
+      "classes": "panel form-grid profile-form",
+      "width": 600,
+      "height": 911,
+      "x": 145,
+      "y": 189.390625,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "24px",
+      "borderRadius": "17px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "avatar large"
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary wide"
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "member-profile",
+    "dom": {
+      "tag": "SECTION",
+      "classes": "member-profile-info",
+      "width": 740,
+      "height": 347.578125,
+      "x": 350,
+      "y": 664.421875,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "30px 35px 25px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "H2",
+          "classes": ""
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-bio"
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "member-profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "dialog-actions profile-primary-actions"
+        },
+        {
+          "tag": "DIV",
+          "classes": "people-management"
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "member-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 850,
+      "height": 277.390625,
+      "x": 295,
+      "y": 76,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "26px 22px 22px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "gallery-post",
+    "dom": {
+      "tag": "DIV",
+      "classes": "post-layout",
+      "width": 1040,
+      "height": 676.484375,
+      "x": 200,
+      "y": 100,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "24px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "post-owner"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-image"
+        },
+        {
+          "tag": "DIV",
+          "classes": "post-social"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-nav"
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "own-profile",
+    "dom": {
+      "tag": "SECTION",
+      "classes": "member-profile-info",
+      "width": 740,
+      "height": 302.078125,
+      "x": 350,
+      "y": 709.921875,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "30px 35px 25px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "H2",
+          "classes": ""
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-bio"
+        },
+        {
+          "tag": "P",
+          "classes": "member-profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "member-profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "dialog-actions profile-primary-actions"
+        },
+        {
+          "tag": "DIV",
+          "classes": "people-management"
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "own-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 850,
+      "height": 217.390625,
+      "x": 295,
+      "y": 76,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "26px 22px 22px",
+      "borderRadius": "0px",
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  }
+]

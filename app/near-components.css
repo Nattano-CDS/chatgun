@@ -1,0 +1,591 @@
+/* NEAR 98bb83e source component rules, original order/media queries.
+   No class aliases. Shared app/legacy rules for these components were removed.
+   The small adapter below only covers branding, fiction notice and route mounting. */
+:is(#app .near-components,#profile-dialog) {font-family:Arial,'Noto Sans Thai',Tahoma,sans-serif;line-height:1.5;}
+:is(#app .near-components,#profile-dialog) :where(h1,h2,h3,p){margin:0;font-size:inherit;font-weight:inherit;}
+:is(#app .near-components,#profile-dialog) :where(button,input,textarea,select){font:inherit;letter-spacing:inherit;color:inherit;}
+:is(#app .near-components,#profile-dialog) button{background:transparent;border:0;border-radius:0;padding:0;min-height:0;box-shadow:none;}
+:is(#app .near-components,#profile-dialog) svg{display:inline-block;vertical-align:middle;flex-shrink:0;}
+:is(#app .near-components,#profile-dialog) button,:is(#app .near-components,#profile-dialog) input,:is(#app .near-components,#profile-dialog) textarea,:is(#app .near-components,#profile-dialog) select { font: inherit; }
+:is(#app .near-components,#profile-dialog) button,:is(#app .near-components,#profile-dialog) a,:is(#app .near-components,#profile-dialog) select { -webkit-tap-highlight-color: transparent; }
+:is(#app .near-components,#profile-dialog) button { cursor: pointer; }
+:is(#app .near-components,#profile-dialog) button:disabled { opacity: 0.45; cursor: not-allowed; }
+:is(#app .near-components,#profile-dialog) a { color: inherit; text-decoration: none; }
+:is(#app .near-components,#profile-dialog) button { border: 0px; }
+:is(#app .near-components,#profile-dialog) button:focus-visible,:is(#app .near-components,#profile-dialog) a:focus-visible { outline: rgb(107, 150, 48) solid 3px; outline-offset: 3px; }
+:is(#app .near-components,#profile-dialog) input,:is(#app .near-components,#profile-dialog) textarea,:is(#app .near-components,#profile-dialog) select { outline-color: rgb(107, 150, 48); }
+:is(#app .near-components,#profile-dialog) svg { flex-shrink: 0; vertical-align: middle; }
+:is(#app .near-components,#profile-dialog) .avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: rgb(53, 66, 42); flex-shrink: 0; }
+:is(#app .near-components,#profile-dialog) .avatar.large { width: 76px; height: 76px; font-size: 32px; }
+:is(#app .near-components,#profile-dialog) .icon-button { width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; background: rgb(255, 255, 255); border: 1px solid rgb(227, 230, 222); }
+:is(#app .near-components,#profile-dialog) h1 { font-size: 40px; letter-spacing: -1px; line-height: 1.35; margin: 0px; font-weight: 700; }
+:is(#app .near-components,#profile-dialog) .location-banner .primary { margin-left: auto; white-space: nowrap; }
+:is(#app .near-components,#profile-dialog) .primary,:is(#app .near-components,#profile-dialog) .secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 11px; padding: 13px 21px; font-size: 15px; font-weight: 700; background: rgb(38, 54, 29); color: rgb(255, 255, 255); min-height: 44px; }
+:is(#app .near-components,#profile-dialog) .primary:hover { background: rgb(60, 81, 44); }
+:is(#app .near-components,#profile-dialog) .secondary { background: rgb(255, 255, 255); border: 1px solid rgb(220, 226, 213); color: rgb(67, 85, 53); }
+:is(#app .near-components,#profile-dialog) .small { padding: 10px 15px; font-size: 14px; min-height: 40px; }
+:is(#app .near-components,#profile-dialog) h2 { font-size: 21px; margin: 0px 0px 14px; }
+:is(#app .near-components,#profile-dialog) .person { background: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 219); border-radius: 18px; padding: 23px; }
+:is(#app .near-components,#profile-dialog) .person-top { display: flex; justify-content: space-between; align-items: flex-start; }
+:is(#app .near-components,#profile-dialog) .person-name { font-size: 20px; font-weight: 700; margin-top: 18px; background: none; padding: 0px; text-align: left; }
+:is(#app .near-components,#profile-dialog) .person-bio { font-size: 14px; color: rgb(124, 132, 115); min-height: 40px; line-height: 1.6; }
+:is(#app .near-components,#profile-dialog) .tags { display: flex; flex-wrap: wrap; gap: 6px; min-height: 27px; }
+:is(#app .near-components,#profile-dialog) .tags span { background: rgb(242, 245, 238); border-radius: 6px; padding: 5px 8px; font-size: 12px; color: rgb(106, 121, 91); }
+:is(#app .near-components,#profile-dialog) .rating-line { display: flex; gap: 6px; align-items: center; color: rgb(123, 136, 110); font-size: 13px; margin-top: 18px; }
+:is(#app .near-components,#profile-dialog) .card-actions { display: flex; gap: 9px; margin-top: 18px; }
+:is(#app .near-components,#profile-dialog) .card-actions .primary { flex: 1 1 0%; }
+:is(#app .near-components,#profile-dialog) .empty { background: rgb(255, 255, 255); border: 1px dashed rgb(217, 224, 208); border-radius: 18px; padding: 44px 25px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 13px; color: rgb(109, 124, 94); }
+:is(#app .near-components,#profile-dialog) .empty h2 { color: rgb(51, 65, 42); margin: 0px; font-size: 23px; }
+:is(#app .near-components,#profile-dialog) .empty p { font-size: 15px; line-height: 1.8; max-width: 450px; margin: 0px 0px 7px; }
+:is(#app .near-components,#profile-dialog) .panel { background: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 219); border-radius: 17px; padding: 24px; }
+:is(#app .near-components,#profile-dialog) .profile-form { max-width: 600px; display: flex; flex-direction: column; gap: 22px; }
+:is(#app .near-components,#profile-dialog) .profile-form label { display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 700; }
+:is(#app .near-components,#profile-dialog) input,:is(#app .near-components,#profile-dialog) textarea { border: 1px solid rgb(223, 229, 215); padding: 13px; border-radius: 10px; background: rgb(250, 251, 248); color: rgb(40, 52, 33); font-size: 16px; min-width: 0px; }
+:is(#app .near-components,#profile-dialog) textarea { min-height: 110px; resize: vertical; }
+:is(#app .near-components,#profile-dialog) .profile-form a { font-size: 14px; color: rgb(124, 136, 110); }
+:is(#app .near-components,#profile-dialog) .chat-window .empty { border: 0px; flex: 1 1 0%; }
+@media (max-width: 1100px) {
+:is(#app .near-components,#profile-dialog) h1 { font-size: 35px; }
+}
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) h1 { font-size: 31px; }
+:is(#app .near-components,#profile-dialog) .location-banner .primary { width: 100%; margin-top: 5px; }
+:is(#app .near-components,#profile-dialog) .person { padding: 15px; }
+:is(#app .near-components,#profile-dialog) .avatar.large { width: 59px; height: 59px; font-size: 25px; }
+:is(#app .near-components,#profile-dialog) .person-top { flex-wrap: wrap; gap: 8px; }
+:is(#app .near-components,#profile-dialog) .person-name { font-size: 18px; }
+:is(#app .near-components,#profile-dialog) .tags span { font-size: 11px; }
+:is(#app .near-components,#profile-dialog) .person-bio { font-size: 13px; }
+:is(#app .near-components,#profile-dialog) .rating-line { font-size: 11px; }
+:is(#app .near-components,#profile-dialog) .small { font-size: 12px; padding: 9px; }
+:is(#app .near-components,#profile-dialog) .card-actions { gap: 6px; }
+:is(#app .near-components,#profile-dialog) .card-actions .icon-button { width: 34px; }
+:is(#app .near-components,#profile-dialog) .empty { padding: 35px 17px; }
+:is(#app .near-components,#profile-dialog) .empty h2 { font-size: 21px; }
+:is(#app .near-components,#profile-dialog) .empty p { font-size: 14px; }
+:is(#app .near-components,#profile-dialog) .chat-list .avatar { width: 28px; height: 28px; font-size: 15px; }
+:is(#app .near-components,#profile-dialog) .profile-form { padding: 20px; }
+}
+:is(#app .near-components,#profile-dialog) button,:is(#app .near-components,#profile-dialog) a,:is(#app .near-components,#profile-dialog) input,:is(#app .near-components,#profile-dialog) textarea,:is(#app .near-components,#profile-dialog) select { transition: background-color 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.18s; }
+:is(#app .near-components,#profile-dialog) button:focus-visible,:is(#app .near-components,#profile-dialog) a:focus-visible { outline-color: rgb(122, 77, 236); }
+:is(#app .near-components,#profile-dialog) .primary { background: rgb(109, 66, 229); box-shadow: rgba(112, 69, 229, 0.11) 0px 3px 8px; }
+:is(#app .near-components,#profile-dialog) .primary:hover { background: rgb(89, 49, 197); }
+:is(#app .near-components,#profile-dialog) .secondary { color: rgb(96, 59, 180); border-color: rgb(227, 218, 255); }
+:is(#app .near-components,#profile-dialog) .location-banner .primary { background: rgb(208, 241, 123); color: rgb(47, 63, 20); box-shadow: none; }
+:is(#app .near-components,#profile-dialog) .location-banner .primary:hover { background: rgb(189, 227, 104); }
+:is(#app .near-components,#profile-dialog) .person { border: 1px solid rgb(229, 225, 236); box-shadow: rgba(52, 32, 82, 0.016) 0px 4px 17px; padding: 22px; position: relative; overflow: hidden; }
+:is(#app .near-components,#profile-dialog) .person::before { content: ""; height: 72px; position: absolute; top: 0px; left: 0px; right: 0px; background: linear-gradient(110deg, rgb(234, 227, 255), rgb(246, 244, 255)); z-index: 0; }
+:is(#app .near-components,#profile-dialog) .person:nth-child(3n+2)::before { background: linear-gradient(110deg, rgb(228, 245, 204), rgb(244, 250, 235)); }
+:is(#app .near-components,#profile-dialog) .person:nth-child(3n)::before { background: linear-gradient(110deg, rgb(255, 232, 221), rgb(255, 247, 241)); }
+:is(#app .near-components,#profile-dialog) .person > * { position: relative; }
+:is(#app .near-components,#profile-dialog) .person-top { align-items: center; }
+:is(#app .near-components,#profile-dialog) .person .avatar.large { border: 4px solid white; box-shadow: rgba(48, 32, 72, 0.05) 0px 3px 10px; width: 76px; height: 76px; }
+:is(#app .near-components,#profile-dialog) .person-name { margin-top: 15px; color: rgb(41, 36, 49); }
+:is(#app .near-components,#profile-dialog) .person-bio { color: rgb(125, 116, 137); font-size: 14px; }
+:is(#app .near-components,#profile-dialog) .tags span { color: rgb(114, 98, 129); background: rgb(245, 242, 250); font-size: 12px; }
+:is(#app .near-components,#profile-dialog) .rating-line { color: rgb(121, 105, 133); font-size: 13px; }
+:is(#app .near-components,#profile-dialog) .rating-line svg { color: rgb(148, 113, 51); }
+:is(#app .near-components,#profile-dialog) .card-actions { margin-top: 16px; }
+:is(#app .near-components,#profile-dialog) .icon-button { min-width: 44px; min-height: 44px; background: rgb(255, 255, 255); border-color: rgb(230, 223, 241); }
+:is(#app .near-components,#profile-dialog) .rate-button { color: rgb(120, 80, 205); background: rgb(247, 243, 255); }
+:is(#app .near-components,#profile-dialog) .rate-button:disabled { color: rgb(139, 135, 144); background: rgb(243, 242, 245); opacity: 0.65; }
+:is(#app .near-components,#profile-dialog) .empty { border-color: rgb(222, 212, 238); color: rgb(139, 115, 164); }
+:is(#app .near-components,#profile-dialog) .empty h2 { color: rgb(71, 51, 91); }
+:is(#app .near-components,#profile-dialog) .profile-form,:is(#app .near-components,#profile-dialog) .panel { border-color: rgb(229, 224, 237); }
+:is(#app .near-components,#profile-dialog) input,:is(#app .near-components,#profile-dialog) textarea { background: rgb(252, 251, 255); border-color: rgb(223, 215, 235); outline-color: rgb(141, 102, 218); }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .location-banner .primary { min-height: 44px; }
+:is(#app .near-components,#profile-dialog) .person { padding: 15px; }
+:is(#app .near-components,#profile-dialog) .person::before { height: 66px; }
+:is(#app .near-components,#profile-dialog) .person-top { flex-direction: column; align-items: flex-start; gap: 7px; }
+:is(#app .near-components,#profile-dialog) .person .avatar.large { width: 66px; height: 66px; }
+:is(#app .near-components,#profile-dialog) .person-name { margin-top: 12px; font-size: 19px; min-height: 30px; }
+:is(#app .near-components,#profile-dialog) .person-bio { font-size: 14px; line-height: 1.65; min-height: 66px; margin: 8px 0px 12px; }
+:is(#app .near-components,#profile-dialog) .tags span { font-size: 12px; padding: 5px 7px; }
+:is(#app .near-components,#profile-dialog) .rating-line { font-size: 12px; flex-wrap: wrap; }
+:is(#app .near-components,#profile-dialog) .card-actions .small { font-size: 13px; min-height: 44px; padding: 8px; }
+:is(#app .near-components,#profile-dialog) .card-actions { gap: 7px; align-items: stretch; }
+:is(#app .near-components,#profile-dialog) .card-actions .icon-button { width: 44px; min-width: 44px; }
+:is(#app .near-components,#profile-dialog) .compose .primary { padding: 12px; }
+}
+@media (max-width: 360px) {
+:is(#app .near-components,#profile-dialog) .person-top { flex-direction: row; align-items: center; }
+:is(#app .near-components,#profile-dialog) .person-bio { min-height: 0px; }
+}
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .location-banner .primary { width: auto; margin: 0px; padding: 10px 12px; font-size: 13px; white-space: nowrap; }
+}
+:is(#app .near-components,#profile-dialog) .photo-card { min-height: 450px; padding: 20px; display: flex; flex-direction: column; justify-content: flex-end; background: rgb(57, 49, 63); color: rgb(255, 255, 255); border: 0px; border-radius: 22px; isolation: isolate; box-shadow: rgba(53, 36, 69, 0.082) 0px 8px 24px; }
+:is(#app .near-components,#profile-dialog) .photo-card::before { display: none; }
+:is(#app .near-components,#profile-dialog) .photo-card .card-photo { position: absolute; inset: 0px; z-index: -3; background-color: rgb(100, 85, 116); background-repeat: no-repeat; }
+:is(#app .near-components,#profile-dialog) .photo-card .photo-shade { position: absolute; inset: 0px; z-index: -2; background: linear-gradient(rgba(20, 17, 28, 0.075) 0%, rgba(20, 17, 28, 0) 22%, rgba(20, 17, 28, 0.22) 40%, rgba(20, 17, 28, 0.85) 75%, rgba(20, 17, 28, 0.96) 100%); }
+:is(#app .near-components,#profile-dialog) .photo-card .person-top { position: absolute; top: 16px; right: 16px; left: 16px; display: flex; align-items: flex-start; justify-content: flex-end; }
+:is(#app .near-components,#profile-dialog) .photo-card .distance { background: rgba(33, 26, 49, 0.5); color: rgb(255, 255, 255); border: 1px solid rgba(255, 255, 255, 0.208); backdrop-filter: blur(10px); font-size: 13px; padding: 7px 10px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { color: rgb(255, 255, 255); font-size: 25px; text-shadow: rgba(0, 0, 0, 0.2) 0px 2px 8px; align-self: flex-start; margin-top: 0px; line-height: 1.45; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name:focus-visible { outline-color: rgb(208, 241, 123); }
+:is(#app .near-components,#profile-dialog) .photo-card .person-bio { color: rgb(238, 230, 245); min-height: 0px; margin: 5px 0px 12px; font-size: 14px; line-height: 1.65; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags { min-height: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags span { background: rgba(255, 255, 255, 0.14); color: rgb(255, 255, 255); border: 1px solid rgba(255, 255, 255, 0.094); backdrop-filter: blur(8px); font-size: 12px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line { color: rgb(255, 255, 255); margin-top: 12px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line svg { color: rgb(229, 207, 135); fill: rgb(229, 207, 135); }
+:is(#app .near-components,#profile-dialog) .photo-card .card-actions { margin-top: 15px; }
+:is(#app .near-components,#profile-dialog) .photo-card .primary { background: rgb(208, 241, 123); color: rgb(40, 54, 20); box-shadow: none; }
+:is(#app .near-components,#profile-dialog) .photo-card .primary:hover { background: rgb(188, 225, 95); }
+:is(#app .near-components,#profile-dialog) .photo-card .primary:disabled { background: rgba(255, 255, 255, 0.19); color: rgb(255, 255, 255); opacity: 0.8; }
+:is(#app .near-components,#profile-dialog) .photo-card .rate-button { background: rgba(255, 255, 255, 0.125); color: rgb(255, 255, 255); border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(8px); }
+:is(#app .near-components,#profile-dialog) .photo-card .rate-button:disabled { color: rgb(221, 209, 231); background: rgba(255, 255, 255, 0.063); opacity: 0.5; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-hint { color: rgb(214, 201, 223); font-size: 12px; margin: 9px 0px 0px; min-height: 0px; }
+:is(#app .near-components,#profile-dialog) .no-photo { position: absolute; top: 18%; left: 0px; right: 0px; text-align: center; font-size: 100px; font-weight: 700; color: rgba(255, 255, 255, 0.376); }
+:is(#app .near-components,#profile-dialog) .photo-card:has(.no-photo) .card-photo { background: linear-gradient(140deg, rgb(115, 97, 151), rgb(60, 50, 78)); }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .photo-card { min-height: 365px; padding: 14px; border-radius: 18px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-top { top: 12px; left: 12px; right: 12px; flex-direction: row; }
+:is(#app .near-components,#profile-dialog) .photo-card .distance { font-size: 12px; padding: 5px 8px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 22px; min-height: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-bio { font-size: 13px; line-height: 1.55; margin: 4px 0px 9px; min-height: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags { gap: 4px; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags span { font-size: 12px; padding: 4px 6px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line { font-size: 12px; margin-top: 10px; gap: 4px; }
+:is(#app .near-components,#profile-dialog) .photo-card .card-actions { margin-top: 12px; }
+:is(#app .near-components,#profile-dialog) .photo-card .card-actions .primary { font-size: 13px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-hint { font-size: 12px; line-height: 1.5; min-height: 36px; }
+:is(#app .near-components,#profile-dialog) .photo-card .no-photo { font-size: 80px; }
+:is(#app .near-components,#profile-dialog) .people-grid:has(.photo-card) { gap: 12px; }
+}
+@media (max-width: 390px) {
+:is(#app .near-components,#profile-dialog) .people-grid:has(.photo-card) { grid-template-columns: 1fr; }
+:is(#app .near-components,#profile-dialog) .photo-card { min-height: 440px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 26px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-bio { font-size: 15px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-hint { min-height: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .card-actions .primary { font-size: 15px; }
+}
+:is(#app .near-components,#profile-dialog) .photo-card .portrait-viewport { display: block; width: 100%; height: 100%; overflow: hidden; }
+:is(#app .near-components,#profile-dialog) .photo-card { padding: 0px; min-height: 0px; justify-content: flex-start; background: rgb(255, 255, 255); color: rgb(41, 36, 49); border: 1px solid rgb(229, 225, 236); gap: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .card-photo { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 1 / 1; z-index: 0; flex-shrink: 0; overflow: hidden; }
+:is(#app .near-components,#profile-dialog) .photo-card .portrait-viewport { position: absolute; inset: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .photo-shade { display: none; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-details { padding: 17px 19px 18px; background: rgb(255, 255, 255); flex: 1 1 0%; display: flex; flex-direction: column; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-top { position: static; inset: auto; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; margin-bottom: 9px; }
+:is(#app .near-components,#profile-dialog) .photo-card .distance { background: rgb(243, 238, 252); color: rgb(121, 89, 162); border: 0px; backdrop-filter: none; font-size: 12px; padding: 5px 8px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { color: rgb(41, 36, 49); text-shadow: none; font-size: 23px; line-height: 1.4; margin: 0px; min-height: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-bio { color: rgb(119, 107, 132); font-size: 14px; line-height: 1.6; margin: 6px 0px 10px; min-height: 45px; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags span { background: rgb(245, 242, 250); color: rgb(117, 96, 132); border: 0px; backdrop-filter: none; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line { color: rgb(118, 98, 134); margin: 12px 0px 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line svg { color: rgb(162, 131, 59); fill: none; }
+:is(#app .near-components,#profile-dialog) .photo-card .card-actions { margin-top: auto; padding-top: 14px; }
+:is(#app .near-components,#profile-dialog) .photo-card .primary { background: rgb(109, 66, 229); color: rgb(255, 255, 255); }
+:is(#app .near-components,#profile-dialog) .photo-card .primary:hover { background: rgb(89, 49, 197); }
+:is(#app .near-components,#profile-dialog) .photo-card .primary:disabled { background: rgb(238, 233, 246); color: rgb(127, 114, 140); }
+:is(#app .near-components,#profile-dialog) .photo-card .rate-button { background: rgb(245, 240, 255); border: 1px solid rgb(227, 217, 247); color: rgb(120, 80, 205); backdrop-filter: none; }
+:is(#app .near-components,#profile-dialog) .photo-card .rate-button:disabled { background: rgb(244, 242, 246); color: rgb(157, 145, 167); opacity: 0.65; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-hint { color: rgb(137, 123, 151); margin: 9px 0px 0px; min-height: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .no-photo { top: 15%; font-size: 100px; }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .photo-card { min-height: 0px; padding: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-details { padding: 13px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-top { position: static; inset: auto; flex-direction: row; margin-bottom: 8px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 21px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-bio { font-size: 14px; min-height: 68px; margin: 5px 0px 9px; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags { min-height: 50px; align-content: flex-start; }
+:is(#app .near-components,#profile-dialog) .photo-card .card-actions { padding-top: 12px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-hint { min-height: 36px; }
+:is(#app .near-components,#profile-dialog) .photo-card .distance { font-size: 12px; }
+:is(#app .near-components,#profile-dialog) .photo-card .no-photo { font-size: 80px; }
+}
+@media (max-width: 390px) {
+:is(#app .near-components,#profile-dialog) .photo-card { min-height: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 25px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-bio { min-height: 0px; font-size: 15px; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags { min-height: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-hint { min-height: 0px; }
+}
+:is(#app .near-components,#profile-dialog) .photo-card { position: relative; min-height: 0px; height: 390px; display: block; border: 0px; padding: 0px; isolation: isolate; background: rgb(64, 52, 73); color: rgb(255, 255, 255); }
+:is(#app .near-components,#profile-dialog) .photo-card .card-photo { position: absolute; inset: 0px; aspect-ratio: auto; width: 100%; height: 100%; z-index: -3; }
+:is(#app .near-components,#profile-dialog) .photo-card .photo-shade { display: block; position: absolute; inset: 0px; z-index: -2; background: linear-gradient(transparent 45%, rgba(23, 17, 32, 0.14) 55%, rgba(23, 17, 32, 0.79) 76%, rgba(23, 17, 32, 0.93) 100%); }
+:is(#app .near-components,#profile-dialog) .photo-card .person-details { position: absolute; bottom: 0px; left: 0px; right: 0px; background: transparent; padding: 16px 18px; display: block; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-top { position: static; margin-bottom: 3px; justify-content: flex-start; }
+:is(#app .near-components,#profile-dialog) .photo-card .distance { background: none; border: 0px; color: rgb(240, 232, 246); padding: 0px; min-height: 0px; font-size: 13px; gap: 4px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 25px; color: white; text-shadow: rgba(0, 0, 0, 0.2) 0px 2px 6px; line-height: 1.4; max-width: calc(100% - 44px); min-height: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-bio { display: none; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags { margin-top: 7px; min-height: 0px; flex-wrap: nowrap; overflow: hidden; white-space: nowrap; gap: 5px; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags span { background: rgba(255, 255, 255, 0.125); color: rgb(245, 239, 250); font-size: 12px; border: 0px; padding: 4px 7px; flex-shrink: 0; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line { color: rgb(233, 222, 239); font-size: 13px; margin-top: 9px; min-height: 18px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line svg { color: rgb(227, 207, 145); }
+:is(#app .near-components,#profile-dialog) .photo-card .card-actions { position: absolute; right: 15px; bottom: 17px; padding: 0px; margin: 0px; display: block; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line { padding-right: 45px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rate-button { width: 40px; min-width: 40px; min-height: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.145); border: 1px solid rgba(255, 255, 255, 0.25); color: rgb(255, 255, 255); backdrop-filter: blur(10px); }
+:is(#app .near-components,#profile-dialog) .photo-card .rate-button:disabled { background: rgba(255, 255, 255, 0.082); color: rgb(217, 205, 224); opacity: 0.55; }
+:is(#app .near-components,#profile-dialog) .incoming-bell { position: absolute; top: 13px; right: 13px; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.86); color: rgb(109, 66, 229); border: 1px solid rgba(255, 255, 255, 0.667); backdrop-filter: blur(10px); box-shadow: rgba(0, 0, 0, 0.067) 0px 3px 12px; }
+:is(#app .near-components,#profile-dialog) .request-dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; right: 10px; top: 9px; background: rgb(118, 71, 234); border: 1px solid white; }
+:is(#app .near-components,#profile-dialog) .incoming-bell:focus-visible { outline-color: rgb(208, 241, 123); }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name:focus-visible { outline-color: rgb(208, 241, 123); }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .people-grid:has(.photo-card) { grid-template-columns: repeat(2, minmax(0px, 1fr)); gap: 10px; }
+:is(#app .near-components,#profile-dialog) .photo-card { height: 310px; min-height: 0px; border-radius: 17px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-details { padding: 12px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-top { margin-bottom: 2px; }
+:is(#app .near-components,#profile-dialog) .photo-card .distance { font-size: 12px; min-height: 0px; padding: 0px; line-height: 1.5; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 21px; line-height: 1.4; max-width: 100%; min-height: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags { margin-top: 5px; min-height: 0px; gap: 4px; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags span { font-size: 12px; padding: 3px 5px; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags span:nth-child(n+3) { display: none; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line { font-size: 12px; line-height: 1.5; margin-top: 7px; gap: 4px; padding-right: 37px; flex-wrap: wrap; }
+:is(#app .near-components,#profile-dialog) .photo-card .card-actions { right: 10px; bottom: 11px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rate-button { width: 36px; min-width: 36px; height: 40px; min-height: 40px; border-radius: 12px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rate-button svg { width: 17px; }
+:is(#app .near-components,#profile-dialog) .incoming-bell { top: 10px; right: 10px; width: 40px; height: 40px; }
+:is(#app .near-components,#profile-dialog) .photo-card .photo-shade { background: linear-gradient(transparent 46%, rgba(23, 17, 32, 0.19) 57%, rgba(23, 17, 32, 0.804) 80%, rgba(23, 17, 32, 0.93) 100%); }
+}
+@media (max-width: 390px) {
+:is(#app .near-components,#profile-dialog) .people-grid:has(.photo-card) { grid-template-columns: repeat(2, minmax(0px, 1fr)); }
+:is(#app .near-components,#profile-dialog) .photo-card { height: 290px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-details { padding: 10px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 20px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line { font-size: 12px; }
+:is(#app .near-components,#profile-dialog) .photo-card .tags span:nth-child(n+2) { display: none; }
+}
+:is(#app .near-components,#profile-dialog) .photo-card .person-top { display: none; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 20px; line-height: 1.45; }
+:is(#app .near-components,#profile-dialog) .card-distance { position: absolute; top: 13px; left: 13px; display: flex; align-items: center; gap: 4px; font-size: 13px; line-height: 1.5; padding: 6px 9px; border-radius: 100px; color: rgb(255, 255, 255); background: rgba(33, 26, 49, 0.46); border: 1px solid rgba(255, 255, 255, 0.145); backdrop-filter: blur(8px); }
+:is(#app .near-components,#profile-dialog) .photo-card .person-details { padding: 14px 18px; }
+:is(#app .near-components,#profile-dialog) .photo-card .photo-shade { background: linear-gradient(rgba(23, 17, 32, 0.05) 0%, transparent 62%, rgba(23, 17, 32, 0.48) 79%, rgba(23, 17, 32, 0.91) 100%); }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 17px; line-height: 1.5; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-details { padding: 12px; }
+:is(#app .near-components,#profile-dialog) .card-distance { top: 10px; left: 10px; font-size: 12px; padding: 5px 8px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line { margin-top: 4px; }
+:is(#app .near-components,#profile-dialog) .photo-card .photo-shade { background: linear-gradient(rgba(23, 17, 32, 0.05) 0%, transparent 62%, rgba(23, 17, 32, 0.57) 82%, rgba(23, 17, 32, 0.93) 100%); }
+}
+@media (max-width: 390px) {
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 17px; }
+}
+:is(#app .near-components,#profile-dialog) .photo-card .person-bio { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: rgb(238, 228, 244); font-size: 13px; line-height: 1.55; margin: 3px 0px 5px; min-height: 0px; max-height: 41px; padding-right: 0px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { display: inline-flex; align-items: center; gap: 5px; }
+:is(#app .near-components,#profile-dialog) .verify-badge { display: inline-flex; align-items: center; justify-content: center; filter: drop-shadow(rgba(61, 21, 104, 0.314) 0px 2px 4px); flex-shrink: 0; }
+:is(#app .near-components,#profile-dialog) .verify-badge svg { width: 19px; height: 19px; stroke-width: 2; }
+:is(#app .near-components,#profile-dialog) .photo-card .photo-shade { background: linear-gradient(transparent 47%, rgba(23, 17, 32, 0.133) 62%, rgba(23, 17, 32, 0.73) 77%, rgba(23, 17, 32, 0.937) 100%); }
+:is(#app .near-components,#profile-dialog) .verify-cta { display: flex; align-items: center; gap: 9px; background: linear-gradient(110deg, rgb(240, 233, 255), rgb(233, 242, 255)); border: 1px solid rgb(215, 197, 245); border-radius: 12px; padding: 15px; color: rgb(96, 54, 178); font-size: 15px; font-weight: 700; }
+:is(#app .near-components,#profile-dialog) .profile-form select { border: 1px solid rgb(223, 215, 235); border-radius: 10px; background: rgb(252, 251, 255); padding: 13px; font-size: 16px; }
+:is(#app .near-components,#profile-dialog) .location-gate-panel .primary { width: 100%; min-height: 50px; }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .photo-card .person-bio { font-size: 12px; line-height: 1.5; max-height: 36px; min-height: 0px; margin: 2px 0px 4px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-name { font-size: 17px; max-width: 100%; gap: 4px; }
+:is(#app .near-components,#profile-dialog) .verify-badge svg { width: 17px; height: 17px; }
+:is(#app .near-components,#profile-dialog) .photo-card .rating-line { font-size: 12px; }
+}
+:is(#app .near-components,#profile-dialog) .toolbar-brand { font-weight: 800; font-size: 30px; letter-spacing: -1.5px; line-height: 1; flex-shrink: 0; }
+:is(#app .near-components,#profile-dialog) .toolbar-brand span { color: rgb(118, 71, 234); font-size: 15px; margin-left: 2px; }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .toolbar-brand { font-size: 28px; }
+}
+@media (max-width: 360px) {
+:is(#app .near-components,#profile-dialog) .toolbar-brand { font-size: 25px; }
+}
+:is(#app .near-components,#profile-dialog) .card-open { inset: 0px; z-index: 1; border: 0px; background: transparent; border-radius: inherit; cursor: pointer; position: absolute !important; }
+:is(#app .near-components,#profile-dialog) .card-open:focus-visible { outline: rgb(208, 241, 123) solid 3px; outline-offset: -4px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-details,:is(#app .near-components,#profile-dialog) .photo-card .card-distance { z-index: 2; pointer-events: none; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-details button { pointer-events: auto; }
+:is(#app .near-components,#profile-dialog) .incoming-bell { z-index: 3; }
+:is(#app .near-components,#profile-dialog) .verify-badge { background: none; border: 0px; padding: 0px; min-height: 30px; min-width: 27px; cursor: pointer; }
+:is(#app .near-components,#profile-dialog) .card-name-row { display: flex; align-items: center; gap: 3px; }
+:is(#app .near-components,#profile-dialog) .person-details .card-name-row .person-name { max-width: 100%; }
+:is(#app .near-components,#profile-dialog) .photo-card .card-name-row .person-name { font-size: 20px; }
+:is(#app .near-components,#profile-dialog) .photo-card .card-photo .profile-photo { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+:is(#app .near-components,#profile-dialog) .portrait-fallback { height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgb(140, 113, 173), rgb(68, 51, 82)); color: rgb(238, 228, 244); font-size: 90px; font-weight: 700; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-bio { max-height: 40px; -webkit-line-clamp: 2; }
+:is(#app .near-components,#profile-dialog) .full-profile { background: rgb(23, 18, 30); overflow: hidden; color: rgb(255, 255, 255); z-index: 50; position: fixed !important; inset: 0px !important; width: 100vw !important; max-width: none !important; height: 100dvh !important; max-height: none !important; transform: none !important; border: 0px !important; border-radius: 0px !important; padding: 0px !important; display: block !important; }
+:is(#app .near-components,#profile-dialog) .full-profile-image { position: absolute; inset: 0px; }
+:is(#app .near-components,#profile-dialog) .full-profile-image .portrait-viewport { width: 100%; height: 100%; display: block; }
+:is(#app .near-components,#profile-dialog) .full-profile-image .profile-photo { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+:is(#app .near-components,#profile-dialog) .full-profile-shade { position: absolute; inset: 0px; background: linear-gradient(rgba(17, 11, 29, 0.145) 0%, transparent 35%, rgba(17, 11, 29, 0.25) 52%, rgba(17, 11, 29, 0.88) 76%, rgba(17, 11, 29, 0.976) 100%); }
+:is(#app .near-components,#profile-dialog) .profile-back,:is(#app .near-components,#profile-dialog) .profile-gallery-top { position: absolute; top: max(20px,env(safe-area-inset-top)); border: 1px solid rgba(255, 255, 255, 0.208); background: rgba(34, 25, 47, 0.396); color: rgb(255, 255, 255); backdrop-filter: blur(15px); height: 44px; display: flex; align-items: center; justify-content: center; z-index: 2; }
+:is(#app .near-components,#profile-dialog) .profile-back { left: 24px; width: 44px; border-radius: 50%; }
+:is(#app .near-components,#profile-dialog) .profile-gallery-top { right: 24px; padding: 0px 16px; gap: 8px; border-radius: 100px; font-size: 14px; }
+:is(#app .near-components,#profile-dialog) .full-profile-info { position: absolute; bottom: 0px; left: 50%; transform: translateX(-50%); width: min(740px, 100%); padding: 30px 35px max(25px,env(safe-area-inset-bottom)); max-height: 55dvh; overflow: auto; }
+:is(#app .near-components,#profile-dialog) .full-name-row { display: flex; align-items: center; gap: 10px; }
+:is(#app .near-components,#profile-dialog) .full-name-row h1 { font-size: 36px; letter-spacing: 0px; line-height: 1.4; }
+:is(#app .near-components,#profile-dialog) .badge-info { background: none; color: white; padding: 6px; min-height: 40px; min-width: 40px; display: flex; align-items: center; justify-content: center; }
+:is(#app .near-components,#profile-dialog) .full-bio { font-size: 17px; line-height: 1.7; margin: 9px 0px 13px; color: rgb(238, 228, 247); white-space: pre-wrap; overflow-wrap: anywhere; }
+:is(#app .near-components,#profile-dialog) .profile-facts { display: flex; flex-wrap: wrap; gap: 10px 17px; font-size: 14px; color: rgb(215, 199, 227); }
+:is(#app .near-components,#profile-dialog) .profile-facts span { display: flex; gap: 5px; align-items: center; }
+:is(#app .near-components,#profile-dialog) .profile-interests { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+:is(#app .near-components,#profile-dialog) .profile-interests span { padding: 6px 11px; border: 1px solid rgba(255, 255, 255, 0.145); background: rgba(255, 255, 255, 0.08); border-radius: 100px; font-size: 13px; color: rgb(233, 220, 244); }
+:is(#app .near-components,#profile-dialog) .full-profile-actions { display: flex; gap: 10px; margin-top: 20px; align-items: center; }
+:is(#app .near-components,#profile-dialog) .full-profile-actions .primary { flex: 1 1 0%; background: rgb(208, 241, 123); color: rgb(46, 57, 29); border-radius: 100px; min-height: 48px; }
+:is(#app .near-components,#profile-dialog) .profile-gallery-button { display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1 1 0%; background: rgba(255, 255, 255, 0.11); border: 1px solid rgba(255, 255, 255, 0.22); color: rgb(255, 255, 255); border-radius: 100px; min-height: 48px; padding: 12px 16px; font-size: 15px; font-weight: 700; backdrop-filter: blur(10px); }
+:is(#app .near-components,#profile-dialog) .profile-gallery-button span { font-size: 12px; font-weight: 400; color: rgb(209, 193, 220); }
+:is(#app .near-components,#profile-dialog) .profile-rate { height: 48px; width: 48px; border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 50%; background: rgba(255, 255, 255, 0.11); color: rgb(255, 255, 255); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+:is(#app .near-components,#profile-dialog) .badge-explainer { padding: 12px 15px; background: rgba(112, 86, 168, 0.24); border: 1px solid rgba(199, 181, 232, 0.22); border-radius: 12px; color: rgb(238, 225, 255); font-size: 13px; line-height: 1.7; }
+:is(#app .near-components,#profile-dialog) .full-profile.gallery-page { background: rgb(255, 255, 255); color: rgb(40, 32, 50); overflow: auto; }
+:is(#app .near-components,#profile-dialog) .gallery-header { height: 65px; display: flex; align-items: center; gap: 15px; background: rgb(255, 255, 255); position: sticky; top: 0px; z-index: 3; border-bottom: 1px solid rgb(238, 231, 244); margin: 0px; padding: 0px 20px; }
+:is(#app .near-components,#profile-dialog) .gallery-header strong { flex: 1 1 0%; font-size: 17px; }
+:is(#app .near-components,#profile-dialog) .gallery-back { width: 42px; height: 42px; border-radius: 50%; background: none; color: rgb(105, 83, 118); display: flex; align-items: center; justify-content: center; }
+:is(#app .near-components,#profile-dialog) .gallery-summary { width: min(850px, 100%); margin: auto; padding: 28px 24px; display: flex; align-items: center; gap: 24px; }
+:is(#app .near-components,#profile-dialog) .gallery-avatar { width: 90px; height: 90px; border-radius: 50%; overflow: hidden; border: 3px solid rgb(226, 212, 252); flex-shrink: 0; }
+:is(#app .near-components,#profile-dialog) .gallery-avatar .portrait-viewport,:is(#app .near-components,#profile-dialog) .gallery-avatar .profile-photo { height: 100%; width: 100%; object-fit: cover; }
+:is(#app .near-components,#profile-dialog) .gallery-summary h2 { display: flex; align-items: center; gap: 6px; font-size: 24px; margin: 0px 0px 8px; }
+:is(#app .near-components,#profile-dialog) .gallery-summary span { font-size: 14px; color: rgb(160, 138, 170); }
+:is(#app .near-components,#profile-dialog) .gallery-summary p { font-size: 15px; line-height: 1.7; color: rgb(128, 106, 144); margin: 9px 0px 0px; white-space: pre-wrap; }
+:is(#app .near-components,#profile-dialog) .gallery-demo { font-size: 12px; text-align: center; color: rgb(168, 148, 182); margin: 12px 0px; }
+:is(#app .near-components,#profile-dialog) .ig-grid { display: grid; grid-template-columns: repeat(3, minmax(0px, 1fr)); gap: 3px; max-width: 960px; margin: auto; }
+:is(#app .near-components,#profile-dialog) .ig-tile { aspect-ratio: 1 / 1; position: relative; overflow: hidden; background: rgb(242, 237, 248); }
+:is(#app .near-components,#profile-dialog) .ig-tile > button:first-child { width: 100%; height: 100%; display: block; background: none; padding: 0px; cursor: pointer; }
+:is(#app .near-components,#profile-dialog) .ig-tile img,:is(#app .near-components,#profile-dialog) .ig-tile svg { width: 100%; height: 100%; object-fit: cover; display: block; }
+:is(#app .near-components,#profile-dialog) .ig-tile > button:first-child:focus-visible { outline-offset: -4px; }
+:is(#app .near-components,#profile-dialog) .delete-photo { position: absolute; right: 8px; bottom: 8px; z-index: 1; width: 32px; height: 32px; background: rgba(37, 20, 51, 0.61); border: 1px solid rgba(255, 255, 255, 0.25); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+:is(#app .near-components,#profile-dialog) .gallery-upload { max-width: 720px; margin: 18px auto; padding: 18px 24px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border: 1px solid rgb(233, 222, 244); border-radius: 15px; background: rgb(250, 247, 255); }
+:is(#app .near-components,#profile-dialog) .gallery-upload label { display: flex; flex-direction: column; gap: 8px; font-size: 14px; flex: 1 1 0%; min-width: 200px; color: rgb(133, 96, 159); }
+:is(#app .near-components,#profile-dialog) .gallery-upload input { font-size: 14px; max-width: 100%; min-width: 0px; }
+:is(#app .near-components,#profile-dialog) .gallery-upload small { width: 100%; font-size: 12px; color: rgb(172, 149, 187); line-height: 1.7; }
+:is(#app .near-components,#profile-dialog) .gallery-upload > .primary { min-height: 44px; }
+:is(#app .near-components,#profile-dialog) .lightbox-image { height: min(70dvh, 760px); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+:is(#app .near-components,#profile-dialog) .lightbox-image img { width: 100%; height: 100%; object-fit: contain; }
+:is(#app .near-components,#profile-dialog) .lightbox-image svg { width: 100%; height: 100%; }
+:is(#app .near-components,#profile-dialog) .lightbox-nav { display: flex; align-items: center; justify-content: center; gap: 20px; }
+:is(#app .near-components,#profile-dialog) .lightbox-nav button { width: 44px; height: 44px; border: 1px solid rgba(255, 255, 255, 0.19); border-radius: 50%; background: rgba(255, 255, 255, 0.063); color: rgb(255, 255, 255); display: flex; align-items: center; justify-content: center; }
+:is(#app .near-components,#profile-dialog) .lightbox-nav span { font-size: 13px; color: rgb(187, 165, 202); }
+@media (min-width: 1000px) {
+:is(#app .near-components,#profile-dialog) .full-profile-image { max-width: 850px; left: 50%; transform: translateX(-50%); }
+:is(#app .near-components,#profile-dialog) .full-profile { background: radial-gradient(rgb(59, 44, 73), rgb(21, 16, 28)); }
+:is(#app .near-components,#profile-dialog) .full-profile-shade { background: linear-gradient(transparent 35%, rgba(17, 11, 29, 0.376) 55%, rgba(17, 11, 29, 0.94) 90%); }
+}
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .photo-card .card-name-row .person-name { font-size: 17px; }
+:is(#app .near-components,#profile-dialog) .photo-card .person-bio { max-height: 36px; }
+:is(#app .near-components,#profile-dialog) .full-profile-info { padding: 20px 22px max(20px,env(safe-area-inset-bottom)); max-height: 49dvh; }
+:is(#app .near-components,#profile-dialog) .full-name-row h1 { font-size: 30px; }
+:is(#app .near-components,#profile-dialog) .full-bio { font-size: 15px; line-height: 1.65; margin: 7px 0px 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+:is(#app .near-components,#profile-dialog) .profile-facts { font-size: 13px; gap: 7px 12px; }
+:is(#app .near-components,#profile-dialog) .profile-interests { margin-top: 12px; gap: 6px; }
+:is(#app .near-components,#profile-dialog) .profile-interests span { font-size: 12px; padding: 5px 9px; }
+:is(#app .near-components,#profile-dialog) .full-profile-actions { margin-top: 16px; gap: 8px; }
+:is(#app .near-components,#profile-dialog) .full-profile-actions .primary,:is(#app .near-components,#profile-dialog) .profile-gallery-button { font-size: 14px; padding: 10px 13px; min-height: 46px; }
+:is(#app .near-components,#profile-dialog) .profile-back { left: 16px; top: max(16px,env(safe-area-inset-top)); }
+:is(#app .near-components,#profile-dialog) .profile-gallery-top { right: 16px; top: max(16px,env(safe-area-inset-top)); font-size: 13px; }
+:is(#app .near-components,#profile-dialog) .profile-rate { height: 46px; width: 46px; }
+:is(#app .near-components,#profile-dialog) .gallery-header { height: 60px; padding: 0px 10px; }
+:is(#app .near-components,#profile-dialog) .gallery-summary { padding: 22px 16px; gap: 17px; }
+:is(#app .near-components,#profile-dialog) .gallery-avatar { width: 75px; height: 75px; }
+:is(#app .near-components,#profile-dialog) .gallery-summary h2 { font-size: 22px; }
+:is(#app .near-components,#profile-dialog) .gallery-summary span { font-size: 13px; }
+:is(#app .near-components,#profile-dialog) .gallery-summary p { font-size: 14px; }
+:is(#app .near-components,#profile-dialog) .ig-grid { gap: 2px; grid-template-columns: repeat(3, minmax(0px, 1fr)); }
+:is(#app .near-components,#profile-dialog) .gallery-upload { margin: 14px 12px; padding: 14px; }
+:is(#app .near-components,#profile-dialog) .gallery-upload label { min-width: 100%; font-size: 14px; }
+:is(#app .near-components,#profile-dialog) .gallery-upload > input { width: 100%; }
+:is(#app .near-components,#profile-dialog) .gallery-upload > .primary { width: 100%; }
+:is(#app .near-components,#profile-dialog) .lightbox-image { height: 68dvh; }
+:is(#app .near-components,#profile-dialog) .delete-photo { right: 5px; bottom: 5px; width: 30px; height: 30px; }
+:is(#app .near-components,#profile-dialog) .badge-info { min-width: 36px; min-height: 36px; }
+}
+:is(#app .near-components,#profile-dialog) main.profile-route { position: relative !important; inset: auto !important; margin: 0px !important; width: 100% !important; max-width: none !important; transform: none !important; height: 100dvh !important; z-index: auto !important; padding: 0px !important; }
+:is(#app .near-components,#profile-dialog) .gallery-summary > div:last-child { flex: 1 1 0%; min-width: 0px; }
+:is(#app .near-components,#profile-dialog) .gallery-verified { display: inline-flex; background: none; border: 0px; padding: 0px; }
+:is(#app .near-components,#profile-dialog) .gallery-facts,:is(#app .near-components,#profile-dialog) .gallery-interests,:is(#app .near-components,#profile-dialog) .gallery-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+:is(#app .near-components,#profile-dialog) .gallery-facts span { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; color: rgb(113, 108, 127); }
+:is(#app .near-components,#profile-dialog) .gallery-interests span { background: rgb(242, 238, 251); border-radius: 20px; padding: 4px 10px; font-size: 12px; }
+:is(#app .near-components,#profile-dialog) .gallery-actions button { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border-radius: 14px; font-size: 12px; }
+:is(#app .near-components,#profile-dialog) .gallery-badge-note { font-size: 12px; }
+:is(#app .near-components,#profile-dialog) .tile-likes { position: absolute; bottom: 7px; left: 7px; color: white; display: flex; align-items: center; gap: 4px; background: rgba(0, 0, 0, 0.4); padding: 3px 6px; border-radius: 10px; font-size: 11px; }
+:is(#app .near-components,#profile-dialog) .photo-lightbox .lightbox-image { height: 52dvh; min-height: 180px; }
+:is(#app .near-components,#profile-dialog) .post-social { padding: 12px 18px; color: white; }
+:is(#app .near-components,#profile-dialog) .post-like { display: flex; align-items: center; gap: 8px; background: none; border: 0px; color: white; }
+:is(#app .near-components,#profile-dialog) .post-like.liked { color: rgb(255, 113, 153); }
+:is(#app .near-components,#profile-dialog) .post-social p { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; margin: 9px 0px; }
+:is(#app .near-components,#profile-dialog) .post-comment { display: flex; gap: 8px; margin: 12px 0px 6px; }
+:is(#app .near-components,#profile-dialog) .post-comment input { flex: 1 1 0%; min-width: 0px; border: 1px solid rgb(85, 85, 85); background: rgb(34, 34, 34); color: white; border-radius: 12px; padding: 11px; }
+:is(#app .near-components,#profile-dialog) .post-comment button { border: 0px; border-radius: 12px; background: rgb(163, 138, 238); color: rgb(22, 16, 34); padding: 10px 15px; }
+:is(#app .near-components,#profile-dialog) .post-social small { color: rgb(187, 187, 187); font-size: 11px; }
+:is(#app .near-components,#profile-dialog) .post-comments > div { border-top: 1px solid rgb(68, 68, 68); padding: 10px 0px; }
+:is(#app .near-components,#profile-dialog) .post-comments strong { font-size: 13px; }
+:is(#app .near-components,#profile-dialog) .gallery-page { background: rgb(250, 249, 252) !important; }
+:is(#app .near-components,#profile-dialog) .gallery-header { background: rgba(255, 255, 255, 0.93); backdrop-filter: blur(18px); border-bottom: 1px solid rgb(238, 235, 243); }
+:is(#app .near-components,#profile-dialog) .gallery-summary { padding: 26px 22px 22px; gap: 22px; align-items: flex-start; max-width: 960px; margin: 0px auto; }
+:is(#app .near-components,#profile-dialog) .gallery-avatar { width: 100px; height: 100px; flex-shrink: 0; border: 3px solid white; box-shadow: rgb(142, 108, 230) 0px 0px 0px 2px; border-radius: 30px; overflow: hidden; }
+:is(#app .near-components,#profile-dialog) .gallery-summary h2 { font-size: 24px; letter-spacing: -0.5px; margin: 0px 0px 6px; gap: 6px; }
+:is(#app .near-components,#profile-dialog) .gallery-summary p { font-size: 16px; line-height: 1.65; margin: 10px 0px; }
+:is(#app .near-components,#profile-dialog) .gallery-facts { gap: 6px 14px; }
+:is(#app .near-components,#profile-dialog) .gallery-facts span { font-size: 13px; }
+:is(#app .near-components,#profile-dialog) .gallery-actions { margin-top: 16px; }
+:is(#app .near-components,#profile-dialog) .gallery-actions button { font-size: 14px; min-height: 42px; }
+:is(#app .near-components,#profile-dialog) .gallery-interests span { font-size: 13px; }
+:is(#app .near-components,#profile-dialog) .ig-grid { gap: 5px; padding: 0px 10px 30px; }
+:is(#app .near-components,#profile-dialog) .ig-tile { border-radius: 10px; overflow: hidden; }
+:is(#app .near-components,#profile-dialog) .ig-tile img { object-fit: cover; transition: transform 0.25s; }
+:is(#app .near-components,#profile-dialog) .ig-tile:hover img { transform: scale(1.025); }
+:is(#app .near-components,#profile-dialog) .gallery-demo { text-align: center; font-size: 12px; margin: 0px 0px 12px; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page { min-height: 100dvh; }
+:is(#app .near-components,#profile-dialog) .post-layout { max-width: 1040px; margin: auto; background: white; }
+:is(#app .near-components,#profile-dialog) .post-owner { display: flex; gap: 10px; align-items: center; padding: 14px 18px; font-size: 16px; }
+:is(#app .near-components,#profile-dialog) .post-avatar { width: 40px; height: 40px; overflow: hidden; border-radius: 50%; flex-shrink: 0; }
+:is(#app .near-components,#profile-dialog) .post-avatar img,:is(#app .near-components,#profile-dialog) .post-avatar svg { width: 100%; height: 100%; object-fit: cover; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .lightbox-image { height: auto; aspect-ratio: 1 / 1; background: rgb(16, 16, 20); display: flex; justify-content: center; overflow: hidden; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .lightbox-image img,:is(#app .near-components,#profile-dialog) .gallery-post-page .lightbox-image svg { width: 100%; height: 100%; object-fit: contain; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .post-social { color: rgb(36, 32, 49); padding: 18px 22px; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .post-like { color: rgb(36, 32, 49); min-height: 40px; font-size: 16px; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .post-like.liked { color: rgb(229, 78, 124); }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .post-social p { font-size: 16px; line-height: 1.6; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .post-comment input { color: rgb(36, 32, 49); background: rgb(248, 246, 251); border: 1px solid rgb(230, 225, 239); font-size: 16px; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .post-comment button { font-size: 14px; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .post-social small { color: rgb(121, 113, 132); font-size: 12px; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .post-comments > div { border-color: rgb(238, 232, 243); }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .post-comments strong { font-size: 14px; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .lightbox-nav { color: rgb(36, 32, 49); padding: 0px 22px 20px; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .lightbox-nav button { color: rgb(36, 32, 49); background: rgb(243, 239, 249); border-radius: 50%; padding: 10px; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .lightbox-nav button:disabled { opacity: 0.3; }
+@media (min-width: 800px) {
+:is(#app .near-components,#profile-dialog) .post-layout { display: grid; grid-template-columns: minmax(0px, 1.4fr) minmax(0px, 1fr); margin: 24px auto; border: 1px solid rgb(238, 233, 244); border-radius: 24px; overflow: hidden; }
+:is(#app .near-components,#profile-dialog) .post-owner { grid-column: 1 / -1; border-bottom: 1px solid rgb(238, 233, 244); }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .lightbox-image { grid-area: 2 / 1 / 4; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .post-social { grid-area: 2 / 2; max-height: 65dvh; overflow: auto; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .lightbox-nav { grid-area: 3 / 2; }
+}
+@media (max-width: 600px) {
+:is(#app .near-components,#profile-dialog) .gallery-summary { padding: 22px 16px 20px; gap: 16px; }
+:is(#app .near-components,#profile-dialog) .gallery-avatar { width: 76px; height: 90px; border-radius: 24px; }
+:is(#app .near-components,#profile-dialog) .gallery-summary h2 { font-size: 22px; }
+:is(#app .near-components,#profile-dialog) .gallery-summary p { font-size: 16px; }
+:is(#app .near-components,#profile-dialog) .gallery-facts { margin-left: -92px; margin-top: 18px; }
+:is(#app .near-components,#profile-dialog) .gallery-interests,:is(#app .near-components,#profile-dialog) .gallery-actions { margin-left: -92px; }
+:is(#app .near-components,#profile-dialog) .ig-grid { gap: 3px; padding: 0px 3px 24px; }
+:is(#app .near-components,#profile-dialog) .ig-tile { border-radius: 5px; }
+:is(#app .near-components,#profile-dialog) .gallery-post-page .post-social { padding: 14px 16px; }
+}
+:is(#app .near-components,#profile-dialog) .chat-friend-photo .no-photo { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; overflow: hidden; }
+:is(#app .near-components,#profile-dialog) .chat-friend-photo .portrait-fallback { width: 100%; height: 100%; border-radius: inherit; display: flex; align-items: center; justify-content: center; background: rgb(238, 229, 250); color: rgb(121, 82, 207); font-size: 22px; }
+:is(#app .near-components,#profile-dialog) .page-header-identity { display: flex; align-items: center; gap: 14px; min-width: 0px; }
+:is(#app .near-components,#profile-dialog) .page-header-identity h1 { font-weight: 700; white-space: nowrap; line-height: 1.4; font-size: 18px !important; margin: 0px !important; }
+:is(#app .near-components,#profile-dialog) .page-header-identity .toolbar-brand { font-size: 30px; flex-shrink: 0; }
+:is(#app .near-components,#profile-dialog) .chat-top .page-header-identity h1 { font-size: 19px; }
+:is(#app .near-components,#profile-dialog) .conversation-name .toolbar-brand { font-size: 28px; flex-shrink: 0; }
+:is(#app .near-components,#profile-dialog) .gallery-header .page-header-identity { margin-right: auto; }
+:is(#app .near-components,#profile-dialog) .gallery-header .page-header-identity strong { font-size: 17px; }
+:is(#app .near-components,#profile-dialog) .gallery-header .toolbar-brand { font-size: 28px; }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .conversation-name .toolbar-brand { font-size: 24px; }
+:is(#app .near-components,#profile-dialog) .page-header-identity { gap: 10px; }
+:is(#app .near-components,#profile-dialog) .chat-top .page-header-identity .toolbar-brand { font-size: 28px; }
+}
+:is(#app .near-components,#profile-dialog) .profile-page-brand { position: absolute; z-index: 3; top: 27px; left: 78px; color: white; gap: 10px; }
+:is(#app .near-components,#profile-dialog) .profile-page-brand .toolbar-brand { color: white; font-size: 28px; }
+:is(#app .near-components,#profile-dialog) .profile-page-brand strong { font-size: 15px; }
+@media (max-width: 600px) {
+:is(#app .near-components,#profile-dialog) .profile-page-brand { top: 25px; left: 68px; gap: 7px; }
+:is(#app .near-components,#profile-dialog) .profile-page-brand .toolbar-brand { font-size: 24px; }
+:is(#app .near-components,#profile-dialog) .profile-page-brand strong { font-size: 13px; }
+}
+:is(#app .near-components,#profile-dialog) .thread-brand-row .toolbar-brand { font-size: 28px; }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .thread-brand-row .toolbar-brand { font-size: 26px; }
+}
+:is(#app .near-components,#profile-dialog) .thread-header .thread-brand-row .toolbar-brand { font-size: 28px !important; line-height: 1 !important; }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .thread-header .thread-brand-row .toolbar-brand { font-size: 26px !important; }
+}
+:is(#app .near-components,#profile-dialog) .upload-page { width: 100%; max-width: none; min-height: 100dvh; background: rgb(250, 248, 253); margin: 0px !important; padding: 0px 0px 40px !important; }
+:is(#app .near-components,#profile-dialog) .upload-header { display: flex; align-items: center; gap: 13px; height: 64px; padding: 0px max(16px, -400px + 50vw); background: rgba(255, 255, 255, 0.93); position: sticky; top: 0px; z-index: 10; border-bottom: 1px solid rgb(237, 231, 244); backdrop-filter: blur(16px); }
+:is(#app .near-components,#profile-dialog) .upload-header button { background: none; color: rgb(121, 82, 207); padding: 8px; }
+:is(#app .near-components,#profile-dialog) .upload-header h1 { font-size: 18px; margin: 0px; }
+:is(#app .near-components,#profile-dialog) .upload-header .toolbar-brand { font-size: 28px; }
+:is(#app .near-components,#profile-dialog) .upload-content { max-width: 800px; margin: auto; padding: 24px 18px; }
+:is(#app .near-components,#profile-dialog) .upload-demo { font-size: 12px; color: rgb(140, 122, 156); margin: 0px 0px 15px; }
+:is(#app .near-components,#profile-dialog) .upload-profile-panel { display: flex; align-items: center; gap: 20px; padding: 20px; background: white; border: 1px solid rgb(238, 231, 245); border-radius: 22px; margin-bottom: 20px; }
+:is(#app .near-components,#profile-dialog) .upload-cover { width: 100px; height: 115px; border-radius: 24px; overflow: hidden; flex-shrink: 0; background: rgb(233, 221, 246); }
+:is(#app .near-components,#profile-dialog) .upload-cover img,:is(#app .near-components,#profile-dialog) .upload-cover svg { width: 100%; height: 100%; object-fit: cover; }
+:is(#app .near-components,#profile-dialog) .upload-profile-panel h2 { margin: 0px; font-size: 22px; }
+:is(#app .near-components,#profile-dialog) .upload-profile-panel p { font-size: 14px; color: rgb(130, 116, 142); margin: 7px 0px 14px; }
+:is(#app .near-components,#profile-dialog) .upload-profile-panel button { font-size: 14px; }
+:is(#app .near-components,#profile-dialog) .upload-editor { background: white; border: 1px solid rgb(238, 231, 245); border-radius: 22px; padding: 18px; margin-bottom: 18px; }
+:is(#app .near-components,#profile-dialog) .upload-kind { display: flex; gap: 8px; margin-bottom: 16px; }
+:is(#app .near-components,#profile-dialog) .upload-kind button { flex: 1 1 0%; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgb(246, 242, 251); color: rgb(129, 116, 141); padding: 12px; border-radius: 13px; font-size: 14px; }
+:is(#app .near-components,#profile-dialog) .upload-kind button.selected { background: rgb(121, 82, 207); color: white; }
+:is(#app .near-components,#profile-dialog) .photo-drop { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; min-height: 220px; background: rgb(250, 247, 254); border: 2px dashed rgb(213, 196, 237); border-radius: 18px; overflow: hidden; cursor: pointer; color: rgb(121, 82, 207); position: relative; }
+:is(#app .near-components,#profile-dialog) .photo-drop strong { font-size: 16px; }
+:is(#app .near-components,#profile-dialog) .photo-drop span { font-size: 12px; color: rgb(141, 123, 157); }
+:is(#app .near-components,#profile-dialog) .photo-drop img { width: 100%; height: 300px; object-fit: contain; }
+:is(#app .near-components,#profile-dialog) .photo-drop input { position: absolute; inset: 0px; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+:is(#app .near-components,#profile-dialog) .upload-caption { width: 100%; border: 1px solid rgb(230, 221, 240); border-radius: 13px; padding: 12px; margin-top: 14px; font-size: 16px; }
+:is(#app .near-components,#profile-dialog) .upload-save { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+:is(#app .near-components,#profile-dialog) .upload-editor > small { display: block; font-size: 12px; color: rgb(141, 123, 157); margin-top: 13px; }
+:is(#app .near-components,#profile-dialog) .upload-success { display: flex; align-items: center; gap: 7px; font-size: 14px; color: rgb(71, 101, 50); }
+:is(#app .near-components,#profile-dialog) .upload-gallery-title { display: flex; align-items: center; justify-content: space-between; margin: 24px 0px 14px; }
+:is(#app .near-components,#profile-dialog) .upload-gallery-title h2 { font-size: 18px; margin: 0px; }
+:is(#app .near-components,#profile-dialog) .upload-gallery-title span { font-size: 13px; color: rgb(141, 123, 157); }
+:is(#app .near-components,#profile-dialog) .manage-photo-grid { display: grid; grid-template-columns: repeat(3, minmax(0px, 1fr)); gap: 12px; }
+:is(#app .near-components,#profile-dialog) .manage-photo-grid article { position: relative; overflow: hidden; border-radius: 16px; background: white; border: 1px solid rgb(238, 231, 245); }
+:is(#app .near-components,#profile-dialog) .manage-photo-grid article > img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+:is(#app .near-components,#profile-dialog) .manage-photo-grid article > div { display: flex; align-items: center; gap: 4px; padding: 8px; }
+:is(#app .near-components,#profile-dialog) .manage-photo-grid button { background: none; color: rgb(121, 82, 207); padding: 6px; font-size: 12px; }
+:is(#app .near-components,#profile-dialog) .manage-photo-grid button:last-child { margin-left: auto; color: rgb(184, 117, 143); }
+:is(#app .near-components,#profile-dialog) .cover-label { position: absolute; top: 8px; left: 8px; background: rgb(121, 82, 207); color: white; padding: 5px 8px; border-radius: 10px; font-size: 11px; display: flex; align-items: center; gap: 4px; }
+:is(#app .near-components,#profile-dialog) .upload-empty { text-align: center; padding: 35px; color: rgb(148, 128, 164); }
+@media (max-width: 600px) {
+:is(#app .near-components,#profile-dialog) .upload-content { padding: 18px 14px; }
+:is(#app .near-components,#profile-dialog) .upload-profile-panel { padding: 16px; gap: 16px; }
+:is(#app .near-components,#profile-dialog) .upload-cover { width: 84px; height: 100px; }
+:is(#app .near-components,#profile-dialog) .manage-photo-grid { grid-template-columns: repeat(2, minmax(0px, 1fr)); gap: 10px; }
+:is(#app .near-components,#profile-dialog) .upload-header { padding: 0px 12px; }
+:is(#app .near-components,#profile-dialog) .upload-save button { font-size: 14px; padding: 11px; }
+:is(#app .near-components,#profile-dialog) .upload-editor { padding: 14px; }
+}
+:is(#app .near-components,#profile-dialog) .upload-page { padding-bottom: calc(95px + env(safe-area-inset-bottom)) !important; }
+:is(#app .near-components,#profile-dialog) .upload-page { min-height: 100dvh; }
+:is(#app .near-components,#profile-dialog) .full-profile.profile-route { padding-bottom: calc(78px + env(safe-area-inset-bottom)) !important; }
+:is(#app .near-components,#profile-dialog) .full-profile-info { bottom: calc(88px + env(safe-area-inset-bottom)) !important; }
+:is(#app .near-components,#profile-dialog) .full-profile.gallery-page { min-height: 100dvh; height: auto !important; padding-bottom: calc(95px + env(safe-area-inset-bottom)) !important; }
+:is(#app .near-components,#profile-dialog) .people-management { display: flex; gap: 12px; flex-wrap: wrap; padding: 12px 0px; }
+:is(#app .near-components,#profile-dialog) .people-management button { display: flex; align-items: center; gap: 5px; background: none; color: inherit; font-size: 13px; padding: 7px; }
+:is(#app .near-components,#profile-dialog) .gallery-page > .people-management { max-width: 960px; margin: auto; padding: 12px 20px; color: rgb(132, 113, 146); }
+:is(#app .near-components,#profile-dialog) .blocked-users { width: 100%; margin: 20px 0px; }
+:is(#app .near-components,#profile-dialog) .blocked-users h2 { font-size: 16px; }
+:is(#app .near-components,#profile-dialog) .blocked-users > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 0px; }
+:is(#app .near-components,#profile-dialog) .blocked-users p { font-size: 14px; color: rgb(141, 127, 153); }
+:is(#app .near-components,#profile-dialog) .profile-photo { max-width: 100%; }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .full-profile-info { max-height: calc(100dvh - 175px); overflow-y: auto; bottom: calc(88px + env(safe-area-inset-bottom)) !important; }
+}
+:is(#app .near-components,#profile-dialog) .full-profile.profile-route:not(.gallery-page) { padding-bottom: 0px !important; }
+:is(#app .near-components,#profile-dialog) .full-profile.profile-route .full-profile-info { bottom: 0px !important; }
+:is(#app .near-components,#profile-dialog) .people-management .safety-actions { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; }
+:is(#app .near-components,#profile-dialog) .safety-actions button { white-space: nowrap; }
+:is(#app .near-components,#profile-dialog) .request-card { min-width: 0px; overflow: hidden; border-radius: 20px; background: white; border: 1px solid rgb(232, 224, 240); }
+:is(#app .near-components,#profile-dialog) .request-card .person { border: 0px; border-radius: 0px; margin: 0px; }
+:is(#app .near-components,#profile-dialog) .request-decisions { display: flex; gap: 8px; padding: 12px; }
+:is(#app .near-components,#profile-dialog) .request-decisions button { flex: 1 1 0%; min-width: 0px; padding: 10px 8px; }
+@media (max-width: 700px) {
+:is(#app .near-components,#profile-dialog) .request-decisions { padding: 9px; gap: 6px; }
+:is(#app .near-components,#profile-dialog) .request-decisions button { font-size: 12px; }
+}
+:is(#app .near-components,#profile-dialog) .profile-form > .logout-button { width: 100%; }
+:is(#app .near-components,#profile-dialog) .garden-controls > .primary { font-size: 14px; padding: 12px; }
+@media (max-width: 600px) {
+:is(#app .near-components,#profile-dialog) .garden-controls > .primary { padding: 10px 8px; font-size: 12px; }
+}
+:is(#app .near-components,#profile-dialog) .object-menu > .primary,:is(#app .near-components,#profile-dialog) .object-menu > .secondary { display: block; width: 100%; margin-top: 14px; }
+:is(#app .near-components,#profile-dialog) .placement-confirm .primary { padding: 12px; font-size: 16px; }
+@media (max-height: 620px) {
+:is(#app .near-components,#profile-dialog) .placement-confirm .primary { padding: 9px; font-size: 14px; }
+}
+
+/* ChatGun-only functional adapters; no card/profile/gallery geometry overrides. */
+#profile-dialog.near-components{display:contents;}
+#profile-dialog[hidden]{display:none;}
+body[data-member-route] #app{display:contents;}
+body[data-member-route] #app>main{display:none;}
+body[data-person-route="profile"] .sidebar{display:none;}
+body[data-own-gallery="true"] #app>main{max-width:none;padding:0;margin:0;width:100%;}
+body[data-own-gallery="true"] #social-view>.toolbar,body[data-own-gallery="true"] #demo-banner,body[data-own-gallery="true"] #global-status{display:none;}
+.near-components .page-header-identity .toolbar-brand{display:inline-flex;align-items:center;gap:5px;letter-spacing:-1px;}
+.near-components .page-header-identity .toolbar-brand img{width:22px;height:22px;}
+.near-components .upload-header .toolbar-brand img{width:22px;height:22px;}
+.near-components .fixture-label{display:block;font-size:11px;opacity:.75;margin-top:6px;}
+.near-components .post-owner>.fixture-label{margin:0 0 0 auto;white-space:nowrap;}
+.near-components .post-owner>.post-report{padding:6px;display:flex;align-items:center;}
+.near-components .gallery-upload-slot:empty{display:none;}
+.near-components .upload-source-form{display:contents;}
+.near-components .post-like.liked svg{fill:currentColor;}
+.near-components .full-profile-info>.fixture-label{position:absolute;bottom:4px;right:22px;margin:0;font-size:10px;}
+.near-components [data-image-error]{display:flex;align-items:center;justify-content:center;min-height:60px;background:#645574;color:white;}
+.near-components [data-image-error]::after{content:attr(data-image-error);font-size:12px;padding:12px;}
+/* Route host is not a dialog: original fixed layout covers the global footer. */

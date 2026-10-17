@@ -100,9 +100,9 @@ test("member profile routes are deep-linkable and preserve browser history", asy
   await page.goto("/app/people/near-1");
   await expect(page).toHaveURL(/\/app\/people\/near-1$/u);
   await expect(page.locator("#profile-dialog")).toBeVisible();
-  await expect(page.locator("#profile-dialog").getByRole("heading", { name: "มิน" })).toBeVisible();
-  await page.locator("#profile-dialog .dialog-close").click();
-  await expect(page).toHaveURL(/\/app\/$/u);
+  await expect(page.locator("#profile-dialog").getByRole("heading", { name: "มิน",exact:true })).toBeVisible();
+  await page.locator("#profile-dialog [data-close-profile]").click();
+  await expect(page).toHaveURL(/\/$/u);
   await page.goBack();
   await expect(page).toHaveURL(/\/app\/people\/near-1$/u);
   await expect(page.locator("#profile-dialog")).toBeVisible();
@@ -126,15 +126,15 @@ test("profile names cannot break out of text or media attributes", async ({ page
   await page.locator('#primary-nav [data-tab="profile"]').click();
   await page.locator('#manage-gallery').click();
   await page.locator('#my-gallery button[data-gallery-action="select"]').first().click();
-  await expect(page.locator('#my-gallery .selected')).toHaveCount(1);
+  await expect(page.locator('#my-gallery .cover-label')).toHaveCount(1);
   await page.locator('#gallery-settings-back').click();
   const payload='x" onerror="alert(1)';
   await page.locator('#profile-form input[name="name"]').fill(payload);
   await page.getByRole("button",{name:"บันทึกโปรไฟล์",exact:true}).click();
   await expect(page.locator("#toast")).toContainText("บันทึกโปรไฟล์แล้ว");
   await page.getByRole("button",{name:"ดูโปรไฟล์และแกลเลอรี"}).click();
-  await expect(page.locator(".member-profile-info h2")).toHaveText(payload);
-  await expect(page.locator(".member-profile-image img")).toHaveAttribute("alt",`รูปของ ${payload}`);
+  await expect(page.locator(".full-name-row h1")).toHaveText(payload);
+  await expect(page.locator(".full-profile-image img")).toHaveAttribute("alt",`รูปของ ${payload}`);
   await expect(page.locator("#profile-dialog img[onerror]")).toHaveCount(0);
   await expect(page.locator("#profile-dialog [onmouseover],#profile-dialog [onfocus]")).toHaveCount(0);
 });
@@ -150,7 +150,7 @@ test("browser-only demo supports local gallery and chat image workflows", async 
   await page.locator('#manage-gallery').click();
   await page.locator('#gallery-upload input[type="file"]').setInputFiles({ name: "demo.png", mimeType: "image/png", buffer: png });
   await page.locator('#gallery-upload input[name="caption"]').fill("รูปตัวอย่างในเครื่อง");
-  await page.getByRole("button", { name: "อัปโหลดรูป" }).click();
+  await page.getByRole("button", { name: "บันทึกรูป" }).click();
   await expect(page.locator("#gallery-count")).toHaveText("3 / 12");
   await expect(page.locator("#my-gallery img").first()).toHaveAttribute("src", /^data:image\//u);
 

@@ -1,0 +1,86 @@
+import {test,expect} from '@playwright/test';
+const widths=[[390,844],[768,1024],[1440,1100]];
+for(const [width,height] of widths){
+ test(`canonical components: complete routed member and own-gallery journey ${width}`,async({page},info)=>{
+  test.skip(info.project.name!=='desktop-chromium','three explicit source viewports');
+  await page.setViewportSize({width,height});
+  const writes=[],errors=[];page.on('pageerror',e=>errors.push(e.message));
+  page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&!['GET','HEAD'].includes(r.method()))writes.push(r.url());});
+  await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+  await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
+  const card=page.locator('#people-grid .photo-card').first();
+  await expect(card.locator(':scope > .card-open')).toHaveCount(1);
+  await expect(card.locator(':scope > .card-photo > .profile-photo')).toHaveCount(1);
+  await expect(card.locator(':scope > .person-details > .card-name-row > button')).toHaveCount(1);
+  await expect(card.locator('[data-action=request],[data-action=chat]')).toHaveCount(0);
+  await card.locator('.card-open').focus();await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/app\/people\/demo-01$/);
+  await expect(page.locator('#profile-dialog')).not.toHaveJSProperty('tagName','DIALOG');
+  await expect(page.locator('.full-profile-image>.profile-photo')).toBeVisible();
+  await expect(page.locator('#profile-dialog nav')).toHaveCount(0);
+  await page.locator('.profile-gallery-top').click();await expect(page).toHaveURL(/\/demo-01\/gallery$/);
+  await expect(page.locator('.ig-grid>.ig-tile>button').first()).toBeVisible();
+  expect(await page.locator('.ig-grid').evaluate(e=>getComputedStyle(e).gridTemplateColumns.split(' ').length)).toBe(3);
+  await page.reload();await expect(page.locator('.gallery-summary')).toBeVisible();
+  await page.locator('.ig-tile>button').first().click();await expect(page).toHaveURL(/\/gallery\/demo-portrait-01$/);
+  await page.locator('.post-like').click();await expect(page.locator('.post-like')).toHaveAttribute('aria-pressed','true');
+  await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นสมมติที่ไม่เปิดให้คนแปลกหน้าอ่าน');
+  await page.locator('#gallery-comment button').click();
+  // Source comments are private to the owner and accepted friends, not strangers.
+  await expect(page.locator('.post-comments')).toHaveCount(0);
+  await page.locator('[data-gallery-return]').click();await page.locator('[data-profile-return]').click();
+  await expect(page.locator('.full-profile:not(.gallery-page)')).toBeVisible();
+  await page.locator('.profile-back').click();await expect(page.locator('#people-grid')).toBeVisible();
+  await page.locator('#primary-nav [data-tab=friends]').click();
+  await page.locator('#friends-grid .card-open').first().click();await expect(page.locator('.full-profile-actions [data-action=chat]')).toBeVisible();
+  await page.keyboard.press('Escape');await page.locator('#primary-nav [data-tab=profile]').click();
+  await page.locator('#manage-gallery').click();await expect(page).toHaveURL(/\/app\/photos$/);
+  const second=page.locator('#my-gallery [data-gallery-action=select]').nth(1);
+  const selectedId=await second.getAttribute('data-photo');await second.click();
+  await expect(page.locator('#my-gallery .cover-label')).toHaveCount(1);
+  await page.locator('#gallery-settings-back').click();await page.locator('#view-own-profile').click();
+  await expect(page.locator('.full-profile-image img')).toHaveAttribute('src',/02\.png$/);
+  await page.locator('.profile-gallery-top').click();await expect(page.locator('.gallery-summary')).toContainText('โปรไฟล์ของคุณ');
+  await expect(page.locator('.gallery-actions')).toHaveCount(0);
+  await page.locator('.ig-tile>button').first().click();await expect(page.locator('.lightbox-nav')).toContainText('1 / 2');
+  await page.locator('[data-gallery-action=next]').click();await expect(page.locator('.lightbox-nav')).toContainText('2 / 2');
+  await expect(page.locator('[data-gallery-action=next]')).toBeDisabled();
+  await page.locator('[data-gallery-action=previous]').click();await expect(page.locator('.lightbox-nav')).toContainText('1 / 2');
+  await page.reload();await expect(page.locator('.post-layout')).toBeVisible();
+  expect(selectedId).toBeTruthy();expect(writes).toEqual([]);expect(errors).toEqual([]);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ });
+ test(`canonical gallery: empty, image failure, landscape, delete and no quota refund ${width}`,async({page},info)=>{
+  test.skip(info.project.name!=='desktop-chromium','three explicit source viewports');
+  await page.setViewportSize({width,height});
+  await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+  await page.goto('/');await page.locator('#primary-nav [data-tab=profile]').click();await page.locator('#manage-gallery').click();
+  const before=await page.locator('#gallery-upload-quota').textContent();
+  page.on('dialog',d=>d.accept());
+  await page.locator('#my-gallery [data-gallery-action=delete]').first().click();
+  await page.locator('#my-gallery [data-gallery-action=delete]').first().click();await expect(page.locator('.upload-empty')).toBeVisible();
+  await expect(page.locator('#gallery-upload-quota')).toHaveText(before);
+  // Landscape synthetic pixels exist only in this disposable browser context.
+  const bytes=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=640;c.height=320;const x=c.getContext('2d');x.fillStyle='#645574';x.fillRect(0,0,640,320);x.fillStyle='#d0f17b';x.fillRect(30,30,200,260);return c.toDataURL('image/png').split(',')[1];});
+  await page.locator('[data-upload-kind=gallery]').click();
+  await page.locator('#gallery-upload input[type=file]').setInputFiles({name:'fictional-landscape.png',mimeType:'image/png',buffer:Buffer.from(bytes,'base64')});
+  await page.locator('#gallery-upload button[type=submit]').click();await expect(page.locator('#gallery-count')).toHaveText('1 / 12');
+  await expect(page.locator('#gallery-upload-quota')).toContainText('9/10');
+  await page.locator('#gallery-settings-back').click();await page.locator('#view-own-profile').click();await page.locator('.profile-gallery-top').click();
+  await page.locator('.ig-tile>button').first().click();expect(await page.locator('.lightbox-image img').evaluate(i=>i.naturalWidth/i.naturalHeight)).toBe(2);
+  await page.locator('[data-gallery-return]').click();await page.locator('.delete-photo').click();await expect(page.locator('.gallery-page .empty')).toBeVisible();
+  await page.locator('[data-close-profile]').click();await page.locator('#manage-gallery').click();await expect(page.locator('#gallery-upload-quota')).toContainText('9/10');
+ });
+}
+test('source card handles long Thai text, failed portraits and keyboard return focus',async({page})=>{
+ await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+ await page.route('**/assets/demo/network.json',async r=>{const response=await r.fetch(),data=await response.json();data.profiles[0].name='ชื่อสมมติสำหรับทดสอบชื่อภาษาไทยที่ยาวเป็นพิเศษ';data.profiles[0].bio='ชอบแลกเปลี่ยนเรื่องหนังสือและดนตรี '.repeat(8);await r.fulfill({json:data});});
+ await page.route('**/assets/demo/01.png',r=>r.abort());
+ await page.goto('/');const card=page.locator('#people-grid .photo-card').first();
+ await expect(card.locator('[data-image-error]')).toHaveAttribute('aria-label',/ชื่อสมมติ/);
+ expect(await card.evaluate(e=>e.scrollHeight<=e.clientHeight)).toBe(true);
+ await card.locator('.card-open').focus();await page.keyboard.press('Enter');
+ await expect(page.locator('.full-name-row')).toContainText('ชื่อสมมติ');
+ await page.keyboard.press('Escape');await expect(card.locator('.card-open')).toBeFocused();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
