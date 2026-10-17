@@ -23,5 +23,5 @@ assert.equal(JSON.parse(readFileSync(join(directory,'release.json'))).commit,sha
 for(const page of ['privacy.html','terms.html','data-deletion.html'])assert.deepEqual(readFileSync(join(directory,page)),readFileSync('canary-notice.html'));
 for(const path of ['docs','scripts','test-results','test','e2e','.dev.vars','node_modules','migrations'])assert.equal(existsSync(join(directory,path)),false,path);
 assert.deepEqual(readFileSync(join(directory,'assets/demo/network.json')),execFileSync('git',['show',baseline+':assets/demo/network.json']));
-const evidence={sha,directory,baseline,backendUpdatedButLiveGatesClosed:true,productionSchemaMigration:false,productionConfigurationUnchanged:true,privateArtifactsExcluded:true,legalDraftsExcluded:true,fictionalDatasetPreserved:true,rollbackDeployment:'f8206788-ecba-4999-a95f-bfcd3c47a69f',rollbackSha:'12e55fde423832152d7317c3e85bfd42f53eaf01'};
+const evidence={sha,directory,baseline,backendUpdatedButLiveGatesClosed:true,productionSchemaMigration:false,productionConfigurationUnchanged:true,privateArtifactsExcluded:true,legalDraftsExcluded:true,fictionalDatasetPreserved:true,rollbackDeployment:'fe23654c-2cc1-4ab6-8833-3275f6bbcbb8',rollbackSha:'a184dc29eb10d565309bd4243be786186764e475'};
 writeFileSync('docs/issue-13/package-check.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));

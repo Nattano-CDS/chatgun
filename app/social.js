@@ -13,6 +13,7 @@ const state = {
   demoSystemEvents: [],
   demoActor: "demo-me",
   demoPreferences: {},
+  demoProfileOverrides: {},
   album: null,
   ratings: [],
   blocked: [],
@@ -108,7 +109,7 @@ async function demoRead() {
 
 async function demoSave() {
   const database = await demoDatabase();
-  const snapshot = { profile: state.profile, relationships: state.relationships, ratings: state.ratings, blocked: state.blocked, messages: state.demoMessages, gallery: state.demoGallery, assets: state.demoAssets, reports: state.demoReports, givenRatings: state.demoRatingsGiven, albumRequests: state.demoAlbumRequests, systemEvents: state.demoSystemEvents, chatPreferences:state.demoPreferences, uploadQuotas: state.uploadQuotas };
+  const snapshot = { modelVersion:13, privateAlbumFixturesInitialized:true, profileOverrides:state.demoProfileOverrides,profile: state.profile, relationships: state.relationships, ratings: state.ratings, blocked: state.blocked, messages: state.demoMessages, gallery: state.demoGallery, assets: state.demoAssets, reports: state.demoReports, givenRatings: state.demoRatingsGiven, albumRequests: state.demoAlbumRequests, systemEvents: state.demoSystemEvents, chatPreferences:state.demoPreferences, uploadQuotas: state.uploadQuotas };
   await new Promise((resolve, reject) => {
     const request = database.transaction("state", "readwrite").objectStore("state").put(snapshot, "chatgun-browser-demo-v1");
     request.onsuccess = resolve;
@@ -230,7 +231,7 @@ async function demoApi(path, options = {}) {
     const owner = url.searchParams.get("user") || "demo-me";
     if (method === "GET") {
       const photos = state.demoGallery.filter((photo) => photo.owner === owner&&demoVisible(photo)).map((photo) => ({
-        ...photo, selected: state.profile.selected_photo_id === photo.id,
+        ...photo, selected: demoPerson(owner)?.selected_photo_id === photo.id,
         comments: undefined,
       }));
       const selected = url.searchParams.get("photo");
@@ -244,12 +245,13 @@ async function demoApi(path, options = {}) {
     if(body.action==='visibility'){
       if(photo.owner!==currentActor()||!['public','private'].includes(body.visibility))throw new Error('ไม่มีสิทธิ์');photo.visibility=body.visibility;await demoSave();return {ok:true};
     }
-    if (body.action === "delete" && photo.owner === "demo-me") {
+    if(['delete','select'].includes(body.action)&&photo.owner!==currentActor())throw new Error('ไม่มีสิทธิ์จัดการรูปนี้');
+    if (body.action === "delete") {
       state.demoGallery = state.demoGallery.filter((item) => item.id !== photo.id);
-      if (state.profile.selected_photo_id === photo.id) state.profile.selected_photo_id = null;
-    } else if (body.action === "select" && photo.owner === "demo-me") state.profile.selected_photo_id = photo.id;
+      const owner=demoPerson(photo.owner);if(owner.selected_photo_id===photo.id){owner.selected_photo_id=null;if(photo.owner!=='demo-me')state.demoProfileOverrides[photo.owner]={selected_photo_id:null};}
+    } else if (body.action === "select") {demoPerson(photo.owner).selected_photo_id=photo.id;if(photo.owner!=='demo-me')state.demoProfileOverrides[photo.owner]={selected_photo_id:photo.id};}
     else if (body.action === "like") { photo.liked = !photo.liked; photo.like_count = Math.max(0, Number(photo.like_count || 0) + (photo.liked ? 1 : -1)); }
-    else if (body.action === "comment") photo.comments.push({ id: crypto.randomUUID(), sender_name: state.profile.name, body: String(body.comment || "").trim(), created_at: Math.floor(Date.now() / 1000) });
+    else if (body.action === "comment") photo.comments.push({ id: crypto.randomUUID(), sender_name: demoPerson(currentActor()).name, body: String(body.comment || "").trim(), created_at: Math.floor(Date.now() / 1000) });
     else if (!['delete', 'select', 'like', 'comment'].includes(body.action)) throw new Error("คำขอไม่ถูกต้อง");
     await demoSave(); return { ok: true, mediaDeletionPending: false };
   }
@@ -268,16 +270,19 @@ async function startDemo() {
   state.account = { user: { id: "demo-me", displayName: "คุณ" }, providers: [] };
   state.profile = saved?.profile || { user_id: "demo-me", name: "คุณ", gender: "ไม่ระบุ", bio: "กำลังทดลอง ChatGun", interests: "กาแฟ, เพื่อนใหม่", discovery_visible: 1 };
   state.people = network.people;
+  state.demoProfileOverrides=saved?.profileOverrides||{};
+  for(const p of state.people)if(Object.hasOwn(state.demoProfileOverrides[p.user_id]||{},'selected_photo_id'))p.selected_photo_id=state.demoProfileOverrides[p.user_id].selected_photo_id;
   state.relationships = saved?.relationships || network.relationships;
   state.ratings = saved?.ratings || network.ratings;
   state.blocked = saved?.blocked || [];
   state.demoMessages = saved?.messages || network.messages;
+  window.chatgunUpgradeDemoReads(state.demoMessages,state.relationships,Boolean(saved&&(saved.modelVersion===13||Object.hasOwn(saved,'albumRequests'))),Math.floor(Date.now()/1000));
   state.demoGallery = saved?.gallery || network.gallery;
   state.demoAssets = saved?.assets || [];
   state.demoAlbumRequests=saved?.albumRequests||[];state.demoSystemEvents=saved?.systemEvents||[];
   state.demoPreferences=saved?.chatPreferences||{};
   for(const photo of state.demoGallery)photo.visibility ||= photo.id.startsWith("demo-portrait-")?"public":"private";
-  for(const person of state.people){const id="demo-private-"+person.slug;if(!state.demoGallery.some(p=>p.id===id))state.demoGallery.push({id,owner:person.user_id,visibility:"private",caption:"อัลบั้มส่วนตัวสมมติ",url:"/assets/demo/"+person.slug+".png",like_count:0,comments:[]});}
+  if(!saved?.privateAlbumFixturesInitialized)for(const person of state.people){const id="demo-private-"+person.slug;if(!state.demoGallery.some(p=>p.id===id))state.demoGallery.push({id,owner:person.user_id,visibility:"private",caption:"อัลบั้มส่วนตัวสมมติ",url:"/assets/demo/"+person.slug+".png",like_count:0,comments:[]});}
 
   state.demoReports = saved?.reports || [];
   state.demoRatingsGiven = saved?.givenRatings || [];
@@ -435,7 +440,9 @@ function portrait(person, distance = true) {
 }
 
 function sourcePortrait(person) {
-  const url=person.selected_photo_id ? galleryMediaUrl(person.selected_photo_id) : '';
+  const selected=state.demo&&state.demoGallery.find(p=>p.id===person.selected_photo_id);
+  const permitted=!state.demo||selected&&(selected.visibility==='public'||selected.owner===state.account.user.id);
+  const url=person.selected_photo_id&&permitted ? galleryMediaUrl(person.selected_photo_id) : '';
   return url ? `<img class="profile-photo" src="${escapeHtml(url)}" alt="รูปของ ${escapeHtml(person.name)}">` : `<div class="portrait-fallback" role="img" aria-label="ยังไม่มีรูปโปรไฟล์">${escapeHtml(String(person.name||'N').slice(0,1))}</div>`;
 }
 
@@ -1139,7 +1146,7 @@ document.addEventListener("click", async (event) => {
   const simulation=event.target.closest('[data-demo-owner]');
   if(simulation&&state.demo){const viewer=currentActor();state.demoActor=simulation.dataset.demoOwner;renderDemoPerspective();await loadRelationships();closeProfileSurface();return openChat(viewer);}
   const visibility=event.target.closest('[data-photo-visibility]');
-  if(visibility){try{await api('/api/social/gallery',{method:'POST',body:{action:'visibility',id:visibility.dataset.photo,visibility:visibility.dataset.photoVisibility}});await showPerson(profileContext(state.selectedPerson).id,{photo:'gallery',historyMode:'replace'});}catch(error){toast(error.message,true);}return;}
+  if(visibility){try{await api('/api/social/gallery',{method:'POST',body:{action:'visibility',id:visibility.dataset.photo,visibility:visibility.dataset.photoVisibility}});renderPeople();await showPerson(profileContext(state.selectedPerson).id,{photo:'gallery',historyMode:'replace'});}catch(error){toast(error.message,true);}return;}
   const profileOpen=event.target.closest('[data-person-open]');if(profileOpen){await showPerson(profileOpen.dataset.personOpen);return;}
   if(event.target.closest('.picker-toggle')){
     const picker=$('#thread .chat-image-picker');picker.hidden=!picker.hidden;$('#thread .picker-toggle').setAttribute('aria-expanded',String(!picker.hidden));
@@ -1240,11 +1247,16 @@ document.addEventListener("click", async (event) => {
     try {
       await api("/api/social/gallery", { method: "POST", body: { action: name, id: photo } });
       if (["delete", "select"].includes(name)) {
+        if(state.demo&&currentActor()!==state.account.user.id){
+          state.personPhotos=(await api('/api/social/gallery?user='+encodeURIComponent(currentActor()))).photos;
+          renderPeople();if(!$('#profile-dialog').hidden)renderPersonRoute('gallery');
+        }else{
         await loadOwnGallery();
         if(name==='select')state.profile.selected_photo_id=photo;
         if(name==='delete'&&state.profile.selected_photo_id===photo)state.profile.selected_photo_id=null;
         fillProfile();
         if(!$('#profile-dialog').hidden){state.personPhotos=state.myGallery;renderPersonRoute('gallery');}
+        }
       }
       if (name === "like" && state.galleryView && samePost(user||state.galleryView.owner,photo)) await openGalleryPhoto(state.galleryView.owner, photo, { historyMode: "replace",preserveComment:true });
       if(name!=='like')toast(name === "delete" ? "ซ่อนรูปและส่งเข้าคิวลบแล้ว" : "ตั้งรูปหลักแล้ว");

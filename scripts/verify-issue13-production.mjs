@@ -7,7 +7,7 @@ if(!/^[a-f0-9]{40}$/.test(sha||''))throw Error('Exact deployed SHA required');
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const release=await(await fetch(origin+'/release.json',{cache:'no-store'})).json();assert.equal(release.commit,sha);
 const assets=[];
-for(const file of ['app/index.html','app/social.js','app/near-components.js','app/near-components.css','auth-nav.js','assets/demo/network.json']){
+for(const file of ['app/index.html','app/social.js','app/demo-network.js','app/near-components.js','app/near-components.css','auth-nav.js','assets/demo/network.json']){
   const response=await fetch(origin+'/'+file+'?verify='+sha,{cache:'no-store'});assert.equal(response.status,200,file);
   const actual=Buffer.from(await response.arrayBuffer()),expected=execFileSync('git',['show',sha+':'+file]);
   assert.equal(hash(actual),hash(expected),file);assets.push({file,sha256:hash(actual),matchesCommit:true});

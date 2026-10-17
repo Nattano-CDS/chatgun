@@ -6,7 +6,7 @@ const unit=readFileSync('/tmp/chatgun-issue13-unit-frozen.log','utf8'),browser=r
 const number=(text,pattern)=>Number(text.match(pattern)?.[1]||0);
 const units={total:number(unit,/ℹ tests (\d+)/),passed:number(unit,/ℹ pass (\d+)/),failed:number(unit,/ℹ fail (\d+)/),skipped:number(unit,/ℹ skipped (\d+)/)};
 const browsers={passed:number(browser,/\n\s+(\d+) passed \(/),skipped:number(browser,/\n\s+(\d+) skipped/),failed:number(browser,/\n\s+(\d+) failed/)};
-assert.equal(units.total,114);assert.equal(units.passed,114);assert.equal(units.failed,0);assert.equal(browsers.passed,76);assert.equal(browsers.failed,0);assert.equal(browsers.skipped,36);
+assert.equal(units.total,117);assert.equal(units.passed,117);assert.equal(units.failed,0);assert.equal(browsers.passed,80);assert.equal(browsers.failed,0);assert.equal(browsers.skipped,36);
 assert.match(browser,/✓.*real isolated D1\/R2 private-album cards, owner consent, revocation and logout/);
 const cloud=JSON.parse(readFileSync('docs/issue-13/cloud-test-results.json'));assert.equal(cloud.commit,sha);assert.equal(cloud.passed,26);assert.equal(cloud.failed,0);
 const audit=JSON.parse(readFileSync('docs/issue-13/dependency-audit.json'));assert.equal(audit.metadata.vulnerabilities.total,0);
