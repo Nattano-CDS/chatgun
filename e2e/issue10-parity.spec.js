@@ -8,9 +8,9 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
     await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(17);
     const metrics=await page.locator('#people-grid').evaluate(e=>{
       const c=getComputedStyle(e),card=e.querySelector('.photo-card'),main=document.querySelector('#app>main');
-      return {columns:c.gridTemplateColumns.split(' ').length,height:card.getBoundingClientRect().height,radius:getComputedStyle(card).borderRadius,padding:getComputedStyle(main).paddingLeft,background:getComputedStyle(document.body).backgroundColor,overflow:document.documentElement.scrollWidth>innerWidth};
+      return {columns:c.gridTemplateColumns.split(' ').length,y:card.getBoundingClientRect().y,height:card.getBoundingClientRect().height,radius:getComputedStyle(card).borderRadius,padding:getComputedStyle(main).paddingLeft,background:getComputedStyle(document.body).backgroundColor,overflow:document.documentElement.scrollWidth>innerWidth};
     });
-    expect(metrics).toEqual({columns:width===1440?4:2,height:width===390?290:390,radius:width===390?'17px':'22px',padding:width===390?'16px':width===768?'28px':'65px',background:'rgb(247, 247, 251)',overflow:false});
+    expect(metrics).toEqual({columns:width===1440?4:2,y:width===390?215.5:width===768?202:210,height:width===390?290:390,radius:width===390?'17px':'22px',padding:width===390?'16px':width===768?'28px':'65px',background:'rgb(247, 247, 251)',overflow:false});
     await page.locator('[data-discovery-page="2"]').click();await expect(page.locator('#people-grid .photo-card')).toHaveCount(5);
     await page.locator('[data-discovery-page="1"]').click();
     await page.locator('#people-search').fill('ไม่มีคนชื่อนี้ในตัวอย่าง');await expect(page.locator('#people-grid .empty')).toBeVisible();

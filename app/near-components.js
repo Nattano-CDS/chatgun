@@ -12,7 +12,7 @@ window.ChatgunNearComponents = (() => {
   const badge = (person,size=19) => Number(person.identity_verified)===1 ? `<button class="verify-badge" type="button" data-badge-info aria-label="ดูความหมายตรายืนยัน" title="ผ่านการตรวจหลักฐานตัวตน · ไม่ใช่การรับรองพฤติกรรม">${icon('badge',size)}</button>` : '';
   const action = (name, id, text, c, extra = '') => `<button class="${c || ''}" data-action="${name}" data-user="${id}" ${extra}>${text}</button>`;
   function card({person:p,id,relation,incoming,context,html:h,portrait,distance,star,userPlus,canRate,rateDisabled,own=false,demo=false}) {
-    const request = context === 'request' || context === 'sent';
+    const request = !own && (context === 'request' || context === 'sent');
     const body = `<article class="person photo-card person-card" data-person="${h(id)}">
       <button class="card-open" data-person-open="${h(id)}" aria-label="เปิดโปรไฟล์ ${h(p.name)}"></button>
       <div class="card-photo">${portrait(p,false)}</div><div class="photo-shade"></div>

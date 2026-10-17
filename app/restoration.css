@@ -113,7 +113,7 @@ dialog .dialog-close{z-index: 10;}
 html, body{background: rgb(247, 247, 251); font-family: Arial, "Noto Sans Thai", Tahoma, sans-serif; font-synthesis: none;}
 #app{padding-bottom: 0px;}
 #app > main{width: 100%; max-width: 1280px; padding: 0 48px calc(100px + env(safe-area-inset-bottom)); margin: auto;}
-#app .toolbar{position: sticky; top: 0px; display: flex; gap: 14px; min-height: 74px; margin: 0px -10px 16px; padding: 0px 10px; border: 0px; background: rgba(247, 247, 251, 0.97);}
+#app .toolbar{position: sticky; top: 0px; display: flex; gap: 14px; min-height: 75px; margin: 0px -10px 16px; padding: 0px 10px; border: 0px; border-bottom: 1px solid rgb(231, 225, 239); background: rgba(247, 247, 251, 0.97);}
 #app .toolbar-context{gap: 10px; flex-shrink: 0;}
 #app .toolbar-brand{font-size: 25px; gap: 7px;}
 #app .toolbar-brand img{width: 32px; height: 32px;}
@@ -134,7 +134,7 @@ body[data-active-tab="near"] #app .toolbar-actions{display: none;}
 #app .demo-info{min-height: 30px; padding: 5px 9px; border-radius: 100px; background: rgb(255, 255, 255); border: 1px solid rgb(230, 222, 240); color: rgb(140, 115, 163); font-size: 12px;}
 body[data-demo="true"] #location-banner{display: none;}
 #app #location-banner{margin: 0px 0px 12px; padding: 10px 14px;}
-#app .section-heading{margin: 10px 0px 15px;}
+#app .section-heading{margin: 0px 0px 18px;}
 #app .section-heading h2{font-size: 26px; line-height: 1.5; letter-spacing: -0.6px;}
 #app .section-heading h2 span{height: 26px; min-width: 28px; font-size: 13px;}
 #app .people-grid, #app #people-grid, #app #friends-grid, #app #requests-grid{grid-template-columns: repeat(3, minmax(0px, 1fr)); gap: 18px; align-items: start;}
@@ -175,11 +175,11 @@ body[data-demo="true"] #location-banner{display: none;}
 #app .toolbar.filters-open .filter-row{display: grid; grid-template-columns: 1fr 1fr; position: absolute; top: 64px; left: 0px; right: 0px; padding: 20px; border: 1px solid rgb(228, 218, 243); border-radius: 22px; background: rgb(255, 255, 255); box-shadow: rgba(48, 32, 71, 0.133) 0px 16px 40px; z-index: 35;}
 #app .filter-row label{height: auto; min-height: 60px; display: flex; flex-direction: column; align-items: start; padding: 10px; background: rgb(250, 248, 254); border-radius: 13px;}
 #app .filter-row input, #app .filter-row select{width: 100%; font-size: 16px;}
-#app .toolbar{min-height: 66px;}
+#app .toolbar{min-height: 67px;}
 }
 @media (max-width: 700px){
 #app > main{padding: 0 16px calc(95px + env(safe-area-inset-bottom));}
-#app .toolbar{min-height: 64px; gap: 10px; margin: 0px -16px 13px; padding: 0px 16px;}
+#app .toolbar{min-height: 65px; gap: 10px; margin: 0px -16px 13px; padding: 0px 16px;}
 #app .toolbar h1{font-size: 12px;}
 body[data-active-tab="near"] #app .toolbar h1{display: none;}
 #app .toolbar-brand{font-size: 20px;}
@@ -193,7 +193,7 @@ body[data-active-tab="near"] #app .toolbar h1{display: none;}
 #app .demo-banner span{display: none;}
 #app .demo-banner > div{flex: 1 1 0%;}
 #app .demo-banner a{white-space: nowrap;}
-#app .section-heading{margin: 9px 0px 12px;}
+#app .section-heading{margin: 0px 0px 13px;}
 #app .section-heading h2{font-size: 23px;}
 #app .people-grid, #app #people-grid, #app #friends-grid, #app #requests-grid{grid-template-columns: repeat(2, minmax(0px, 1fr)); gap: 10px;}
 #app .sidebar{padding-inline: 4px;}

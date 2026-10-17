@@ -23,7 +23,7 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
     await page.evaluate(async()=>{await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,5000))]);await Promise.race([Promise.all([...document.images].filter(i=>{const r=i.getBoundingClientRect();return r.width>0&&r.height>0&&r.top<innerHeight&&r.bottom>0;}).map(i=>i.decode().catch(()=>{}))),new Promise(r=>setTimeout(r,5000))]);});
     await page.waitForTimeout(200);
     await page.screenshot({path:resolve(output,`${name}-${width}.png`),fullPage:false});
-    const selector={discovery:original||modern?'.photo-card':'.person-card',friends:'.request-card .photo-card','member-profile':original||modern?'.full-profile-info':'.member-profile-info','member-gallery':'.gallery-summary','gallery-post':'.post-layout','own-profile':original||modern?'.full-profile-info':'.member-profile-info','own-gallery':'.gallery-summary',profile:'.profile-form'}[name];
+    const selector={'member-card':original?'.photo-card':'#people-grid [data-person="demo-01"]',discovery:original||modern?'.photo-card':'.person-card',friends:'.request-card .photo-card','member-profile':original||modern?'.full-profile-info':'.member-profile-info','member-gallery':'.gallery-summary','gallery-post':'.post-layout','own-profile':original||modern?'.full-profile-info':'.member-profile-info','own-gallery':'.gallery-summary',profile:'.profile-form'}[name];
     if(selector){const element=page.locator(selector).first();if(await element.isVisible()){
       measurements.push({width,name,dom:await element.evaluate(e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect(),image=e.querySelector('img'),imageStyle=image&&getComputedStyle(image);return{tag:e.tagName,classes:e.className,width:r.width,height:r.height,x:r.x,y:r.y,font:s.fontFamily,fontSize:s.fontSize,lineHeight:s.lineHeight,padding:s.padding,borderRadius:s.borderRadius,image:image?{objectFit:imageStyle.objectFit,objectPosition:imageStyle.objectPosition,width:image.getBoundingClientRect().width,height:image.getBoundingClientRect().height}:null,children:[...e.children].map(c=>({tag:c.tagName,classes:c.className}))}})});
       await element.screenshot({path:resolve(output,`crop-${name}-${width}.png`)});
@@ -65,7 +65,7 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
     await page.evaluate(async()=>{await new Promise((resolve,reject)=>{const request=indexedDB.open('chatgun-demo',1);request.onsuccess=()=>{const db=request.result,tx=db.transaction('state','readwrite');tx.objectStore('state').put({assets:[{id:'fixture-chat-01',url:'/assets/demo/01.png',created_at:Math.floor(Date.now()/1000)}]},'chatgun-browser-demo-v1');tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};});});
     await page.reload();await page.locator('#people-grid .person-card').first().waitFor();
   }
-  await shot('discovery');
+  await shot('discovery');await shot('member-card');
   const search=page.locator(original?'.toolbar-search input':'#people-search');
   await attempt('search-empty',async()=>{await search.fill('ไม่พบข้อมูลตัวอย่างนี้');});
   await search.fill('');
