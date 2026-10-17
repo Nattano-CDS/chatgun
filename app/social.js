@@ -1295,7 +1295,7 @@ document.addEventListener("click", async (event) => {
     if(!galleryReturn)state.privateAlbumOpen=false;
     await showPerson(profileContext(state.selectedPerson).id,{photo:'gallery'});return;
   }
-  if(event.target.closest('[data-profile-return]')){updateProfileRoute(profileContext(state.selectedPerson).id);renderPersonRoute('profile');return;}
+  if(event.target.closest('[data-profile-return]')){await showPerson(profileContext(state.selectedPerson).id);return;}
   if(event.target.closest('[data-retry-gallery]')){await showPerson(profileContext(state.selectedPerson).id,{photo:'gallery',historyMode:'replace'});return;}
   const personOpen=event.target.closest('[data-person-open]');
   if(personOpen){await showPerson(personOpen.dataset.personOpen);return;}

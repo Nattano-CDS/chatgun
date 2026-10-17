@@ -23,6 +23,7 @@ for(const width of [390,768,1440])test(`approved Gallery: four destinations, upl
   await page.keyboard.press('Escape');await expect(page).toHaveURL(/demo-01\/gallery$/);await expect(page.locator('.lightbox')).toHaveCount(0);
   await page.goto('/app/people/demo-08/private-gallery');await expect(page.locator('.gallery-grid .tile')).toHaveCount(5);await expect(page.locator('.private-summary')).toContainText('คุณได้รับสิทธิ์');await shot('private-view');
   await page.locator('.gallery-grid .tile').first().click();await expect(page).toHaveURL(/private-gallery\//);await page.reload();await expect(page.locator('.lightbox')).toBeVisible();await page.keyboard.press('Escape');await expect(page).toHaveURL(/private-gallery$/);
+  await page.locator('[data-profile-return]').first().click();await expect(page.locator('.profile-gallery-button span')).toHaveText('5');await page.locator('[data-private-album]').click();await expect(page).toHaveURL(/private-gallery$/);
   await page.goto('/app/people/demo-01/private-gallery');await expect(page).toHaveURL(/people\/demo-01$/);await expect(page.locator('.gallery-grid')).toHaveCount(0);
   for(const scope of ['gallery','private-gallery']){
     await page.goto('/app/me/'+scope+'/upload');await expect(page.locator('#approved-gallery-upload')).toBeVisible();await expect(page.locator('input[name=visibility]')).toHaveValue(scope==='gallery'?'public':'private');await shot(scope==='gallery'?'upload-public':'upload-private');
