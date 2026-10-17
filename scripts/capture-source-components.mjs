@@ -19,13 +19,14 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
     await page.route('**/assets/demo/*.png',async route=>route.fulfill({contentType:'image/png',body:await readFile(resolve('assets/demo',new URL(route.request().url()).pathname.split('/').at(-1)))}));
   }
   const shot=async name=>{
+    await page.evaluate(()=>window.scrollTo(0,0));
     await page.evaluate(async()=>{await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,5000))]);await Promise.race([Promise.all([...document.images].filter(i=>{const r=i.getBoundingClientRect();return r.width>0&&r.height>0&&r.top<innerHeight&&r.bottom>0;}).map(i=>i.decode().catch(()=>{}))),new Promise(r=>setTimeout(r,5000))]);});
     await page.waitForTimeout(200);
     await page.screenshot({path:resolve(output,`${name}-${width}.png`),fullPage:false});
     const selector={discovery:original||modern?'.photo-card':'.person-card',friends:'.request-card .photo-card','member-profile':original||modern?'.full-profile-info':'.member-profile-info','member-gallery':'.gallery-summary','gallery-post':'.post-layout','own-profile':original||modern?'.full-profile-info':'.member-profile-info','own-gallery':'.gallery-summary',profile:'.profile-form'}[name];
     if(selector){const element=page.locator(selector).first();if(await element.isVisible()){
-      await element.screenshot({path:resolve(output,`crop-${name}-${width}.png`)});
       measurements.push({width,name,dom:await element.evaluate(e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect(),image=e.querySelector('img'),imageStyle=image&&getComputedStyle(image);return{tag:e.tagName,classes:e.className,width:r.width,height:r.height,x:r.x,y:r.y,font:s.fontFamily,fontSize:s.fontSize,lineHeight:s.lineHeight,padding:s.padding,borderRadius:s.borderRadius,image:image?{objectFit:imageStyle.objectFit,objectPosition:imageStyle.objectPosition,width:image.getBoundingClientRect().width,height:image.getBoundingClientRect().height}:null,children:[...e.children].map(c=>({tag:c.tagName,classes:c.className}))}})});
+      await element.screenshot({path:resolve(output,`crop-${name}-${width}.png`)});
     }}
 
   };
@@ -93,7 +94,7 @@ for(const [width,height] of [[390,844],[768,1024],[1440,1100]]){
   },original);
   await page.reload();await page.locator(original?'.photo-card':'#people-grid .person-card').first().waitFor();
   for(const [tab,name] of [['friends','friends-empty'],['chat','inbox-empty'],['reviews','reviews-empty'],['profile','own-gallery-empty']])await attempt(name,async()=>{await nav(tab);if(tab==='profile')await page.goto(target+(original?'/photos':'/app/photos'));});
-  await nav('near');await context.setOffline(true);await shot('offline');await context.setOffline(false);
+  await nav('near');await context.setOffline(true);try{await shot('offline');}finally{await context.setOffline(false);}
   for(const [name,path] of [['upload-photos',original?'/photos':'/app/photos'],['login',original?'/login':'/signup'],['register',original?'/register':'/acceptance'],['account','/account'],['admin-denied','/app/moderation.html']]){
     if(original&&['account','admin-denied'].includes(name))continue;
     await attempt(name,async()=>{

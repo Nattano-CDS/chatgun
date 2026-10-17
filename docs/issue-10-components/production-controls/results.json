@@ -1,0 +1,51 @@
+{
+  "origin": "https://chatgun.social",
+  "commit": "0a4bd1d25c730d131615960e892c77b257b16947",
+  "results": [
+    {
+      "width": 390,
+      "height": 844,
+      "result": "PASS",
+      "serverWrites": 0,
+      "apiInterception": false,
+      "checks": [
+        "member profile/gallery/like/private comment/back",
+        "own selection/gallery upload/next/previous/delete",
+        "deletion does not refund quota",
+        "image management CSP-compatible preview/cancel",
+        "no overflow or page errors"
+      ]
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "result": "PASS",
+      "serverWrites": 0,
+      "apiInterception": false,
+      "checks": [
+        "member profile/gallery/like/private comment/back",
+        "own selection/gallery upload/next/previous/delete",
+        "deletion does not refund quota",
+        "image management CSP-compatible preview/cancel",
+        "no overflow or page errors"
+      ]
+    },
+    {
+      "width": 1440,
+      "height": 1100,
+      "result": "PASS",
+      "serverWrites": 0,
+      "apiInterception": false,
+      "checks": [
+        "member profile/gallery/like/private comment/back",
+        "own selection/gallery upload/next/previous/delete",
+        "deletion does not refund quota",
+        "image management CSP-compatible preview/cancel",
+        "no overflow or page errors"
+      ]
+    }
+  ],
+  "stagingMutations": 0,
+  "productionDatabaseWrites": 0,
+  "fixtureMutations": "disposable browser IndexedDB only"
+}

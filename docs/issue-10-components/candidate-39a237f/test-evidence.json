@@ -1,0 +1,28 @@
+{
+  "validatedCommit": "39a237fda5004494dad936ea776acfcc9b8ab8d3",
+  "unitIntegrationSecurity": {
+    "passed": 100,
+    "failed": 0,
+    "skipped": 0
+  },
+  "stablePreview": {
+    "url": "https://codex-chatgun-release-candid.chatgun.pages.dev",
+    "passed": 58,
+    "failed": 0,
+    "skipped": 32,
+    "total": 90
+  },
+  "skips": {
+    "liveSessionD1R2Tests": 16,
+    "duplicateExplicitViewportCasesOnMobile": 15,
+    "desktopInapplicableMobileCase": 1
+  },
+  "sourceMeasurements": {
+    "states": 21,
+    "widthHeightMismatches": 0
+  },
+  "interactiveOAuth": "not repeated: no provider, authentication or session implementation change",
+  "stagingMutations": 0,
+  "productionDatabaseWrites": 0,
+  "visualAcceptance": "requires final owner review; no blanket pixel-identity claim"
+}

@@ -1,0 +1,102 @@
+
+Running 92 tests using 1 worker
+
+(node:97017) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 390px (4.9s)
+  ✓   2 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 768px (4.0s)
+  ✓   3 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 1440px (4.2s)
+  ✓   4 [desktop-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth (738ms)
+  ✓   5 [desktop-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed (1.3s)
+  ✓   6 [desktop-chromium] › e2e/auth.spec.js:93:1 › post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations (872ms)
+  ✓   7 [desktop-chromium] › e2e/auth.spec.js:139:1 › privacy notice explains social identity data use (912ms)
+  ✓   8 [desktop-chromium] › e2e/auth.spec.js:148:1 › legal review pages disclose unresolved owner decisions (1.1s)
+  ✓   9 [desktop-chromium] › e2e/auth.spec.js:158:1 › account page redirects unauthenticated users to signup (987ms)
+  ✓  10 [desktop-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations (559ms)
+  ✓  11 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 390px (1.2s)
+  ✓  12 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 768px (1.5s)
+  ✓  13 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 1440px (951ms)
+  ✓  14 [desktop-chromium] › e2e/issue10-parity.spec.js:28:1 › failed portrait remains labelled; persistent auth navigation excludes Game (1.3s)
+  ✓  15 [desktop-chromium] › e2e/issue10-parity.spec.js:34:1 › fictional friendship accept/reject/request/block/unblock persists without server writes (2.1s)
+  -  16 [desktop-chromium] › e2e/live-social.spec.js:81:1 › staging social APIs persist positive and negative non-media workflows
+  -  17 [desktop-chromium] › e2e/live-social.spec.js:159:1 › staging R2 gallery and chat media remain private and relationship-authorized
+  -  18 [desktop-chromium] › e2e/live-social.spec.js:261:1 › desktop and mobile render persisted staging profile, discovery, notifications, and reviews
+  -  19 [desktop-chromium] › e2e/live-social.spec.js:311:1 › synthetic account deletion queues owned R2 media and revokes access
+  ✓  20 [desktop-chromium] › e2e/moderation.spec.js:48:1 › admin dashboard opens routine overview automatically and requires justification for restricted evidence (1.2s)
+  ✓  21 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px (5.1s)
+  ✓  22 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px (6.8s)
+  ✓  23 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px (6.0s)
+  ✓  24 [desktop-chromium] › e2e/social.spec.js:54:1 › root is the authenticated discovery entry while welcome retains marketing (1.8s)
+  ✓  25 [desktop-chromium] › e2e/social.spec.js:63:1 › desktop social shell preserves discovery, friends, chat, reviews, and profile without game (866ms)
+  -  26 [desktop-chromium] › e2e/social.spec.js:81:1 › mobile social shell uses bottom navigation and remains usable
+  ✓  27 [desktop-chromium] › e2e/social.spec.js:91:1 › disabled social environment reveals no member features (635ms)
+  ✓  28 [desktop-chromium] › e2e/social.spec.js:99:1 › member profile routes are deep-linkable and preserve browser history (738ms)
+  ✓  29 [desktop-chromium] › e2e/social.spec.js:111:1 › coarse live distance does not silently remove the server-authorized rating workflow (784ms)
+  ✓  30 [desktop-chromium] › e2e/social.spec.js:120:1 › source header switches out discovery controls; gallery distinguishes loading failure from empty and retries (809ms)
+  ✓  31 [desktop-chromium] › e2e/social.spec.js:139:1 › optional demo remains browser-only and contains no game (1.3s)
+  ✓  32 [desktop-chromium] › e2e/social.spec.js:149:1 › profile names cannot break out of text or media attributes (2.3s)
+  ✓  33 [desktop-chromium] › e2e/social.spec.js:170:1 › browser-only demo supports local gallery and chat image workflows (6.5s)
+  ✓  34 [desktop-chromium] › e2e/social.spec.js:202:1 › social shell reports offline state and recovers when connectivity returns (718ms)
+  ✓  35 [desktop-chromium] › e2e/social.spec.js:213:1 › daily image quota disables only the exhausted category while chat text remains available (781ms)
+  ✓  36 [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 390 (6.5s)
+  ✓  37 [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 390 (7.1s)
+  ✓  38 [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 768 (3.6s)
+  ✓  39 [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 768 (1.5s)
+  ✓  40 [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 1440 (4.8s)
+  ✓  41 [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 1440 (2.4s)
+  ✓  42 [desktop-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus (1.7s)
+  -  43 [desktop-chromium] › e2e/staging-readonly.spec.js:5:1 › preserved staging batch and private media remain accessible only to authorized sessions
+  -  44 [desktop-chromium] › e2e/synthetic-owner-review.spec.js:42:1 › synthetic staging APIs expose the complete traceable owner-review network
+  -  45 [desktop-chromium] › e2e/synthetic-owner-review.spec.js:78:1 › NEAR-style social pages render populated synthetic data on desktop and mobile
+  -  46 [desktop-chromium] › e2e/synthetic-owner-review.spec.js:108:1 › admin overview and urgent queues render synthetic moderation samples
+(node:97267) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -  47 [mobile-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 390px
+  -  48 [mobile-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 768px
+  -  49 [mobile-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 1440px
+  ✓  50 [mobile-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth (1.1s)
+  ✓  51 [mobile-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed (2.0s)
+  ✓  52 [mobile-chromium] › e2e/auth.spec.js:93:1 › post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations (939ms)
+  ✓  53 [mobile-chromium] › e2e/auth.spec.js:139:1 › privacy notice explains social identity data use (1.4s)
+  ✓  54 [mobile-chromium] › e2e/auth.spec.js:148:1 › legal review pages disclose unresolved owner decisions (1.4s)
+  ✓  55 [mobile-chromium] › e2e/auth.spec.js:158:1 › account page redirects unauthenticated users to signup (1.7s)
+  ✓  56 [mobile-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations (560ms)
+  -  57 [mobile-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 390px
+  -  58 [mobile-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 768px
+  -  59 [mobile-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 1440px
+  ✓  60 [mobile-chromium] › e2e/issue10-parity.spec.js:28:1 › failed portrait remains labelled; persistent auth navigation excludes Game (2.4s)
+  ✓  61 [mobile-chromium] › e2e/issue10-parity.spec.js:34:1 › fictional friendship accept/reject/request/block/unblock persists without server writes (2.2s)
+  -  62 [mobile-chromium] › e2e/live-social.spec.js:81:1 › staging social APIs persist positive and negative non-media workflows
+  -  63 [mobile-chromium] › e2e/live-social.spec.js:159:1 › staging R2 gallery and chat media remain private and relationship-authorized
+  -  64 [mobile-chromium] › e2e/live-social.spec.js:261:1 › desktop and mobile render persisted staging profile, discovery, notifications, and reviews
+  -  65 [mobile-chromium] › e2e/live-social.spec.js:311:1 › synthetic account deletion queues owned R2 media and revokes access
+  ✓  66 [mobile-chromium] › e2e/moderation.spec.js:48:1 › admin dashboard opens routine overview automatically and requires justification for restricted evidence (1.4s)
+  -  67 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px
+  -  68 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px
+  -  69 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px
+  ✓  70 [mobile-chromium] › e2e/social.spec.js:54:1 › root is the authenticated discovery entry while welcome retains marketing (2.1s)
+  ✓  71 [mobile-chromium] › e2e/social.spec.js:63:1 › desktop social shell preserves discovery, friends, chat, reviews, and profile without game (916ms)
+  ✓  72 [mobile-chromium] › e2e/social.spec.js:81:1 › mobile social shell uses bottom navigation and remains usable (1.0s)
+  ✓  73 [mobile-chromium] › e2e/social.spec.js:91:1 › disabled social environment reveals no member features (702ms)
+  ✓  74 [mobile-chromium] › e2e/social.spec.js:99:1 › member profile routes are deep-linkable and preserve browser history (1.0s)
+  ✓  75 [mobile-chromium] › e2e/social.spec.js:111:1 › coarse live distance does not silently remove the server-authorized rating workflow (988ms)
+  ✓  76 [mobile-chromium] › e2e/social.spec.js:120:1 › source header switches out discovery controls; gallery distinguishes loading failure from empty and retries (977ms)
+  ✓  77 [mobile-chromium] › e2e/social.spec.js:139:1 › optional demo remains browser-only and contains no game (1.9s)
+  ✓  78 [mobile-chromium] › e2e/social.spec.js:149:1 › profile names cannot break out of text or media attributes (1.6s)
+  ✓  79 [mobile-chromium] › e2e/social.spec.js:170:1 › browser-only demo supports local gallery and chat image workflows (6.4s)
+  ✓  80 [mobile-chromium] › e2e/social.spec.js:202:1 › social shell reports offline state and recovers when connectivity returns (994ms)
+  ✓  81 [mobile-chromium] › e2e/social.spec.js:213:1 › daily image quota disables only the exhausted category while chat text remains available (850ms)
+  -  82 [mobile-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 390
+  -  83 [mobile-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 390
+  -  84 [mobile-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 768
+  -  85 [mobile-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 768
+  -  86 [mobile-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 1440
+  -  87 [mobile-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 1440
+  ✓  88 [mobile-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus (1.5s)
+  -  89 [mobile-chromium] › e2e/staging-readonly.spec.js:5:1 › preserved staging batch and private media remain accessible only to authorized sessions
+  -  90 [mobile-chromium] › e2e/synthetic-owner-review.spec.js:42:1 › synthetic staging APIs expose the complete traceable owner-review network
+  -  91 [mobile-chromium] › e2e/synthetic-owner-review.spec.js:78:1 › NEAR-style social pages render populated synthetic data on desktop and mobile
+  -  92 [mobile-chromium] › e2e/synthetic-owner-review.spec.js:108:1 › admin overview and urgent queues render synthetic moderation samples
+
+  32 skipped
+  60 passed (2.2m)

@@ -1,0 +1,1753 @@
+
+Running 92 tests using 1 worker
+
+(node:96071) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 390px (3.9s)
+  ✓   2 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 768px (3.6s)
+  ✓   3 [desktop-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 1440px (4.3s)
+  ✓   4 [desktop-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth (742ms)
+  ✓   5 [desktop-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed (1.1s)
+  ✓   6 [desktop-chromium] › e2e/auth.spec.js:93:1 › post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations (692ms)
+  ✓   7 [desktop-chromium] › e2e/auth.spec.js:139:1 › privacy notice explains social identity data use (754ms)
+  ✓   8 [desktop-chromium] › e2e/auth.spec.js:148:1 › legal review pages disclose unresolved owner decisions (1.5s)
+  ✓   9 [desktop-chromium] › e2e/auth.spec.js:158:1 › account page redirects unauthenticated users to signup (694ms)
+  ✓  10 [desktop-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations (247ms)
+  ✘  11 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 390px (1.8m)
+(node:96222) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  12 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 768px (144ms)
+(node:96240) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  13 [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 1440px (133ms)
+(node:96246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  14 [desktop-chromium] › e2e/issue10-parity.spec.js:28:1 › failed portrait remains labelled; persistent auth navigation excludes Game (117ms)
+(node:96254) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  15 [desktop-chromium] › e2e/issue10-parity.spec.js:34:1 › fictional friendship accept/reject/request/block/unblock persists without server writes (119ms)
+  -  16 [desktop-chromium] › e2e/live-social.spec.js:81:1 › staging social APIs persist positive and negative non-media workflows
+  -  17 [desktop-chromium] › e2e/live-social.spec.js:159:1 › staging R2 gallery and chat media remain private and relationship-authorized
+  -  18 [desktop-chromium] › e2e/live-social.spec.js:261:1 › desktop and mobile render persisted staging profile, discovery, notifications, and reviews
+  -  19 [desktop-chromium] › e2e/live-social.spec.js:311:1 › synthetic account deletion queues owned R2 media and revokes access
+(node:96260) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  20 [desktop-chromium] › e2e/moderation.spec.js:48:1 › admin dashboard opens routine overview automatically and requires justification for restricted evidence (127ms)
+(node:96268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  21 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px (161ms)
+(node:96275) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  22 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px (527ms)
+(node:96282) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  23 [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px (360ms)
+(node:96291) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  24 [desktop-chromium] › e2e/social.spec.js:54:1 › root is the authenticated discovery entry while welcome retains marketing (220ms)
+(node:96298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  25 [desktop-chromium] › e2e/social.spec.js:63:1 › desktop social shell preserves discovery, friends, chat, reviews, and profile without game (191ms)
+(node:96304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -  26 [desktop-chromium] › e2e/social.spec.js:81:1 › mobile social shell uses bottom navigation and remains usable
+  ✘  27 [desktop-chromium] › e2e/social.spec.js:91:1 › disabled social environment reveals no member features (208ms)
+(node:96312) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  28 [desktop-chromium] › e2e/social.spec.js:99:1 › member profile routes are deep-linkable and preserve browser history (240ms)
+(node:96318) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  29 [desktop-chromium] › e2e/social.spec.js:111:1 › coarse live distance does not silently remove the server-authorized rating workflow (243ms)
+(node:96324) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  30 [desktop-chromium] › e2e/social.spec.js:120:1 › source header switches out discovery controls; gallery distinguishes loading failure from empty and retries (310ms)
+(node:96334) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  31 [desktop-chromium] › e2e/social.spec.js:139:1 › optional demo remains browser-only and contains no game (337ms)
+(node:96343) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  32 [desktop-chromium] › e2e/social.spec.js:149:1 › profile names cannot break out of text or media attributes (241ms)
+(node:96351) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  33 [desktop-chromium] › e2e/social.spec.js:170:1 › browser-only demo supports local gallery and chat image workflows (263ms)
+(node:96358) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  34 [desktop-chromium] › e2e/social.spec.js:202:1 › social shell reports offline state and recovers when connectivity returns (279ms)
+(node:96364) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  35 [desktop-chromium] › e2e/social.spec.js:213:1 › daily image quota disables only the exhausted category while chat text remains available (268ms)
+(node:96370) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  36 [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 390 (220ms)
+(node:96376) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  37 [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 390 (222ms)
+(node:96382) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  38 [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 768 (226ms)
+(node:96388) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  39 [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 768 (225ms)
+(node:96395) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  40 [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 1440 (239ms)
+(node:96401) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  41 [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 1440 (243ms)
+(node:96408) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  42 [desktop-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus (261ms)
+(node:96417) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -  43 [desktop-chromium] › e2e/staging-readonly.spec.js:5:1 › preserved staging batch and private media remain accessible only to authorized sessions
+  -  44 [desktop-chromium] › e2e/synthetic-owner-review.spec.js:42:1 › synthetic staging APIs expose the complete traceable owner-review network
+  -  45 [desktop-chromium] › e2e/synthetic-owner-review.spec.js:78:1 › NEAR-style social pages render populated synthetic data on desktop and mobile
+  -  46 [desktop-chromium] › e2e/synthetic-owner-review.spec.js:108:1 › admin overview and urgent queues render synthetic moderation samples
+(node:96424) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -  47 [mobile-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 390px
+  -  48 [mobile-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 768px
+  -  49 [mobile-chromium] › e2e/account-surfaces.spec.js:5:35 › account and protected Admin visual fixtures at 1440px
+  ✘  50 [mobile-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth (229ms)
+(node:96433) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  51 [mobile-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed (254ms)
+(node:96439) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  52 [mobile-chromium] › e2e/auth.spec.js:93:1 › post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations (256ms)
+(node:96445) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  53 [mobile-chromium] › e2e/auth.spec.js:139:1 › privacy notice explains social identity data use (241ms)
+(node:96452) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  54 [mobile-chromium] › e2e/auth.spec.js:148:1 › legal review pages disclose unresolved owner decisions (248ms)
+(node:96458) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  55 [mobile-chromium] › e2e/auth.spec.js:158:1 › account page redirects unauthenticated users to signup (558ms)
+(node:96467) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  56 [mobile-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations (72ms)
+(node:96468) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -  57 [mobile-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 390px
+  -  58 [mobile-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 768px
+  -  59 [mobile-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 1440px
+  ✘  60 [mobile-chromium] › e2e/issue10-parity.spec.js:28:1 › failed portrait remains labelled; persistent auth navigation excludes Game (281ms)
+(node:96477) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  61 [mobile-chromium] › e2e/issue10-parity.spec.js:34:1 › fictional friendship accept/reject/request/block/unblock persists without server writes (552ms)
+  -  62 [mobile-chromium] › e2e/live-social.spec.js:81:1 › staging social APIs persist positive and negative non-media workflows
+  -  63 [mobile-chromium] › e2e/live-social.spec.js:159:1 › staging R2 gallery and chat media remain private and relationship-authorized
+  -  64 [mobile-chromium] › e2e/live-social.spec.js:261:1 › desktop and mobile render persisted staging profile, discovery, notifications, and reviews
+  -  65 [mobile-chromium] › e2e/live-social.spec.js:311:1 › synthetic account deletion queues owned R2 media and revokes access
+(node:96486) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  66 [mobile-chromium] › e2e/moderation.spec.js:48:1 › admin dashboard opens routine overview automatically and requires justification for restricted evidence (402ms)
+(node:96492) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -  67 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px
+  -  68 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px
+  -  69 [mobile-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px
+  ✘  70 [mobile-chromium] › e2e/social.spec.js:54:1 › root is the authenticated discovery entry while welcome retains marketing (231ms)
+(node:96502) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  71 [mobile-chromium] › e2e/social.spec.js:63:1 › desktop social shell preserves discovery, friends, chat, reviews, and profile without game (323ms)
+(node:96508) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  72 [mobile-chromium] › e2e/social.spec.js:81:1 › mobile social shell uses bottom navigation and remains usable (316ms)
+(node:96514) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  73 [mobile-chromium] › e2e/social.spec.js:91:1 › disabled social environment reveals no member features (309ms)
+(node:96520) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  74 [mobile-chromium] › e2e/social.spec.js:99:1 › member profile routes are deep-linkable and preserve browser history (310ms)
+(node:96528) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  75 [mobile-chromium] › e2e/social.spec.js:111:1 › coarse live distance does not silently remove the server-authorized rating workflow (298ms)
+(node:96534) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  76 [mobile-chromium] › e2e/social.spec.js:120:1 › source header switches out discovery controls; gallery distinguishes loading failure from empty and retries (333ms)
+(node:96541) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  77 [mobile-chromium] › e2e/social.spec.js:139:1 › optional demo remains browser-only and contains no game (170ms)
+(node:96547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  78 [mobile-chromium] › e2e/social.spec.js:149:1 › profile names cannot break out of text or media attributes (171ms)
+(node:96553) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  79 [mobile-chromium] › e2e/social.spec.js:170:1 › browser-only demo supports local gallery and chat image workflows (151ms)
+(node:96559) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  80 [mobile-chromium] › e2e/social.spec.js:202:1 › social shell reports offline state and recovers when connectivity returns (1ms)
+(node:96565) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  81 [mobile-chromium] › e2e/social.spec.js:213:1 › daily image quota disables only the exhausted category while chat text remains available (145ms)
+(node:96579) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -  82 [mobile-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 390
+  -  83 [mobile-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 390
+  -  84 [mobile-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 768
+  -  85 [mobile-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 768
+  -  86 [mobile-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 1440
+  -  87 [mobile-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 1440
+  ✘  88 [mobile-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus (129ms)
+(node:96593) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  -  89 [mobile-chromium] › e2e/staging-readonly.spec.js:5:1 › preserved staging batch and private media remain accessible only to authorized sessions
+  -  90 [mobile-chromium] › e2e/synthetic-owner-review.spec.js:42:1 › synthetic staging APIs expose the complete traceable owner-review network
+  -  91 [mobile-chromium] › e2e/synthetic-owner-review.spec.js:78:1 › NEAR-style social pages render populated synthetic data on desktop and mobile
+  -  92 [mobile-chromium] › e2e/synthetic-owner-review.spec.js:108:1 › admin overview and urgent queues render synthetic moderation samples
+
+
+  1) [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 390px 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('#people-grid .photo-card')
+    Expected: 16
+    Received: 0
+
+    Call log:
+      - Expect "toHaveCount" locator('#people-grid .photo-card') with timeout 10000ms
+      - waiting for locator('#people-grid .photo-card')
+        3 × locator resolved to 0 elements
+          - unexpected value "0"
+      - Test timeout of 30000ms exceeded.
+
+
+       6 |     await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+       7 |     const writes=[];page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&r.method()!=='GET')writes.push(r.url());});
+    >  8 |     await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
+         |                                                                                 ^
+       9 |     const metrics=await page.locator('#people-grid').evaluate(e=>{
+      10 |       const c=getComputedStyle(e),card=e.querySelector('.photo-card'),main=document.querySelector('#app>main');
+      11 |       return {columns:c.gridTemplateColumns.split(' ').length,height:card.getBoundingClientRect().height,radius:getComputedStyle(card).borderRadius,padding:getComputedStyle(main).paddingLeft,background:getComputedStyle(document.body).backgroundColor,overflow:document.documentElement.scrollWidth>innerWidth};
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/issue10-parity.spec.js:8:81
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-v91-measure-b67d7--and-failure-recovery-390px-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/issue10-parity-v91-measure-b67d7--and-failure-recovery-390px-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-v91-measure-b67d7--and-failure-recovery-390px-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/issue10-parity-v91-measure-b67d7--and-failure-recovery-390px-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 768px 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+       6 |     await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+       7 |     const writes=[];page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&r.method()!=='GET')writes.push(r.url());});
+    >  8 |     await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
+         |                ^
+       9 |     const metrics=await page.locator('#people-grid').evaluate(e=>{
+      10 |       const c=getComputedStyle(e),card=e.querySelector('.photo-card'),main=document.querySelector('#app>main');
+      11 |       return {columns:c.gridTemplateColumns.split(' ').length,height:card.getBoundingClientRect().height,radius:getComputedStyle(card).borderRadius,padding:getComputedStyle(main).paddingLeft,background:getComputedStyle(document.body).backgroundColor,overflow:document.documentElement.scrollWidth>innerWidth};
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/issue10-parity.spec.js:8:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-v91-measure-5ed01--and-failure-recovery-768px-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/issue10-parity-v91-measure-5ed01--and-failure-recovery-768px-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-v91-measure-5ed01--and-failure-recovery-768px-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/issue10-parity-v91-measure-5ed01--and-failure-recovery-768px-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 1440px 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+       6 |     await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+       7 |     const writes=[];page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&r.method()!=='GET')writes.push(r.url());});
+    >  8 |     await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
+         |                ^
+       9 |     const metrics=await page.locator('#people-grid').evaluate(e=>{
+      10 |       const c=getComputedStyle(e),card=e.querySelector('.photo-card'),main=document.querySelector('#app>main');
+      11 |       return {columns:c.gridTemplateColumns.split(' ').length,height:card.getBoundingClientRect().height,radius:getComputedStyle(card).borderRadius,padding:getComputedStyle(main).paddingLeft,background:getComputedStyle(document.body).backgroundColor,overflow:document.documentElement.scrollWidth>innerWidth};
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/issue10-parity.spec.js:8:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-v91-measure-63733-and-failure-recovery-1440px-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/issue10-parity-v91-measure-63733-and-failure-recovery-1440px-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-v91-measure-63733-and-failure-recovery-1440px-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/issue10-parity-v91-measure-63733-and-failure-recovery-1440px-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [desktop-chromium] › e2e/issue10-parity.spec.js:28:1 › failed portrait remains labelled; persistent auth navigation excludes Game 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+      29 |   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+      30 |   await page.route('**/assets/demo/01.png',r=>r.abort());
+    > 31 |   await page.goto('/');await expect(page.locator('[data-image-error]').first()).toHaveAttribute('aria-label',/มะปราง/);
+         |              ^
+      32 |   await page.goto('/signup');await expect(page.locator('.auth-navigation a')).toHaveCount(5);await expect(page.locator('.auth-navigation')).not.toContainText('เกม');
+      33 | });
+      34 | test('fictional friendship accept/reject/request/block/unblock persists without server writes',async({page})=>{
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/issue10-parity.spec.js:31:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-failed-port-c62b6-th-navigation-excludes-Game-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/issue10-parity-failed-port-c62b6-th-navigation-excludes-Game-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-failed-port-c62b6-th-navigation-excludes-Game-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/issue10-parity-failed-port-c62b6-th-navigation-excludes-Game-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [desktop-chromium] › e2e/issue10-parity.spec.js:34:1 › fictional friendship accept/reject/request/block/unblock persists without server writes 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+      35 |   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+      36 |   const writes=[];page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&r.method()!=='GET')writes.push(r.url());});
+    > 37 |   await page.goto('/');await page.locator('#primary-nav [data-tab=friends]').click();
+         |              ^
+      38 |   await page.locator('#requests-grid [data-action=accept]').first().click();await expect(page.locator('#friends-grid .person-card')).toHaveCount(11);
+      39 |   await page.locator('#requests-grid [data-action=reject]').first().click();await expect(page.locator('#requests-grid .person-card')).toHaveCount(3);
+      40 |   await page.locator('#primary-nav [data-tab=near]').click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/issue10-parity.spec.js:37:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-fictional-f-d469d-sists-without-server-writes-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/issue10-parity-fictional-f-d469d-sists-without-server-writes-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-fictional-f-d469d-sists-without-server-writes-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/issue10-parity-fictional-f-d469d-sists-without-server-writes-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [desktop-chromium] › e2e/moderation.spec.js:48:1 › admin dashboard opens routine overview automatically and requires justification for restricted evidence 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/moderation.html
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/moderation.html", waiting until "load"
+
+
+      49 |   const decisions = [];
+      50 |   page.on("request", (request) => { if (request.url().endsWith("/api/social/moderation/media") && request.method() === "POST") decisions.push(request.postDataJSON()); });
+    > 51 |   await page.goto("/app/moderation.html");
+         |              ^
+      52 |   await expect(page).toHaveTitle("ศูนย์ดูแลสื่อ · ChatGun");
+      53 |   await expect(page.locator("#moderation-stats")).toContainText("รายงานผู้ใช้");
+      54 |   await expect(page.getByLabel("วัตถุประสงค์เฉพาะกรณี")).toHaveCount(0);
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/moderation.spec.js:51:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/moderation-admin-dashboard-94f09-ion-for-restricted-evidence-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/moderation-admin-dashboard-94f09-ion-for-restricted-evidence-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/moderation-admin-dashboard-94f09-ion-for-restricted-evidence-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/moderation-admin-dashboard-94f09-ion-for-restricted-evidence-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/?demo=1
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/?demo=1", waiting until "load"
+
+
+      13 |     page.on("request",r=>{if(new URL(r.url()).pathname.startsWith("/api/")){if(!["GET","HEAD"].includes(r.method()))apiWrites.push(r.url());else memberReads.push(new URL(r.url()).pathname);}});
+      14 |     const shot=async(name)=>{await page.screenshot({path:resolve(directory,`${name}-${width}.png`),fullPage:!["member-profile","member-gallery","gallery-post"].includes(name)});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);};
+    > 15 |     await page.goto("/?demo=1");
+         |                ^
+      16 |     await expect(page.locator("#demo-banner")).toContainText("สมมติ");
+      17 |     await expect(page.locator("#people-grid .person-card")).toHaveCount(16);
+      18 |     await expect.poll(()=>page.locator("#people-grid img").evaluateAll(images=>images.filter(i=>i.complete&&i.naturalWidth>0).length)).toBe(16);
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/owner-release.spec.js:15:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/owner-release-owner-packag-e8cfa-network-and-layout-at-390px-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/owner-release-owner-packag-e8cfa-network-and-layout-at-390px-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/owner-release-owner-packag-e8cfa-network-and-layout-at-390px-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/owner-release-owner-packag-e8cfa-network-and-layout-at-390px-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/?demo=1
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/?demo=1", waiting until "load"
+
+
+      13 |     page.on("request",r=>{if(new URL(r.url()).pathname.startsWith("/api/")){if(!["GET","HEAD"].includes(r.method()))apiWrites.push(r.url());else memberReads.push(new URL(r.url()).pathname);}});
+      14 |     const shot=async(name)=>{await page.screenshot({path:resolve(directory,`${name}-${width}.png`),fullPage:!["member-profile","member-gallery","gallery-post"].includes(name)});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);};
+    > 15 |     await page.goto("/?demo=1");
+         |                ^
+      16 |     await expect(page.locator("#demo-banner")).toContainText("สมมติ");
+      17 |     await expect(page.locator("#people-grid .person-card")).toHaveCount(16);
+      18 |     await expect.poll(()=>page.locator("#people-grid img").evaluateAll(images=>images.filter(i=>i.complete&&i.naturalWidth>0).length)).toBe(16);
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/owner-release.spec.js:15:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/owner-release-owner-packag-4ea3c-network-and-layout-at-768px-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/owner-release-owner-packag-4ea3c-network-and-layout-at-768px-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/owner-release-owner-packag-4ea3c-network-and-layout-at-768px-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/owner-release-owner-packag-4ea3c-network-and-layout-at-768px-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/?demo=1
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/?demo=1", waiting until "load"
+
+
+      13 |     page.on("request",r=>{if(new URL(r.url()).pathname.startsWith("/api/")){if(!["GET","HEAD"].includes(r.method()))apiWrites.push(r.url());else memberReads.push(new URL(r.url()).pathname);}});
+      14 |     const shot=async(name)=>{await page.screenshot({path:resolve(directory,`${name}-${width}.png`),fullPage:!["member-profile","member-gallery","gallery-post"].includes(name)});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);};
+    > 15 |     await page.goto("/?demo=1");
+         |                ^
+      16 |     await expect(page.locator("#demo-banner")).toContainText("สมมติ");
+      17 |     await expect(page.locator("#people-grid .person-card")).toHaveCount(16);
+      18 |     await expect.poll(()=>page.locator("#people-grid img").evaluateAll(images=>images.filter(i=>i.complete&&i.naturalWidth>0).length)).toBe(16);
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/owner-release.spec.js:15:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/owner-release-owner-packag-d09cd-etwork-and-layout-at-1440px-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/owner-release-owner-packag-d09cd-etwork-and-layout-at-1440px-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/owner-release-owner-packag-d09cd-etwork-and-layout-at-1440px-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/owner-release-owner-packag-d09cd-etwork-and-layout-at-1440px-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [desktop-chromium] › e2e/social.spec.js:54:1 › root is the authenticated discovery entry while welcome retains marketing 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+      53 |
+      54 | test("root is the authenticated discovery entry while welcome retains marketing", async ({ page }) => {
+    > 55 |   await page.goto("/");
+         |              ^
+      56 |   await expect(page).toHaveURL(/\/$/u);
+      57 |   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();
+      58 |   await expect(page.locator("#people-grid .person-card")).toHaveCount(2);
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:55:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-root-is-the-authent-defb5-e-welcome-retains-marketing-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-root-is-the-authent-defb5-e-welcome-retains-marketing-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-root-is-the-authent-defb5-e-welcome-retains-marketing-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-root-is-the-authent-defb5-e-welcome-retains-marketing-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [desktop-chromium] › e2e/social.spec.js:63:1 › desktop social shell preserves discovery, friends, chat, reviews, and profile without game 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      62 |
+      63 | test("desktop social shell preserves discovery, friends, chat, reviews, and profile without game", async ({ page }, testInfo) => {
+    > 64 |   await page.goto("/app/");
+         |              ^
+      65 |   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();
+      66 |   await expect(page.getByText("มิน")).toBeVisible();
+      67 |   await expect(page.getByText("ต้น")).toBeVisible();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:64:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-desktop-social-shel-810bc-ws-and-profile-without-game-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-desktop-social-shel-810bc-ws-and-profile-without-game-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-desktop-social-shel-810bc-ws-and-profile-without-game-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-desktop-social-shel-810bc-ws-and-profile-without-game-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [desktop-chromium] › e2e/social.spec.js:91:1 › disabled social environment reveals no member features 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      92 |   await page.unroute("**/api/**");
+      93 |   await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false }) }));
+    > 94 |   await page.goto("/app/");
+         |              ^
+      95 |   await expect(page.getByRole("heading", { name: "ChatGun Social ยังไม่เปิดใช้งาน" })).toBeVisible();
+      96 |   await expect(page.locator("#social-view")).toBeHidden();
+      97 | });
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:94:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-disabled-social-env-b4b0d--reveals-no-member-features-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-disabled-social-env-b4b0d--reveals-no-member-features-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-disabled-social-env-b4b0d--reveals-no-member-features-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-disabled-social-env-b4b0d--reveals-no-member-features-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [desktop-chromium] › e2e/social.spec.js:99:1 › member profile routes are deep-linkable and preserve browser history 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/people/near-1
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/people/near-1", waiting until "load"
+
+
+       98 |
+       99 | test("member profile routes are deep-linkable and preserve browser history", async ({ page }) => {
+    > 100 |   await page.goto("/app/people/near-1");
+          |              ^
+      101 |   await expect(page).toHaveURL(/\/app\/people\/near-1$/u);
+      102 |   await expect(page.locator("#profile-dialog")).toBeVisible();
+      103 |   await expect(page.locator("#profile-dialog").getByRole("heading", { name: "มิน",exact:true })).toBeVisible();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:100:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-member-profile-rout-f4bca-nd-preserve-browser-history-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-member-profile-rout-f4bca-nd-preserve-browser-history-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-member-profile-rout-f4bca-nd-preserve-browser-history-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-member-profile-rout-f4bca-nd-preserve-browser-history-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [desktop-chromium] › e2e/social.spec.js:111:1 › coarse live distance does not silently remove the server-authorized rating workflow 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/people/near-2
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/people/near-2", waiting until "load"
+
+
+      111 | test('coarse live distance does not silently remove the server-authorized rating workflow',async({page})=>{
+      112 |   // The live API never sends the exact 100m location threshold or can_rate.
+    > 113 |   await page.goto('/app/people/near-2');
+          |              ^
+      114 |   await expect(page.locator('.full-profile-actions [data-action=rate]')).toBeEnabled();
+      115 |   await page.locator('.full-profile-actions [data-action=rate]').click();
+      116 |   await expect(page.locator('#rating-dialog')).toBeVisible();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:113:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-coarse-live-distanc-48a57--authorized-rating-workflow-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-coarse-live-distanc-48a57--authorized-rating-workflow-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-coarse-live-distanc-48a57--authorized-rating-workflow-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-coarse-live-distanc-48a57--authorized-rating-workflow-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [desktop-chromium] › e2e/social.spec.js:120:1 › source header switches out discovery controls; gallery distinguishes loading failure from empty and retries 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      119 |
+      120 | test('source header switches out discovery controls; gallery distinguishes loading failure from empty and retries',async({page})=>{
+    > 121 |   await page.goto('/app/');await page.locator('#primary-nav [data-tab=friends]').click();
+          |              ^
+      122 |   await expect(page.locator('.toolbar .discovery-controls')).toHaveCount(0);
+      123 |   await expect(page.locator('.toolbar>.toolbar-page')).toHaveText('เพื่อน');
+      124 |   await page.locator('#primary-nav [data-tab=profile]').click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:121:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-source-header-switc-943dd-lure-from-empty-and-retries-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-source-header-switc-943dd-lure-from-empty-and-retries-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-source-header-switc-943dd-lure-from-empty-and-retries-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-source-header-switc-943dd-lure-from-empty-and-retries-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [desktop-chromium] › e2e/social.spec.js:139:1 › optional demo remains browser-only and contains no game 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      140 |   await page.unroute("**/api/**");
+      141 |   await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false, demoModeEnabled: true }) }));
+    > 142 |   await page.goto("/app/");
+          |              ^
+      143 |   await page.getByRole("button", { name: "ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์" }).click();
+      144 |   await expect(page.locator("#demo-banner")).toBeVisible();
+      145 |   await expect(page.locator("#people-grid").getByText("มะปราง")).toBeVisible();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:142:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-optional-demo-remai-54678-r-only-and-contains-no-game-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-optional-demo-remai-54678-r-only-and-contains-no-game-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-optional-demo-remai-54678-r-only-and-contains-no-game-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-optional-demo-remai-54678-r-only-and-contains-no-game-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [desktop-chromium] › e2e/social.spec.js:149:1 › profile names cannot break out of text or media attributes 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      150 |   await page.unroute("**/api/**");
+      151 |   await page.route("**/api/social/config",route=>route.fulfill({json:{...config,socialAppEnabled:false,demoModeEnabled:true}}));
+    > 152 |   await page.goto("/app/");
+          |              ^
+      153 |   await page.getByRole("button",{name:"ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์"}).click();
+      154 |   await page.locator('#primary-nav [data-tab="profile"]').click();
+      155 |   await page.locator('#manage-gallery').click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:152:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-profile-names-canno-1692e-of-text-or-media-attributes-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-profile-names-canno-1692e-of-text-or-media-attributes-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-profile-names-canno-1692e-of-text-or-media-attributes-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-profile-names-canno-1692e-of-text-or-media-attributes-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [desktop-chromium] › e2e/social.spec.js:170:1 › browser-only demo supports local gallery and chat image workflows 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      171 |   await page.unroute("**/api/**");
+      172 |   await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false, demoModeEnabled: true }) }));
+    > 173 |   await page.goto("/app/");
+          |              ^
+      174 |   await page.getByRole("button", { name: "ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์" }).click();
+      175 |   const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Z0ioAAAAASUVORK5CYII=", "base64");
+      176 |
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:173:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-browser-only-demo-s-3ba1f-ry-and-chat-image-workflows-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-browser-only-demo-s-3ba1f-ry-and-chat-image-workflows-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-browser-only-demo-s-3ba1f-ry-and-chat-image-workflows-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-browser-only-demo-s-3ba1f-ry-and-chat-image-workflows-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [desktop-chromium] › e2e/social.spec.js:202:1 › social shell reports offline state and recovers when connectivity returns 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      201 |
+      202 | test("social shell reports offline state and recovers when connectivity returns", async ({ page, context }) => {
+    > 203 |   await page.goto("/app/");
+          |              ^
+      204 |   await expect(page.locator("#app")).toHaveAttribute("aria-busy", "false");
+      205 |   await context.setOffline(true);
+      206 |   await page.evaluate(() => window.dispatchEvent(new Event("offline")));
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:203:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-social-shell-report-e50cc-s-when-connectivity-returns-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-social-shell-report-e50cc-s-when-connectivity-returns-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-social-shell-report-e50cc-s-when-connectivity-returns-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-social-shell-report-e50cc-s-when-connectivity-returns-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [desktop-chromium] › e2e/social.spec.js:213:1 › daily image quota disables only the exhausted category while chat text remains available 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      228 |     }),
+      229 |   }));
+    > 230 |   await page.goto("/app/");
+          |              ^
+      231 |   await page.locator('#primary-nav button[data-tab="profile"]').click();
+      232 |   await expect(page.locator("#gallery-upload-quota")).toContainText("อัปโหลดรูปแกลเลอรีครบขีดจำกัดรายวันแล้ว");
+      233 |   await expect(page.locator('#gallery-upload input[type="file"]')).toBeDisabled();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:230:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-daily-image-quota-d-a2a22-chat-text-remains-available-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-daily-image-quota-d-a2a22-chat-text-remains-available-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-daily-image-quota-d-a2a22-chat-text-remains-available-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-daily-image-quota-d-a2a22-chat-text-remains-available-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 390 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+       8 |   page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&!['GET','HEAD'].includes(r.method()))writes.push(r.url());});
+       9 |   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+    > 10 |   await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
+         |              ^
+      11 |   const card=page.locator('#people-grid .photo-card').first();
+      12 |   await expect(card.locator(':scope > .card-open')).toHaveCount(1);
+      13 |   await expect(card.locator(':scope > .card-photo > .profile-photo')).toHaveCount(1);
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/source-components.spec.js:10:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-bc480-and-own-gallery-journey-390-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/source-components-canonica-bc480-and-own-gallery-journey-390-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-bc480-and-own-gallery-journey-390-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/source-components-canonica-bc480-and-own-gallery-journey-390-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 390 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+      55 |   await page.setViewportSize({width,height});
+      56 |   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+    > 57 |   await page.goto('/');await page.locator('#primary-nav [data-tab=profile]').click();await page.locator('#manage-gallery').click();
+         |              ^
+      58 |   const before=await page.locator('#gallery-upload-quota').textContent();
+      59 |   page.on('dialog',d=>d.accept());
+      60 |   await page.locator('#my-gallery [data-gallery-action=delete]').first().click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/source-components.spec.js:57:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-aa37d-ete-and-no-quota-refund-390-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/source-components-canonica-aa37d-ete-and-no-quota-refund-390-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-aa37d-ete-and-no-quota-refund-390-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/source-components-canonica-aa37d-ete-and-no-quota-refund-390-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 768 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+       8 |   page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&!['GET','HEAD'].includes(r.method()))writes.push(r.url());});
+       9 |   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+    > 10 |   await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
+         |              ^
+      11 |   const card=page.locator('#people-grid .photo-card').first();
+      12 |   await expect(card.locator(':scope > .card-open')).toHaveCount(1);
+      13 |   await expect(card.locator(':scope > .card-photo > .profile-photo')).toHaveCount(1);
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/source-components.spec.js:10:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-41e6c-and-own-gallery-journey-768-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/source-components-canonica-41e6c-and-own-gallery-journey-768-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-41e6c-and-own-gallery-journey-768-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/source-components-canonica-41e6c-and-own-gallery-journey-768-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 768 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+      55 |   await page.setViewportSize({width,height});
+      56 |   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+    > 57 |   await page.goto('/');await page.locator('#primary-nav [data-tab=profile]').click();await page.locator('#manage-gallery').click();
+         |              ^
+      58 |   const before=await page.locator('#gallery-upload-quota').textContent();
+      59 |   page.on('dialog',d=>d.accept());
+      60 |   await page.locator('#my-gallery [data-gallery-action=delete]').first().click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/source-components.spec.js:57:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-a9e7d-ete-and-no-quota-refund-768-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/source-components-canonica-a9e7d-ete-and-no-quota-refund-768-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-a9e7d-ete-and-no-quota-refund-768-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/source-components-canonica-a9e7d-ete-and-no-quota-refund-768-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25) [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 1440 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+       8 |   page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&!['GET','HEAD'].includes(r.method()))writes.push(r.url());});
+       9 |   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+    > 10 |   await page.goto('/');await expect(page.locator('#people-grid .photo-card')).toHaveCount(16);
+         |              ^
+      11 |   const card=page.locator('#people-grid .photo-card').first();
+      12 |   await expect(card.locator(':scope > .card-open')).toHaveCount(1);
+      13 |   await expect(card.locator(':scope > .card-photo > .profile-photo')).toHaveCount(1);
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/source-components.spec.js:10:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-635ff-nd-own-gallery-journey-1440-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/source-components-canonica-635ff-nd-own-gallery-journey-1440-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-635ff-nd-own-gallery-journey-1440-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/source-components-canonica-635ff-nd-own-gallery-journey-1440-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  26) [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 1440 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+      55 |   await page.setViewportSize({width,height});
+      56 |   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+    > 57 |   await page.goto('/');await page.locator('#primary-nav [data-tab=profile]').click();await page.locator('#manage-gallery').click();
+         |              ^
+      58 |   const before=await page.locator('#gallery-upload-quota').textContent();
+      59 |   page.on('dialog',d=>d.accept());
+      60 |   await page.locator('#my-gallery [data-gallery-action=delete]').first().click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/source-components.spec.js:57:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-d28b8-te-and-no-quota-refund-1440-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/source-components-canonica-d28b8-te-and-no-quota-refund-1440-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-canonica-d28b8-te-and-no-quota-refund-1440-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/source-components-canonica-d28b8-te-and-no-quota-refund-1440-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  27) [desktop-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+      79 |  await page.route('**/assets/demo/network.json',async r=>{const response=await r.fetch(),data=await response.json();data.profiles[0].name='ชื่อสมมติสำหรับทดสอบชื่อภาษาไทยที่ยาวเป็นพิเศษ';data.profiles[0].bio='ชอบแลกเปลี่ยนเรื่องหนังสือและดนตรี '.repeat(8);await r.fulfill({json:data});});
+      80 |  await page.route('**/assets/demo/01.png',r=>r.abort());
+    > 81 |  await page.goto('/');const card=page.locator('#people-grid .photo-card').first();
+         |             ^
+      82 |  await expect(card.locator('[data-image-error]')).toHaveAttribute('aria-label',/ชื่อสมมติ/);
+      83 |  expect(await card.evaluate(e=>e.scrollHeight<=e.clientHeight)).toBe(true);
+      84 |  await card.locator('.card-open').focus();await page.keyboard.press('Enter');
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/source-components.spec.js:81:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-source-c-a2d66-s-and-keyboard-return-focus-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/source-components-source-c-a2d66-s-and-keyboard-return-focus-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-source-c-a2d66-s-and-keyboard-return-focus-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/source-components-source-c-a2d66-s-and-keyboard-return-focus-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  28) [mobile-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/signup.html
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/signup.html", waiting until "load"
+
+
+      53 |   }));
+      54 |
+    > 55 |   await page.goto("/signup.html");
+         |              ^
+      56 |   await expect(page.getByRole("status")).toContainText("ไม่สามารถเชื่อมต่อระบบยืนยันความปลอดภัยได้");
+      57 |   const retry = page.getByRole("button", { name: "ลองโหลดระบบยืนยันอีกครั้ง" });
+      58 |   await expect(retry).toBeVisible();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:55:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/auth-signup-explains-a-Tur-c259c-ai-and-retries-before-OAuth-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  29) [mobile-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/signup.html
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/signup.html", waiting until "load"
+
+
+      69 |     if (/Content Security Policy directive/iu.test(entry.text())) cspErrors.push(entry.text());
+      70 |   });
+    > 71 |   await page.goto("/signup.html");
+         |              ^
+      72 |   await expect(page).toHaveTitle("สมัครสมาชิก | ChatGun");
+      73 |   await expect(page.getByRole("heading", { name: "เข้าสู่ระบบด้วยบัญชีเดิม" })).toBeVisible();
+      74 |   await expect(page.getByText("การสมัครบัญชีใหม่ยังไม่เปิดเป็นสาธารณะ")).toBeVisible();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:71:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-signup-permits-existi-9a111-registration-remains-closed-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/auth-signup-permits-existi-9a111-registration-remains-closed-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-signup-permits-existi-9a111-registration-remains-closed-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/auth-signup-permits-existi-9a111-registration-remains-closed-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  30) [mobile-chromium] › e2e/auth.spec.js:93:1 › post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/acceptance
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/acceptance", waiting until "load"
+
+
+      111 |   await page.route("**/app/?onboarding=1", (route) => route.fulfill({ status: 200, contentType: "text/html", body: "<h1>Member Onboarding</h1>" }));
+      112 |
+    > 113 |   await page.goto("/acceptance");
+          |              ^
+      114 |   await expect(page.getByRole("heading", { name: "ยืนยันก่อนเริ่มใช้งาน" })).toBeVisible();
+      115 |   const adult = page.getByLabel("ข้าพเจ้าขอยืนยันว่ามีอายุ 18 ปีบริบูรณ์ขึ้นไป");
+      116 |   const policy = page.getByLabel(/ข้าพเจ้ายอมรับ/u);
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:113:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-post-OAuth-acceptance-9159d-ly-after-both-confirmations-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/auth-post-OAuth-acceptance-9159d-ly-after-both-confirmations-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-post-OAuth-acceptance-9159d-ly-after-both-confirmations-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/auth-post-OAuth-acceptance-9159d-ly-after-both-confirmations-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  31) [mobile-chromium] › e2e/auth.spec.js:139:1 › privacy notice explains social identity data use 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/privacy.html
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/privacy.html", waiting until "load"
+
+
+      138 |
+      139 | test("privacy notice explains social identity data use", async ({ page }) => {
+    > 140 |   await page.goto("/privacy.html");
+          |              ^
+      141 |   await expect(page).toHaveTitle("นโยบายความเป็นส่วนตัว | ChatGun");
+      142 |   await expect(page.getByRole("heading", { name: "ข้อมูลที่เราเก็บ" })).toBeVisible();
+      143 |   await expect(page.getByText(/Google, Facebook หรือ LINE/u)).toBeVisible();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:140:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-privacy-notice-explains-social-identity-data-use-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/auth-privacy-notice-explains-social-identity-data-use-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-privacy-notice-explains-social-identity-data-use-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/auth-privacy-notice-explains-social-identity-data-use-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  32) [mobile-chromium] › e2e/auth.spec.js:148:1 › legal review pages disclose unresolved owner decisions 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/terms.html
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/terms.html", waiting until "load"
+
+
+      147 |
+      148 | test("legal review pages disclose unresolved owner decisions", async ({ page }) => {
+    > 149 |   await page.goto("/terms.html");
+          |              ^
+      150 |   await expect(page).toHaveTitle("ข้อกำหนดการใช้บริการ | ChatGun");
+      151 |   await expect(page.getByText("ฉบับร่างสำหรับเจ้าของบริการตรวจสอบ:")).toBeVisible();
+      152 |
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:149:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-legal-review-pages-disclose-unresolved-owner-decisions-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/auth-legal-review-pages-disclose-unresolved-owner-decisions-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-legal-review-pages-disclose-unresolved-owner-decisions-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/auth-legal-review-pages-disclose-unresolved-owner-decisions-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  33) [mobile-chromium] › e2e/auth.spec.js:158:1 › account page redirects unauthenticated users to signup 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/account.html
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/account.html", waiting until "load"
+
+
+      157 |
+      158 | test("account page redirects unauthenticated users to signup", async ({ page }) => {
+    > 159 |   await page.goto("/account.html");
+          |              ^
+      160 |   await expect(page).toHaveURL(/\/signup(?:\.html)?$/u);
+      161 |   await expect(page.getByRole("heading", { name: "เข้าสู่ระบบด้วยบัญชีเดิม" })).toBeVisible();
+      162 | });
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:159:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-account-page-redirects-unauthenticated-users-to-signup-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/auth-account-page-redirects-unauthenticated-users-to-signup-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-account-page-redirects-unauthenticated-users-to-signup-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/auth-account-page-redirects-unauthenticated-users-to-signup-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  34) [mobile-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations 
+
+    Error: apiRequestContext.get: getaddrinfo ENOTFOUND codex-chatgun-release-candid.chatgun.pages.dev
+    Call log:
+      - → GET https://codex-chatgun-release-candid.chatgun.pages.dev/api/auth/config
+        - user-agent: Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1
+        - accept: */*
+        - accept-encoding: gzip,deflate,br
+
+
+      163 |
+      164 | test("Pages Functions expose secure config and reject cross-origin mutations", async ({ request, baseURL }) => {
+    > 165 |   const configResponse = await request.get("/api/auth/config");
+          |                                        ^
+      166 |   expect(configResponse.status()).toBe(200);
+      167 |   expect(configResponse.headers()["cache-control"]).toBe("no-store");
+      168 |   expect(configResponse.headers()["x-content-type-options"]).toBe("nosniff");
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/auth.spec.js:165:40
+
+    Error Context: test-results/components-final-0a4bd1d/auth-Pages-Functions-expos-0d0a0-ject-cross-origin-mutations-mobile-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/auth-Pages-Functions-expos-0d0a0-ject-cross-origin-mutations-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/auth-Pages-Functions-expos-0d0a0-ject-cross-origin-mutations-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  35) [mobile-chromium] › e2e/issue10-parity.spec.js:28:1 › failed portrait remains labelled; persistent auth navigation excludes Game 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+      29 |   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+      30 |   await page.route('**/assets/demo/01.png',r=>r.abort());
+    > 31 |   await page.goto('/');await expect(page.locator('[data-image-error]').first()).toHaveAttribute('aria-label',/มะปราง/);
+         |              ^
+      32 |   await page.goto('/signup');await expect(page.locator('.auth-navigation a')).toHaveCount(5);await expect(page.locator('.auth-navigation')).not.toContainText('เกม');
+      33 | });
+      34 | test('fictional friendship accept/reject/request/block/unblock persists without server writes',async({page})=>{
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/issue10-parity.spec.js:31:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-failed-port-c62b6-th-navigation-excludes-Game-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/issue10-parity-failed-port-c62b6-th-navigation-excludes-Game-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-failed-port-c62b6-th-navigation-excludes-Game-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/issue10-parity-failed-port-c62b6-th-navigation-excludes-Game-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  36) [mobile-chromium] › e2e/issue10-parity.spec.js:34:1 › fictional friendship accept/reject/request/block/unblock persists without server writes 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+      35 |   await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false,demoModeEnabled:true,demoAutoStartEnabled:true}}));
+      36 |   const writes=[];page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&r.method()!=='GET')writes.push(r.url());});
+    > 37 |   await page.goto('/');await page.locator('#primary-nav [data-tab=friends]').click();
+         |              ^
+      38 |   await page.locator('#requests-grid [data-action=accept]').first().click();await expect(page.locator('#friends-grid .person-card')).toHaveCount(11);
+      39 |   await page.locator('#requests-grid [data-action=reject]').first().click();await expect(page.locator('#requests-grid .person-card')).toHaveCount(3);
+      40 |   await page.locator('#primary-nav [data-tab=near]').click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/issue10-parity.spec.js:37:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-fictional-f-d469d-sists-without-server-writes-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/issue10-parity-fictional-f-d469d-sists-without-server-writes-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/issue10-parity-fictional-f-d469d-sists-without-server-writes-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/issue10-parity-fictional-f-d469d-sists-without-server-writes-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  37) [mobile-chromium] › e2e/moderation.spec.js:48:1 › admin dashboard opens routine overview automatically and requires justification for restricted evidence 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/moderation.html
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/moderation.html", waiting until "load"
+
+
+      49 |   const decisions = [];
+      50 |   page.on("request", (request) => { if (request.url().endsWith("/api/social/moderation/media") && request.method() === "POST") decisions.push(request.postDataJSON()); });
+    > 51 |   await page.goto("/app/moderation.html");
+         |              ^
+      52 |   await expect(page).toHaveTitle("ศูนย์ดูแลสื่อ · ChatGun");
+      53 |   await expect(page.locator("#moderation-stats")).toContainText("รายงานผู้ใช้");
+      54 |   await expect(page.getByLabel("วัตถุประสงค์เฉพาะกรณี")).toHaveCount(0);
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/moderation.spec.js:51:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/moderation-admin-dashboard-94f09-ion-for-restricted-evidence-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/moderation-admin-dashboard-94f09-ion-for-restricted-evidence-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/moderation-admin-dashboard-94f09-ion-for-restricted-evidence-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/moderation-admin-dashboard-94f09-ion-for-restricted-evidence-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  38) [mobile-chromium] › e2e/social.spec.js:54:1 › root is the authenticated discovery entry while welcome retains marketing 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+      53 |
+      54 | test("root is the authenticated discovery entry while welcome retains marketing", async ({ page }) => {
+    > 55 |   await page.goto("/");
+         |              ^
+      56 |   await expect(page).toHaveURL(/\/$/u);
+      57 |   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();
+      58 |   await expect(page.locator("#people-grid .person-card")).toHaveCount(2);
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:55:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-root-is-the-authent-defb5-e-welcome-retains-marketing-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-root-is-the-authent-defb5-e-welcome-retains-marketing-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-root-is-the-authent-defb5-e-welcome-retains-marketing-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-root-is-the-authent-defb5-e-welcome-retains-marketing-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  39) [mobile-chromium] › e2e/social.spec.js:63:1 › desktop social shell preserves discovery, friends, chat, reviews, and profile without game 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      62 |
+      63 | test("desktop social shell preserves discovery, friends, chat, reviews, and profile without game", async ({ page }, testInfo) => {
+    > 64 |   await page.goto("/app/");
+         |              ^
+      65 |   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();
+      66 |   await expect(page.getByText("มิน")).toBeVisible();
+      67 |   await expect(page.getByText("ต้น")).toBeVisible();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:64:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-desktop-social-shel-810bc-ws-and-profile-without-game-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-desktop-social-shel-810bc-ws-and-profile-without-game-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-desktop-social-shel-810bc-ws-and-profile-without-game-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-desktop-social-shel-810bc-ws-and-profile-without-game-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  40) [mobile-chromium] › e2e/social.spec.js:81:1 › mobile social shell uses bottom navigation and remains usable 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      81 | test("mobile social shell uses bottom navigation and remains usable", async ({ page }, testInfo) => {
+      82 |   test.skip(testInfo.project.name !== "mobile-chromium", "mobile-only layout check");
+    > 83 |   await page.goto("/app/");
+         |              ^
+      84 |   await expect(page.locator(".sidebar")).toBeVisible();
+      85 |   await expect(page.locator("#people-grid .person-card")).toHaveCount(2);
+      86 |   await page.locator('#primary-nav button[data-tab="profile"]').click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:83:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-mobile-social-shell-48531-vigation-and-remains-usable-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-mobile-social-shell-48531-vigation-and-remains-usable-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-mobile-social-shell-48531-vigation-and-remains-usable-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-mobile-social-shell-48531-vigation-and-remains-usable-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  41) [mobile-chromium] › e2e/social.spec.js:91:1 › disabled social environment reveals no member features 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      92 |   await page.unroute("**/api/**");
+      93 |   await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false }) }));
+    > 94 |   await page.goto("/app/");
+         |              ^
+      95 |   await expect(page.getByRole("heading", { name: "ChatGun Social ยังไม่เปิดใช้งาน" })).toBeVisible();
+      96 |   await expect(page.locator("#social-view")).toBeHidden();
+      97 | });
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:94:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-disabled-social-env-b4b0d--reveals-no-member-features-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-disabled-social-env-b4b0d--reveals-no-member-features-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-disabled-social-env-b4b0d--reveals-no-member-features-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-disabled-social-env-b4b0d--reveals-no-member-features-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  42) [mobile-chromium] › e2e/social.spec.js:99:1 › member profile routes are deep-linkable and preserve browser history 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/people/near-1
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/people/near-1", waiting until "load"
+
+
+       98 |
+       99 | test("member profile routes are deep-linkable and preserve browser history", async ({ page }) => {
+    > 100 |   await page.goto("/app/people/near-1");
+          |              ^
+      101 |   await expect(page).toHaveURL(/\/app\/people\/near-1$/u);
+      102 |   await expect(page.locator("#profile-dialog")).toBeVisible();
+      103 |   await expect(page.locator("#profile-dialog").getByRole("heading", { name: "มิน",exact:true })).toBeVisible();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:100:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-member-profile-rout-f4bca-nd-preserve-browser-history-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-member-profile-rout-f4bca-nd-preserve-browser-history-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-member-profile-rout-f4bca-nd-preserve-browser-history-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-member-profile-rout-f4bca-nd-preserve-browser-history-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  43) [mobile-chromium] › e2e/social.spec.js:111:1 › coarse live distance does not silently remove the server-authorized rating workflow 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/people/near-2
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/people/near-2", waiting until "load"
+
+
+      111 | test('coarse live distance does not silently remove the server-authorized rating workflow',async({page})=>{
+      112 |   // The live API never sends the exact 100m location threshold or can_rate.
+    > 113 |   await page.goto('/app/people/near-2');
+          |              ^
+      114 |   await expect(page.locator('.full-profile-actions [data-action=rate]')).toBeEnabled();
+      115 |   await page.locator('.full-profile-actions [data-action=rate]').click();
+      116 |   await expect(page.locator('#rating-dialog')).toBeVisible();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:113:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-coarse-live-distanc-48a57--authorized-rating-workflow-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-coarse-live-distanc-48a57--authorized-rating-workflow-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-coarse-live-distanc-48a57--authorized-rating-workflow-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-coarse-live-distanc-48a57--authorized-rating-workflow-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  44) [mobile-chromium] › e2e/social.spec.js:120:1 › source header switches out discovery controls; gallery distinguishes loading failure from empty and retries 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      119 |
+      120 | test('source header switches out discovery controls; gallery distinguishes loading failure from empty and retries',async({page})=>{
+    > 121 |   await page.goto('/app/');await page.locator('#primary-nav [data-tab=friends]').click();
+          |              ^
+      122 |   await expect(page.locator('.toolbar .discovery-controls')).toHaveCount(0);
+      123 |   await expect(page.locator('.toolbar>.toolbar-page')).toHaveText('เพื่อน');
+      124 |   await page.locator('#primary-nav [data-tab=profile]').click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:121:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-source-header-switc-943dd-lure-from-empty-and-retries-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-source-header-switc-943dd-lure-from-empty-and-retries-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-source-header-switc-943dd-lure-from-empty-and-retries-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-source-header-switc-943dd-lure-from-empty-and-retries-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  45) [mobile-chromium] › e2e/social.spec.js:139:1 › optional demo remains browser-only and contains no game 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      140 |   await page.unroute("**/api/**");
+      141 |   await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false, demoModeEnabled: true }) }));
+    > 142 |   await page.goto("/app/");
+          |              ^
+      143 |   await page.getByRole("button", { name: "ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์" }).click();
+      144 |   await expect(page.locator("#demo-banner")).toBeVisible();
+      145 |   await expect(page.locator("#people-grid").getByText("มะปราง")).toBeVisible();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:142:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-optional-demo-remai-54678-r-only-and-contains-no-game-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-optional-demo-remai-54678-r-only-and-contains-no-game-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-optional-demo-remai-54678-r-only-and-contains-no-game-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-optional-demo-remai-54678-r-only-and-contains-no-game-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  46) [mobile-chromium] › e2e/social.spec.js:149:1 › profile names cannot break out of text or media attributes 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      150 |   await page.unroute("**/api/**");
+      151 |   await page.route("**/api/social/config",route=>route.fulfill({json:{...config,socialAppEnabled:false,demoModeEnabled:true}}));
+    > 152 |   await page.goto("/app/");
+          |              ^
+      153 |   await page.getByRole("button",{name:"ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์"}).click();
+      154 |   await page.locator('#primary-nav [data-tab="profile"]').click();
+      155 |   await page.locator('#manage-gallery').click();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:152:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-profile-names-canno-1692e-of-text-or-media-attributes-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-profile-names-canno-1692e-of-text-or-media-attributes-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-profile-names-canno-1692e-of-text-or-media-attributes-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-profile-names-canno-1692e-of-text-or-media-attributes-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  47) [mobile-chromium] › e2e/social.spec.js:170:1 › browser-only demo supports local gallery and chat image workflows 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      171 |   await page.unroute("**/api/**");
+      172 |   await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false, demoModeEnabled: true }) }));
+    > 173 |   await page.goto("/app/");
+          |              ^
+      174 |   await page.getByRole("button", { name: "ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์" }).click();
+      175 |   const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Z0ioAAAAASUVORK5CYII=", "base64");
+      176 |
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:173:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-browser-only-demo-s-3ba1f-ry-and-chat-image-workflows-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-browser-only-demo-s-3ba1f-ry-and-chat-image-workflows-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-browser-only-demo-s-3ba1f-ry-and-chat-image-workflows-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-browser-only-demo-s-3ba1f-ry-and-chat-image-workflows-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  48) [mobile-chromium] › e2e/social.spec.js:202:1 › social shell reports offline state and recovers when connectivity returns 
+
+    TimeoutError: browserType.launch: Timeout 180000ms exceeded.
+    Call log:
+      - <launching> /Users/nattano/Library/Caches/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-mac-arm64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=/var/folders/gd/r5f17fjx6rg1syk20hrwwzyc0000gn/T/playwright_chromiumdev_profile-ztxacf --remote-debugging-pipe --no-startup-window
+      - <launched> pid=96560
+      - [pid=96560][err] [1017/131113.852164:WARNING:net/dns/dns_config_service_posix.cc:198] Failed to read DnsConfig.
+
+
+    Error Context: test-results/components-final-0a4bd1d/social-social-shell-report-e50cc-s-when-connectivity-returns-mobile-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-social-shell-report-e50cc-s-when-connectivity-returns-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-social-shell-report-e50cc-s-when-connectivity-returns-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  49) [mobile-chromium] › e2e/social.spec.js:213:1 › daily image quota disables only the exhausted category while chat text remains available 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/app/", waiting until "load"
+
+
+      228 |     }),
+      229 |   }));
+    > 230 |   await page.goto("/app/");
+          |              ^
+      231 |   await page.locator('#primary-nav button[data-tab="profile"]').click();
+      232 |   await expect(page.locator("#gallery-upload-quota")).toContainText("อัปโหลดรูปแกลเลอรีครบขีดจำกัดรายวันแล้ว");
+      233 |   await expect(page.locator('#gallery-upload input[type="file"]')).toBeDisabled();
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/social.spec.js:230:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-daily-image-quota-d-a2a22-chat-text-remains-available-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/social-daily-image-quota-d-a2a22-chat-text-remains-available-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/social-daily-image-quota-d-a2a22-chat-text-remains-available-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/social-daily-image-quota-d-a2a22-chat-text-remains-available-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  50) [mobile-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus 
+
+    Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
+    Call log:
+      - navigating to "https://codex-chatgun-release-candid.chatgun.pages.dev/", waiting until "load"
+
+
+      79 |  await page.route('**/assets/demo/network.json',async r=>{const response=await r.fetch(),data=await response.json();data.profiles[0].name='ชื่อสมมติสำหรับทดสอบชื่อภาษาไทยที่ยาวเป็นพิเศษ';data.profiles[0].bio='ชอบแลกเปลี่ยนเรื่องหนังสือและดนตรี '.repeat(8);await r.fulfill({json:data});});
+      80 |  await page.route('**/assets/demo/01.png',r=>r.abort());
+    > 81 |  await page.goto('/');const card=page.locator('#people-grid .photo-card').first();
+         |             ^
+      82 |  await expect(card.locator('[data-image-error]')).toHaveAttribute('aria-label',/ชื่อสมมติ/);
+      83 |  expect(await card.evaluate(e=>e.scrollHeight<=e.clientHeight)).toBe(true);
+      84 |  await card.locator('.card-open').focus();await page.keyboard.press('Enter');
+        at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/source-components.spec.js:81:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-source-c-a2d66-s-and-keyboard-return-focus-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/components-final-0a4bd1d/source-components-source-c-a2d66-s-and-keyboard-return-focus-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/components-final-0a4bd1d/source-components-source-c-a2d66-s-and-keyboard-return-focus-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/components-final-0a4bd1d/source-components-source-c-a2d66-s-and-keyboard-return-focus-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  50 failed
+    [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 390px 
+    [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 768px 
+    [desktop-chromium] › e2e/issue10-parity.spec.js:3:3 › v91 measured layout, pagination, keyboard and failure recovery 1440px 
+    [desktop-chromium] › e2e/issue10-parity.spec.js:28:1 › failed portrait remains labelled; persistent auth navigation excludes Game 
+    [desktop-chromium] › e2e/issue10-parity.spec.js:34:1 › fictional friendship accept/reject/request/block/unblock persists without server writes 
+    [desktop-chromium] › e2e/moderation.spec.js:48:1 › admin dashboard opens routine overview automatically and requires justification for restricted evidence 
+    [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 390px 
+    [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 768px 
+    [desktop-chromium] › e2e/owner-release.spec.js:6:3 › owner package: isolated fictional network and layout at 1440px 
+    [desktop-chromium] › e2e/social.spec.js:54:1 › root is the authenticated discovery entry while welcome retains marketing 
+    [desktop-chromium] › e2e/social.spec.js:63:1 › desktop social shell preserves discovery, friends, chat, reviews, and profile without game 
+    [desktop-chromium] › e2e/social.spec.js:91:1 › disabled social environment reveals no member features 
+    [desktop-chromium] › e2e/social.spec.js:99:1 › member profile routes are deep-linkable and preserve browser history 
+    [desktop-chromium] › e2e/social.spec.js:111:1 › coarse live distance does not silently remove the server-authorized rating workflow 
+    [desktop-chromium] › e2e/social.spec.js:120:1 › source header switches out discovery controls; gallery distinguishes loading failure from empty and retries 
+    [desktop-chromium] › e2e/social.spec.js:139:1 › optional demo remains browser-only and contains no game 
+    [desktop-chromium] › e2e/social.spec.js:149:1 › profile names cannot break out of text or media attributes 
+    [desktop-chromium] › e2e/social.spec.js:170:1 › browser-only demo supports local gallery and chat image workflows 
+    [desktop-chromium] › e2e/social.spec.js:202:1 › social shell reports offline state and recovers when connectivity returns 
+    [desktop-chromium] › e2e/social.spec.js:213:1 › daily image quota disables only the exhausted category while chat text remains available 
+    [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 390 
+    [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 390 
+    [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 768 
+    [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 768 
+    [desktop-chromium] › e2e/source-components.spec.js:4:2 › canonical components: complete routed member and own-gallery journey 1440 
+    [desktop-chromium] › e2e/source-components.spec.js:53:2 › canonical gallery: empty, image failure, landscape, delete and no quota refund 1440 
+    [desktop-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus 
+    [mobile-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth 
+    [mobile-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed 
+    [mobile-chromium] › e2e/auth.spec.js:93:1 › post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations 
+    [mobile-chromium] › e2e/auth.spec.js:139:1 › privacy notice explains social identity data use ──
+    [mobile-chromium] › e2e/auth.spec.js:148:1 › legal review pages disclose unresolved owner decisions 
+    [mobile-chromium] › e2e/auth.spec.js:158:1 › account page redirects unauthenticated users to signup 
+    [mobile-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations 
+    [mobile-chromium] › e2e/issue10-parity.spec.js:28:1 › failed portrait remains labelled; persistent auth navigation excludes Game 
+    [mobile-chromium] › e2e/issue10-parity.spec.js:34:1 › fictional friendship accept/reject/request/block/unblock persists without server writes 
+    [mobile-chromium] › e2e/moderation.spec.js:48:1 › admin dashboard opens routine overview automatically and requires justification for restricted evidence 
+    [mobile-chromium] › e2e/social.spec.js:54:1 › root is the authenticated discovery entry while welcome retains marketing 
+    [mobile-chromium] › e2e/social.spec.js:63:1 › desktop social shell preserves discovery, friends, chat, reviews, and profile without game 
+    [mobile-chromium] › e2e/social.spec.js:81:1 › mobile social shell uses bottom navigation and remains usable 
+    [mobile-chromium] › e2e/social.spec.js:91:1 › disabled social environment reveals no member features 
+    [mobile-chromium] › e2e/social.spec.js:99:1 › member profile routes are deep-linkable and preserve browser history 
+    [mobile-chromium] › e2e/social.spec.js:111:1 › coarse live distance does not silently remove the server-authorized rating workflow 
+    [mobile-chromium] › e2e/social.spec.js:120:1 › source header switches out discovery controls; gallery distinguishes loading failure from empty and retries 
+    [mobile-chromium] › e2e/social.spec.js:139:1 › optional demo remains browser-only and contains no game 
+    [mobile-chromium] › e2e/social.spec.js:149:1 › profile names cannot break out of text or media attributes 
+    [mobile-chromium] › e2e/social.spec.js:170:1 › browser-only demo supports local gallery and chat image workflows 
+    [mobile-chromium] › e2e/social.spec.js:202:1 › social shell reports offline state and recovers when connectivity returns 
+    [mobile-chromium] › e2e/social.spec.js:213:1 › daily image quota disables only the exhausted category while chat text remains available 
+    [mobile-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus 
+  32 skipped
+  10 passed (17.9m)

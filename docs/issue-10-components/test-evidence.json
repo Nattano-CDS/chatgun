@@ -1,0 +1,44 @@
+{
+  "validatedCommit": "0a4bd1d25c730d131615960e892c77b257b16947",
+  "unitIntegrationSecurity": {
+    "passed": 100,
+    "failed": 0,
+    "skipped": 0
+  },
+  "stablePreview": {
+    "passed": 60,
+    "failed": 0,
+    "skipped": 32,
+    "total": 92
+  },
+  "productionOwnerJourneys": {
+    "passed": 3,
+    "failed": 0
+  },
+  "productionControls": {
+    "passed": 3,
+    "failed": 0,
+    "apiInterception": false,
+    "serverWrites": 0
+  },
+  "interruptedConnectivityRun": {
+    "passed": 10,
+    "failed": 50,
+    "skipped": 32,
+    "resolvedBy": "Fresh browser checks and complete rerun; no safety bypass"
+  },
+  "sourceMeasurements": {
+    "states": 24,
+    "widthHeightMismatches": 0
+  },
+  "deployment": {
+    "id": "94825247-c404-4eef-98cc-7fea8b378025",
+    "sha": "0a4bd1d25c730d131615960e892c77b257b16947",
+    "status": "success"
+  },
+  "stagingMutations": 0,
+  "productionDatabaseWrites": 0,
+  "interactiveOAuth": "not repeated",
+  "visualAcceptance": "pending final owner review",
+  "readiness": "GO public-fiction UI release; NO-GO opening live services"
+}

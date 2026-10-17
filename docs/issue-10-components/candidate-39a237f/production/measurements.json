@@ -1,0 +1,923 @@
+[
+  {
+    "width": 390,
+    "name": "discovery",
+    "dom": {
+      "tag": "ARTICLE",
+      "classes": "person photo-card person-card",
+      "width": 174,
+      "height": 290,
+      "x": 16,
+      "y": 213.5,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "17px",
+      "image": {
+        "objectFit": "cover",
+        "objectPosition": "50% 25%",
+        "width": 174,
+        "height": 290
+      },
+      "children": [
+        {
+          "tag": "BUTTON",
+          "classes": "card-open"
+        },
+        {
+          "tag": "DIV",
+          "classes": "card-photo"
+        },
+        {
+          "tag": "DIV",
+          "classes": "photo-shade"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "card-distance"
+        },
+        {
+          "tag": "DIV",
+          "classes": "person-details"
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "profile",
+    "dom": {
+      "tag": "FORM",
+      "classes": "panel profile-form",
+      "width": 358,
+      "height": 1122,
+      "x": 16,
+      "y": -0.25,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "20px",
+      "borderRadius": "17px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "avatar large"
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "verify-cta"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary wide"
+        },
+        {
+          "tag": "DIV",
+          "classes": "blocked-users"
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "member-profile",
+    "dom": {
+      "tag": "DIV",
+      "classes": "full-profile-info",
+      "width": 390,
+      "height": 304.75,
+      "x": 0,
+      "y": 539.25,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "20px 22px",
+      "borderRadius": "0px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "full-name-row"
+        },
+        {
+          "tag": "P",
+          "classes": "full-bio"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "full-profile-actions"
+        },
+        {
+          "tag": "DIV",
+          "classes": "people-management"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "fixture-label"
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "member-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 390,
+      "height": 300.78125,
+      "x": 0,
+      "y": 60,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "22px 16px 20px",
+      "borderRadius": "0px",
+      "image": {
+        "objectFit": "cover",
+        "objectPosition": "50% 50%",
+        "width": 70,
+        "height": 84
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "gallery-post",
+    "dom": {
+      "tag": "DIV",
+      "classes": "post-layout",
+      "width": 390,
+      "height": 714.59375,
+      "x": 0,
+      "y": 60,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "0px",
+      "image": {
+        "objectFit": "cover",
+        "objectPosition": "50% 50%",
+        "width": 40,
+        "height": 40
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "post-owner"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-image"
+        },
+        {
+          "tag": "DIV",
+          "classes": "post-social"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-nav"
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "own-profile",
+    "dom": {
+      "tag": "DIV",
+      "classes": "full-profile-info",
+      "width": 390,
+      "height": 247.25,
+      "x": 0,
+      "y": 596.75,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "20px 22px",
+      "borderRadius": "0px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "full-name-row"
+        },
+        {
+          "tag": "P",
+          "classes": "full-bio"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "full-profile-actions"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "fixture-label"
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "name": "own-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 390,
+      "height": 216.390625,
+      "x": 0,
+      "y": 60,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "22px 16px 20px",
+      "borderRadius": "0px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "discovery",
+    "dom": {
+      "tag": "ARTICLE",
+      "classes": "person photo-card person-card",
+      "width": 347.5,
+      "height": 390,
+      "x": 28,
+      "y": 198,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "22px",
+      "image": {
+        "objectFit": "cover",
+        "objectPosition": "50% 25%",
+        "width": 347.5,
+        "height": 390
+      },
+      "children": [
+        {
+          "tag": "BUTTON",
+          "classes": "card-open"
+        },
+        {
+          "tag": "DIV",
+          "classes": "card-photo"
+        },
+        {
+          "tag": "DIV",
+          "classes": "photo-shade"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "card-distance"
+        },
+        {
+          "tag": "DIV",
+          "classes": "person-details"
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "profile",
+    "dom": {
+      "tag": "FORM",
+      "classes": "panel profile-form",
+      "width": 600,
+      "height": 1147,
+      "x": 28,
+      "y": 0.390625,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "24px",
+      "borderRadius": "17px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "avatar large"
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "verify-cta"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary wide"
+        },
+        {
+          "tag": "DIV",
+          "classes": "blocked-users"
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "member-profile",
+    "dom": {
+      "tag": "DIV",
+      "classes": "full-profile-info",
+      "width": 740,
+      "height": 350.78125,
+      "x": 14,
+      "y": 673.21875,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "30px 35px 25px",
+      "borderRadius": "0px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "full-name-row"
+        },
+        {
+          "tag": "P",
+          "classes": "full-bio"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "full-profile-actions"
+        },
+        {
+          "tag": "DIV",
+          "classes": "people-management"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "fixture-label"
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "member-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 768,
+      "height": 275.390625,
+      "x": 0,
+      "y": 65,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "26px 22px 22px",
+      "borderRadius": "0px",
+      "image": {
+        "objectFit": "cover",
+        "objectPosition": "50% 50%",
+        "width": 94,
+        "height": 94
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "gallery-post",
+    "dom": {
+      "tag": "DIV",
+      "classes": "post-layout",
+      "width": 768,
+      "height": 1100.59375,
+      "x": 0,
+      "y": 0,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "0px",
+      "image": {
+        "objectFit": "cover",
+        "objectPosition": "50% 50%",
+        "width": 40,
+        "height": 40
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "post-owner"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-image"
+        },
+        {
+          "tag": "DIV",
+          "classes": "post-social"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-nav"
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "own-profile",
+    "dom": {
+      "tag": "DIV",
+      "classes": "full-profile-info",
+      "width": 740,
+      "height": 293.28125,
+      "x": 14,
+      "y": 730.71875,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "30px 35px 25px",
+      "borderRadius": "0px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "full-name-row"
+        },
+        {
+          "tag": "P",
+          "classes": "full-bio"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "full-profile-actions"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "fixture-label"
+        }
+      ]
+    }
+  },
+  {
+    "width": 768,
+    "name": "own-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 768,
+      "height": 217.390625,
+      "x": 0,
+      "y": 65,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "26px 22px 22px",
+      "borderRadius": "0px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "discovery",
+    "dom": {
+      "tag": "ARTICLE",
+      "classes": "person photo-card person-card",
+      "width": 274.75,
+      "height": 390,
+      "x": 145,
+      "y": 206,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "22px",
+      "image": {
+        "objectFit": "cover",
+        "objectPosition": "50% 25%",
+        "width": 274.75,
+        "height": 390
+      },
+      "children": [
+        {
+          "tag": "BUTTON",
+          "classes": "card-open"
+        },
+        {
+          "tag": "DIV",
+          "classes": "card-photo"
+        },
+        {
+          "tag": "DIV",
+          "classes": "photo-shade"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "card-distance"
+        },
+        {
+          "tag": "DIV",
+          "classes": "person-details"
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "profile",
+    "dom": {
+      "tag": "FORM",
+      "classes": "panel profile-form",
+      "width": 600,
+      "height": 1147,
+      "x": 145,
+      "y": 0.390625,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "24px",
+      "borderRadius": "17px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "avatar large"
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": ""
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "LABEL",
+          "classes": "wide"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "primary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "verify-cta"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary"
+        },
+        {
+          "tag": "BUTTON",
+          "classes": "secondary wide"
+        },
+        {
+          "tag": "DIV",
+          "classes": "blocked-users"
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "member-profile",
+    "dom": {
+      "tag": "DIV",
+      "classes": "full-profile-info",
+      "width": 740,
+      "height": 350.78125,
+      "x": 350,
+      "y": 749.21875,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "30px 35px 25px",
+      "borderRadius": "0px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "full-name-row"
+        },
+        {
+          "tag": "P",
+          "classes": "full-bio"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "full-profile-actions"
+        },
+        {
+          "tag": "DIV",
+          "classes": "people-management"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "fixture-label"
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "member-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 850,
+      "height": 275.390625,
+      "x": 295,
+      "y": 65,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "26px 22px 22px",
+      "borderRadius": "0px",
+      "image": {
+        "objectFit": "cover",
+        "objectPosition": "50% 50%",
+        "width": 94,
+        "height": 94
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "gallery-post",
+    "dom": {
+      "tag": "DIV",
+      "classes": "post-layout",
+      "width": 1040,
+      "height": 676.484375,
+      "x": 200,
+      "y": 89,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "0px",
+      "borderRadius": "24px",
+      "image": {
+        "objectFit": "cover",
+        "objectPosition": "50% 50%",
+        "width": 40,
+        "height": 40
+      },
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "post-owner"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-image"
+        },
+        {
+          "tag": "DIV",
+          "classes": "post-social"
+        },
+        {
+          "tag": "DIV",
+          "classes": "lightbox-nav"
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "own-profile",
+    "dom": {
+      "tag": "DIV",
+      "classes": "full-profile-info",
+      "width": 740,
+      "height": 293.28125,
+      "x": 350,
+      "y": 806.71875,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "30px 35px 25px",
+      "borderRadius": "0px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "full-name-row"
+        },
+        {
+          "tag": "P",
+          "classes": "full-bio"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-facts"
+        },
+        {
+          "tag": "DIV",
+          "classes": "profile-interests"
+        },
+        {
+          "tag": "DIV",
+          "classes": "full-profile-actions"
+        },
+        {
+          "tag": "SPAN",
+          "classes": "fixture-label"
+        }
+      ]
+    }
+  },
+  {
+    "width": 1440,
+    "name": "own-gallery",
+    "dom": {
+      "tag": "DIV",
+      "classes": "gallery-summary",
+      "width": 850,
+      "height": 217.390625,
+      "x": 295,
+      "y": 65,
+      "font": "Arial, \"Noto Sans Thai\", Tahoma, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "padding": "26px 22px 22px",
+      "borderRadius": "0px",
+      "image": null,
+      "children": [
+        {
+          "tag": "DIV",
+          "classes": "gallery-avatar"
+        },
+        {
+          "tag": "DIV",
+          "classes": ""
+        }
+      ]
+    }
+  }
+]
