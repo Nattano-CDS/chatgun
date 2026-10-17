@@ -20,7 +20,7 @@ css+='\n.gallery-experience .breadcrumbs{height:16px;align-items:center}.gallery
 css+=`\n.gallery-experience .thumb-small.saved{outline:2px solid var(--lime)}
 .gallery-experience .upload-file-state{max-height:65%;overflow:auto;overflow-wrap:anywhere}
 .gallery-experience .thumb-small{width:112px;height:112px;flex:none}
-.gallery-experience .thumb-strip{overflow-x:auto;gap:10px;padding:4px}
+.gallery-experience .thumb-strip{display:flex;flex-wrap:wrap;overflow-x:auto;gap:10px;padding:4px}
 .gallery-experience [data-upload-success]{padding:12px;background:var(--lavender,#f5efff);border-radius:14px}
 .gallery-experience .action-bar{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));z-index:45;display:flex;flex-wrap:wrap;justify-content:center;background:#fff;padding:10px 16px;box-shadow:0 -3px 16px #21143912;border-top:1px solid var(--line);gap:8px}
 .gallery-experience [data-upload-summary]{flex-basis:100%;text-align:center;font-size:12px;color:var(--muted)}

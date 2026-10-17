@@ -37,6 +37,7 @@ test('10/12 capacity rejects an oversized selection without dropping or charging
   await page.goto('/app/me/gallery/upload');await expect(page.locator('[data-album-capacity]')).toHaveText('10 / 12 รูป');
   await page.locator('#gallery-file-picker').setInputFiles(Array.from({length:5},(_,i)=>file(i)));
   await expect(page.locator('.thumb-small')).toHaveCount(5);await expect(page.locator('[data-upload-submit]')).toBeDisabled();await expect(page.locator('#gallery-upload-status')).toContainText('พื้นที่ว่าง 2 รูป');
+  expect(await page.locator('.thumb-small').evaluateAll(es=>es.every((a,i)=>es.slice(i+1).every(b=>{const x=a.getBoundingClientRect(),y=b.getBoundingClientRect();return x.right<=y.left||y.right<=x.left||x.bottom<=y.top||y.bottom<=x.top;})))).toBe(true);
   await expect(page.locator('[data-approved-quota]')).toHaveText('0 / 10 รูป');await shot(page,info.project.name+'-capacity-exceeded');
   for(let i=0;i<3;i++)await page.locator('[data-remove-upload]').last().click();
   await page.locator('[data-upload-submit]').click();await expect(page.locator('[data-upload-success]')).toBeVisible();
