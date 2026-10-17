@@ -123,7 +123,7 @@ Running 100 tests using 1 worker
   -  100 [mobile-chromium] › e2e/synthetic-owner-review.spec.js:108:1 › admin overview and urgent queues render synthetic moderation samples
 
 
-  1) [desktop-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth 
+  1) [desktop-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth
 
     Error: expect(locator).toContainText(expected) failed
 
@@ -162,7 +162,7 @@ Running 100 tests using 1 worker
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  2) [desktop-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed 
+  2) [desktop-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed
 
     Error: expect(locator).toBeAttached() failed
 
@@ -199,7 +199,7 @@ Running 100 tests using 1 worker
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  3) [desktop-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations 
+  3) [desktop-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations
 
     TypeError: expect(received).toMatch(expected)
 
@@ -226,7 +226,7 @@ Running 100 tests using 1 worker
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  4) [mobile-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth 
+  4) [mobile-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth
 
     Error: expect(locator).toContainText(expected) failed
 
@@ -265,7 +265,7 @@ Running 100 tests using 1 worker
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  5) [mobile-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed 
+  5) [mobile-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed
 
     Error: expect(locator).toBeAttached() failed
 
@@ -302,7 +302,7 @@ Running 100 tests using 1 worker
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  6) [mobile-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations 
+  6) [mobile-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations
 
     TypeError: expect(received).toMatch(expected)
 
@@ -330,11 +330,11 @@ Running 100 tests using 1 worker
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
   6 failed
-    [desktop-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth 
-    [desktop-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed 
-    [desktop-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations 
-    [mobile-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth 
-    [mobile-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed 
-    [mobile-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations 
+    [desktop-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth
+    [desktop-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed
+    [desktop-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations
+    [mobile-chromium] › e2e/auth.spec.js:9:1 › signup explains a Turnstile connection failure in Thai and retries before OAuth
+    [mobile-chromium] › e2e/auth.spec.js:66:1 › signup permits existing social login while public registration remains closed
+    [mobile-chromium] › e2e/auth.spec.js:164:1 › Pages Functions expose secure config and reject cross-origin mutations
   35 skipped
   59 passed (1.9m)

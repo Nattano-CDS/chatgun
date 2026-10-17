@@ -121,7 +121,7 @@ Running 102 tests using 1 worker
   -  102 [mobile-chromium] › e2e/synthetic-owner-review.spec.js:108:1 › admin overview and urgent queues render synthetic moderation samples
 
 
-  1) [mobile-chromium] › e2e/social.spec.js:177:1 › profile names cannot break out of text or media attributes 
+  1) [mobile-chromium] › e2e/social.spec.js:177:1 › profile names cannot break out of text or media attributes
 
     Error: page.goto: net::ERR_NETWORK_IO_SUSPENDED at https://codex-chatgun-release-candid.chatgun.pages.dev/app/
     Call log:
@@ -151,7 +151,7 @@ Running 102 tests using 1 worker
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  2) [mobile-chromium] › e2e/social.spec.js:230:1 › social shell reports offline state and recovers when connectivity returns 
+  2) [mobile-chromium] › e2e/social.spec.js:230:1 › social shell reports offline state and recovers when connectivity returns
 
     Test timeout of 30000ms exceeded.
 
@@ -179,7 +179,7 @@ Running 102 tests using 1 worker
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  3) [mobile-chromium] › e2e/social.spec.js:241:1 › daily image quota disables only the exhausted category while chat text remains available 
+  3) [mobile-chromium] › e2e/social.spec.js:241:1 › daily image quota disables only the exhausted category while chat text remains available
 
     Test timeout of 30000ms exceeded.
 
@@ -207,7 +207,7 @@ Running 102 tests using 1 worker
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  4) [mobile-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus 
+  4) [mobile-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus
 
     Error: page.goto: net::ERR_INTERNET_DISCONNECTED at https://codex-chatgun-release-candid.chatgun.pages.dev/
     Call log:
@@ -238,9 +238,9 @@ Running 102 tests using 1 worker
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
   4 failed
-    [mobile-chromium] › e2e/social.spec.js:177:1 › profile names cannot break out of text or media attributes 
-    [mobile-chromium] › e2e/social.spec.js:230:1 › social shell reports offline state and recovers when connectivity returns 
-    [mobile-chromium] › e2e/social.spec.js:241:1 › daily image quota disables only the exhausted category while chat text remains available 
-    [mobile-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus 
+    [mobile-chromium] › e2e/social.spec.js:177:1 › profile names cannot break out of text or media attributes
+    [mobile-chromium] › e2e/social.spec.js:230:1 › social shell reports offline state and recovers when connectivity returns
+    [mobile-chromium] › e2e/social.spec.js:241:1 › daily image quota disables only the exhausted category while chat text remains available
+    [mobile-chromium] › e2e/source-components.spec.js:77:1 › source card handles long Thai text, failed portraits and keyboard return focus
   35 skipped
   63 passed (3.9m)
