@@ -36,7 +36,9 @@ test('explicit closed prelaunch renders without relying on Cloudflare Functions'
   const html=readFileSync(join(directory,'app/index.html'),'utf8');
   const app=readFileSync(join(directory,'app/social.js'),'utf8');
   const release=JSON.parse(readFileSync(join(directory,'release.json'),'utf8'));
-  assert.match(html,/<body data-static-prelaunch="true">/);
+  assert.match(html,/<body data-static-prelaunch="true" data-prelaunch="true">/);
+  assert.match(html,/<section id="disabled-view" class="empty">/);
+  assert.doesNotMatch(html,/กำลังโหลด ChatGun…/);
   assert.equal(release.staticPrelaunch,true);
   assert.equal(release.fictionalDemoEnabled,false);
   assert.match(app,/if \(document\.body\.dataset\.staticPrelaunch === "true"\)/);

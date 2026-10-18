@@ -24,7 +24,10 @@ const staticPrelaunch=releaseMode==='closed-prelaunch';
 if(staticPrelaunch){
   const file=resolve(output,'app/index.html'),html=readFileSync(file,'utf8');
   if(!html.includes('<body>'))throw Error('Static prelaunch marker insertion failed');
-  writeFileSync(file,html.replace('<body>','<body data-static-prelaunch="true">'));
+  writeFileSync(file,html.replace('<body>','<body data-static-prelaunch="true" data-prelaunch="true">')
+    .replace('<section id="disabled-view" class="empty" hidden>','<section id="disabled-view" class="empty">')
+    .replace('aria-busy="true"','aria-busy="false"')
+    .replace('กำลังโหลด ChatGun…',''));
   // Real OAuth/registration are disabled in a closed release. Never leave
   // clickable provider buttons pointing into a known-unavailable API.
   for(const page of ['signup.html','account.html','acceptance.html']){

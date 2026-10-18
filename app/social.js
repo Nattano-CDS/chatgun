@@ -1293,6 +1293,7 @@ window.addEventListener("pagehide", () => {
   state.locationWatch !== null && navigator.geolocation && navigator.geolocation.clearWatch(state.locationWatch), state.locationPermission && (state.locationPermission.onchange = null);
 });
 window.addEventListener("popstate", (event) => {
+  if (document.body.dataset.staticPrelaunch === "true") return;
   if (restoringUpload) {
     restoringUpload = !1;
     return;
