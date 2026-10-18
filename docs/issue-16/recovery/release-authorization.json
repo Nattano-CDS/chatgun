@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-10-18T06:17:18.313Z",
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "sha": "6c824ab0ecf5e70f414e7d34d74b7abe7bae3a8c",
+  "releaseMode": "closed-prelaunch",
+  "productionBranch": "main",
+  "gitMerge": false,
+  "realServicesEnabled": false,
+  "productionD1Migrations": false,
+  "productionR2Changes": false,
+  "privateRollbackPackage": "protected outside Git; exact validated closed build and functions, never old demo",
+  "priorDeployment": "0e3dd9fd-0f6e-421d-b2a5-2f2293a452d2"
+}

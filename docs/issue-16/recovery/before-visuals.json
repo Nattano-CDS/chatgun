@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-10-18T06:10:40.046Z",
+  "origin": "https://chatgun.social",
+  "sha": "bb44dd90557da89f7dc5f6ff0ec81fcfda53ce6b",
+  "screens": [
+    {
+      "width": 390,
+      "cards": 17,
+      "heading": "ChatGun · เพื่อนใกล้คุณ"
+    },
+    {
+      "width": 768,
+      "cards": 17,
+      "heading": "ChatGun · เพื่อนใกล้คุณ"
+    },
+    {
+      "width": 1440,
+      "cards": 17,
+      "heading": "ChatGun · เพื่อนใกล้คุณ"
+    }
+  ],
+  "dnsA": [
+    "172.67.189.136",
+    "104.21.9.193"
+  ],
+  "httpsCertificateValidated": true,
+  "context": "fresh anonymous Playwright; no owner cookies or browser storage accessed"
+}

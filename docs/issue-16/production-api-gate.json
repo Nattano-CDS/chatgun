@@ -1,19 +1,27 @@
 {
-  "checkedAt": "2026-10-17T18:21:05.694Z",
+  "checkedAt": "2026-10-18T06:17:54.536Z",
   "origin": "https://chatgun.social",
-  "ready": false,
+  "ready": true,
   "checks": [
     {
       "path": "/api/social/config",
-      "status": 404,
-      "json": false,
-      "valid": false
+      "status": 200,
+      "json": true,
+      "valid": true,
+      "onlineStatusEnabled": false,
+      "socialAppEnabled": false
     },
     {
       "path": "/api/auth/config",
-      "status": 404,
-      "json": false,
-      "valid": false
+      "status": 200,
+      "json": true,
+      "valid": true
+    },
+    {
+      "path": "/api/health",
+      "status": 200,
+      "json": true,
+      "valid": true
     }
   ],
   "productionDeploymentAuthorizedByThisScript": false
