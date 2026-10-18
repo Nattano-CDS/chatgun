@@ -20,7 +20,8 @@ assert.equal(project.deployment_configs.preview.d1_databases.DB.id,'5bbfd55d-eb2
 const directory=mkdtempSync(join(tmpdir(),'chatgun-closed-production-'));chmodSync(directory,0o700);
 cpSync('dist',join(directory,'dist'),{recursive:true});cpSync('functions',join(directory,'functions'),{recursive:true});
 // Do not carry the top-level staging bindings into a Production deployment cwd.
-const deployConfig={name:'chatgun',account_id:account,pages_build_output_dir:'dist',compatibility_date:cfg.compatibility_date,...production};
+// Pages accepts the account via CLOUDFLARE_ACCOUNT_ID, not an account_id config key.
+const deployConfig={name:'chatgun',pages_build_output_dir:'dist',compatibility_date:cfg.compatibility_date,...production};
 writeFileSync(join(directory,'wrangler.jsonc'),JSON.stringify(deployConfig,null,2),{mode:0o600});
 writeFileSync('/tmp/chatgun-closed-production-package-path',directory,{mode:0o600});
 writeFileSync('docs/issue-16/recovery/release-authorization.json',JSON.stringify({checkedAt:new Date().toISOString(),account,sha,releaseMode:'closed-prelaunch',productionBranch:'main',gitMerge:false,realServicesEnabled:false,productionD1Migrations:false,productionR2Changes:false,privateRollbackPackage:'protected outside Git; exact validated closed build and functions, never old demo',priorDeployment:project.canonical_deployment.id},null,2)+'\n');

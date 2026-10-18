@@ -28,6 +28,15 @@ test('runtime only polls the member\'s visible social surface',()=>{
   assert.doesNotMatch(source,/setInterval\(\(\) => \{\s*document\.visibilityState === "visible" && navigator\.onLine && state\.config\?\.socialAppEnabled && state\.profile && Promise\.all\(\[loadPeople\(\), loadRelationships\(\)\]\)/);
 });
 
+test('closed Production packaging excludes staging bindings and unsupported Pages account config',()=>{
+  const source=readFileSync('scripts/deploy-closed-production.mjs','utf8');
+  const config=source.match(/const deployConfig=([^;]+);/)[1];
+  assert.doesNotMatch(config,/account_id/);
+  assert.match(config,/\.\.\.production/);
+  assert.match(source,/CLOUDFLARE_ACCOUNT_ID:account/);
+  assert.match(source,/CHATGUN_DEPLOY_APPROVED!=='closed-prelaunch'/);
+});
+
 test('explicit closed prelaunch renders without relying on Cloudflare Functions',()=>{
   const directory=mkdtempSync(join(tmpdir(),'chatgun-closed-release-'));
   execFileSync(process.execPath,['scripts/build-pages.mjs'],{
