@@ -1,4 +1,5 @@
-import {readFileSync,writeFileSync} from 'node:fs';
+import {readFileSync,writeFileSync,existsSync} from 'node:fs';
+if(existsSync('docs/issue-16/recovery/production-security.json')){await import('./report-closed-recovery.mjs');process.exit(0);}
 const dir='docs/issue-16',read=name=>JSON.parse(readFileSync(`${dir}/${name}.json`));
 const pw=read('local-playwright'),audit=read('cleanup-audit'),api=read('production-api-gate'),infrastructure=read('production-readiness');
 const unit=readFileSync(`${dir}/unit-tests.log`,'utf8').match(/ℹ pass (\d+)/)?.[1]||'unknown';

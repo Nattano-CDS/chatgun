@@ -37,6 +37,11 @@ test('closed Production packaging excludes staging bindings and unsupported Page
   assert.match(source,/CHATGUN_DEPLOY_APPROVED!=='closed-prelaunch'/);
 });
 
+test('static Pages redirects use supported path-only sources, without catch-all Functions',()=>{
+  assert.doesNotMatch(readFileSync('_redirects','utf8'),/^https?:\/\//m);
+  assert.deepEqual(JSON.parse(readFileSync('_routes.json')),{version:1,include:['/api/*'],exclude:[]});
+});
+
 test('explicit closed prelaunch renders without relying on Cloudflare Functions',()=>{
   const directory=mkdtempSync(join(tmpdir(),'chatgun-closed-release-'));
   execFileSync(process.execPath,['scripts/build-pages.mjs'],{
