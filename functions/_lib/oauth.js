@@ -143,15 +143,19 @@ export async function verifyProviderIdentity(provider, configuration, token, non
     });
     const claims = await response.json().catch(() => ({}));
     if (!response.ok || claims.iss !== "https://access.line.me" || claims.aud !== configuration.clientId
-      || claims.nonce !== nonce || Number(claims.exp) <= timestamp || typeof claims.sub !== "string") {
+      || claims.nonce !== nonce || typeof nonce !== "string" || !nonce
+      || !Number.isSafeInteger(claims.exp) || claims.exp <= timestamp
+      || !Number.isSafeInteger(claims.iat) || claims.iat <= 0 || claims.iat > timestamp + 60 || claims.iat >= claims.exp
+      || typeof claims.sub !== "string" || !claims.sub.trim() || claims.sub.length > 255) {
       throw new Error("invalid_line_id_token");
     }
+    const emailAllowed = configuration.scope.split(/\s+/u).includes("email");
     return {
       provider,
       subject: claims.sub,
-      email: typeof claims.email === "string" ? claims.email.trim().toLowerCase() : null,
+      email: emailAllowed && typeof claims.email === "string" ? claims.email.trim().toLowerCase() : null,
       // LINE returns email only after the channel receives email permission and validates the signed ID token.
-      emailVerified: typeof claims.email === "string",
+      emailVerified: emailAllowed && typeof claims.email === "string",
       name: typeof claims.name === "string" ? claims.name : null,
       picture: typeof claims.picture === "string" ? claims.picture : null,
     };

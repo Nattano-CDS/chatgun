@@ -266,6 +266,7 @@ test("provider reauthentication refreshes only the matching active session", asy
         aud: env.LINE_CLIENT_ID,
         nonce: expectedNonce,
         exp: Math.floor(Date.now() / 1000) + 300,
+        iat: Math.floor(Date.now() / 1000),
         sub: providerSubject,
         name: "Privacy Member",
       });
@@ -341,6 +342,7 @@ test("closed registration rejects an unknown provider identity without creating 
         aud: env.LINE_CLIENT_ID,
         nonce: expectedNonce,
         exp: Math.floor(Date.now() / 1000) + 300,
+        iat: Math.floor(Date.now() / 1000),
         sub: "unknown-line-user",
         name: "Unknown Member",
       });

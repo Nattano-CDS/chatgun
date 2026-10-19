@@ -30,6 +30,7 @@ function installLineMock(env, nonce, subject) {
         aud: env.LINE_CLIENT_ID,
         nonce,
         exp: unixTime() + 300,
+        iat: unixTime(),
         sub: subject,
         name: "Invited Member",
       });

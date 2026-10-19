@@ -35,6 +35,7 @@ function installLineCallbackMock(env, nonce, subject) {
         aud: env.LINE_CLIENT_ID,
         nonce,
         exp: Math.floor(Date.now() / 1000) + 300,
+        iat: Math.floor(Date.now() / 1000),
         sub: subject,
         name: "Line Member",
       });
@@ -376,6 +377,7 @@ test("account linking callback rejects an identity owned by another user", async
 test("LINE callback validates ID token claims, creates identity, and rejects replay", async () => {
   const database = new TestD1();
   const env = environment(database);
+  env.LINE_EMAIL_ENABLED = "true"; // Explicit approved-email fixture; minimal scope is tested separately.
   installDeliveryMock();
   const start = await onRequest({
     env,
@@ -395,6 +397,7 @@ test("LINE callback validates ID token claims, creates identity, and rejects rep
       return Response.json({
         iss: "https://access.line.me", aud: env.LINE_CLIENT_ID, nonce,
         exp: Math.floor(Date.now() / 1000) + 300, sub: "line-user-1",
+        iat: Math.floor(Date.now() / 1000),
         email: "line@example.com", name: "Line Member",
       });
     }
