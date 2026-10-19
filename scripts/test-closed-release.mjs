@@ -9,6 +9,13 @@ const local=process.argv.includes('--local'),stage=process.env.RELEASE_CHECK_STA
 assert.ok(['local','preview','production'].includes(stage));
 const directory=resolve(process.env.CLOSED_BUILD_DIR||'dist'),expected=JSON.parse(readFileSync(directory+'/release.json'));
 assert.equal(expected.staticPrelaunch,true);assert.equal(expected.fictionalDemoEnabled,false);
+// Read-only checks of an intentionally unchanged Production release must not
+// mistake the newer, unshipped candidate build for the approved live baseline.
+if(process.env.RELEASE_CHECK_EXPECTED_SHA){
+  assert.equal(stage,'production');assert.equal(local,false);
+  assert.match(process.env.RELEASE_CHECK_EXPECTED_SHA,/^[a-f0-9]{40}$/);
+  expected.commit=process.env.RELEASE_CHECK_EXPECTED_SHA;
+}
 let server,origin=process.env.RELEASE_CHECK_ORIGIN;
 if(local){server=createServer((req,res)=>{
   let path=new URL(req.url,'http://localhost').pathname;
@@ -21,7 +28,7 @@ if(local){server=createServer((req,res)=>{
   res.writeHead(200,{'content-type':mime[extname(file)]||'application/octet-stream'});res.end(readFileSync(file));
 });await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));origin='http://127.0.0.1:'+server.address().port;}
 else assert.ok(['https://issue13.chatgun-issue13-staging.pages.dev','https://chatgun.social'].includes(origin));
-const output='docs/issue-16/recovery';mkdirSync(output+'/screens/'+stage,{recursive:true});
+const output=process.env.RELEASE_CHECK_OUTPUT||'docs/issue-16/recovery';mkdirSync(output+'/screens/'+stage,{recursive:true});
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex'),checks=[];
 const check=(name,value)=>{assert.ok(value,name);checks.push({name,status:'PASS'});};
 const browser=await chromium.launch();
