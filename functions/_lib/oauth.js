@@ -142,7 +142,7 @@ export async function verifyProviderIdentity(provider, configuration, token, non
       body,
     });
     const claims = await response.json().catch(() => ({}));
-    if (!response.ok || claims.iss !== "https://access.line.me" || claims.aud !== configuration.clientId
+    if (!response.ok || !claims || Array.isArray(claims) || claims.iss !== "https://access.line.me" || claims.aud !== configuration.clientId
       || claims.nonce !== nonce || typeof nonce !== "string" || !nonce
       || !Number.isSafeInteger(claims.exp) || claims.exp <= timestamp
       || !Number.isSafeInteger(claims.iat) || claims.iat <= 0 || claims.iat > timestamp + 60 || claims.iat >= claims.exp

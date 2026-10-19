@@ -2,9 +2,18 @@
 // or authorization transaction is generated; never enables Production OAuth.
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
-import {mkdirSync,writeFileSync} from 'node:fs';
+import {mkdirSync,writeFileSync,readFileSync,statSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 const account='23017b53386fb67fc62a52cdd017454c',origin='https://chatgun.social';
 const {token}=JSON.parse(execFileSync('npx',['wrangler@4.151.1','auth','token','--json'],{encoding:'utf8'}));
+const backupDirectory=readFileSync('/tmp/chatgun-beta-backup-path','utf8').trim();
+assert.ok(backupDirectory.startsWith('/Users/nattano/.codex/private-backups/chatgun/production-beta-'));
+const recordedBackup=JSON.parse(readFileSync('docs/beta-activation/backup-rehearsal.json'));
+assert.equal(createHash('sha256').update(readFileSync(backupDirectory+'/production.sql')).digest('hex'),recordedBackup.backupSha256);
+assert.equal(statSync(backupDirectory).mode&0o777,0o700);assert.equal(statSync(backupDirectory+'/production.sql').mode&0o777,0o600);
+const recovery=JSON.parse(execFileSync('npx',['wrangler@4.151.1','d1','time-travel','info','chatgun-auth','--env','production','--json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+assert.ok(recovery.bookmark,'An actual recovery bookmark is required');
+writeFileSync(backupDirectory+'/line-time-travel.json',JSON.stringify(recovery),{mode:0o600});
 async function cf(path){const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}${path}`,{headers:{Authorization:`Bearer ${token}`}});const j=await r.json();assert.ok(r.ok&&j.success,'Scoped read-only metadata check failed');return j.result;}
 const project=await cf('/pages/projects/chatgun'),prod=project.deployment_configs.production,preview=project.deployment_configs.preview;
 assert.equal(prod.d1_databases.DB.id,'9738a051-d914-42d0-8e7b-8098ef2b959d');
@@ -35,5 +44,5 @@ const live=await(await fetch(origin+'/release.json',{cache:'no-store'})).json();
 assert.equal(live.commit,'6c824ab0ecf5e70f414e7d34d74b7abe7bae3a8c');assert.equal(live.staticPrelaunch,true);assert.equal(live.fictionalDemoEnabled,false);
 const managed=await cf('/r2/buckets/chatgun-media-production/domains/managed'),custom=await cf('/r2/buckets/chatgun-media-production/domains/custom');
 assert.equal(managed.enabled,false);assert.equal((custom.domains||[]).filter(d=>d.enabled).length,0);
-const evidence={checkedAt:new Date().toISOString(),account,productionSha:live.commit,checks,flags,providerAllowlistConfigured:prod.env_vars.OAUTH_ENABLED_PROVIDERS!==undefined,globalProviderGateClosed:true,credentialMetadata:{lineClientIdPresent:Boolean(prod.env_vars.LINE_CLIENT_ID),lineSecretEncrypted:prod.env_vars.LINE_CLIENT_SECRET?.type==='secret_text',clientIdExactMatch:'BLOCKED: encrypted value not retrievable through Pages metadata',secretPairVerified:'BLOCKED: requires approved genuine token exchange; metadata is not credential validation'},productionMediaBound:false,publicR2DevEnabled:false,publicR2CustomDomains:0,productionD1Writes:0,providerMutation:false,realOAuth:'BLOCKED before authorization initiation by explicit Production gate',scope:'Read-only metadata plus closed API probes; no real identity or session generated'};
+const evidence={checkedAt:new Date().toISOString(),account,productionSha:live.commit,checks,flags,providerAllowlistConfigured:prod.env_vars.OAUTH_ENABLED_PROVIDERS!==undefined,globalProviderGateClosed:true,credentialMetadata:{lineClientIdPresent:Boolean(prod.env_vars.LINE_CLIENT_ID),lineSecretEncrypted:prod.env_vars.LINE_CLIENT_SECRET?.type==='secret_text',clientIdExactMatch:'BLOCKED: encrypted value not retrievable through Pages metadata',secretPairVerified:'BLOCKED: requires approved genuine token exchange; metadata is not credential validation'},backup:{digestVerified:true,permissionsVerified:true,sha256:recordedBackup.backupSha256,currentRecoveryBookmarkAvailable:true,bookmarkRecordedPrivately:true,restoreExecuted:false},productionMediaBound:false,publicR2DevEnabled:false,publicR2CustomDomains:0,productionD1Writes:0,providerMutation:false,realOAuth:'BLOCKED before authorization initiation by explicit Production gate',scope:'Read-only metadata plus closed API probes; no real identity or session generated'};
 mkdirSync('docs/line-verification',{recursive:true});writeFileSync('docs/line-verification/production-gates.json',JSON.stringify(evidence,null,2)+'\n');console.log('Production JSON APIs, disabled LINE initiation, isolation and private unbound R2 verified.');

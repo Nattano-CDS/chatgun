@@ -30,7 +30,7 @@ test('LINE rejects missing, nonnumeric, expired, future and mismatched verified 
 });
 test('LINE rejects provider verification errors and malformed responses without trusting decoded claims',async t=>{
   let response;mockFetch(t,async()=>response);
-  for(const value of [Response.json({error:'invalid_request'}, {status:400}),Response.json({...claims()},{status:401}),new Response('not-json',{status:200})]){
+  for(const value of [Response.json({error:'invalid_request'}, {status:400}),Response.json({...claims()},{status:401}),Response.json(null),Response.json([]),new Response('not-json',{status:200})]){
     response=value;await assert.rejects(verifyProviderIdentity('line',config(),{id_token:'unit-id-token'},nonce,now),/invalid_line_id_token/);
   }
   await assert.rejects(verifyProviderIdentity('line',config(),{},nonce,now),/missing_id_token/);
