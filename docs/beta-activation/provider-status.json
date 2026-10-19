@@ -1,0 +1,47 @@
+{
+  "reviewedOn": "2026-10-19",
+  "method": "Read-only existing developer consoles; no secrets revealed or changes saved",
+  "google": {
+    "project": "ChatGun / chatgun",
+    "productionClient": "ChatGun Production",
+    "publishingStatus": "Testing",
+    "audience": "External",
+    "testUserEntries": 1,
+    "intendedOwnerIdentityConfirmed": false,
+    "javascriptOriginVerified": "https://chatgun.social",
+    "callbackVerified": "https://chatgun.social/api/auth/oauth/google/callback",
+    "runtimeCredentialPairTested": false,
+    "realOAuthE2E": "BLOCKED: Production activation/legal/admission approval required"
+  },
+  "facebook": {
+    "application": "ChatGun Production",
+    "publishingStatus": "Unpublished / In development",
+    "callbackVerified": "https://chatgun.social/api/auth/oauth/facebook/callback",
+    "clientOAuthLogin": true,
+    "webOAuthLogin": true,
+    "strictRedirectMatching": true,
+    "enforceHttps": true,
+    "embeddedBrowserLogin": false,
+    "publicProfilePermission": "Ready for testing",
+    "emailPermission": "Not added; UI offers Add",
+    "businessPortfolio": "Verification page requires connecting a business portfolio; no ownership change made",
+    "preparedScope": "public_profile only by default; no email requested or retained unless separately enabled",
+    "authorizedHumanRolesConfirmed": false,
+    "runtimeCredentialPairTested": false,
+    "realOAuthE2E": "BLOCKED: Production approval and explicit owner/tester role confirmation required"
+  },
+  "line": {
+    "console": "https://developers.line.biz/console/",
+    "currentStatus": "BLOCKED at LINE Business ID login",
+    "productionChannelStatusReverified": false,
+    "callbackReverified": false,
+    "expectedCallback": "https://chatgun.social/api/auth/oauth/line/callback",
+    "emailPermissionEnabled": false,
+    "manualAction": "Owner signs in to the LINE console Chrome handoff tab; inspect existing ChatGun Production channel without publishing",
+    "realOAuthE2E": "NOT RUN"
+  },
+  "providerApplicationsCreated": 0,
+  "credentialsCopiedOrReplaced": false,
+  "publishingActionsSubmitted": 0,
+  "productionLoginEnabled": false
+}

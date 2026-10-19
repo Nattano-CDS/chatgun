@@ -99,6 +99,116 @@
   },
   "suites": [
     {
+      "title": "issue16-beta-admission.spec.js",
+      "file": "issue16-beta-admission.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "private admission transport and provider filtering, localhost 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 452,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:33.066Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3dc0655c4d38cf182e34-911f490ea30a9aca6504",
+          "file": "issue16-beta-admission.spec.js",
+          "line": 4,
+          "column": 35
+        },
+        {
+          "title": "private admission transport and provider filtering, localhost 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 267,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:33.747Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3dc0655c4d38cf182e34-8bdc3a9fce3024fd5e8a",
+          "file": "issue16-beta-admission.spec.js",
+          "line": 4,
+          "column": 35
+        },
+        {
+          "title": "private admission transport and provider filtering, localhost 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 356,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:34.019Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3dc0655c4d38cf182e34-d21ec132f90dbe11446b",
+          "file": "issue16-beta-admission.spec.js",
+          "line": 4,
+          "column": 35
+        }
+      ]
+    },
+    {
       "title": "issue16-presence-retirement.spec.js",
       "file": "issue16-presence-retirement.spec.js",
       "column": 0,
@@ -120,12 +230,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1282,
+                  "duration": 916,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-18T06:14:53.606Z",
+                  "startTime": "2026-10-19T14:21:34.385Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -154,12 +264,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 394,
+                  "duration": 377,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-18T06:14:55.155Z",
+                  "startTime": "2026-10-19T14:21:35.305Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -188,12 +298,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1115,
+                  "duration": 1139,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-18T06:14:55.554Z",
+                  "startTime": "2026-10-19T14:21:35.687Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -222,12 +332,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 329,
+                  "duration": 319,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-18T06:14:56.673Z",
+                  "startTime": "2026-10-19T14:21:36.831Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -256,12 +366,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1317,
+                  "duration": 1301,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-18T06:14:57.007Z",
+                  "startTime": "2026-10-19T14:21:37.155Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -290,12 +400,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 336,
+                  "duration": 348,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-18T06:14:58.329Z",
+                  "startTime": "2026-10-19T14:21:38.460Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -324,12 +434,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 272,
+                  "duration": 264,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-18T06:14:58.670Z",
+                  "startTime": "2026-10-19T14:21:38.812Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -347,9 +457,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-18T06:14:52.978Z",
-    "duration": 6006.342,
-    "expected": 7,
+    "startTime": "2026-10-19T14:21:32.436Z",
+    "duration": 6689.543,
+    "expected": 10,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

@@ -1,13 +1,13 @@
 {
-  "checkedAt": "2026-10-18T06:16:42.143Z",
-  "origin": "http://127.0.0.1:52032",
+  "checkedAt": "2026-10-19T14:25:18.585Z",
+  "origin": "http://127.0.0.1:56859",
   "stage": "local",
-  "commit": "6c824ab0ecf5e70f414e7d34d74b7abe7bae3a8c",
+  "commit": "5d0ef9af8329d545214ded8b9ca3b7229d0b891f",
   "staticPrelaunch": true,
   "passed": 35,
   "failed": 0,
   "skipped": 0,
-  "hashedAssets": 23,
+  "hashedAssets": 24,
   "checks": [
     {
       "name": "actual release SHA and static mode",
