@@ -5,6 +5,7 @@ let turnstileReady = false;
 let busy = false;
 let account = null;
 let pendingDeletion = null;
+let availableProviders = new Set();
 
 function readCookie(name) {
   const prefix = `${name}=`;
@@ -25,6 +26,9 @@ async function initializeTurnstile() {
   const response = await fetch("/api/auth/config", { credentials: "same-origin" });
   const config = await response.json();
   if (!response.ok || !config.turnstileSiteKey) throw new Error("ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย");
+  availableProviders=new Set(config.oauthProviders||[]);
+  document.querySelectorAll('.link-provider').forEach(button=>{button.hidden=!availableProviders.has(button.dataset.provider);});
+  if(!availableProviders.size){message("ผู้ให้บริการยืนยันตัวตนยังไม่พร้อมใช้งาน หากต้องการความช่วยเหลือกรุณาติดต่อผู้ดูแล");return;}
   const script = document.createElement("script");
   script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
   script.async = true;
@@ -65,7 +69,8 @@ async function startOauth(provider, payload) {
 function showReauthentication() {
   const container = document.getElementById("reauth-providers");
   container.replaceChildren();
-  for (const provider of account.providers) {
+  const providers=account.providers.filter(provider=>availableProviders.has(provider));
+  for (const provider of providers) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "reauth-provider";
@@ -78,13 +83,13 @@ function showReauthentication() {
       catch (error) {
         deletionMessage(error.message);
         lock(false);
-        window.turnstile.reset(turnstileWidget);
+        if(turnstileWidget!==null)window.turnstile?.reset(turnstileWidget);
       }
     });
     container.appendChild(button);
   }
   document.getElementById("delete-reauth").hidden = false;
-  deletionMessage("ต้องยืนยันตัวตนล่าสุดก่อนสร้างคำขอลบบัญชี");
+  deletionMessage(providers.length?"ต้องยืนยันตัวตนล่าสุดก่อนสร้างคำขอลบบัญชี":"ผู้ให้บริการที่เชื่อมบัญชียังไม่พร้อมยืนยันตัวตน กรุณาติดต่อผู้ดูแลเพื่อดำเนินการอย่างปลอดภัย");
 }
 
 async function createDeletionRequest() {
@@ -141,7 +146,7 @@ document.querySelectorAll(".link-provider").forEach((button) => {
     catch (error) {
       message(error.message);
       lock(false);
-      window.turnstile.reset(turnstileWidget);
+      if(turnstileWidget!==null)window.turnstile?.reset(turnstileWidget);
     }
   });
 });

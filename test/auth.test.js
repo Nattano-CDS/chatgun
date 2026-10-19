@@ -475,6 +475,7 @@ test("Google callback verifies the ID token signature, audience, and nonce", asy
 test("Facebook callback debugs the token and does not mark its email verified", async () => {
   const database = new TestD1();
   const env = environment(database);
+  env.FACEBOOK_EMAIL_ENABLED = "true";
   env.FACEBOOK_CLIENT_ID = "1136950635489003";
   installDeliveryMock();
   const start = await onRequest({

@@ -45,6 +45,8 @@
   "env": {
     "production": {
       "vars": {
+        "OAUTH_ENABLED_PROVIDERS": "",
+        "FACEBOOK_EMAIL_ENABLED": "false",
         "PRESENCE_ENABLED": "false",
         "EMAIL_OTP_ENABLED": "false",
         "MOBILE_OTP_ENABLED": "false",

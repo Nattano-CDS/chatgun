@@ -46,7 +46,7 @@ function versionAssets(directory,prefix=''){
     if(entry.isDirectory()){versionAssets(path,relative+'/');continue;}
     if(/\.(?:html|js)$/u.test(relative)){
       let source=readFileSync(path,'utf8');
-      if(relative.endsWith('.html'))source=source.replace(/(src|href)=(["'])(\/[^"'?#]+\.(?:js|css))\2/gu,(_,attribute,quote,url)=>`${attribute}=${quote}${url}?v=${commit}${quote}`);
+      if(relative.endsWith('.html'))source=source.replace(/(src|href)=(["'])((?:\/(?!\/)|\.\/|\.\.\/)[^"'?#]+\.(?:js|css))\2/gu,(_,attribute,quote,url)=>`${attribute}=${quote}${url}?v=${commit}${quote}`);
       else source=source.replace(/(from\s*["'])(\.{1,2}\/[^"'?#]+\.js)(["'])/gu,(_,before,url,after)=>`${before}${url}?v=${commit}${after}`);
       writeFileSync(path,source);
     }

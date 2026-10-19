@@ -88,7 +88,7 @@ export function providerConfiguration(provider, env) {
     clientId, clientSecret,
     authorizationUrl: `https://www.facebook.com/${version}/dialog/oauth`,
     tokenUrl: `https://graph.facebook.com/${version}/oauth/access_token`,
-    scope: "email,public_profile",
+    scope: String(env.FACEBOOK_EMAIL_ENABLED).toLowerCase()==='true' ? "email,public_profile" : "public_profile",
     pkce: false,
     version,
   };
@@ -185,7 +185,8 @@ export async function verifyProviderIdentity(provider, configuration, token, non
   }
   const proof = await hmacHex(configuration.clientSecret, token.access_token);
   const profileUrl = new URL(`https://graph.facebook.com/${configuration.version}/me`);
-  profileUrl.searchParams.set("fields", "id,name,email,picture");
+  const emailAllowed=configuration.scope.split(',').includes('email');
+  profileUrl.searchParams.set("fields", emailAllowed ? "id,name,email,picture" : "id,name,picture");
   profileUrl.searchParams.set("appsecret_proof", proof);
   const profileResponse = await fetch(profileUrl, {
     headers: { accept: "application/json", authorization: `Bearer ${token.access_token}` },
@@ -195,7 +196,7 @@ export async function verifyProviderIdentity(provider, configuration, token, non
   return {
     provider,
     subject: profile.id,
-    email: typeof profile.email === "string" ? profile.email.trim().toLowerCase() : null,
+    email: emailAllowed && typeof profile.email === "string" ? profile.email.trim().toLowerCase() : null,
     // Meta does not include an email_verified assertion in this response; never auto-link with it.
     emailVerified: false,
     name: typeof profile.name === "string" ? profile.name : null,

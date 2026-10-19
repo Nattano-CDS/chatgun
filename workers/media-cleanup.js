@@ -10,6 +10,7 @@ function retryDelay(attempts) {
 }
 
 export async function drainMediaDeletionQueue(env, timestamp = unixTime()) {
+  if(String(env.MEDIA_CLEANUP_ENABLED).toLowerCase()==='false')return {disabled:true,completed:0,failed:0};
   if (!env.DB || !env.MEDIA) throw new Error("missing_staging_bindings");
   const exhaustedBefore = await env.DB.prepare(`
     SELECT COUNT(*) count FROM media_deletion_queue
