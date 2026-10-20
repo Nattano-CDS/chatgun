@@ -32,7 +32,7 @@ async function api(path, options = {}) {
   if (method !== "GET" && method !== "HEAD") headers["x-csrf-token"] = decodeURIComponent(cookie("__Host-cg_csrf"));
   const response = await fetch(path, { credentials: "same-origin", ...options, method, headers, ...(body ? { body } : {}) });
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || "ไม่สามารถดำเนินการได้");
+  if (!response.ok) throw new Error(payload.message || payload.error || "ไม่สามารถดำเนินการได้");
   return payload;
 }
 
@@ -140,7 +140,7 @@ function renderMedia(items) {
 function renderStats(counts = {}) {
   const stats = $("#moderation-stats");
   stats.replaceChildren();
-  for (const [key, text] of [["critical", "วิกฤต"], ["high", "สูง"], ["pending", "สื่อรอตรวจ"], ["userReports", "รายงานผู้ใช้"], ["mediaReports", "รายงานสื่อ"], ["appeals", "อุทธรณ์"]]) {
+  for (const [key, text] of [["members", "สมาชิกจริง"], ["activeMembers", "บัญชีที่เปิดใช้งาน"], ["critical", "วิกฤต"], ["high", "สูง"], ["pending", "สื่อรอตรวจ"], ["userReports", "รายงานผู้ใช้"], ["mediaReports", "รายงานสื่อ"], ["appeals", "อุทธรณ์"], ["deletionRequests", "คำขอลบบัญชี"], ["availableInvitations", "คำเชิญที่ยังใช้ได้"]]) {
     const card = node("article", null, "moderation-stat");
     card.append(node("strong", Number(counts[key] || 0).toLocaleString("th-TH")), node("span", text));
     stats.append(card);
@@ -186,6 +186,7 @@ function renderUserReports(reports) {
     );
     const actions = node("div", null, "dialog-actions");
     actions.append(button("ตรวจแล้ว", "user-report", "reviewed"), button("ยกระดับ", "user-report", "escalated", "danger"), button("ปิดรายงาน", "user-report", "closed"));
+    if(state.accountOps)actions.append(button("ระงับสิทธิ์ Beta", "account-suspend", report.id, "danger"));
     card.append(actions); results.append(card);
   }
 }
@@ -245,6 +246,20 @@ function renderAudit(events) {
   }
 }
 
+function renderAccountOperations(items,view){
+  const results=$("#moderation-results");results.replaceChildren();
+  if(!items.length)return empty("ไม่มีรายการสิทธิ์ Beta ในคิวนี้");
+  for(const item of items){
+    const card=node('article',null,'moderation-card');card.dataset.accountItem=item.id;card.dataset.revision=String(item.revision||0);
+    card.append(cardHeader(item.subject_name||'สิทธิ์ Beta',new Date(item.created_at*1000).toLocaleString('th-TH'),item.status||item.action),node('p',item.reason));
+    if(item.reviewer_conflict){card.dataset.conflict='true';card.append(node('p','คุณเป็นผู้ตัดสินเดิม การทบทวนนี้ไม่ใช่การตรวจสอบอิสระ ต้องบันทึกข้อขัดแย้ง','error'));}
+    const actions=node('div',null,'dialog-actions');
+    if(view==='account-restrictions'&&item.status==='active')actions.append(button('คืนสิทธิ์ Beta','account-lift',item.id));
+    if(view==='account-appeals')actions.append(button('คืนสิทธิ์ตามอุทธรณ์','account-appeal','lifted'),button('ยืนยันการระงับ','account-appeal','upheld','danger'));
+    card.append(actions);results.append(card);
+  }
+}
+
 async function load(view = state.view) {
   state.view = view; setStatus("กำลังโหลด…");
   document.querySelectorAll("[data-load]").forEach((item) => item.classList.toggle("active", item.dataset.load === view));
@@ -270,6 +285,7 @@ async function load(view = state.view) {
   else if (view === "media-reports") { payload = await api("/api/social/moderation/media-reports?status=pending"); renderMediaReports(payload.reports || []); }
   else if (view === "appeals") { payload = await api("/api/social/moderation/appeals?status=pending"); renderAppeals(payload.appeals || []); }
   else if (view === "audit") { payload = await api(`/api/social/moderation/audit?page=${state.page}`); renderAudit(payload.events || []); }
+  else if(view.startsWith('account-')){const kind={'account-restrictions':'restrictions','account-appeals':'appeals','account-history':'history'}[view];payload=await api('/api/social/moderation/accounts?view='+kind);renderAccountOperations(payload.items||[],view);}
   state.hasMore = Boolean(payload?.hasMore);
   $("#moderation-page").textContent = `หน้า ${state.page.toLocaleString("th-TH")}`;
   $("[data-page='previous']").disabled = state.page <= 1;
@@ -279,7 +295,7 @@ async function load(view = state.view) {
 
 async function authenticatedImage(path) {
   const response = await fetch(path, { credentials: "same-origin", headers: { "x-moderation-purpose": encodeURIComponent(purpose()) } });
-  if (!response.ok) { const payload = await response.json().catch(() => ({})); throw new Error(payload.error || "ไม่สามารถเปิดรูปภาพได้"); }
+  if (!response.ok) { const payload = await response.json().catch(() => ({})); throw new Error(payload.message || payload.error || "ไม่สามารถเปิดรูปภาพได้"); }
   return URL.createObjectURL(await response.blob());
 }
 
@@ -304,6 +320,17 @@ document.addEventListener("click", async (event) => {
   const action = event.target.closest("[data-action]");
   if (!action) return;
   try {
+    if(action.dataset.action.startsWith('account-')){
+      const reason=prompt('บันทึกเหตุผลสำหรับการตัดสินสิทธิ์ Beta (อย่างน้อย 10 ตัวอักษร)');if(!reason||reason.trim().length<10)return;
+      const card=action.closest('[data-account-item]');let body;
+      if(action.dataset.action==='account-suspend')body={action:'suspend',reportId:action.dataset.value,reason};
+      if(action.dataset.action==='account-lift')body={action:'lift',id:action.dataset.value,revision:Number(card.dataset.revision),reason};
+      if(action.dataset.action==='account-appeal'){
+        const conflict=card.dataset.conflict==='true';if(conflict&&!confirm('คุณเป็นผู้ตัดสินเดิม ไม่มีผู้ทบทวนอิสระ ยืนยันว่าบันทึกข้อขัดแย้งและดำเนินการตามขั้นตอนที่เจ้าของอนุมัติแล้วหรือไม่?'))return;
+        body={action:'resolve_appeal',id:card.dataset.accountItem,revision:Number(card.dataset.revision),decision:action.dataset.value,reason,conflictAcknowledged:conflict};
+      }
+      await api('/api/social/moderation/accounts',{method:'POST',body});await load();return;
+    }
     if (action.dataset.action === "media-view") await showMedia(action.dataset.value);
     if (action.dataset.action === "media") {
       const card = action.closest("[data-media]");
@@ -331,3 +358,4 @@ document.addEventListener("click", async (event) => {
 });
 
 load("overview").catch((error) => setStatus(error.message, true));
+api('/api/social/config',{routine:true}).then(c=>{state.accountOps=c.accountModerationEnabled===true;document.querySelectorAll('[data-account-ops]').forEach(el=>el.hidden=!state.accountOps);}).catch(()=>{});

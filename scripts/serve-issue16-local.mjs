@@ -20,9 +20,10 @@ for(const width of [390,768,1440])for(const [kind,name] of [['viewer','ผู้
     INSERT INTO member_profiles(user_id,age_assurance_id,name,discovery_visible,latitude,longitude,accuracy,located_at,created_at,updated_at)
       VALUES('${id}','${id}-adult','${name}',1,0,0,10,${now},${now},${now});`);
   sessions[id]=await issueSession(db,id);
+  if(kind==='owner')for(const role of ['report_reviewer','safety_admin'])await db.prepare('INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at) VALUES(?,?,?,?,?,?)').bind(id+'-'+role,id,role,'Local-only browser authorization fixture',now,now+86400).run();
 }
 writeFileSync('/tmp/chatgun-issue16-local-sessions.json',JSON.stringify(sessions),{mode:0o600});
-const base={...environment(db),SOCIAL_APP_ENABLED:'true',PRESENCE_ENABLED:'true',PUBLIC_DISCOVERY_ENABLED:'true',MESSAGING_ENABLED:'true',MEDIA_UPLOAD_ENABLED:'false',RATINGS_ENABLED:'false',IDENTITY_VERIFICATION_ENABLED:'false',OAUTH_LOGIN_ENABLED:'false',NEW_ACCOUNT_REGISTRATION_ENABLED:'false',DEMO_MODE_ENABLED:'false',DEMO_AUTO_START_ENABLED:'false'};
+const base={...environment(db),SOCIAL_APP_ENABLED:'true',PRESENCE_ENABLED:'true',PUBLIC_DISCOVERY_ENABLED:'true',MESSAGING_ENABLED:'true',MODERATION_TOOLS_ENABLED:'true',ACCOUNT_MODERATION_ENABLED:'true',MEDIA_UPLOAD_ENABLED:'false',RATINGS_ENABLED:'false',IDENTITY_VERIFICATION_ENABLED:'false',OAUTH_LOGIN_ENABLED:'false',NEW_ACCOUNT_REGISTRATION_ENABLED:'false',DEMO_MODE_ENABLED:'false',DEMO_AUTO_START_ENABLED:'false'};
 const dist=resolve('dist'),mime={'.js':'text/javascript','.css':'text/css','.html':'text/html','.svg':'image/svg+xml','.json':'application/json','.png':'image/png','.woff2':'font/woff2'};
 for(const [port,enabled] of [[8797,true],[8798,false]])createServer(tlsOptions,async(req,res)=>{
   try{

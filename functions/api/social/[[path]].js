@@ -166,13 +166,13 @@ function capability(env, name) {
   if (!enabled(env[name])) throw new SocialError("feature_disabled", "ฟีเจอร์นี้ยังไม่เปิดใช้งาน", 404);
 }
 
-async function authenticated(request, env, { csrf = false, onboarding = false } = {}) {
+async function authenticated(request, env, { csrf = false, onboarding = false, allowRevokedEnrollment = false } = {}) {
   const session = await getSession(request, env.DB);
   if (!session) throw new SocialError("unauthorized", "กรุณาเข้าสู่ระบบ", 401);
   const betaEnrollment = await env.DB.prepare(
     "SELECT status FROM beta_enrollments WHERE user_id = ?",
   ).bind(session.user_id).first();
-  if (betaEnrollment?.status === "revoked") {
+  if (betaEnrollment?.status === "revoked" && !allowRevokedEnrollment) {
     throw new SocialError("beta_access_revoked", "สิทธิ์เข้าร่วม Beta ถูกระงับ", 403);
   }
   if (acceptanceFlowEnabled(env)) {
@@ -331,6 +331,8 @@ async function config(env) {
     demoModeEnabled: false,
     demoAutoStartEnabled: false,
     onlineStatusEnabled: socialAppEnabled && enabled(env.PRESENCE_ENABLED),
+    moderationToolsEnabled: socialAppEnabled && enabled(env.MODERATION_TOOLS_ENABLED),
+    accountModerationEnabled: socialAppEnabled && enabled(env.ACCOUNT_MODERATION_ENABLED),
     gameEnabled: false,
     emailOtpEnabled: false,
     mobileOtpEnabled: false,
@@ -1331,6 +1333,100 @@ async function moderationMediaObject(request, env, id) {
   } });
 }
 
+async function accountAppeals(request,env){
+  capability(env,'SOCIAL_APP_ENABLED');capability(env,'ACCOUNT_MODERATION_ENABLED');
+  const session=await authenticated(request,env,{csrf:request.method==='POST',allowRevokedEnrollment:true});
+  if(request.method==='GET'){
+    const restrictions=await env.DB.prepare(`SELECT r.id,r.status,r.reason,r.created_at,r.resolution_reason,
+      a.status appeal_status,a.decision_reason FROM beta_account_restrictions r
+      LEFT JOIN beta_account_appeals a ON a.restriction_id=r.id AND a.user_id=?
+      WHERE r.user_id=? ORDER BY r.created_at DESC LIMIT 50`).bind(session.user_id,session.user_id).all();
+    return json({restrictions:restrictions.results||[]});
+  }
+  if(!hasRecentAuthentication(session))throw new SocialError('recent_auth_required','กรุณาเข้าสู่ระบบอีกครั้งก่อนยื่นอุทธรณ์',428);
+  await limited(env,'account_appeal_day',session.user_id,3,86400);
+  const body=await readJson(request),id=identifier(body.id),reason=cleanText(body.reason,1000,{required:true});
+  if(reason.length<10)throw new SocialError('invalid_reason','กรุณาระบุเหตุผลอย่างน้อย 10 ตัวอักษร');
+  const restriction=await env.DB.prepare("SELECT id FROM beta_account_restrictions WHERE id=? AND user_id=? AND status='active'").bind(id,session.user_id).first();
+  if(!restriction)throw new SocialError('not_found','ไม่พบสิทธิ์อุทธรณ์นี้',404);
+  const now=unixTime();
+  try{await env.DB.batch([
+    env.DB.prepare("INSERT INTO beta_account_appeals(id,restriction_id,user_id,reason,created_at) VALUES(?,?,?,?,?)").bind(safeUuid(),id,session.user_id,reason,now),
+    env.DB.prepare("INSERT INTO beta_account_moderation_events(id,restriction_id,actor_user_id,action,reason,created_at) VALUES(?,?,?,'appeal','Member submitted authenticated account appeal',?)").bind(safeUuid(),id,session.user_id,now),
+  ]);}catch(e){if(String(e.message).includes('UNIQUE'))throw new SocialError('appeal_exists','ส่งคำอุทธรณ์แล้ว',409);throw e;}
+  return json({ok:true},201);
+}
+
+async function moderationAccounts(request,env){
+  capability(env,'ACCOUNT_MODERATION_ENABLED');
+  const{session,purpose}=await moderationAccess(request,env,['safety_admin']);
+  if(request.method==='GET'){
+    const view=new URL(request.url).searchParams.get('view')||'restrictions';
+    let rows;
+    if(view==='appeals')rows=await env.DB.prepare(`SELECT a.id,a.restriction_id,a.reason,a.status,a.revision,a.created_at,
+      p.name subject_name,r.reason restriction_reason,r.created_by=? AS reviewer_conflict
+      FROM beta_account_appeals a JOIN beta_account_restrictions r ON r.id=a.restriction_id
+      LEFT JOIN member_profiles p ON p.user_id=a.user_id WHERE a.status='pending' ORDER BY a.created_at LIMIT 100`).bind(session.user_id).all();
+    else if(view==='restrictions')rows=await env.DB.prepare(`SELECT r.id,r.status,r.reason,r.revision,r.created_at,p.name subject_name
+      FROM beta_account_restrictions r LEFT JOIN member_profiles p ON p.user_id=r.user_id ORDER BY r.created_at DESC LIMIT 100`).all();
+    else if(view==='history')rows=await env.DB.prepare('SELECT action,reason,revision,created_at FROM beta_account_moderation_events ORDER BY created_at DESC LIMIT 100').all();
+    else throw new SocialError('invalid_input','คิวไม่ถูกต้อง');
+    await env.DB.prepare("INSERT INTO beta_account_moderation_events(id,actor_user_id,action,reason,created_at) VALUES(?,?,'queue_view',?,?)").bind(safeUuid(),session.user_id,purpose,unixTime()).run();
+    return json({items:rows.results||[]});
+  }
+  await limited(env,'account_moderation_hour',session.user_id,20,3600);
+  const body=await readJson(request),reason=cleanText(body.reason,300,{required:true}),now=unixTime();
+  if(reason.length<10)throw new SocialError('invalid_reason','กรุณาระบุเหตุผลอย่างน้อย 10 ตัวอักษร');
+  if(body.action==='suspend'){
+    const reportId=identifier(body.reportId),report=await env.DB.prepare('SELECT subject_user_id FROM social_reports WHERE id=?').bind(reportId).first();
+    if(!report||report.subject_user_id===session.user_id)throw new SocialError('invalid_target','ไม่สามารถระงับบัญชีนี้',403);
+    const target=report.subject_user_id;
+    const protectedAccount=await env.DB.prepare(`SELECT 1 ok FROM moderation_access_grants WHERE user_id=? AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>?)
+      UNION ALL SELECT 1 FROM moderation_roles WHERE user_id=? LIMIT 1`).bind(target,now,target).first();
+    if(protectedAccount)throw new SocialError('protected_account','บัญชีผู้ดูแลต้องใช้กระบวนการเพิกถอนสิทธิ์แยกต่างหาก',403);
+    const id=safeUuid();let results;
+    try{results=await env.DB.batch([
+      env.DB.prepare(`INSERT INTO beta_account_restrictions(id,user_id,report_id,reason,created_by,created_at)
+        SELECT ?,u.id,?,?,?,? FROM users u JOIN beta_enrollments e ON e.user_id=u.id
+        WHERE u.id=? AND u.status='active' AND u.account_state='active' AND e.status='active'`).bind(id,reportId,reason,session.user_id,now,target),
+      env.DB.prepare("UPDATE beta_enrollments SET status='revoked',revoked_at=? WHERE user_id=? AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=?)").bind(now,target,id),
+      env.DB.prepare('UPDATE sessions SET revoked_at=? WHERE user_id=? AND revoked_at IS NULL AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=?)').bind(now,target,id),
+      env.DB.prepare('UPDATE member_profiles SET discovery_visible=0,latitude=NULL,longitude=NULL,accuracy=NULL,located_at=NULL WHERE user_id=? AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=?)').bind(target,id),
+      env.DB.prepare('DELETE FROM member_presence_leases WHERE user_id=? AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=?)').bind(target,id),
+      env.DB.prepare('UPDATE album_access_grants SET revoked_at=? WHERE (album_owner_id=? OR viewer_id=?) AND revoked_at IS NULL AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=?)').bind(now,target,target,id),
+      env.DB.prepare("UPDATE album_access_requests SET status='revoked',revision=revision+1,updated_at=? WHERE (album_owner_id=? OR requester_id=?) AND status='approved' AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=?)").bind(now,target,target,id),
+      env.DB.prepare("INSERT INTO beta_account_moderation_events(id,restriction_id,actor_user_id,action,reason,created_at) SELECT ?,id,?,'suspend',?,? FROM beta_account_restrictions WHERE id=?").bind(safeUuid(),session.user_id,`${purpose}; ${reason}`.slice(0,300),now,id),
+    ]);}catch(e){if(String(e.message).includes('UNIQUE'))throw new SocialError('decision_conflict','บัญชีนี้ถูกระงับอยู่แล้ว',409);throw e;}
+    if(!results[0]?.meta.changes)throw new SocialError('decision_conflict','บัญชีนี้ไม่มีสิทธิ์ Beta ที่ระงับได้',409);
+    return json({ok:true},201);
+  }
+  if(body.action==='lift'||body.action==='resolve_appeal'){
+    if(!Number.isSafeInteger(body.revision)||body.revision<0)throw new SocialError('revision_required','กรุณาโหลดสถานะใหม่',409);
+    let restriction,appeal;
+    if(body.action==='resolve_appeal'){
+      if(!['upheld','lifted'].includes(body.decision))throw new SocialError('invalid_action','ผลการอุทธรณ์ไม่ถูกต้อง');
+      appeal=await env.DB.prepare("SELECT * FROM beta_account_appeals WHERE id=? AND status='pending' AND revision=?").bind(identifier(body.id),body.revision).first();
+      if(!appeal)throw new SocialError('decision_conflict','คำอุทธรณ์ถูกแก้ไขแล้ว',409);
+      restriction=await env.DB.prepare("SELECT * FROM beta_account_restrictions WHERE id=? AND status='active'").bind(appeal.restriction_id).first();
+    }else restriction=await env.DB.prepare("SELECT * FROM beta_account_restrictions WHERE id=? AND status='active' AND revision=?").bind(identifier(body.id),body.revision).first();
+    if(!restriction||!restriction.user_id||restriction.user_id===session.user_id)throw new SocialError('decision_conflict','ไม่พบรายการที่ดำเนินการได้',409);
+    if(appeal&&restriction.created_by===session.user_id&&body.conflictAcknowledged!==true)throw new SocialError('reviewer_conflict','ผู้ตัดสินเดิมต้องบันทึกข้อขัดแย้งและยืนยันการทบทวนที่ไม่เป็นอิสระ',409);
+    const lift=!appeal||body.decision==='lifted',revision=restriction.revision+1,statements=[];
+    if(appeal)statements.push(env.DB.prepare(`UPDATE beta_account_appeals SET status=?,reviewed_by=?,reviewed_at=?,decision_reason=?,revision=revision+1
+      WHERE id=? AND status='pending' AND revision=?`).bind(body.decision,session.user_id,now,reason,appeal.id,body.revision));
+    statements.push(env.DB.prepare(`UPDATE beta_account_restrictions SET status=?,resolved_by=?,resolved_at=?,resolution_reason=?,revision=revision+1
+      WHERE id=? AND status='active' AND revision=?`).bind(lift?'lifted':'active',session.user_id,now,reason,restriction.id,restriction.revision));
+    if(lift)statements.push(env.DB.prepare(`UPDATE beta_enrollments SET status='active',revoked_at=NULL
+      WHERE user_id=? AND status='revoked' AND EXISTS(SELECT 1 FROM users WHERE id=? AND status='active' AND account_state='active')
+        AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=? AND status='lifted' AND revision=?)`).bind(restriction.user_id,restriction.user_id,restriction.id,revision));
+    statements.push(env.DB.prepare(`INSERT INTO beta_account_moderation_events(id,restriction_id,actor_user_id,action,reason,revision,created_at)
+      SELECT ?,id,?,?,?,?,? FROM beta_account_restrictions WHERE id=? AND revision=? AND resolved_by=? AND resolved_at=?`).bind(safeUuid(),session.user_id,appeal?(lift?'appeal_lifted':'appeal_upheld'):'lift',`${purpose}; ${reason}${appeal&&restriction.created_by===session.user_id?'; original reviewer conflict acknowledged':''}`.slice(0,300),revision,now,restriction.id,revision,session.user_id,now));
+    const results=await env.DB.batch(statements);if(!results[0]?.meta.changes)throw new SocialError('decision_conflict','ข้อมูลถูกแก้ไขแล้ว',409);
+    return json({ok:true});
+  }
+  throw new SocialError('invalid_action','คำสั่งไม่ถูกต้อง');
+}
+
 async function moderationOverview(request, env) {
   const { session, purpose } = await moderationAccess(request, env, ["report_reviewer", "safety_admin"], {
     fixedPurpose: "routine_admin_dashboard_access",
@@ -1339,6 +1435,10 @@ async function moderationOverview(request, env) {
   const since = unixTime() - 86400;
   const counts = await env.DB.prepare(`
     SELECT
+      (SELECT COUNT(*) FROM users) members,
+      (SELECT COUNT(*) FROM users WHERE status='active' AND account_state='active') activeMembers,
+      (SELECT COUNT(*) FROM account_deletion_requests) deletionRequests,
+      (SELECT COUNT(*) FROM beta_invitations WHERE status='active' AND use_count<max_uses AND expires_at>unixepoch()) availableInvitations,
       (SELECT COUNT(*) FROM media_safety_reviews WHERE status='pending') pending,
       (SELECT COUNT(*) FROM media_safety_reviews WHERE status='released' AND COALESCE(category,'general')='general') general,
       (SELECT COUNT(*) FROM media_safety_reviews WHERE status='released' AND category='sensitive') sensitive,
@@ -2036,6 +2136,8 @@ export async function onRequest({ request, env }) {
     if (path === "/api/social/media/appeals" && ["GET", "POST"].includes(request.method)) return await mediaAppeals(request, env);
     if (path === "/api/social/moderation/notifications" && ["GET", "POST"].includes(request.method)) return await moderationNotifications(request, env);
     if (request.method === "GET" && path === "/api/social/moderation/overview") return await moderationOverview(request, env);
+    if (path === '/api/social/account-appeals' && ['GET','POST'].includes(request.method)) return await accountAppeals(request,env);
+    if (path === '/api/social/moderation/accounts' && ['GET','POST'].includes(request.method)) return await moderationAccounts(request,env);
     if (path === "/api/social/moderation/roles" && ["GET", "POST"].includes(request.method)) return await moderationRoleManagement(request, env);
     if (path === "/api/social/moderation/reports" && ["GET", "POST"].includes(request.method)) return await moderationReports(request, env);
     if (path === "/api/social/moderation/media-reports" && ["GET", "POST"].includes(request.method)) return await moderationMediaReports(request, env);
