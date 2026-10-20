@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-20T03:50:00.739Z",
+  "checkedAt": "2026-10-20T04:19:19.624Z",
   "account": "23017b53386fb67fc62a52cdd017454c",
-  "sha": "815c2c401e095bb2dc3e6a1a2497269f4f268fb6",
+  "sha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
   "scope": "line-owner-pilot",
   "policyVersions": {
     "adultNotice": "adult-beta-2026-10-20-rc1",
@@ -34,15 +34,16 @@
     "SENSITIVE_CONTENT_ENABLED": "false",
     "RATINGS_ENABLED": "false",
     "IDENTITY_VERIFICATION_ENABLED": "false",
-    "MODERATION_TOOLS_ENABLED": "false",
+    "MODERATION_TOOLS_ENABLED": "true",
     "DEMO_MODE_ENABLED": "false",
     "DEMO_AUTO_START_ENABLED": "false",
     "PUBLIC_DEMO_CANARY_ENABLED": "false",
     "OAUTH_LOGIN_ENABLED": "true",
-    "LINE_EXPECTED_CLIENT_ID": "2012039306"
+    "LINE_EXPECTED_CLIENT_ID": "2012039306",
+    "ACCOUNT_MODERATION_ENABLED": "false"
   },
-  "priorDeployment": "336fe5fa-c4ab-4bdd-a4da-6b91f0df1d88",
-  "priorSha": "c1116c25a77e0a96f1e53f9fe662b6a9c4aab671",
+  "priorDeployment": "6930ba48-5511-422e-9dc0-b7cdcf604d7f",
+  "priorSha": "815c2c401e095bb2dc3e6a1a2497269f4f268fb6",
   "rollback": "Protected durable closed-prepilot package, preserve DB/R2, no schema rollback",
   "rolesGranted": 0,
   "publicRegistration": false,

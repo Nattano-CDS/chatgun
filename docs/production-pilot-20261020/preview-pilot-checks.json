@@ -1,8 +1,8 @@
 {
-  "checkedAt": "2026-10-20T03:47:43.342Z",
+  "checkedAt": "2026-10-20T04:16:51.369Z",
   "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
   "stage": "preview",
-  "commit": "815c2c401e095bb2dc3e6a1a2497269f4f268fb6",
+  "commit": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
   "passed": 14,
   "failed": 0,
   "checks": [
@@ -63,7 +63,7 @@
       "status": "PASS"
     }
   ],
-  "hashedAssets": 36,
+  "hashedAssets": 38,
   "policyVersions": {
     "adultNotice": "adult-beta-2026-10-20-rc1",
     "terms": "terms-beta-2026-10-20-rc1",

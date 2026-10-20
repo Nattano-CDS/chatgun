@@ -1,8 +1,8 @@
 {
-  "checkedAt": "2026-10-20T03:50:31.146Z",
+  "checkedAt": "2026-10-20T04:19:56.925Z",
   "origin": "https://chatgun.social",
   "stage": "production",
-  "commit": "815c2c401e095bb2dc3e6a1a2497269f4f268fb6",
+  "commit": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
   "passed": 22,
   "failed": 0,
   "checks": [
@@ -95,7 +95,7 @@
       "status": "PASS"
     }
   ],
-  "hashedAssets": 36,
+  "hashedAssets": 38,
   "policyVersions": {
     "adultNotice": "adult-beta-2026-10-20-rc1",
     "terms": "terms-beta-2026-10-20-rc1",

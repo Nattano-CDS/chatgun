@@ -1,6 +1,6 @@
 {
-  "checkedAt": "2026-10-20T03:50:49.904Z",
-  "productionSha": "815c2c401e095bb2dc3e6a1a2497269f4f268fb6",
+  "checkedAt": "2026-10-20T04:20:18.002Z",
+  "productionSha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
   "invitationConsumedExactlyOnce": true,
   "enrollmentActive": true,
   "accountActive": true,
@@ -8,7 +8,7 @@
   "approvedAcceptance": true,
   "selfDeclaredAgeRecorded": true,
   "profilePersisted": true,
-  "activeSessions": 2,
+  "activeSessions": 3,
   "revokedSessions": 1,
   "profileFields": {
     "namePresent": true,
@@ -23,11 +23,12 @@
     "users": 1,
     "identities": 1,
     "member_profiles": 1,
-    "sessions": 3,
+    "sessions": 4,
     "beta_invitations": 1,
     "social_messages": 0,
     "social_media": 0,
-    "moderation_roles": 0
+    "moderation_roles": 0,
+    "moderation_access_grants": 2
   },
   "foreignKeyViolations": 0,
   "duplicateProviderSubjects": 0,
