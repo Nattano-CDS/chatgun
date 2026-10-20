@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {createHash} from 'node:crypto';import {approvedOwnerPilot,ownerPilotVars} from './lib/owner-pilot-release.mjs';
 const origin=process.env.PILOT_CHECK_ORIGIN;assert.ok(['https://issue13.chatgun-issue13-staging.pages.dev','https://chatgun.social'].includes(origin));
-const stage=origin==='https://chatgun.social'?'production':'preview',out='docs/production-pilot-20261020';mkdirSync(out,{recursive:true});
+const stage=origin==='https://chatgun.social'?'production':'preview',out=process.env.PILOT_EVIDENCE_DIR||'docs/production-pilot-20261020';assert.ok(['docs/production-pilot-20261020','docs/production-owner-uat'].includes(out));mkdirSync(out,{recursive:true});
 const expected=JSON.parse(readFileSync('dist/release.json')),approved=approvedOwnerPilot(),checks=[];
 assert.equal(expected.releaseMode,'controlled-beta');
 const check=(name,value)=>{assert.ok(value,name);checks.push({name,status:'PASS'});};
