@@ -51,6 +51,15 @@ test.beforeEach(async ({ page }) => {
   await mockSocialApi(page);
 });
 
+test('restricted public account reaches account privacy/deletion and appeal controls instead of a retry dead end',async({page})=>{
+ await page.route('**/api/social/profile',r=>r.fulfill({status:403,json:{code:'account_access_restricted',message:'บัญชีถูกระงับสิทธิ์'}}));
+ await page.route('**/api/social/config',r=>r.fulfill({json:{...config,accountModerationEnabled:true}}));
+ await page.goto('/app/');await expect(page).toHaveURL(/\/account\.html\?access=restricted$/);
+ await expect(page.locator('#account-appeals-link')).toBeVisible();
+ await expect(page.locator('#account-appeals-link')).toHaveAttribute('href','/app/appeals.html');
+ await expect(page.locator('#deletion')).toBeVisible();await expect(page.locator('#logout')).toBeVisible();
+});
+
 test('authenticated chat deep link opens the actual inbox immediately',async({page})=>{
   await page.goto('/?tab=chat');await expect(page.locator('#chat-tab')).toBeVisible();
   await expect(page.locator('#near-tab')).not.toBeVisible();await expect(page.locator('[data-chat="friend-1"]')).toBeVisible();

@@ -290,18 +290,26 @@ export async function findOrCreateIdentity(
       if (Number(results[0]?.meta?.changes || 0) !== 1) throw new Error("invitation_unavailable");
       return userId;
     }
-    await db.prepare(`
-      INSERT INTO users(id, email, email_verified_at, display_name, avatar_url, status, account_state, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, 'active', 'pending_acceptance', ?, ?)
-    `).bind(
-      userId,
-      safeEmail,
-      safeEmail ? timestamp : null,
-      profile.name || null,
-      profile.picture || null,
-      timestamp,
-      timestamp,
-    ).run();
+    // Public registration has no invitation claim, but account + identity must
+    // still commit together. A failed/duplicate callback must leave no orphan.
+    try {
+      await db.batch([
+        db.prepare(`
+          INSERT INTO users(id,email,email_verified_at,display_name,avatar_url,status,account_state,created_at,updated_at)
+          VALUES(?,?,?,?,?,'active','pending_acceptance',?,?)
+        `).bind(userId,safeEmail,safeEmail?timestamp:null,profile.name||null,profile.picture||null,timestamp,timestamp),
+        db.prepare(`
+          INSERT INTO identities(provider,subject,user_id,provider_email,email_verified,created_at,last_login_at)
+          VALUES(?,?,?,?,?,?,?)
+        `).bind(profile.provider,profile.subject,userId,profile.email||null,profile.emailVerified?1:0,timestamp,timestamp),
+      ]);
+    } catch (error) {
+      const winner=await db.prepare(`SELECT i.user_id,u.status FROM identities i JOIN users u ON u.id=i.user_id
+        WHERE i.provider=? AND i.subject=?`).bind(profile.provider,profile.subject).first();
+      if(!winner||winner.status!=='active')throw error;
+      return winner.user_id;
+    }
+    return userId;
   }
 
   try {

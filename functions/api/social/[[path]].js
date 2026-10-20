@@ -185,11 +185,15 @@ async function authenticated(request, env, { csrf = false, onboarding = false, a
   const session = await getSession(request, env.DB);
   if (!session) throw new SocialError("unauthorized", "กรุณาเข้าสู่ระบบ", 401);
   const betaEnrollment = await env.DB.prepare(
-    "SELECT status FROM beta_enrollments WHERE user_id = ?",
-  ).bind(session.user_id).first();
+    `SELECT (SELECT status FROM beta_enrollments WHERE user_id=?) status,
+      EXISTS(SELECT 1 FROM beta_account_restrictions WHERE user_id=? AND status='active') account_restricted`,
+  ).bind(session.user_id,session.user_id).first();
   if (betaEnrollment?.status === "revoked" && !allowRevokedEnrollment) {
     throw new SocialError("beta_access_revoked", "สิทธิ์เข้าร่วม Beta ถูกระงับ", 403);
   }
+  // Public registrations have no Beta enrollment. Restrictions must remain
+  // effective after re-login and even if the moderation UI flag is disabled.
+  if(betaEnrollment?.account_restricted&&!allowRevokedEnrollment)throw new SocialError('account_access_restricted','บัญชีถูกระงับสิทธิ์ กรุณาไปหน้าบัญชีเพื่อดูหรือยื่นอุทธรณ์',403);
   if (acceptanceFlowEnabled(env)) {
     const acceptance = await currentAcceptance(env.DB, session.user_id, env);
     if (!acceptance.accepted || session.account_state === "pending_acceptance") {
@@ -1466,8 +1470,8 @@ async function moderationAccounts(request,env){
     const id=safeUuid();let results;
     try{results=await env.DB.batch([
       env.DB.prepare(`INSERT INTO beta_account_restrictions(id,user_id,report_id,reason,created_by,created_at)
-        SELECT ?,u.id,?,?,?,? FROM users u JOIN beta_enrollments e ON e.user_id=u.id
-        WHERE u.id=? AND u.status='active' AND u.account_state='active' AND e.status='active'`).bind(id,reportId,reason,session.user_id,now,target),
+        SELECT ?,u.id,?,?,?,? FROM users u
+        WHERE u.id=? AND ${eligibleSql('u.id')} AND ${betaTargetSql(env,'u.id')}`).bind(id,reportId,reason,session.user_id,now,target),
       env.DB.prepare("UPDATE beta_enrollments SET status='revoked',revoked_at=? WHERE user_id=? AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=?)").bind(now,target,id),
       env.DB.prepare('UPDATE sessions SET revoked_at=? WHERE user_id=? AND revoked_at IS NULL AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=?)').bind(now,target,id),
       env.DB.prepare('UPDATE member_profiles SET discovery_visible=0,latitude=NULL,longitude=NULL,accuracy=NULL,located_at=NULL WHERE user_id=? AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=?)').bind(target,id),
