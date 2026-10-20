@@ -279,7 +279,13 @@ async function loadRelationships() {
   state.conversations = result.conversations, state.conversationMore = !!result.hasMore, state.conversationOffset = result.nextOffset || state.conversations.length, renderRelationships();
 }
 async function loadPeople() {
-  if (!state.config.publicDiscoveryEnabled) return;
+  if (!state.config.publicDiscoveryEnabled) {
+    state.people = [];
+    $("#location-toggle").disabled = true;
+    renderPeople();
+    $("#people-grid .empty").innerHTML = '<h2>ระยะทดสอบโปรไฟล์ของคุณ</h2><p>การค้นหาสมาชิกและการเผยแพร่ตำแหน่งยังไม่เปิดใช้งาน</p>';
+    return;
+  }
   const result = await api("/api/social/discovery");
   state.people = result.people, state.locationFresh = result.locationFresh, $("#location-banner").classList.toggle("active", state.locationFresh), $("#location-toggle").textContent = state.locationFresh ? "ปิดตำแหน่ง" : "เปิดตำแหน่ง", renderPeople();
 }

@@ -8,9 +8,9 @@ test('prepared Production cleanup is inert until explicit enablement and schedul
   await privacy.scheduled({scheduledTime:1},{DB,RETENTION_CLEANUP_ENABLED:'false'},{waitUntil(){throw Error('must not schedule deletes');}});
   assert.equal((await drainMediaDeletionQueue({DB,MEDIA_CLEANUP_ENABLED:'false'})).disabled,true);
 });
-test('legal drafts match confirmed operator and 18+ scope without asserting legal approval',()=>{
+test('limited owner-pilot policies match confirmed operator and disclosed 18+ scope',()=>{
   for(const file of ['privacy.html','terms.html','data-deletion.html']){
-    const html=readFileSync(file,'utf8');assert.match(html,/เทพกร ทาโน/);assert.match(html,/natttano@outlook.com/);assert.match(html,/ยังไม่มีผลบังคับ/);
+    const html=readFileSync(file,'utf8');assert.match(html,/เทพกร ทาโน/);assert.match(html,/natttano@outlook.com/);assert.match(html,/data-policy-version=/);assert.match(html,/20 ตุลาคม 2026/);
   }
   const privacyHtml=readFileSync('privacy.html','utf8');assert.match(privacyHtml,/18–19/);assert.match(privacyHtml,/public_profile/);assert.match(privacyHtml,/ไม่ใช่การตรวจสอบอายุอย่างอิสระ/);assert.match(privacyHtml,/ไม่แสดงเวลาที่พบล่าสุด/);
 });
