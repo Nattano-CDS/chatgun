@@ -374,5 +374,5 @@ api('/api/social/config',{routine:true}).then(async c=>{state.accountOps=c.accou
  if(!c.moderationToolsEnabled)return;
  const grants=await api('/api/social/moderation/capabilities',{routine:true});
  state.accountOps=grants.canModerateAccounts;
- document.querySelectorAll('[data-load]').forEach(el=>{const view=el.dataset.load;if(view.startsWith('account-'))el.hidden=!grants.canModerateAccounts;else if(['pending','approved','sensitive','rejected','appeals','audit'].includes(view))el.hidden=!grants.canReviewMedia;else if(['priority','user-reports','media-reports'].includes(view))el.hidden=!grants.canReviewReports;});
+ document.querySelectorAll('[data-load]').forEach(el=>{const view=el.dataset.load;if(view.startsWith('account-'))el.hidden=!grants.canModerateAccounts;else if(['priority','pending','approved','sensitive','rejected','appeals','audit'].includes(view))el.hidden=!grants.canReviewMedia;else if(['user-reports','media-reports'].includes(view))el.hidden=!grants.canReviewReports;});
 }).catch(()=>{});

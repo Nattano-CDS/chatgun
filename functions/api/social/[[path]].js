@@ -5,7 +5,7 @@ import { RequestError, failure, json, readJson, requireSameOrigin } from "../../
 import { sanitizeImage } from "../../_lib/image.js";
 import { acceptanceFlowEnabled, currentAcceptance } from "../../_lib/acceptance.js";
 import { selfDeclaredAdult } from "../../_lib/age.js";
-import { canContact, albumGrant, canViewPhoto, publicPortrait, eligibleSql, unblockedSql } from "../../_lib/social-permissions.js";
+import { canContact, albumGrant, canViewPhoto, publicPortrait, publicPortraitColumn, eligibleSql, unblockedSql } from "../../_lib/social-permissions.js";
 
 const LOCATION_FRESH_SECONDS = 120;
 const MEDIA_UPLOAD_DAILY_LIMIT = 10;
@@ -583,7 +583,7 @@ async function discovery(request, env) {
   if(after.length>128||(gender&&!ALLOWED_GENDERS.has(gender))||![500,1000,5000].includes(radius))throw new SocialError('invalid_filter','ตัวกรองค้นหาไม่ถูกต้อง');
   const longitudeRange=Math.min(360,0.06/Math.max(0.001,Math.cos(radians(Number(ownLocation.latitude)))));
   const rows = await env.DB.prepare(`
-    SELECT p.user_id, p.name, p.gender, p.bio, p.interests, p.selected_photo_id,p.direct_messages_enabled,
+    SELECT p.user_id, p.name, p.gender, p.bio, p.interests, ${publicPortraitColumn},p.direct_messages_enabled,
            p.latitude, p.longitude,
            EXISTS(SELECT 1 FROM identity_verification_requests v WHERE v.user_id = p.user_id AND v.status = 'approved') identity_verified,
            (SELECT AVG(score) FROM proximity_ratings r WHERE r.receiver_user_id = p.user_id) rating,
@@ -620,7 +620,6 @@ async function discovery(request, env) {
   }).filter((person) => person._distance <= 5000&&person.distance<=radius)
     .sort((a, b) => a.distance - b.distance || String(a.user_id).localeCompare(String(b.user_id)))
     .map(({ _distance, ...person }) => person);
-  for (const person of people) person.selected_photo_id=await publicPortrait(env.DB,person.selected_photo_id,person.user_id);
   if(enabled(env.PRESENCE_ENABLED))for(let start=0;start<people.length;start+=50){const group=people.slice(start,start+50),statuses=await onlineStatuses(env.DB,session.user_id,group.map(p=>p.user_id));for(const person of group)person.is_online=statuses[person.user_id];}
   return json({ people, locationFresh: true,hasMore:(rows.results||[]).length>limit,nextCursor:candidates.at(-1)?.user_id||null });
 }
@@ -682,7 +681,7 @@ async function conversations(request,env) {
     UNION ALL SELECT CASE WHEN album_owner_id=? THEN requester_id ELSE album_owner_id END,created_at,id,
       json_object('body','อัลบั้มส่วนตัว','media_id',NULL,'sender_user_id',actor_user_id,'unsent_at',NULL)
     FROM chat_system_events WHERE album_owner_id=? OR requester_id=?
-  ) SELECT p.user_id other_user_id,p.name,p.gender,p.bio,p.interests,p.selected_photo_id,p.direct_messages_enabled,MAX(a.created_at) last_message_at,
+  ) SELECT p.user_id other_user_id,p.name,p.gender,p.bio,p.interests,${publicPortraitColumn},p.direct_messages_enabled,MAX(a.created_at) last_message_at,
     (SELECT recent.payload FROM activity recent WHERE recent.other_user_id=p.user_id
       ORDER BY recent.created_at DESC,recent.activity_id DESC LIMIT 1) last_message_payload,
     (SELECT COUNT(*) FROM social_messages m WHERE m.sender_user_id=p.user_id AND m.receiver_user_id=? AND m.read_at IS NULL AND m.unsent_at IS NULL)
@@ -697,7 +696,6 @@ async function conversations(request,env) {
     .bind(...Array(10).fill(session.user_id),session.user_id,session.user_id,offset).all();
   const result=(rows.results||[]).slice(0,50);
   for(const p of result){
-    p.selected_photo_id=await publicPortrait(env.DB,p.selected_photo_id,p.other_user_id);
     const latest=JSON.parse(p.last_message_payload||'null');delete p.last_message_payload;
     if(latest)Object.assign(p,{last_message_body:latest.body,last_message_media_id:latest.media_id,last_message_sender_id:latest.sender_user_id,last_message_unsent_at:latest.unsent_at});
   }
@@ -1074,7 +1072,9 @@ async function moderationCapabilities(request,env){
   capability(env,'SOCIAL_APP_ENABLED');capability(env,'MODERATION_TOOLS_ENABLED');
   const session=await authenticated(request,env),now=unixTime();
   const rows=await env.DB.prepare(`SELECT role FROM moderation_access_grants WHERE user_id=? AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>?)
-    UNION SELECT role FROM moderation_roles WHERE user_id=?`).bind(session.user_id,now,session.user_id).all();
+    UNION SELECT legacy.role FROM moderation_roles legacy WHERE legacy.user_id=? AND NOT EXISTS(
+      SELECT 1 FROM moderation_access_grants recorded WHERE recorded.user_id=legacy.user_id AND recorded.role=legacy.role)
+    `).bind(session.user_id,now,session.user_id).all();
   const roles=new Set((rows.results||[]).map(row=>row.role));
   return json({canReviewReports:roles.has('report_reviewer')||roles.has('safety_admin'),canReviewMedia:roles.has('safety_admin'),canManageRoles:roles.has('moderation_admin'),canReviewIdentity:enabled(env.IDENTITY_VERIFICATION_ENABLED)&&roles.has('identity_reviewer'),canModerateAccounts:enabled(env.ACCOUNT_MODERATION_ENABLED)&&roles.has('safety_admin'),recentAuthentication:hasRecentAuthentication(session)});
 }
@@ -1892,8 +1892,8 @@ async function gallery(request, env) {
       const comments = await env.DB.prepare(`
         SELECT c.id, c.body, c.created_at, p.user_id sender_user_id, p.name sender_name
         FROM photo_comments c JOIN member_profiles p ON p.user_id = c.sender_user_id
-        WHERE c.media_id = ? ORDER BY c.created_at ASC LIMIT 200
-      `).bind(id).all();
+        WHERE c.media_id = ? AND ${unblockedSql('c.sender_user_id','?')} ORDER BY c.created_at ASC,c.id LIMIT 200
+      `).bind(id,session.user_id,session.user_id).all();
       return json({ photos, comments: comments.results || [], owner });
     }
     const access=await env.DB.prepare('SELECT id,status,revision FROM album_access_requests WHERE album_owner_id=? AND requester_id=?')

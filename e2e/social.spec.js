@@ -103,6 +103,16 @@ test('gallery failed comment keeps its draft and inline reason; likes are disabl
   await page.keyboard.press('Escape');await expect(page.locator('#profile-dialog')).toBeHidden();
 });
 
+test('public photo stays open without a private grant and foreground updates preserve comment draft',async({page})=>{
+ await page.clock.install();let updated=false;
+ await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',album:{granted:false,request:null},photos:[{id:'public-refresh',visibility:'public',caption:'รูปสาธารณะ',like_count:updated?2:0}],comments:updated?[{id:'new',sender_name:'ผู้แสดงความคิดเห็นทดสอบ',body:'ความคิดเห็นใหม่'}]:[]}}));
+ await page.goto('/app/people/near-1/gallery/public-refresh');await expect(page.locator('.lightbox-shell')).toBeVisible();await page.locator('#gallery-comment input[name=comment]').fill('ร่างที่ต้องรักษาไว้');updated=true;await page.clock.fastForward(11000);
+ await expect(page.locator('.lightbox-shell')).toBeVisible();await expect(page.locator('.post-comments')).toContainText('ความคิดเห็นใหม่');await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ร่างที่ต้องรักษาไว้');
+});
+test('core configuration outage exposes a working recovery action without fake members',async({page})=>{
+ let failed=true;await page.route('**/api/social/config',r=>failed?r.fulfill({status:503,json:{message:'Temporary failure'}}):r.fulfill({json:config}));await page.goto('/');await expect(page.locator('#disabled-view')).toBeVisible();await expect(page.locator('#people-grid .person-card')).toHaveCount(0);failed=false;await page.locator('#service-retry').click();await expect(page.locator('#social-view')).toBeVisible();await expect(page.locator('#disabled-view')).toBeHidden();
+});
+
 test('moderation withdrawal clears an already-open photo on permission refresh',async({page})=>{
   let released=true;
   await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',album:{granted:false,request:null},photos:released?[{id:'withdrawn',visibility:'public',review_status:'released',caption:'รูปสมมติ'}]:[],comments:[]}}));

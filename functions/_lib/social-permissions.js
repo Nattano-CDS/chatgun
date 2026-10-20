@@ -40,3 +40,10 @@ export async function publicPortrait(db, id, owner) {
     JOIN media_safety_reviews r ON r.media_id=m.id AND r.status='released' AND r.category='general'
     WHERE p.media_id=? AND p.owner_user_id=? AND p.visibility='public'`).bind(id,owner).first())?.media_id || null;
 }
+// Source-owned alias p only. Resolve portraits within discovery/inbox queries,
+// rather than issuing one D1 network query per card.
+export const publicPortraitColumn=`CASE WHEN EXISTS(SELECT 1 FROM profile_photos portrait
+  JOIN social_media portrait_media ON portrait_media.id=portrait.media_id AND portrait_media.state='active'
+  JOIN media_safety_reviews portrait_review ON portrait_review.media_id=portrait.media_id AND portrait_review.status='released' AND portrait_review.category='general'
+  WHERE portrait.media_id=p.selected_photo_id AND portrait.owner_user_id=p.user_id AND portrait.visibility='public')
+  THEN p.selected_photo_id ELSE NULL END selected_photo_id`;

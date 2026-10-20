@@ -565,12 +565,12 @@ async function refreshAlbumPermission() {
   // An empty public profile cannot receive uploads/requests while both services
   // are closed. Keep live private/granted-media checks; avoid six empty reads/minute.
   if (!state.privateAlbumOpen && !state.personPhotos.length && !state.config?.mediaUploadEnabled && !state.config?.messagingEnabled) return;
-  const generation = state.profileRequest, id = profileContext(state.selectedPerson).id;
+  const generation = state.profileRequest, id = profileContext(state.selectedPerson).id,privateWasOpen=state.privateAlbumOpen;
   state.albumRefreshBusy = !0;
   try {
     const result = await api("/api/social/gallery?user=" + encodeURIComponent(id) + "&album=" + (state.privateAlbumOpen ? "private" : "public"));
     if (generation !== state.profileRequest || $("#profile-dialog").hidden) return;
-    const changed = JSON.stringify(result.album) !== JSON.stringify(state.album);
+    const changed = JSON.stringify(result.album) !== JSON.stringify(state.album),photosChanged=JSON.stringify(result.photos)!==JSON.stringify(state.personPhotos);
     if (state.album = result.album, state.personPhotos = result.photos, state.galleryLoadError = !1, state.personRouteView === "post") {
       const id2 = state.galleryView?.photos[state.galleryView.index]?.id;
       if (!result.photos.some((p) => p.id === id2 && !["pending", "rejected"].includes(p.review_status))) {
@@ -578,16 +578,25 @@ async function refreshAlbumPermission() {
         return;
       }
     }
-    if (!result.album?.granted && id !== currentActor() && (state.privateAlbumOpen = !1, state.personRouteView === "post")) {
+    if (privateWasOpen && !result.album?.granted && id !== currentActor() && (state.privateAlbumOpen = !1, state.personRouteView === "post")) {
       updateProfileRoute(id, "gallery", "replace"), renderPersonRoute("gallery");
       return;
     }
-    if (changed && state.personRouteView !== "post") {
+    if(state.personRouteView==='post'&&state.galleryView&&Date.now()-(state.lastPostRefresh||0)>25000){
+      const photo=state.galleryView.photos[state.galleryView.index]?.id;
+      if(photo){const detail=await api('/api/social/gallery?'+new URLSearchParams({user:id,album:privateWasOpen?'private':'public',photo}));
+        if(generation!==state.profileRequest||!samePost(id,photo))return;
+        state.lastPostRefresh=Date.now();const comments=$('.post-comments');if(comments)comments.innerHTML=(detail.comments||[]).map(c=>`<div class="comment"><strong>${escapeHtml(c.sender_name)}</strong> <p>${escapeHtml(c.body)}</p></div>`).join('');
+        const current=detail.photos.find(p=>p.id===photo),like=$('.lightbox-like');if(current&&like&&!like.disabled){like.classList.toggle('liked',!!current.liked);like.setAttribute('aria-pressed',String(!!current.liked));like.innerHTML=ChatgunNearComponents.icon('heart',18)+Number(current.like_count||0)+' Likes';}
+      }
+    }
+    if ((changed||photosChanged) && state.personRouteView !== "post") {
       const focused = document.activeElement?.hasAttribute("data-private-album");
       renderPersonRoute(state.personRouteView), focused && $("[data-private-album]")?.focus({ preventScroll: !0 });
     }
-  } catch {
+  } catch(error) {
     if (generation !== state.profileRequest) return;
+    if(!privateWasOpen&&state.personRouteView==='post'&&(!error.status||error.status>=500)){const feedback=$('[data-post-feedback]');if(feedback){feedback.hidden=false;feedback.setAttribute('role','alert');feedback.textContent='โหลดข้อมูลรูปเพิ่มเติมไม่สำเร็จ ระบบจะลองใหม่ โดยเก็บร่างความคิดเห็นของคุณไว้';}return;}
     state.album = null, state.personPhotos = [], state.privateAlbumOpen = !1, state.galleryLoadError = !0, state.personRouteView === "post" && updateProfileRoute(id, "gallery", "replace"), renderPersonRoute(state.personRouteView === "profile" ? "profile" : "gallery");
   } finally {
     state.albumRefreshBusy = !1;
@@ -740,10 +749,12 @@ async function initialize() {
     if(state.config.onlineStatusEnabled)await startOnlinePresence().catch(()=>toast('สถานะออนไลน์ยังไม่พร้อม ส่วนอื่นยังใช้งานได้',true));
   } catch {
     $("#global-status").textContent = "", $("#disabled-view").hidden = !1, document.body.dataset.prelaunch = "true", $("#service-status").textContent = "ระบบสมาชิกยังไม่พร้อมให้บริการในขณะนี้ กรุณากลับมาใหม่ภายหลัง";
+    $('#service-retry').hidden=false;
   } finally {
     $("#app").setAttribute("aria-busy", "false");
   }
 }
+$('#service-retry').addEventListener('click',()=>location.reload());
 $("#primary-nav").addEventListener("click", (event) => {
   const button = event.target.closest("button[data-tab]");
   if (!button) return;

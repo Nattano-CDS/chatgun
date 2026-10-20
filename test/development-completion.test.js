@@ -115,6 +115,7 @@ test('role capabilities reflect expiry without broadening report-only grants or 
  const{db,call,now}=await fixture(t);db.exec("DELETE FROM moderation_roles WHERE user_id='admin'");
  await db.prepare("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES('narrow','admin','report_reviewer','Isolated temporary narrow scope',?,?)").bind(now,now+60).run();
  let c=await(await call('moderation/capabilities')).json();assert.equal(c.canReviewReports,true);assert.equal(c.canReviewMedia,false);assert.equal(c.canManageRoles,false);assert.equal(c.canReviewIdentity,false);assert.doesNotMatch(JSON.stringify(c),/user_id|token_hash|expires_at/);
+ db.exec("INSERT INTO moderation_roles(user_id,role,created_at)VALUES('admin','report_reviewer',1)");
  db.exec('UPDATE moderation_access_grants SET granted_at=0,expires_at=1');c=await(await call('moderation/capabilities')).json();assert.equal(c.canReviewReports,false);assert.equal((await call('moderation/overview')).status,403);
 });
 test('member session management preserves current session and rejects CSRF/stale/foreign operations',async t=>{
@@ -128,4 +129,8 @@ test('member session management preserves current session and rejects CSRF/stale
 });
 test('new release cannot deploy against Production schema15 or reuse an old owner-only rollout approval',()=>{
  const release={commit:'fixture-sha',requiredD1MigrationNumber:17};assert.throws(()=>assertFullSystemRelease({release,migrationCount:15,approval:null}));assert.throws(()=>assertFullSystemRelease({release,migrationCount:17,approval:{sha:'old-sha',humanUatPassed:true,rolloutApproved:true,productionMigrationsApproved:true}}));assert.throws(()=>assertFullSystemRelease({release,migrationCount:17,approval:null}));assert.doesNotThrow(()=>assertFullSystemRelease({release,migrationCount:17,approval:{sha:'fixture-sha',humanUatPassed:true,rolloutApproved:true,productionMigrationsApproved:true}}));
+});
+test('gallery comment reads hide both directions of blocked authors without leaking their text',async t=>{
+ const{db,call,media,now}=await fixture(t);media();db.exec("UPDATE social_media SET state='active';UPDATE media_safety_reviews SET status='released',category='general';UPDATE profile_photos SET visibility='public'");await db.prepare("INSERT INTO photo_comments(id,media_id,sender_user_id,body,created_at)VALUES('comment','photo','independent','Must be hidden after blocking',?)").bind(now).run();
+ assert.equal((await(await call('gallery?user=owner&photo=photo','viewer')).json()).comments.length,1);db.exec("INSERT INTO social_blocks VALUES('independent','viewer',1)");const response=await(await call('gallery?user=owner&photo=photo','viewer')).json();assert.equal(response.comments.length,0);assert.ok(!JSON.stringify(response).includes('Must be hidden'));
 });
