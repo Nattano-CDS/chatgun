@@ -15,7 +15,7 @@ assert.equal(project.deployment_configs.preview.d1_databases.DB.id,'5bbfd55d-eb2
 const baseline=JSON.parse(readFileSync(out+'/production-before-deployment.json'));
 const secretNames=Object.entries(prod.env_vars).filter(([,v])=>v.type==='secret_text').map(([k])=>k).sort();assert.deepEqual(secretNames,baseline.secretNames);
 const release=await(await fetch('https://chatgun.social/release.json',{cache:'no-store'})).json();assert.equal(release.commit,expected);assert.equal(project.canonical_deployment.deployment_trigger.metadata.commit_hash,expected);assert.equal(release.releaseMode,'controlled-beta');
-const history=await select('SELECT name FROM d1_migrations ORDER BY id');assert.equal(history.length,15);assert.equal(history.at(-1).name,'0015_authenticated_online_presence.sql');
+const history=await select('SELECT name FROM d1_migrations ORDER BY id');assert.ok([15,17].includes(history.length));assert.equal(history.at(-1).name,history.length===17?'0017_delivery_and_review_claims.sql':'0015_authenticated_online_presence.sql');
 const fk=(await select('SELECT COUNT(*) n FROM pragma_foreign_key_check'))[0].n;assert.equal(fk,0);
 const counts={};for(const table of ['users','identities','sessions','account_acceptances','member_profiles','beta_invitations','beta_enrollments','moderation_roles','social_messages','social_media'])counts[table]=(await select('SELECT COUNT(*) n FROM '+table))[0].n;
 const mismatch=(await select('SELECT COUNT(*) n FROM identities i LEFT JOIN users u ON u.id=i.user_id WHERE u.id IS NULL'))[0].n;assert.equal(mismatch,0);
