@@ -1,10 +1,10 @@
 {
-  "checkedAt": "2026-10-20T04:20:07.396Z",
+  "checkedAt": "2026-10-20T07:18:28.419Z",
   "account": "23017b53386fb67fc62a52cdd017454c",
-  "productionSha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
-  "deployment": "118728d1-90ef-45c5-804c-2f270b4ba31b",
+  "productionSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "deployment": "f705d7cd-974d-4e48-8b61-73ec1a760c42",
   "productionD1": "9738a051-d914-42d0-8e7b-8098ef2b959d",
-  "migrationCount": 15,
+  "migrationCount": 17,
   "foreignKeyViolations": 0,
   "counts": {
     "users": 1,
