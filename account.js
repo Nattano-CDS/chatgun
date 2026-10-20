@@ -126,6 +126,7 @@ fetch("/api/auth/me", { credentials: "same-origin" })
       .then((response) => response.ok ? response.json() : null)
       .then((config) => {
         if (config?.socialAppEnabled && account.nextPath === "/app/") document.getElementById("open-social").hidden = false;
+        document.getElementById('account-appeals-link').hidden = !config?.accountModerationEnabled;
       })
       .catch(() => {});
     if (new URLSearchParams(window.location.search).get("reauth") === "account_deletion") {
