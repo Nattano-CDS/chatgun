@@ -74,6 +74,7 @@ export function providerConfiguration(provider, env) {
     scope: "openid email profile",
     pkce: true,
   };
+  if (provider === "line" && env.LINE_EXPECTED_CLIENT_ID && String(clientId) !== String(env.LINE_EXPECTED_CLIENT_ID)) throw new Error("line_channel_mismatch");
   if (provider === "line") return {
     clientId, clientSecret,
     authorizationUrl: "https://access.line.me/oauth2/v2.1/authorize",

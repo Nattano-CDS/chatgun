@@ -611,6 +611,7 @@ export async function onRequest({ request, env }) {
         turnstileSiteKey: env.TURNSTILE_SITE_KEY || null,
         oauthLoginEnabled: String(env.OAUTH_LOGIN_ENABLED).toLowerCase() !== "false",
         oauthProviders: enabledOAuthProviders(env),
+        lineChannelMatchesExpected: env.LINE_EXPECTED_CLIENT_ID ? String(env.LINE_CLIENT_ID) === String(env.LINE_EXPECTED_CLIENT_ID) : null,
         emailOtpEnabled,
         mobileOtpEnabled,
         smsEnabled: mobileOtpEnabled,

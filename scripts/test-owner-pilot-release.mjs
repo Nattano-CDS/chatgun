@@ -15,6 +15,7 @@ for(const path of ['/api/health','/api/auth/config','/api/social/config']){const
 if(stage==='production'){
   const auth=await(await fetch(origin+'/api/auth/config')).json(),social=await(await fetch(origin+'/api/social/config')).json();
   check('LINE only invitation admission and approved versions',auth.oauthLoginEnabled&&JSON.stringify(auth.oauthProviders)==='["line"]'&&!auth.newAccountRegistrationEnabled&&auth.invitationOnlyRegistrationEnabled);
+  check('encrypted runtime LINE client ID matches the intended Production channel',auth.lineChannelMatchesExpected===true);
   check('social shell but no later-wave services',social.socialAppEnabled&&!social.publicDiscoveryEnabled&&!social.messagingEnabled&&!social.onlineStatusEnabled&&!social.mediaUploadEnabled&&!social.sensitiveContentEnabled);
   check('anonymous account denied',(await fetch(origin+'/api/auth/me')).status===401);
   for(const provider of ['google','facebook']){const r=await fetch(origin+'/api/auth/oauth/'+provider+'/start',{method:'POST',headers:{origin,'content-type':'application/json'},body:'{}'});check(provider+' disabled',r.status===503);}
