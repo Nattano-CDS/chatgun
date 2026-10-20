@@ -5,6 +5,7 @@ import { RequestError, failure, json, readJson, requireSameOrigin } from "../../
 import { sanitizeImage } from "../../_lib/image.js";
 import { acceptanceFlowEnabled, currentAcceptance } from "../../_lib/acceptance.js";
 import { selfDeclaredAdult } from "../../_lib/age.js";
+import { requireCloudflareAdminAccess } from "../../_lib/cloudflare-admin-access.js";
 import { canContact, albumGrant, canViewPhoto, publicPortrait, publicPortraitColumn, eligibleSql, unblockedSql } from "../../_lib/social-permissions.js";
 
 const LOCATION_FRESH_SECONDS = 120;
@@ -1051,11 +1052,17 @@ async function reports(request, env) {
   return json({ ok: true }, 201);
 }
 
+async function enforceAdminAccess(request, env, session) {
+  try { await requireCloudflareAdminAccess(request, env, session); }
+  catch { throw new SocialError('admin_access_required', 'กรุณาเข้าสู่ระบบผู้ดูแลผ่าน Cloudflare Access ด้วยบัญชีที่ได้รับอนุญาต', 403); }
+}
+
 async function moderationAccess(request, env, roles, options = {}) {
   capability(env, "SOCIAL_APP_ENABLED");
   capability(env, "MODERATION_TOOLS_ENABLED");
   const session = await authenticated(request, env, { csrf: request.method === "POST" });
   let purpose = options.fixedPurpose;
+  await enforceAdminAccess(request, env, session);
   if (!purpose) {
     const encodedPurpose = String(request.headers.get("x-moderation-purpose") || "");
     if (encodedPurpose.length > 900) throw new SocialError("purpose_required", "วัตถุประสงค์การเข้าถึงไม่ถูกต้อง");
@@ -1093,6 +1100,7 @@ async function moderationAccess(request, env, roles, options = {}) {
 async function moderationCapabilities(request,env){
   capability(env,'SOCIAL_APP_ENABLED');capability(env,'MODERATION_TOOLS_ENABLED');
   const session=await authenticated(request,env),now=unixTime();
+  await enforceAdminAccess(request,env,session);
   const rows=await env.DB.prepare(`SELECT role FROM moderation_access_grants WHERE user_id=? AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>?)
     UNION SELECT legacy.role FROM moderation_roles legacy WHERE legacy.user_id=? AND NOT EXISTS(
       SELECT 1 FROM moderation_access_grants recorded WHERE recorded.user_id=legacy.user_id AND recorded.role=legacy.role)
