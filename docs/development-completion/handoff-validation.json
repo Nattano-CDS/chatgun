@@ -1,0 +1,69 @@
+{
+  "checkedAt": "2026-10-20T05:20:28.084Z",
+  "checks": [
+    {
+      "page": "report.html",
+      "width": 390,
+      "overflow": false,
+      "scriptErrors": 0
+    },
+    {
+      "page": "report.html",
+      "width": 768,
+      "overflow": false,
+      "scriptErrors": 0
+    },
+    {
+      "page": "report.html",
+      "width": 1440,
+      "overflow": false,
+      "scriptErrors": 0
+    },
+    {
+      "page": "uat-package.html",
+      "width": 390,
+      "overflow": false,
+      "scriptErrors": 0
+    },
+    {
+      "page": "uat-package.html",
+      "width": 768,
+      "overflow": false,
+      "scriptErrors": 0
+    },
+    {
+      "page": "uat-package.html",
+      "width": 1440,
+      "overflow": false,
+      "scriptErrors": 0
+    },
+    {
+      "page": "production-release-plan.html",
+      "width": 390,
+      "overflow": false,
+      "scriptErrors": 0
+    },
+    {
+      "page": "production-release-plan.html",
+      "width": 768,
+      "overflow": false,
+      "scriptErrors": 0
+    },
+    {
+      "page": "production-release-plan.html",
+      "width": 1440,
+      "overflow": false,
+      "scriptErrors": 0
+    }
+  ],
+  "passed": 9,
+  "backupCheck": {
+    "scope": "isolated-before-0017, not Production",
+    "sha256": "7eba324faa722e527215b9b2757f26c9985ca1ccad710fd400535f5bb0d4194d",
+    "bytes": 366606,
+    "permissions": "0600",
+    "restoredMigrations": 16,
+    "foreignKeyViolations": 0,
+    "restore": "PASS: in-memory SQLite"
+  }
+}

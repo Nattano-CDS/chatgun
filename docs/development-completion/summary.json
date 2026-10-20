@@ -1,0 +1,206 @@
+{
+  "checkedAt": "2026-10-20T05:20:26.955Z",
+  "decision": "DEVELOPMENT COMPLETE — READY FOR CONSOLIDATED E2E/UAT",
+  "applicationSha": "0a0eb19beb701371151ebd26c3415b8a3a33a76b",
+  "productionSha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+  "preview": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "productionDeployed": false,
+  "unit": {
+    "tests": 199,
+    "passed": 199,
+    "failed": 0,
+    "skipped": 0
+  },
+  "automatedBrowser": {
+    "realLocalHandlers": 16,
+    "mockedUi": 81,
+    "fullSystemLocal": 7,
+    "realPagesD1R2": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "genuineHumanUat": {
+    "status": "DEFERRED",
+    "executedThisWorkstream": false,
+    "reason": "Owner requested one consolidated UAT after development; no fresh login or additional genuine participants requested."
+  },
+  "previewChecks": 13,
+  "assetHashes": 39,
+  "ci": {
+    "conclusion": "success",
+    "databaseId": 39373672748,
+    "headSha": "0a0eb19beb701371151ebd26c3415b8a3a33a76b",
+    "status": "completed",
+    "url": "https://github.com/Nattano-CDS/chatgun/actions/runs/39373672748"
+  },
+  "cleanup": {
+    "checkedAt": "2026-10-20T05:19:38.427Z",
+    "database": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
+    "bucket": "chatgun-issue13-media",
+    "fixtureBatches": 7,
+    "manifestFixtureUsers": 84,
+    "fixtureMediaQueued": 6,
+    "objectsCompleted": 18,
+    "sessionsRevokedInThisRun": 9,
+    "temporaryGrantsRevokedInThisRun": 12,
+    "activeFixtureSessionsRemaining": 0,
+    "activeFixtureGrantsRemaining": 0,
+    "unrelatedPendingQueueRowsUnchanged": 0,
+    "cleanup": {
+      "selected": 9,
+      "completed": 9,
+      "failed": 0,
+      "exhausted": 0
+    },
+    "checks": [
+      {
+        "name": "Only exact manifest-owned R2 objects deleted; unrelated queues unchanged",
+        "status": "PASS"
+      },
+      {
+        "name": "All fixture sessions and temporary grants revoked",
+        "status": "PASS"
+      },
+      {
+        "name": "Foreign keys valid after fixture account deletion and R2 cleanup",
+        "status": "PASS"
+      }
+    ],
+    "productionWrites": 0,
+    "existingFixtureUsersDeleted": 0,
+    "protectedStagingWrites": 0
+  },
+  "productionSafety": {
+    "checkedAt": "2026-10-20T05:19:50.737Z",
+    "account": "23017b53386fb67fc62a52cdd017454c",
+    "productionSha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+    "productionDeployment": "118728d1-90ef-45c5-804c-2f270b4ba31b",
+    "isolatedSha": "0a0eb19beb701371151ebd26c3415b8a3a33a76b",
+    "productionCounts": {
+      "users": 1,
+      "identities": 1,
+      "member_profiles": 1,
+      "social_messages": 0,
+      "social_media": 0,
+      "moderation_access_grants": 2
+    },
+    "roles": [
+      {
+        "role": "report_reviewer",
+        "expires_at": 1793073705,
+        "revoked_at": null
+      },
+      {
+        "role": "safety_admin",
+        "expires_at": 1793073705,
+        "revoked_at": null
+      }
+    ],
+    "flags": {
+      "OAUTH_LOGIN_ENABLED": "true",
+      "OAUTH_ENABLED_PROVIDERS": "line",
+      "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
+      "BETA_INVITATION_REGISTRATION_ENABLED": "true",
+      "SOCIAL_APP_ENABLED": "true",
+      "MODERATION_TOOLS_ENABLED": "true",
+      "ACCOUNT_MODERATION_ENABLED": "false",
+      "PUBLIC_DISCOVERY_ENABLED": "false",
+      "MESSAGING_ENABLED": "false",
+      "PRESENCE_ENABLED": "false",
+      "MEDIA_UPLOAD_ENABLED": "false",
+      "IDENTITY_VERIFICATION_ENABLED": "false",
+      "SENSITIVE_CONTENT_ENABLED": "false",
+      "EMAIL_OTP_ENABLED": "false",
+      "MOBILE_OTP_ENABLED": "false",
+      "DEMO_MODE_ENABLED": "false"
+    },
+    "migrations": {
+      "production": 15,
+      "isolated": 17,
+      "protectedStaging": 12
+    },
+    "foreignKeyViolations": {
+      "production": 0,
+      "isolated": 0,
+      "protectedStaging": 0
+    },
+    "protectedStagingCounts": {
+      "users": 25,
+      "identities": 2,
+      "member_profiles": 25,
+      "social_messages": 122,
+      "social_relationships": 16,
+      "profile_photos": 37,
+      "social_media": 38,
+      "synthetic_seed_records": 369,
+      "synthetic_seed_objects": 33
+    },
+    "protectedAggregateFingerprint": "6768cc6b45b2adfd4c508068250013d5c2bd1dcb717c80ddaa5157618a8f080b",
+    "protectedDataCountsUnchanged": true,
+    "r2": {
+      "chatgun-media-production": {
+        "publicR2Dev": false,
+        "customDomains": 0
+      },
+      "chatgun-issue13-media": {
+        "publicR2Dev": false,
+        "customDomains": 0
+      }
+    },
+    "isolatedCredentialMetadata": {
+      "GOOGLE_CLIENT_ID": {
+        "configured": false
+      },
+      "GOOGLE_CLIENT_SECRET": {
+        "configured": false
+      },
+      "FACEBOOK_CLIENT_ID": {
+        "configured": false
+      },
+      "FACEBOOK_CLIENT_SECRET": {
+        "configured": false
+      },
+      "LINE_CLIENT_ID": {
+        "configured": false
+      },
+      "LINE_CLIENT_SECRET": {
+        "configured": false
+      },
+      "TURNSTILE_SITE_KEY": {
+        "configured": false
+      },
+      "TURNSTILE_SECRET_KEY": {
+        "configured": false
+      }
+    },
+    "productionApiStatuses": {
+      "/api/social/config": 200,
+      "/api/auth/config": 200,
+      "/api/health": 200
+    },
+    "productionWrites": 0,
+    "productionDeploymentByThisWorkstream": false
+  },
+  "knownCriticalOrHighEngineeringDefects": [],
+  "resolvedDefects": [
+    "Durable client request IDs prevent duplicate text/media-reference sends after a lost response.",
+    "Revision/nonce claims atomically gate report/appeal writes, notifications, media restoration and cleanup cancellation.",
+    "Safety roles cannot access identity-document routes; expired/revoked grants cannot be revived through legacy capability rows.",
+    "Reports/appeals/account queues paginate; search/status filters and urgency navigation reach real backend operations.",
+    "Discovery has stable candidate cursors/server filters and retains existing coarse 250m distance bands and enforces a minimum discovery query radius of 500m; 100m rating eligibility stays server-only. Portraits resolve inside SQL instead of an extra D1 call per card.",
+    "Optional API outages no longer take down the full app; core outages offer a working recovery action without invented members.",
+    "Gallery reuse in Chat requires ownership and recipient access; private grants do not permit redistribution. Gallery and Chat URLs recheck permission after revocation.",
+    "Public photos no longer close because the viewer lacks a Private Album grant; foreground comment refresh preserves drafts. Blocked authors are filtered server-side.",
+    "Online status stays opt-in, foreground/authenticated and expiring; offline reads stop and expired leases join retention cleanup.",
+    "Session management reveals no token/hash and preserves the current session when revoking others.",
+    "Cleanup lease prevents restoration during R2 deletion. Forwarded image-only messages are tombstoned before media deletion; R2-delete and D1-commit failures have distinct retry codes.",
+    "New release requires schema17 and exact-SHA consolidated UAT/rollout/migration approval; old owner-pilot approval cannot authorize it."
+  ],
+  "externalBlockers": [
+    "Individually approved consenting genuine adult participants; none invited by this workstream.",
+    "Configure dedicated authorized Preview OAuth apps/callbacks and Turnstile; isolated project currently has no provider credentials. Do not copy Production secrets.",
+    "Approve expanded Social/location/media policy and operational scope, independent media appeal review, backup/emergency/appeals procedures and scanning decision.",
+    "Complete genuine UAT and explicitly approve Production migrations16/17, exact SHA rollout and selected service flags."
+  ],
+  "release": "NO-GO for expanded Production/public launch until genuine UAT and external approvals pass"
+}
