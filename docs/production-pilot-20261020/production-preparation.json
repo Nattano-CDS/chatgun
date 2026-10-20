@@ -1,0 +1,40 @@
+{
+  "startedAt": "2026-10-20T01:15:47.225Z",
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "database": "9738a051-d914-42d0-8e7b-8098ef2b959d",
+  "authorization": "Owner full technical execution authorization 2026-10-20",
+  "backupSha256": "4837380105cf8d7bd1da5ba55ae9b82fbdfdbfeeb5b2f6c1593b2279e1c964b7",
+  "migrationHashes": {
+    "0013_direct_chat_private_albums.sql": "a96fa03519eaf91fc298a2065a7576b65312256aeeefbc66ec3daa8594e3d962",
+    "0014_gallery_capacity.sql": "7b1cf53865a1f9089b468b2353108692e8d88cef76be683b491aaf48ec64a1bf",
+    "0015_authenticated_online_presence.sql": "23843f4791b99b597da82ec0f7e165a3e3c5160c8bbca45358b5646540f5fdaa"
+  },
+  "rehearsalDatabase": "02de170e-02cf-4c80-bc1e-3aee0010da27",
+  "recoveryBookmarkAvailable": true,
+  "baselineMigrations": 12,
+  "stage": "PASS",
+  "productionPersonalDataDeleted": false,
+  "realServicesEnabled": false,
+  "migrationCount": 15,
+  "applied": [
+    "0013_direct_chat_private_albums.sql",
+    "0014_gallery_capacity.sql",
+    "0015_authenticated_online_presence.sql"
+  ],
+  "existingRecordProjectionsPreserved": true,
+  "foreignKeyViolations": 0,
+  "sourceExactTriggers": 5,
+  "presenceIndexes": 2,
+  "privateVisibilityDefault": true,
+  "versionedSecondApply": "No migrations to apply",
+  "productionMediaBinding": {
+    "MEDIA": {
+      "name": "chatgun-media-production"
+    }
+  },
+  "previewPreserved": true,
+  "productionFlagsAndSecretsMetadataUnchanged": true,
+  "publicR2DevEnabled": false,
+  "enabledPublicCustomDomains": 0,
+  "completedAt": "2026-10-20T01:16:00.406Z"
+}

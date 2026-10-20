@@ -120,12 +120,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 414,
+                  "duration": 453,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-19T14:52:32.755Z",
+                  "startTime": "2026-10-20T01:23:01.369Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -154,12 +154,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 268,
+                  "duration": 284,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-19T14:52:33.484Z",
+                  "startTime": "2026-10-20T01:23:02.052Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -188,12 +188,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 339,
+                  "duration": 369,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-19T14:52:33.757Z",
+                  "startTime": "2026-10-20T01:23:02.342Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -203,6 +203,116 @@
           ],
           "id": "3dc0655c4d38cf182e34-d21ec132f90dbe11446b",
           "file": "issue16-beta-admission.spec.js",
+          "line": 4,
+          "column": 35
+        }
+      ]
+    },
+    {
+      "title": "issue16-owner-pilot.spec.js",
+      "file": "issue16-owner-pilot.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "owner-only shell renders own real-record-shaped card with Discovery disabled 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 224,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T01:23:02.719Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bf12feec91dfefa730fc-e51bd7b3d9d0a2bcc395",
+          "file": "issue16-owner-pilot.spec.js",
+          "line": 4,
+          "column": 35
+        },
+        {
+          "title": "owner-only shell renders own real-record-shaped card with Discovery disabled 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 237,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T01:23:02.947Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bf12feec91dfefa730fc-84190b1360ff525c3ab3",
+          "file": "issue16-owner-pilot.spec.js",
+          "line": 4,
+          "column": 35
+        },
+        {
+          "title": "owner-only shell renders own real-record-shaped card with Discovery disabled 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 238,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T01:23:03.188Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bf12feec91dfefa730fc-025849fabdfbc0705d3a",
+          "file": "issue16-owner-pilot.spec.js",
           "line": 4,
           "column": 35
         }
@@ -230,12 +340,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 945,
+                  "duration": 1013,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-19T14:52:34.106Z",
+                  "startTime": "2026-10-20T01:23:03.434Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -264,12 +374,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 377,
+                  "duration": 394,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-19T14:52:35.055Z",
+                  "startTime": "2026-10-20T01:23:04.452Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -298,12 +408,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1103,
+                  "duration": 1096,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-19T14:52:35.437Z",
+                  "startTime": "2026-10-20T01:23:04.850Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -332,12 +442,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 320,
+                  "duration": 324,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-19T14:52:36.544Z",
+                  "startTime": "2026-10-20T01:23:05.954Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -366,12 +476,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1223,
+                  "duration": 1323,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-19T14:52:36.868Z",
+                  "startTime": "2026-10-20T01:23:06.282Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -400,12 +510,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 337,
+                  "duration": 343,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-19T14:52:38.096Z",
+                  "startTime": "2026-10-20T01:23:07.609Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -434,12 +544,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 260,
+                  "duration": 267,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-19T14:52:38.437Z",
+                  "startTime": "2026-10-20T01:23:07.956Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -457,9 +567,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-19T14:52:32.420Z",
-    "duration": 6318.018,
-    "expected": 10,
+    "startTime": "2026-10-20T01:23:00.698Z",
+    "duration": 7569.388000000001,
+    "expected": 13,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

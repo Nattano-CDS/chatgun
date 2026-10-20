@@ -1,0 +1,124 @@
+{
+  "conclusion": "success",
+  "databaseId": 39352636897,
+  "headSha": "9c856eea06b8d959a3e33491429e30c9b4c99bfa",
+  "jobs": [
+    {
+      "completedAt": "2026-10-20T01:18:51Z",
+      "conclusion": "success",
+      "databaseId": 118400132268,
+      "name": "local-regression",
+      "startedAt": "2026-10-20T01:17:51Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-20T01:17:53Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-20T01:17:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:07Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 2,
+          "startedAt": "2026-10-20T01:17:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:08Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "number": 3,
+          "startedAt": "2026-10-20T01:18:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:09Z",
+          "conclusion": "success",
+          "name": "Run npm ci --ignore-scripts",
+          "number": 4,
+          "startedAt": "2026-10-20T01:18:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:14Z",
+          "conclusion": "success",
+          "name": "Run npm test",
+          "number": 5,
+          "startedAt": "2026-10-20T01:18:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:34Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium",
+          "number": 6,
+          "startedAt": "2026-10-20T01:18:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:34Z",
+          "conclusion": "success",
+          "name": "Run npm run build",
+          "number": 7,
+          "startedAt": "2026-10-20T01:18:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:47Z",
+          "conclusion": "success",
+          "name": "Run npx playwright test --config=playwright.issue16.config.js",
+          "number": 8,
+          "startedAt": "2026-10-20T01:18:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:47Z",
+          "conclusion": "success",
+          "name": "Run npm run build",
+          "number": 9,
+          "startedAt": "2026-10-20T01:18:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:49Z",
+          "conclusion": "success",
+          "name": "Run node scripts/test-closed-release.mjs --local",
+          "number": 10,
+          "startedAt": "2026-10-20T01:18:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:49Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+          "number": 19,
+          "startedAt": "2026-10-20T01:18:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:49Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 20,
+          "startedAt": "2026-10-20T01:18:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-20T01:18:49Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-10-20T01:18:49Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/Nattano-CDS/chatgun/actions/runs/39352636897/job/118400132268"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/Nattano-CDS/chatgun/actions/runs/39352636897"
+}
