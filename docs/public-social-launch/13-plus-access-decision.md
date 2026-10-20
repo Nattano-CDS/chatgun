@@ -98,6 +98,13 @@ remove the `adult_18_plus` SQL eligibility predicates. No youth-safety claim is 
 Tests generate their own RSA keypair and local synthetic accounts; they are not a
 genuine Cloudflare Access login. Live API authorization remains BLOCKED.
 
+Current result: **213 unit/integration/security tests and 84 mocked browser tests
+passed**, zero failures/skips. Browser widths: 390, 768, 1440. Isolated Preview serves
+`bba908a37d79dade6e4ddd3424ebe3d491536072`; all 39 manifest asset hashes match.
+Production still serves `a73ff21c615dabb6a0c19c0a22685c2370958ca1`, schema 17/FK0,
+with public signup/Social services off. Protected staging aggregate counts and all
+Production/Preview bindings are unchanged. See `13-plus-access-results.json`.
+
 - [Cloudflare: validate Access JWTs](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/)
 - [Cloudflare: identity-based and service application tokens](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/application-token/)
 - [Thai PDPA text, ministry-hosted English translation, Section 20](https://www.mdes.go.th/law/detail/3577-Personal-Data-Protection-Act-B-E--2562--2019-)
