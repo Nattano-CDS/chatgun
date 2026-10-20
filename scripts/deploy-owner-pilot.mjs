@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';import {execFileSync} from 'node:child_p
 import {readFileSync,writeFileSync,mkdtempSync,cpSync,chmodSync,existsSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';
 import {approvedOwnerPilot,ownerPilotVars} from './lib/owner-pilot-release.mjs';
 import {ownerAdminScope} from './lib/owner-admin-bootstrap.mjs';
+import{assertFullSystemRelease}from'./lib/full-system-release-gate.mjs';
 if(process.env.CHATGUN_DEPLOY_APPROVED!=='line-owner-pilot')throw Error('Explicit LINE owner pilot deployment required');
 const receipt=approvedOwnerPilot(),account='23017b53386fb67fc62a52cdd017454c',db='9738a051-d914-42d0-8e7b-8098ef2b959d',out='docs/production-pilot-20261020';
 const ownerAdmin=ownerAdminScope(),targetVars=ownerPilotVars(receipt,{ownerAdmin});
@@ -31,7 +32,10 @@ if(ownerAdmin){
   const result=(await api('/d1/database/'+db+'/query',{sql:'SELECT role,expires_at FROM moderation_access_grants WHERE user_id=? AND revoked_at IS NULL AND expires_at>unixepoch() ORDER BY role',params:[approval.userId]}))[0].results;
   assert.deepEqual(result.map(r=>r.role),approval.roles);assert.ok(result.every(r=>r.expires_at===approval.expiresAt));
 }
-const history=await query('SELECT name FROM d1_migrations ORDER BY id');assert.equal(history.length,15);assert.equal(history.at(-1).name,'0015_authenticated_online_presence.sql');assert.equal((await query('SELECT COUNT(*) n FROM pragma_foreign_key_check'))[0].n,0);
+const history=await query('SELECT name FROM d1_migrations ORDER BY id');
+const uatPath='/Users/nattano/.codex/private-backups/chatgun/full-system-uat-approval.json';
+assertFullSystemRelease({release,migrationCount:history.length,approval:existsSync(uatPath)?JSON.parse(readFileSync(uatPath)):null});
+assert.equal(history.length,Number(release.requiredD1MigrationNumber||15));assert.equal((await query('SELECT COUNT(*) n FROM pragma_foreign_key_check'))[0].n,0);
 const prior=readFileSync('/tmp/chatgun-closed-production-package-path','utf8').trim();assert.ok(prior.startsWith(tmpdir()+'/chatgun-closed-production-'));
 if(existsSync('/tmp/chatgun-owner-pilot-package-path')){const path=readFileSync('/tmp/chatgun-owner-pilot-package-path','utf8').trim();assert.ok(path.startsWith(tmpdir()+'/chatgun-owner-pilot-'));if(JSON.parse(readFileSync(path+'/dist/release.json')).commit===project.canonical_deployment.deployment_trigger.metadata.commit_hash){const copy=mkdtempSync('/Users/nattano/.codex/private-backups/chatgun/last-safe-owner-pilot-');cpSync(path,copy,{recursive:true});writeFileSync('/tmp/chatgun-last-safe-owner-pilot-path',copy,{mode:0o600});}}
 const rollback=mkdtempSync('/Users/nattano/.codex/private-backups/chatgun/closed-prepilot-');chmodSync(rollback,0o700);cpSync(prior,rollback,{recursive:true});writeFileSync('/tmp/chatgun-owner-pilot-rollback-path',rollback,{mode:0o600});

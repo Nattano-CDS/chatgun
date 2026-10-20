@@ -1,6 +1,7 @@
 // Adds only new, distinctly tagged fixtures in the dedicated isolated test project.
 // No Production writes; no OAuth identity fabrication; no existing fixture mutation.
-import assert from'node:assert/strict';import{execFileSync}from'node:child_process';import{mkdirSync,mkdtempSync,writeFileSync,chmodSync}from'node:fs';import{join}from'node:path';import{randomUUID}from'node:crypto';import{issueSession,unixTime}from'../functions/_lib/db.js';
+import assert from'node:assert/strict';import{execFileSync}from'node:child_process';import{mkdirSync,mkdtempSync,writeFileSync,chmodSync,readFileSync,existsSync}from'node:fs';import{join}from'node:path';import{randomUUID}from'node:crypto';import{issueSession,unixTime}from'../functions/_lib/db.js';
+import{ONE_PIXEL_PNG}from'../test/helpers/image.js';
 if(process.env.CHATGUN_ISOLATED_STAGING!=='issue13')throw Error('Explicit isolated staging acknowledgement required');
 const account='23017b53386fb67fc62a52cdd017454c',databaseId='275d9820-6aec-494a-8bb5-b7ed9b8b74cc',origin='https://issue13.chatgun-issue13-staging.pages.dev';
 const{token}=JSON.parse(execFileSync('npx',['wrangler@4.151.1','auth','token','--json'],{encoding:'utf8'}));
@@ -27,5 +28,12 @@ for(const width of[390,768,1440])for(const kind of['owner','viewer','moderator',
  if(['owner','moderator'].includes(kind))for(const role of['report_reviewer','safety_admin'])await query('INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES(?,?,?,?,?,?)',[randomUUID(),id,role,'Isolated automated regression fixture only',now,now+7200]);
  sessions[kind+width]={...await issueSession(db,id),userId:id};
 }
-const bundle={origin,databaseId,run,sessions,createdAt:now,syntheticOnly:true};const bundleFile=join(directory,'sessions.json');writeFileSync(bundleFile,JSON.stringify(bundle),{mode:0o600});writeFileSync('/tmp/chatgun-development-fixture-path',bundleFile,{mode:0o600});
+const deletionMedia=[];
+for(const width of[390,768,1440]){
+ const s=sessions['other'+width],form=new FormData();form.set('file',new File([ONE_PIXEL_PNG],'isolated-deletion.png',{type:'image/png'}));form.set('visibility','private');
+ const response=await fetch(origin+'/api/social/gallery',{method:'POST',headers:{cookie:`__Host-cg_session=${s.token}; __Host-cg_csrf=${s.csrf}`,origin,'x-csrf-token':s.csrf,'idempotency-key':randomUUID()},body:form});assert.equal(response.status,201);const{id}=await response.json();
+ const row=(await query('SELECT object_key FROM social_media WHERE id=? AND owner_user_id=?',[id,s.userId])).results[0];assert.ok(row);deletionMedia.push({width,ownerId:s.userId,mediaId:id,objectKey:row.object_key});
+}
+const bundle={origin,databaseId,run,sessions,deletionMedia,createdAt:now,syntheticOnly:true};const bundleFile=join(directory,'sessions.json');writeFileSync(bundleFile,JSON.stringify(bundle),{mode:0o600});
+const historyFile='/tmp/chatgun-development-fixture-history.json',paths=existsSync(historyFile)?JSON.parse(readFileSync(historyFile)):[];if(existsSync('/tmp/chatgun-development-fixture-path'))paths.push(readFileSync('/tmp/chatgun-development-fixture-path','utf8').trim());paths.push(bundleFile);writeFileSync(historyFile,JSON.stringify([...new Set(paths)]),{mode:0o600});writeFileSync('/tmp/chatgun-development-fixture-path',bundleFile,{mode:0o600});
 mkdirSync('docs/development-completion',{recursive:true});writeFileSync('docs/development-completion/cloud-fixture-preparation.json',JSON.stringify({checkedAt:new Date().toISOString(),accountId:account,isolatedDatabase:databaseId,migrations:17,newSyntheticUsers:12,noProviderIdentitiesCreated:true,productionWrites:0,productionSha:production.canonical_deployment.deployment_trigger.metadata.commit_hash,originalStagingUntouched:true,privateSessionHandoff:true,foreignKeyViolations:(await query('SELECT COUNT(*) n FROM pragma_foreign_key_check')).results[0].n},null,2)+'\n');console.log('12 new isolated fixtures prepared. Session bundle stays private; pointer saved locally. No Production writes.');

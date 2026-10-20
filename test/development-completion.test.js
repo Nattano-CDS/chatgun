@@ -5,6 +5,7 @@ import {issueSession,unixTime} from '../functions/_lib/db.js';
 import {onRequest} from '../functions/api/social/[[path]].js';
 import {createMessageDelivery} from '../app/message-delivery.js';
 import {onRequest as auth} from '../functions/api/auth/[[path]].js';
+import {assertFullSystemRelease} from '../scripts/lib/full-system-release-gate.mjs';
 
 async function fixture(t){
  const db=new TestD1();t.after(()=>db.close());const now=unixTime(),sessions={};
@@ -124,4 +125,7 @@ test('member session management preserves current session and rejects CSRF/stale
  const response=await req('owner',{action:'revoke_others'});assert.equal(response.status,200);assert.equal((await response.json()).revoked,1);
  assert.equal((await req('owner')).status,200);const invalid=await auth({env,request:new Request('https://chatgun.pages.dev/api/auth/me',{headers:{cookie:`__Host-cg_session=${extra.token}`}})});assert.equal(invalid.status,401);assert.equal((await req('viewer')).status,200);
  db.exec("UPDATE session_auth_evidence SET authenticated_at=1 WHERE user_id='owner'");assert.equal((await req('owner',{action:'revoke_others'})).status,428);
+});
+test('new release cannot deploy against Production schema15 or reuse an old owner-only rollout approval',()=>{
+ const release={commit:'fixture-sha',requiredD1MigrationNumber:17};assert.throws(()=>assertFullSystemRelease({release,migrationCount:15,approval:null}));assert.throws(()=>assertFullSystemRelease({release,migrationCount:17,approval:{sha:'old-sha',humanUatPassed:true,rolloutApproved:true,productionMigrationsApproved:true}}));assert.throws(()=>assertFullSystemRelease({release,migrationCount:17,approval:null}));assert.doesNotThrow(()=>assertFullSystemRelease({release,migrationCount:17,approval:{sha:'fixture-sha',humanUatPassed:true,rolloutApproved:true,productionMigrationsApproved:true}}));
 });

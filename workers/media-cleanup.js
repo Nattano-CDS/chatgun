@@ -9,9 +9,11 @@ function retryDelay(attempts) {
   return Math.min(86400, 60 * (2 ** Math.min(attempts, 10)));
 }
 
-export async function drainMediaDeletionQueue(env, timestamp = unixTime()) {
+export async function drainMediaDeletionQueue(env, timestamp = unixTime(), {objectKeys} = {}) {
   if(String(env.MEDIA_CLEANUP_ENABLED).toLowerCase()==='false')return {disabled:true,completed:0,failed:0};
   if (!env.DB || !env.MEDIA) throw new Error("missing_staging_bindings");
+  if(objectKeys!==undefined&&(!Array.isArray(objectKeys)||objectKeys.length>100||objectKeys.some(k=>typeof k!=='string'||!k||k.length>1024)))throw new Error('invalid_cleanup_scope');
+  const scope=objectKeys===undefined?'':` AND object_key IN (${objectKeys.map(()=>'?').join(',')||'NULL'})`;
   const exhaustedBefore = await env.DB.prepare(`
     SELECT COUNT(*) count FROM media_deletion_queue
     WHERE completed_at IS NULL AND attempts >= ?
@@ -19,9 +21,9 @@ export async function drainMediaDeletionQueue(env, timestamp = unixTime()) {
   const due = await env.DB.prepare(`
     SELECT object_key, attempts FROM media_deletion_queue
     WHERE completed_at IS NULL AND next_attempt_at <= ? AND attempts < ?
-      AND (processing_nonce IS NULL OR lease_until<=?)
+      AND (processing_nonce IS NULL OR lease_until<=?) ${scope}
     ORDER BY created_at, object_key LIMIT ?
-  `).bind(timestamp, MAX_ATTEMPTS,timestamp, BATCH_SIZE).all();
+  `).bind(timestamp, MAX_ATTEMPTS,timestamp,...objectKeys||[], BATCH_SIZE).all();
   let completed = 0;
   let failed = 0;
   for (const row of due.results || []) {
