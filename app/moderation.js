@@ -8,6 +8,7 @@ const labels = {
   critical: "วิกฤต", high: "สูง", medium: "ปานกลาง", low: "ปกติ",
 };
 const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+function adminPath(path) { return state.standalone ? path.replace(/^\/api\/social\/moderation\//u, '/api/admin/') : path; }
 
 function cookie(name) {
   return document.cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${name}=`))?.slice(name.length + 1) || "";
@@ -30,7 +31,8 @@ async function api(path, options = {}) {
     body = JSON.stringify(options.body);
   }
   if (method !== "GET" && method !== "HEAD") headers["x-csrf-token"] = decodeURIComponent(cookie("__Host-cg_csrf"));
-  const response = await fetch(path, { credentials: "same-origin", ...options, method, headers, ...(body ? { body } : {}) });
+  if (state.standalone && method !== 'GET' && method !== 'HEAD') headers['x-cg-admin-csrf'] = state.adminCsrf || '';
+  const response = await fetch(adminPath(path), { credentials: "same-origin", ...options, method, headers, ...(body ? { body } : {}) });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(payload.message || payload.error || "ไม่สามารถดำเนินการได้");
   return payload;
@@ -304,7 +306,7 @@ async function load(view = state.view) {
 }
 
 async function authenticatedImage(path) {
-  const response = await fetch(path, { credentials: "same-origin", headers: { "x-moderation-purpose": encodeURIComponent(purpose()) } });
+  const response = await fetch(adminPath(path), { credentials: "same-origin", headers: { "x-moderation-purpose": encodeURIComponent(purpose()) } });
   if (!response.ok) { const payload = await response.json().catch(() => ({})); throw new Error(payload.message || payload.error || "ไม่สามารถเปิดรูปภาพได้"); }
   return URL.createObjectURL(await response.blob());
 }
@@ -320,6 +322,11 @@ async function showMedia(id) {
 }
 
 document.addEventListener("click", async (event) => {
+  if (event.target.closest('#admin-access-logout')) {
+    try { await api('/api/admin/session', { method: 'POST', routine: true, body: { action: 'logout' } }); state.adminCsrf = ''; location.assign('/cdn-cgi/access/logout'); }
+    catch (error) { setStatus(error.message, true); }
+    return;
+  }
   if(event.target.closest('#moderation-retry')){try{await load();}catch(error){setStatus(error.message,true);}return;}
   const close = event.target.closest(".dialog-close");
   if (close) return close.closest("dialog").close();
@@ -369,10 +376,19 @@ document.addEventListener("click", async (event) => {
   } catch (error) { setStatus(error.message, true); }
 });
 
-load("overview").catch((error) => setStatus(error.message, true));
-api('/api/social/config',{routine:true}).then(async c=>{state.accountOps=c.accountModerationEnabled===true;document.querySelectorAll('[data-account-ops]').forEach(el=>el.hidden=!state.accountOps);
+async function initializeAdmin() {
+ const c=await api('/api/social/config',{routine:true});
+ state.standalone=c.adminAccessStandaloneEnabled===true;
+ if(state.standalone){
+   let session=await api('/api/admin/session',{routine:true});state.adminCsrf=session.csrfToken;
+   if(!session.authenticated)session=await api('/api/admin/session',{method:'POST',routine:true,body:{action:'start'}});
+   state.adminCsrf=session.csrfToken;$('#admin-access-logout').hidden=false;
+ }
+ await load("overview");
+ state.accountOps=c.accountModerationEnabled===true;document.querySelectorAll('[data-account-ops]').forEach(el=>el.hidden=!state.accountOps);
  if(!c.moderationToolsEnabled)return;
  const grants=await api('/api/social/moderation/capabilities',{routine:true});
  state.accountOps=grants.canModerateAccounts;
  document.querySelectorAll('[data-load]').forEach(el=>{const view=el.dataset.load;if(view.startsWith('account-'))el.hidden=!grants.canModerateAccounts;else if(['priority','pending','approved','sensitive','rejected','appeals','audit'].includes(view))el.hidden=!grants.canReviewMedia;else if(['user-reports','media-reports'].includes(view))el.hidden=!grants.canReviewReports;});
-}).catch(()=>{});
+}
+initializeAdmin().catch(error=>setStatus(error.message,true));

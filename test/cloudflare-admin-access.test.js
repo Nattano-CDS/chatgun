@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { base64Url } from '../functions/_lib/crypto.js';
-import { requireCloudflareAdminAccess, verifyCloudflareAccessJwt } from '../functions/_lib/cloudflare-admin-access.js';
+import { requireCloudflareAdminAccess, verifyCloudflareAccessJwt, cloudflareAdminPrincipal } from '../functions/_lib/cloudflare-admin-access.js';
 import { issueSession, unixTime } from '../functions/_lib/db.js';
 import { onRequest } from '../functions/api/social/[[path]].js';
+import { onRequest as adminRequest } from '../functions/api/admin/[[path]].js';
+import { onRequest as authRequest } from '../functions/api/auth/[[path]].js';
+import { cleanupAdminAccessSessions } from '../functions/_lib/cloudflare-admin-session.js';
 import { environment, TestD1 } from './helpers/d1.js';
 
 // Locally generated test-only signing key. Never a Cloudflare or owner token.
@@ -24,7 +27,7 @@ async function signed(payload = {}, header = {}) {
 }
 
 test('Access verifier accepts only a correctly signed owner application token and returns no email', async () => {
-  assert.deepEqual(await verifyCloudflareAccessJwt(await signed(), config, jwks, now), { subject: claims.sub });
+  assert.deepEqual(await verifyCloudflareAccessJwt(await signed(), config, jwks, now), { subject: claims.sub, expiresAt: claims.exp, authenticatedAt: null });
 });
 
 test('Access rejects wrong issuer/audience/email, expired/missing/non-numeric timestamps and service/org tokens', async () => {
@@ -103,4 +106,77 @@ test('Access key service outages fail closed; a token cannot supply an alternate
     globalThis.fetch = async url => { assert.equal(url, `${issuer}/cdn-cgi/access/certs`); return new Response('unavailable', { status: 503 }); };
     await assert.rejects(requireCloudflareAdminAccess(r, { ...envConfig, ADMIN_ACCESS_ISSUER: issuer }, { user_id: config.userId }));
   } finally { globalThis.fetch = originalFetch; }
+});
+
+test('standalone Access login needs no LINE/member cookie, retains RBAC/CSRF, and logout rejects assertion replay', async () => {
+  const db = new TestD1(), originalFetch = globalThis.fetch;
+  const issuer = 'https://chatgun-standalone-test.cloudflareaccess.com';
+  globalThis.fetch = async url => { assert.equal(url, `${issuer}/cdn-cgi/access/certs`); return Response.json(jwks); };
+  try {
+    const env = { ...environment(db), ...envConfig, ADMIN_ACCESS_ISSUER: issuer, ADMIN_ACCESS_STANDALONE_ENABLED: 'true', SOCIAL_APP_ENABLED: 'true', MODERATION_TOOLS_ENABLED: 'true' };
+    await db.prepare("INSERT INTO users(id,display_name,status,created_at,updated_at)VALUES(?,'Local owner','active',?,?)").bind(config.userId, now, now).run();
+    const jwt = await signed({ iss: issuer });
+    const req = (path, body, csrf, origin = 'https://chatgun.pages.dev', assertion = jwt) => new Request(`https://chatgun.pages.dev/api/admin/${path}`, {
+      method: body ? 'POST' : 'GET', headers: { 'cf-access-jwt-assertion': assertion,
+        ...(body ? { origin, 'content-type': 'application/json', 'x-cg-admin-csrf': csrf || '' } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    const call = (path, ...args) => adminRequest({ env, request: req(path, ...args) });
+    assert.equal((await call('session')).status, 403, 'A valid Access identity without a role cannot start');
+    await db.prepare("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES('standalone-role',?,'safety_admin','Local Access fixture only',?,?)").bind(config.userId, now, now + 3600).run();
+    let response = await call('session'); assert.equal(response.status, 200);
+    const challenge = await response.json(); assert.equal(challenge.authenticated, false);
+    assert.equal(response.headers.get('set-cookie'), null);
+    assert.equal((await call('overview')).status, 401);
+    assert.equal((await call('session', { action: 'start' })).status, 403);
+    assert.equal((await call('session', { action: 'start' }, challenge.csrfToken, 'https://attacker.example.test')).status, 403);
+    response = await call('session', { action: 'start' }, challenge.csrfToken); assert.equal(response.status, 200);
+    const login = await response.json(); assert.equal(login.authenticated, true); assert.equal(login.recentlyAuthenticated, false);
+    assert.equal((await call('overview')).status, 200, 'Routine dashboard needs no repeated member OAuth');
+    assert.equal((await call('reports')).status, 400, 'Exceptional purpose is still mandatory');
+    const reports = new Request(req('reports'), { headers: { 'cf-access-jwt-assertion': jwt, 'x-moderation-purpose': 'Inspect local fixture reports only' } });
+    response = await adminRequest({ env, request: reports }); assert.equal(response.status, 403);
+    assert.equal((await response.json()).code, 'admin_auth_evidence_missing', 'iat does not masquerade as fresh authentication');
+    const freshJwt = await signed({ iss: issuer, sub: 'fresh-local-subject', auth_time: now - 5 });
+    response = await adminRequest({ env, request: req('session', undefined, undefined, undefined, freshJwt) });
+    const freshChallenge = await response.json();
+    response = await adminRequest({ env, request: req('session', { action: 'start' }, freshChallenge.csrfToken, undefined, freshJwt) });
+    const fresh = await response.json(); assert.equal(fresh.recentlyAuthenticated, true);
+    const freshReports = new Request(req('reports', undefined, undefined, undefined, freshJwt), { headers: { 'cf-access-jwt-assertion': freshJwt, 'x-moderation-purpose': 'Inspect local fixture reports only' } });
+    assert.equal((await adminRequest({ env, request: freshReports })).status, 200);
+    assert.equal((await db.prepare('SELECT COUNT(*) n FROM sessions').first()).n, 0);
+    assert.equal((await db.prepare('SELECT COUNT(*) n FROM identities').first()).n, 0);
+    assert.equal((await authRequest({ env, request: new Request('https://chatgun.pages.dev/api/auth/me', { headers: { 'cf-access-jwt-assertion': jwt } }) })).status, 401, 'Admin assertion is not a member login');
+    assert.equal((await call('session', { action: 'logout' }, challenge.csrfToken)).status, 403, 'Start challenge cannot authorize logout');
+    assert.equal((await call('session', { action: 'logout' }, login.csrfToken)).status, 200);
+    assert.equal((await call('overview')).status, 401);
+    const retry = await (await call('session')).json();
+    assert.equal((await call('session', { action: 'start' }, retry.csrfToken)).status, 403, 'Logged-out assertion cannot revive a session');
+    assert.equal(await cleanupAdminAccessSessions(db, now + 1000), 0, 'Do not delete revocation tombstones before assertion expiry');
+    await db.prepare("UPDATE moderation_access_grants SET revoked_at=?,revocation_reason='Local revocation test only' WHERE id='standalone-role'").bind(now).run();
+    assert.equal((await adminRequest({ env, request: freshReports })).status, 403);
+    assert.equal((await adminRequest({env,request:req('session',{action:'logout'},fresh.csrfToken,undefined,freshJwt)})).status,200,'Own-session logout remains possible after role revocation');
+    assert.equal((await call('notifications')).status, 404, 'Member notifications stay outside Access namespace');
+    assert.equal((await db.prepare('SELECT COUNT(*) n FROM pragma_foreign_key_check').first()).n, 0);
+  } finally { globalThis.fetch = originalFetch; db.close(); }
+});
+
+test('optional Cloudflare identity lookup binds real login time to verified subject, email and account, not JWT refresh time', async () => {
+  const originalFetch=globalThis.fetch,issuer='https://chatgun-identity-test.cloudflareaccess.com';
+  const env={...envConfig,ADMIN_ACCESS_ISSUER:issuer,ADMIN_ACCESS_IDENTITY_LOOKUP_ENABLED:'true'};
+  const cases=[{}, {account_id:'wrong-account'}, {email:'other@example.test'}, {user_uuid:'wrong-subject'},
+    {iat:now+1}, {iat:'today'}, {service_token_status:true}];
+  try {
+    for(let index=0;index<cases.length;index++){
+      const sub='local-identity-'+index,jwt=await signed({iss:issuer,sub});
+      globalThis.fetch=async(url,options)=>{
+        if(url===`${issuer}/cdn-cgi/access/certs`)return Response.json(jwks);
+        assert.equal(url,`${issuer}/cdn-cgi/access/get-identity`);
+        assert.equal(options.headers.cookie,`CF_Authorization=${jwt}`);
+        assert.equal(options.redirect,'error');
+        return Response.json({user_uuid:sub,email:config.email,account_id:'23017b53386fb67fc62a52cdd017454c',iat:now-1000,...cases[index]});
+      };
+      const principal=await cloudflareAdminPrincipal(new Request('https://chatgun.pages.dev/api/admin/session',{headers:{'cf-access-jwt-assertion':jwt}}),env);
+      assert.equal(principal.authenticatedAt,index===0?now-1000:null);
+    }
+  } finally {globalThis.fetch=originalFetch;}
 });

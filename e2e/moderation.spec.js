@@ -45,6 +45,30 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+test('standalone Cloudflare Admin bootstrap uses its own namespace and CSRF without member login', async ({page}, testInfo) => {
+  let active=false;
+  await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:true,moderationToolsEnabled:true,accountModerationEnabled:false,adminAccessStandaloneEnabled:true}}));
+  await page.route('**/api/admin/**',async r=>{
+    const url=new URL(r.request().url());
+    if(url.pathname==='/api/admin/session'){
+      if(r.request().method()==='POST'){
+        expect(r.request().headers()['x-cg-admin-csrf']).toBe('local-ui-start-challenge');
+        expect(r.request().postDataJSON()).toEqual({action:'start'});active=true;
+      }
+      return r.fulfill({json:{authentication:'cloudflare_access',authenticated:active,csrfToken:active?'local-ui-action-challenge':'local-ui-start-challenge'}});
+    }
+    expect(active).toBe(true);
+    if(url.pathname==='/api/admin/overview')return r.fulfill({json:{counts:{pending:0,reports:0,appeals:0},daily:{newLast24Hours:0,resolvedLast24Hours:0},cleanup:{pending:0,exhausted:0},coverage:{start:'19:00',end:'22:00',timezone:'Asia/Bangkok'}}});
+    if(url.pathname==='/api/admin/capabilities')return r.fulfill({json:{canReviewReports:true,canReviewMedia:true,canModerateAccounts:false}});
+    return r.fulfill({status:404,json:{message:'Not a local UI fixture route'}});
+  });
+  await page.goto('/app/moderation.html');
+  await expect(page.locator('#moderation-status')).toContainText('โหลดข้อมูลเรียบร้อยแล้ว');
+  await expect(page.locator('#admin-access-logout')).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:resolve(screenshotDirectory,`admin-access-standalone-${testInfo.project.name}.png`),fullPage:true});
+});
+
 test("admin dashboard opens routine overview automatically and requires justification for restricted evidence", async ({ page }, testInfo) => {
   const decisions = [];
   page.on("request", (request) => { if (request.url().endsWith("/api/social/moderation/media") && request.method() === "POST") decisions.push(request.postDataJSON()); });

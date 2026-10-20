@@ -4,6 +4,8 @@ export function eligibleSql(alias) {
     JOIN age_assurance_events ea ON ea.id=ep.age_assurance_id AND ea.user_id=eu.id
     WHERE eu.id=${alias} AND eu.status='active' AND eu.account_state='active'
       AND ea.age_band='adult_18_plus' AND ea.revoked_at IS NULL
+      AND NOT EXISTS(SELECT 1 FROM member_age_safety_holds age_hold WHERE age_hold.user_id=eu.id
+        AND (age_hold.state='held' OR age_hold.age_band<>'20_plus'))
       AND NOT EXISTS(SELECT 1 FROM beta_enrollments eb WHERE eb.user_id=eu.id AND eb.status='revoked')
       AND NOT EXISTS(SELECT 1 FROM beta_account_restrictions restriction WHERE restriction.user_id=eu.id AND restriction.status='active'))`;
 }

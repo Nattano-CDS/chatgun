@@ -2,7 +2,8 @@
 // Neither fixture mode is genuine human OAuth UAT.
 import{test,expect}from'@playwright/test';import{readFileSync,mkdirSync}from'node:fs';import{ONE_PIXEL_PNG}from'../test/helpers/image.js';
 const cloudFile=process.env.CHATGUN_FULL_SYSTEM_BUNDLE,cloud=cloudFile?JSON.parse(readFileSync(cloudFile)):null;
-const origin=cloud?.origin||'https://localhost:8797',dir=cloud?'docs/development-completion/cloud-screens':'docs/development-completion/screens';
+const origin=cloud?.origin||'https://localhost:8797',dir=process.env.CHATGUN_FULL_SYSTEM_SCREEN_DIR||(cloud?'docs/development-completion/cloud-screens':'docs/development-completion/screens');
+if(process.env.CHATGUN_FULL_SYSTEM_SCREEN_DIR&&!/^test-results\/[a-z0-9/-]+$/u.test(dir))throw Error('Invalid isolated screenshot output');
 if(cloud&&(process.env.CHATGUN_ISOLATED_STAGING!=='issue13'||origin!=='https://issue13.chatgun-issue13-staging.pages.dev'||cloud.databaseId!=='275d9820-6aec-494a-8bb5-b7ed9b8b74cc'))throw Error('Not the authorized isolated fixture environment');mkdirSync(dir,{recursive:true});
 for(const width of[390,768,1440])test(`complete handler-driven social and moderation journey ${width}`,async({browser})=>{
  const sessions=cloud?.sessions||JSON.parse(readFileSync('/tmp/chatgun-issue16-local-sessions.json')),contexts={};

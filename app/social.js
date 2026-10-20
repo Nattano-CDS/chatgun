@@ -737,7 +737,7 @@ async function initialize() {
     try {
       state.profile = (await api("/api/social/profile")).profile;
     } catch (error) {
-      if (['account_access_restricted','beta_access_revoked'].includes(error.code))
+      if (['account_access_restricted','beta_access_revoked','age_safety_review_required'].includes(error.code))
         return location.replace('/account.html?access=restricted');
       if (error.code === "not_found" && state.config.adultOnboardingEnabled) {
         document.body.dataset.flow = "onboarding", $("#global-status").textContent = "", $("#onboarding-view").hidden = !1, $("#onboarding-form").elements.name.value = state.account.user.displayName || "";

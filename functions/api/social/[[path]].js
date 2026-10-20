@@ -6,6 +6,7 @@ import { sanitizeImage } from "../../_lib/image.js";
 import { acceptanceFlowEnabled, currentAcceptance } from "../../_lib/acceptance.js";
 import { selfDeclaredAdult } from "../../_lib/age.js";
 import { requireCloudflareAdminAccess } from "../../_lib/cloudflare-admin-access.js";
+import { standaloneAdminEnabled, adminAccessContext, getAdminAccessSession, startAdminAccessSession, adminCsrfValid } from '../../_lib/cloudflare-admin-session.js';
 import { canContact, albumGrant, canViewPhoto, publicPortrait, publicPortraitColumn, eligibleSql, unblockedSql } from "../../_lib/social-permissions.js";
 
 const LOCATION_FRESH_SECONDS = 120;
@@ -185,6 +186,8 @@ function capability(env, name) {
 async function authenticated(request, env, { csrf = false, onboarding = false, allowRevokedEnrollment = false } = {}) {
   const session = await getSession(request, env.DB);
   if (!session) throw new SocialError("unauthorized", "กรุณาเข้าสู่ระบบ", 401);
+  const ageHold = await env.DB.prepare("SELECT 1 held FROM member_age_safety_holds WHERE user_id=? AND (state='held' OR age_band<>'20_plus')").bind(session.user_id).first();
+  if (ageHold) throw new SocialError('age_safety_review_required', 'บัญชีนี้ยังไม่เปิดใช้ฟีเจอร์สังคมระหว่างตรวจสอบสิทธิ์ตามช่วงอายุ คุณยังเข้าหน้าบัญชีเพื่อออกจากระบบ ติดต่อผู้ดูแล หรือขอลบข้อมูลได้', 403);
   const betaEnrollment = await env.DB.prepare(
     `SELECT (SELECT status FROM beta_enrollments WHERE user_id=?) status,
       EXISTS(SELECT 1 FROM beta_account_restrictions WHERE user_id=? AND status='active') account_restricted`,
@@ -353,6 +356,7 @@ async function config(env) {
     demoAutoStartEnabled: false,
     onlineStatusEnabled: socialAppEnabled && enabled(env.PRESENCE_ENABLED),
     moderationToolsEnabled: socialAppEnabled && enabled(env.MODERATION_TOOLS_ENABLED),
+    adminAccessStandaloneEnabled: standaloneAdminEnabled(env),
     accountModerationEnabled: socialAppEnabled && enabled(env.ACCOUNT_MODERATION_ENABLED),
     gameEnabled: false,
     emailOtpEnabled: false,
@@ -1057,10 +1061,59 @@ async function enforceAdminAccess(request, env, session) {
   catch { throw new SocialError('admin_access_required', 'กรุณาเข้าสู่ระบบผู้ดูแลผ่าน Cloudflare Access ด้วยบัญชีที่ได้รับอนุญาต', 403); }
 }
 
+async function moderationSession(request, env) {
+  if (!standaloneAdminEnabled(env)) return authenticated(request, env, { csrf: request.method === 'POST' });
+  let context;
+  try { context = await adminAccessContext(request, env); }
+  catch { throw new SocialError('admin_access_required', 'กรุณาเข้าสู่ระบบผู้ดูแลผ่าน Cloudflare Access', 403); }
+  const session = await getAdminAccessSession(env, context);
+  if (!session) throw new SocialError('admin_session_required', 'เซสชันผู้ดูแลหมดอายุ กรุณาออกจาก Cloudflare Access แล้วเข้าสู่ระบบใหม่', 401);
+  if (request.method === 'POST') {
+    requireSameOrigin(request);
+    if (!await adminCsrfValid(request, session, context.actionCsrf)) throw new SocialError('invalid_csrf', 'คำขอหมดอายุ กรุณาลองใหม่', 403);
+  }
+  return session;
+}
+
+async function adminAccessLogin(request, env) {
+  capability(env, 'MODERATION_TOOLS_ENABLED');
+  if (!standaloneAdminEnabled(env)) throw new SocialError('feature_disabled', 'ขั้นตอนนี้ยังไม่เปิดใช้งาน', 404);
+  let context;
+  try { context = await adminAccessContext(request, env); }
+  catch { throw new SocialError('admin_access_required', 'กรุณาเข้าสู่ระบบผู้ดูแลผ่าน Cloudflare Access ด้วยบัญชีที่ได้รับอนุญาต', 403); }
+  let session = await getAdminAccessSession(env, context);
+  let body;
+  if (request.method === 'POST') { requireSameOrigin(request); body = await readJson(request); }
+  // Ending one's own session stays possible even after the role expires.
+  if (body?.action === 'logout') {
+    if (!session || !await adminCsrfValid(request, session, context.actionCsrf)) throw new SocialError('invalid_csrf', 'คำขอไม่ถูกต้อง', 403);
+    await env.DB.prepare('UPDATE cloudflare_admin_sessions SET revoked_at=? WHERE token_hash=? AND revoked_at IS NULL').bind(unixTime(), context.tokenHash).run();
+    await auditMediaSafety(env.DB, context.userId, 'queue_view', 'admin_logout', 'cloudflare_admin_session_logout');
+    return json({ ok: true, logoutPath: '/cdn-cgi/access/logout' });
+  }
+  // Access identity never provisions roles, reactivates accounts or revives grants.
+  const grant = await env.DB.prepare(`SELECT 1 ok FROM moderation_access_grants
+    WHERE user_id=? AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>?)
+      AND role IN ('report_reviewer','safety_admin','moderation_admin')`).bind(context.userId, unixTime()).first();
+  if (!grant) throw new SocialError('forbidden', 'บัญชีนี้ไม่มีสิทธิ์ผู้ดูแลที่ใช้งานได้', 403);
+  if (request.method === 'POST') {
+    if (body.action === 'start') {
+      if (!await adminCsrfValid(request, null, context.startCsrf)) throw new SocialError('invalid_csrf', 'คำขอไม่ถูกต้อง', 403);
+      await limited(env, 'admin_access_session_start', context.userId, 30, 3600);
+      session = await startAdminAccessSession(env, context);
+      if (!session) throw new SocialError('admin_session_revoked', 'เซสชันนี้สิ้นสุดแล้ว กรุณาออกจาก Cloudflare Access และเข้าสู่ระบบใหม่', 403);
+      await auditMediaSafety(env.DB, context.userId, 'queue_view', 'admin_login', 'cloudflare_admin_session_start');
+    } else throw new SocialError('invalid_action', 'คำขอไม่ถูกต้อง');
+  }
+  return json({ authentication: 'cloudflare_access', authenticated: Boolean(session),
+    csrfToken: session ? context.actionCsrf : context.startCsrf,
+    expiresAt: session?.expires_at || null, recentlyAuthenticated: session ? hasRecentAuthentication(session) : false });
+}
+
 async function moderationAccess(request, env, roles, options = {}) {
   capability(env, "SOCIAL_APP_ENABLED");
   capability(env, "MODERATION_TOOLS_ENABLED");
-  const session = await authenticated(request, env, { csrf: request.method === "POST" });
+  const session = await moderationSession(request, env);
   let purpose = options.fixedPurpose;
   await enforceAdminAccess(request, env, session);
   if (!purpose) {
@@ -1073,6 +1126,7 @@ async function moderationAccess(request, env, roles, options = {}) {
     if (purpose.length < 10) throw new SocialError("purpose_required", "กรุณาระบุวัตถุประสงค์การเข้าถึงอย่างน้อย 10 ตัวอักษร");
   }
   if (options.requireRecentAuthentication !== false && !hasRecentAuthentication(session)) {
+    if (standaloneAdminEnabled(env) && !session.authenticated_at) throw new SocialError('admin_auth_evidence_missing', 'Cloudflare Access ยังไม่ส่งหลักฐานเวลายืนยันตัวตน กรุณาตั้งค่า IdP ให้ส่ง auth_time ก่อนดำเนินการที่มีความเสี่ยงสูง', 403);
     throw new SocialError("recent_authentication_required", "กรุณาเข้าสู่ระบบอีกครั้งก่อนใช้เครื่องมือดูแล", 403);
   }
   const placeholders = roles.map(() => "?").join(",");
@@ -1099,7 +1153,7 @@ async function moderationAccess(request, env, roles, options = {}) {
 
 async function moderationCapabilities(request,env){
   capability(env,'SOCIAL_APP_ENABLED');capability(env,'MODERATION_TOOLS_ENABLED');
-  const session=await authenticated(request,env),now=unixTime();
+  const session=await moderationSession(request,env),now=unixTime();
   await enforceAdminAccess(request,env,session);
   const rows=await env.DB.prepare(`SELECT role FROM moderation_access_grants WHERE user_id=? AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>?)
     UNION SELECT legacy.role FROM moderation_roles legacy WHERE legacy.user_id=? AND NOT EXISTS(
@@ -1194,6 +1248,7 @@ async function moderationRoleManagement(request, env) {
         WHERE id=? AND revoked_at IS NULL
       `).bind(timestamp, session.user_id, reason, grantId),
       env.DB.prepare("DELETE FROM moderation_roles WHERE user_id=? AND role=?").bind(grant.user_id, grant.role),
+      env.DB.prepare('UPDATE cloudflare_admin_sessions SET revoked_at=? WHERE user_id=? AND revoked_at IS NULL').bind(timestamp,grant.user_id),
       env.DB.prepare(`
         INSERT INTO moderation_role_events(
           id,grant_id,actor_user_id,target_user_id,role,action,reason,created_at
@@ -1924,7 +1979,7 @@ async function gallery(request, env) {
       const comments = await env.DB.prepare(`
         SELECT c.id, c.body, c.created_at, p.user_id sender_user_id, p.name sender_name
         FROM photo_comments c JOIN member_profiles p ON p.user_id = c.sender_user_id
-        WHERE c.media_id = ? AND ${unblockedSql('c.sender_user_id','?')} ORDER BY c.created_at ASC,c.id LIMIT 200
+        WHERE c.media_id = ? AND ${unblockedSql('c.sender_user_id','?')} AND ${eligibleSql('c.sender_user_id')} ORDER BY c.created_at ASC,c.id LIMIT 200
       `).bind(id,session.user_id,session.user_id).all();
       return json({ photos, comments: comments.results || [], owner });
     }
@@ -2228,6 +2283,7 @@ export async function onRequest({ request, env }) {
     if (!env.DB) throw new Error("missing_db_binding");
     const path = new URL(request.url).pathname;
     if (request.method === "GET" && path === "/api/social/config") return config(env);
+    if (path === '/api/social/moderation/access' && ['GET','POST'].includes(request.method)) return await adminAccessLogin(request,env);
     if (path === '/api/social/online' && ['GET','POST'].includes(request.method)) return await onlinePresence(request,env);
     if (path === '/api/social/conversations' && request.method === 'GET') return await conversations(request,env);
     if (path === '/api/social/albums/access' && ['GET','POST'].includes(request.method)) return await albumAccess(request,env);
@@ -2281,6 +2337,7 @@ export async function onRequest({ request, env }) {
     }
     return failure("ไม่พบหน้าที่เรียก", 404, "not_found");
   } catch (error) {
+    if (/age_safety_contact_denied/u.test(String(error?.message))) return failure('การติดต่อยังไม่ได้รับอนุญาตตามมาตรการช่วงอายุ',403,'age_safety_review_required');
     if (/direct_chat_(recipient_limit|duplicate)/u.test(String(error?.message))) return failure('ส่งข้อความซ้ำหรือติดต่อสมาชิกใหม่บ่อยเกินไป กรุณารอ',429,'chat_spam_limited');
     if (error instanceof RequestError) return failure("คำขอไม่ถูกต้อง", error.status, error.code);
     if (error instanceof SocialError) return failure(error.message, error.status, error.code);

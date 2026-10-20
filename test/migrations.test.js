@@ -11,10 +11,13 @@ test("migration is idempotent and creates required tables and indexes", () => {
   database.exec(readFileSync("migrations/0004_moderation_audit.sql", "utf8"));
   database.exec(readFileSync("migrations/0015_authenticated_online_presence.sql", "utf8"));
   database.exec(readFileSync("migrations/0016_beta_account_moderation.sql", "utf8"));
+  database.exec(readFileSync("migrations/0018_cloudflare_admin_sessions.sql", "utf8"));
+  database.exec(readFileSync("migrations/0019_member_age_safety_holds.sql", "utf8"));
   const tables = database.database.prepare(
     "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name",
   ).all().map(({ name }) => name);
   assert.deepEqual(tables, [
+    "cloudflare_admin_sessions", "member_age_safety_holds",
     "beta_account_restrictions", "beta_account_appeals", "beta_account_moderation_events", "album_access_grants", "album_access_requests", "chat_initiations", "chat_preferences", "chat_system_events", "account_acceptances", "account_deletion_requests", "age_assurance_events", "beta_enrollments", "beta_invitations", "deletion_receipts", "identities",
     "identity_verification_requests", "independent_age_assurances", "media_appeals", "media_deletion_queue", "media_moderation_decisions", "media_reports",
     "media_safety_audit_events", "media_safety_reviews", "media_upload_quota_attempts", "member_profiles", "moderation_access_grants", "moderation_audit_events", "moderation_notifications", "moderation_role_events", "moderation_roles",
@@ -27,6 +30,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
     "SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE 'idx_%' ORDER BY name",
   ).all().map(({ name }) => name);
   assert.deepEqual(indexes, [
+    "idx_cloudflare_admin_sessions_user", "idx_cloudflare_admin_sessions_expiry",
     "idx_beta_restriction_active", "idx_beta_appeals_queue", "idx_messages_client_request", "idx_discovery_candidates",
     "idx_album_owner_status", "idx_album_viewer_status", "idx_chat_events_owner", "idx_chat_events_requester", "idx_chat_initiations_daily", "idx_photo_visibility", "idx_account_acceptances_user_accepted", "idx_age_assurance_user", "idx_beta_enrollments_status", "idx_beta_invitations_available", "idx_blocks_blocked", "idx_deletion_receipts_expiry",
     "idx_deletion_requests_expiry", "idx_identities_user", "idx_independent_age_user_status", "idx_media_appeals_status_created", "idx_media_decisions_actor_created",
