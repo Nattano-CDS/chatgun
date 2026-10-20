@@ -35,12 +35,19 @@ export async function drainMediaDeletionQueue(env, timestamp = unixTime(), {obje
         AND NOT EXISTS(SELECT 1 FROM social_media m WHERE m.object_key=media_deletion_queue.object_key AND m.state<>'pending_deletion')`)
       .bind(nonce,timestamp+300,row.object_key,timestamp,timestamp).run();
     if(!claim.meta?.changes)continue;
+    let objectDeleted=false;
     try {
       await env.MEDIA.delete(row.object_key);
+      objectDeleted=true;
       await env.DB.batch([
+        env.DB.prepare(`UPDATE social_messages SET unsent_at=COALESCE(unsent_at,?)
+          WHERE body='' AND media_id IN(SELECT id FROM social_media WHERE object_key=? AND state='pending_deletion')
+            AND EXISTS(SELECT 1 FROM media_deletion_queue WHERE object_key=? AND processing_nonce=?)`)
+          .bind(timestamp,row.object_key,row.object_key,nonce),
         env.DB.prepare(`
           DELETE FROM social_media WHERE object_key = ? AND state = 'pending_deletion'
-        `).bind(row.object_key),
+            AND EXISTS(SELECT 1 FROM media_deletion_queue WHERE object_key=? AND processing_nonce=?)
+        `).bind(row.object_key,row.object_key,nonce),
         env.DB.prepare(`
           UPDATE media_deletion_queue
           SET completed_at = ?, attempts = attempts + 1, last_error_code = NULL
@@ -52,9 +59,9 @@ export async function drainMediaDeletionQueue(env, timestamp = unixTime(), {obje
       const attempts = Number(row.attempts || 0) + 1;
       await env.DB.prepare(`
         UPDATE media_deletion_queue
-        SET attempts = ?, next_attempt_at = ?, last_error_code = 'r2_delete_failed',processing_nonce=NULL,lease_until=NULL
+        SET attempts = ?, next_attempt_at = ?, last_error_code = ?,processing_nonce=NULL,lease_until=NULL
         WHERE object_key = ? AND completed_at IS NULL AND processing_nonce=?
-      `).bind(attempts, timestamp + retryDelay(attempts), row.object_key,nonce).run();
+      `).bind(attempts, timestamp + retryDelay(attempts),objectDeleted?'cleanup_commit_failed':'r2_delete_failed', row.object_key,nonce).run();
       failed += 1;
     }
   }

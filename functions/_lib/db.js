@@ -158,6 +158,10 @@ export async function confirmAccountDeletion(
         WHERE request_id = ? AND operation_id = ? AND status = 'processing'
       ) AND state IN ('active', 'pending_deletion')
     `).bind(operationId, timestamp, timestamp, requestId, operationId),
+    db.prepare(`UPDATE social_messages SET unsent_at=COALESCE(unsent_at,?)
+      WHERE body='' AND media_id IN(SELECT id FROM social_media WHERE owner_user_id=(
+        SELECT user_id FROM account_deletion_requests WHERE request_id=? AND operation_id=? AND status='processing'))
+    `).bind(timestamp,requestId,operationId),
     db.prepare(`
       INSERT INTO deletion_receipts(
         request_id, completed_at, policy_version, implementation_version, outcome, expires_at

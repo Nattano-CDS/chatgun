@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {TestD1,environment} from './helpers/d1.js';
-import {issueSession,unixTime} from '../functions/_lib/db.js';
+import {issueSession,unixTime,createDeletionRequest,confirmAccountDeletion} from '../functions/_lib/db.js';
+import {drainMediaDeletionQueue} from '../workers/media-cleanup.js';
 import {onRequest} from '../functions/api/social/[[path]].js';
 import {createMessageDelivery} from '../app/message-delivery.js';
 import {onRequest as auth} from '../functions/api/auth/[[path]].js';
@@ -133,4 +134,13 @@ test('new release cannot deploy against Production schema15 or reuse an old owne
 test('gallery comment reads hide both directions of blocked authors without leaking their text',async t=>{
  const{db,call,media,now}=await fixture(t);media();db.exec("UPDATE social_media SET state='active';UPDATE media_safety_reviews SET status='released',category='general';UPDATE profile_photos SET visibility='public'");await db.prepare("INSERT INTO photo_comments(id,media_id,sender_user_id,body,created_at)VALUES('comment','photo','independent','Must be hidden after blocking',?)").bind(now).run();
  assert.equal((await(await call('gallery?user=owner&photo=photo','viewer')).json()).comments.length,1);db.exec("INSERT INTO social_blocks VALUES('independent','viewer',1)");const response=await(await call('gallery?user=owner&photo=photo','viewer')).json();assert.equal(response.comments.length,0);assert.ok(!JSON.stringify(response).includes('Must be hidden'));
+});
+test('cleanup tombstones image-only forwarded messages before ON DELETE SET NULL',async t=>{
+ const{db,media,now,objects}=await fixture(t);media();db.exec(`INSERT INTO social_messages(id,sender_user_id,receiver_user_id,body,media_id,created_at)VALUES('forwarded','viewer','independent','','photo',${now})`);
+ const result=await drainMediaDeletionQueue({DB:db,MEDIA:{delete:async key=>objects.delete(key)}},now+8*86400);
+ assert.equal(result.completed,1);assert.equal(result.failed,0);const message=await db.prepare("SELECT media_id,unsent_at FROM social_messages WHERE id='forwarded'").first();assert.equal(message.media_id,null);assert.ok(message.unsent_at);assert.equal(db.database.prepare('PRAGMA foreign_key_check').all().length,0);
+});
+test('deleting the original uploader preserves other members and safely tombstones forwarded media',async t=>{
+ const{db,media,now}=await fixture(t);media();db.exec(`INSERT INTO social_messages(id,sender_user_id,receiver_user_id,body,media_id,created_at)VALUES('forwarded','viewer','independent','','photo',${now})`);
+ const request=await createDeletionRequest(db,'owner'),receipt=await confirmAccountDeletion(db,'owner',request.requestId,request.confirmationToken);assert.ok(receipt);assert.equal((await db.prepare("SELECT COUNT(*) n FROM users WHERE id IN('viewer','independent')").first()).n,2);const message=await db.prepare("SELECT media_id,unsent_at FROM social_messages WHERE id='forwarded'").first();assert.equal(message.media_id,null);assert.ok(message.unsent_at);assert.equal(db.database.prepare('PRAGMA foreign_key_check').all().length,0);
 });
