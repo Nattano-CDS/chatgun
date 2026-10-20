@@ -1236,7 +1236,7 @@ async function moderationMedia(request, env) {
              (SELECT COUNT(*) FROM media_reports report WHERE report.media_id = media.id AND report.status IN ('pending','escalated')) report_count
       FROM media_safety_reviews review JOIN social_media media ON media.id = review.media_id
       LEFT JOIN member_profiles owner ON owner.user_id = media.owner_user_id
-      WHERE review.status = ?
+      WHERE review.status = ? AND media.purpose IN ('profile','gallery','chat')
         AND (? = '' OR review.category = ?)
         AND (? = '' OR review.media_id LIKE '%' || ? || '%' OR media.purpose LIKE '%' || ? || '%' OR owner.name LIKE '%' || ? || '%')
       ORDER BY CASE WHEN review.status = 'pending' THEN review.created_at END ASC,
@@ -1264,7 +1264,7 @@ async function moderationMedia(request, env) {
   const media = await env.DB.prepare(`
     SELECT media.object_key,media.owner_user_id,media.state,review.status,review.category,review.revision
     FROM social_media media JOIN media_safety_reviews review ON review.media_id = media.id
-    WHERE media.id = ? AND media.state = 'active'
+    WHERE media.id = ? AND media.state = 'active' AND media.purpose IN ('profile','gallery','chat')
   `).bind(mediaId).first();
   if (!media) throw new SocialError("not_found", "ไม่พบรูปภาพ", 404);
   if (Number(media.revision) !== expectedRevision) throw new SocialError("decision_conflict", "รายการนี้ถูกแก้ไขแล้ว กรุณาโหลดใหม่", 409);
@@ -1318,7 +1318,7 @@ async function moderationMediaObject(request, env, id) {
   const media = await env.DB.prepare(`
     SELECT media.object_key,media.content_type FROM social_media media
     JOIN media_safety_reviews review ON review.media_id=media.id
-    WHERE media.id=? AND media.state IN ('active','pending_deletion')
+    WHERE media.id=? AND media.state IN ('active','pending_deletion') AND media.purpose IN ('profile','gallery','chat')
   `).bind(mediaId).first();
   if (!media || !env.MEDIA) throw new SocialError("not_found", "ไม่พบรูปภาพ", 404);
   const object = await env.MEDIA.get(media.object_key);
@@ -1537,7 +1537,7 @@ async function moderationMediaReports(request, env) {
       FROM media_reports report
       JOIN social_media media ON media.id=report.media_id
       JOIN media_safety_reviews review ON review.media_id=report.media_id
-      WHERE report.status=? ORDER BY report.created_at ASC LIMIT 100
+      WHERE report.status=? AND media.purpose IN ('profile','gallery','chat') ORDER BY report.created_at ASC LIMIT 100
     `).bind(status).all();
     await auditMediaSafety(env.DB, session.user_id, "queue_view", `reports:${status}`, purpose);
     return json({ reports: rows.results || [] });
@@ -1610,7 +1610,8 @@ async function moderationAppeals(request, env) {
       SELECT appeal.id,appeal.media_id,appeal.reason,appeal.status,appeal.revision,
              appeal.created_at,appeal.reviewed_at,review.category,review.reason decision_reason
       FROM media_appeals appeal JOIN media_safety_reviews review ON review.media_id=appeal.media_id
-      WHERE appeal.status=? ORDER BY appeal.created_at ASC LIMIT 100
+      JOIN social_media media ON media.id=appeal.media_id
+      WHERE appeal.status=? AND media.purpose IN ('profile','gallery','chat') ORDER BY appeal.created_at ASC LIMIT 100
     `).bind(status).all();
     await auditMediaSafety(env.DB, session.user_id, "queue_view", `appeals:${status}`, purpose);
     return json({ appeals: rows.results || [] });
@@ -1630,7 +1631,7 @@ async function moderationAppeals(request, env) {
     FROM media_appeals appeal
     JOIN social_media media ON media.id=appeal.media_id
     JOIN media_safety_reviews review ON review.media_id=appeal.media_id
-    WHERE appeal.id=? AND appeal.status='pending'
+    WHERE appeal.id=? AND appeal.status='pending' AND media.purpose IN ('profile','gallery','chat')
   `).bind(id).first();
   if (!appeal) throw new SocialError("not_found", "ไม่พบคำอุทธรณ์ที่รอตรวจ", 404);
   if (Number(appeal.revision) !== expectedRevision) throw new SocialError("decision_conflict", "คำอุทธรณ์นี้ถูกแก้ไขแล้ว", 409);
@@ -1680,7 +1681,7 @@ async function moderationAudit(request, env) {
   const events = rows.results || [];
   const access = await env.DB.prepare(`SELECT action,purpose,created_at FROM (
     SELECT action,purpose,created_at FROM media_safety_audit_events
-    UNION ALL SELECT action,purpose,created_at FROM moderation_audit_events
+    UNION ALL SELECT action,purpose,created_at FROM moderation_audit_events WHERE action NOT IN ('verification_view','verification_decision')
   ) ORDER BY created_at DESC LIMIT ? OFFSET ?`).bind(limit+1,(page-1)*limit).all();
   return json({ events: events.slice(0, limit), accessEvents:(access.results||[]).slice(0,limit), page, hasMore: events.length > limit || (access.results||[]).length>limit });
 }
