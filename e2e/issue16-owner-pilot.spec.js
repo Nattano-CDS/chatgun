@@ -6,10 +6,11 @@ for(const width of [390,768,1440])test(`owner-only shell renders own real-record
   const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:900}});
   try{
     for(const [name,value]of [['__Host-cg_session',sessions['owner'+width].token],['__Host-cg_csrf',sessions['owner'+width].csrf]])await context.addCookies([{name,value,url:'https://localhost:8797',secure:true,sameSite:'Lax'}]);
-    const page=await context.newPage();const discovery=[],albumRequests=[];
+    const page=await context.newPage();const discovery=[],albumRequests=[],galleryReads=[];await page.clock.install();
     await page.route('**/api/social/config',async route=>{const r=await route.fetch();const c=await r.json();await route.fulfill({response:r,json:{...c,publicDiscoveryEnabled:false,messagingEnabled:false,mediaUploadEnabled:false,ratingsEnabled:false,onlineStatusEnabled:false,moderationToolsEnabled:false}});});
     page.on('request',r=>{if(new URL(r.url()).pathname==='/api/social/discovery')discovery.push(r);});
     page.on('request',r=>{if(new URL(r.url()).pathname==='/api/social/albums/access')albumRequests.push(r);});
+    page.on('request',r=>{if(new URL(r.url()).pathname==='/api/social/gallery')galleryReads.push(r);});
     await page.goto('/');await expect(page.locator('#social-view')).toBeVisible();await expect(page.locator('#people-grid .photo-card')).toHaveCount(1);
     await expect(page.locator('#people-grid .empty')).toContainText('การค้นหาสมาชิกและการเผยแพร่ตำแหน่งยังไม่เปิดใช้งาน');await expect(page.locator('#location-toggle')).toBeDisabled();
     expect(discovery.length).toBe(0);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -19,5 +20,7 @@ for(const width of [390,768,1440])test(`owner-only shell renders own real-record
     await expect(page.locator('#profile-dialog-content .profile-name, #profile-dialog-content h1').first()).toBeVisible();
     await expect(page.locator('#toast')).not.toContainText('โหลด Gallery ไม่สำเร็จ');
     expect(albumRequests.length).toBe(0);
+    await expect(page.locator('.private-album-icon')).toBeEnabled();const before=galleryReads.length;
+    await page.clock.fastForward(31000);expect(galleryReads.length).toBe(before);
   }finally{await context.close();}
 });

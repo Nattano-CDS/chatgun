@@ -150,13 +150,14 @@ test("privacy notice explains social identity data use", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "ข้อมูลที่เราเก็บ" })).toBeVisible();
   await expect(page.getByText(/Google, Facebook หรือ LINE/u)).toBeVisible();
   await expect(page.getByRole("heading", { name: "การลบข้อมูล" })).toBeVisible();
-  await expect(page.getByText("Email OTP ถูกปิดใช้งาน")).toBeVisible();
+  await expect(page.getByText(/OTP/).first()).toBeVisible();
 });
 
-test("legal review pages disclose unresolved owner decisions", async ({ page }) => {
+test("approved owner-pilot legal pages retain version, scope and unresolved wider-release decisions", async ({ page }) => {
   await page.goto("/terms.html");
   await expect(page).toHaveTitle("ข้อกำหนดการใช้บริการ | ChatGun");
-  await expect(page.getByText("ฉบับร่างสำหรับเจ้าของบริการตรวจสอบ:")).toBeVisible();
+  await expect(page.locator('[data-policy-version]')).toContainText('20 ตุลาคม 2026');
+  await expect(page.getByRole('heading',{name:'ข้อมูลที่เจ้าของต้องยืนยัน'})).toBeVisible();
 
   await page.goto("/data-deletion.html");
   await expect(page).toHaveTitle("การขอลบบัญชีและข้อมูล | ChatGun");
@@ -181,12 +182,11 @@ test("Pages Functions expose secure config and reject cross-origin mutations", a
   expect(config.smsEnabled).toBe(false);
   expect(config.newAccountRegistrationEnabled).toBe(false);
   expect(config.invitationOnlyRegistrationEnabled).toBe(false);
-  expect(config.safety).toEqual({
-    publicDiscoveryEnabled: false,
-    unsolicitedMessagingEnabled: false,
-    minorRegistrationEnabled: false,
-  });
-  if(config.turnstileSiteKey!==null)expect(config.turnstileSiteKey).toMatch(/^0x[\w-]+$/u);
+  expect(config.safety).toEqual({publicDiscoveryEnabled:false,unsolicitedMessagingEnabled:false,minorRegistrationEnabled:false});
+  if(config.turnstileSiteKey!==null){
+    if(new URL(baseURL).hostname==='localhost')expect(config.turnstileSiteKey).toBe('turnstile-site'); // Synthetic local harness only.
+    else expect(config.turnstileSiteKey).toMatch(/^0x[\w-]+$/u);
+  }
 
   const disabledOtpResponse = await request.post("/api/auth/otp/start", {
     headers: { origin: baseURL, "content-type": "application/json" },

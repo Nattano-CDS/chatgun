@@ -540,6 +540,9 @@ async function showPerson(id, { historyMode = "push", photo = null } = {}) {
 }
 async function refreshAlbumPermission() {
   if ($("#profile-dialog").hidden || !state.selectedPerson || state.albumLoading || state.albumRefreshBusy) return;
+  // An empty public profile cannot receive uploads/requests while both services
+  // are closed. Keep live private/granted-media checks; avoid six empty reads/minute.
+  if (!state.privateAlbumOpen && !state.personPhotos.length && !state.config?.mediaUploadEnabled && !state.config?.messagingEnabled) return;
   const generation = state.profileRequest, id = profileContext(state.selectedPerson).id;
   state.albumRefreshBusy = !0;
   try {
