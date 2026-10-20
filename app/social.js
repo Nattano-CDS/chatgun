@@ -525,7 +525,7 @@ async function showPerson(id, { historyMode = "push", photo = null } = {}) {
   try {
     const result = await api("/api/social/gallery?user=" + encodeURIComponent(id) + "&album=" + (state.privateAlbumOpen ? "private" : "public")), photos = result.photos;
     if (generation !== state.profileRequest) return;
-    state.personPhotos = photos, state.album = result.album, id === currentActor() && (state.albumRequests = (await api("/api/social/albums/access")).requests), photo === "upload" && await loadUploadQuotas();
+    state.personPhotos = photos, state.album = result.album, id === currentActor() && state.config.messagingEnabled && (state.albumRequests = (await api("/api/social/albums/access")).requests), photo === "upload" && await loadUploadQuotas();
   } catch {
     if (generation !== state.profileRequest) return;
     state.galleryLoadError = !0, toast("โหลด Gallery ไม่สำเร็จ โปรดลองอีกครั้ง", !0);
