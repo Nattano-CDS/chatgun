@@ -1,5 +1,9 @@
 {
   "scope": "line-public-social-beta",
+  "superseded": true,
+  "supersededBy": "docs/admin-access-13plus/implementation.md",
+  "ownerSelectedMinimumAge": 13,
+  "youthRegistrationJourneyReady": false,
   "ownerScopeApproved": true,
   "published": false,
   "exactPolicyTextApproved": false,
@@ -38,5 +42,5 @@
     "DEMO_MODE_ENABLED": "false",
     "DEMO_AUTO_START_ENABLED": "false"
   },
-  "note": "Preparation only. Draft policy versions intentionally fail existing acceptance-version validation. No credential values, migrations, role grants or Production service writes."
+  "note": "SUPERSEDED adult-only proposal: do not apply these candidate variables. The owner subsequently selected age13+, whose youth admission/authorization model remains incomplete. Draft versions intentionally fail validation. See docs/admin-access-13plus/implementation.md; no Production activation is authorized by this file."
 }

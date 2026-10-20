@@ -40,6 +40,8 @@ export async function accountJourney(db, userId, env) {
     "SELECT account_state FROM users WHERE id = ? AND status = 'active'",
   ).bind(userId).first();
   if (!user) throw new Error("account_disabled");
+  const ageHold = await db.prepare("SELECT 1 held FROM member_age_safety_holds WHERE user_id=? AND (state='held' OR age_band<>'20_plus')").bind(userId).first();
+  if (ageHold) return { nextPath: '/account.html?access=age-review', acceptanceRequired: false, accountState: user.account_state };
   const acceptance = await currentAcceptance(db, userId, env);
   if (!acceptance.accepted || user.account_state === "pending_acceptance") {
     return { nextPath: "/acceptance", acceptanceRequired: true, accountState: user.account_state };

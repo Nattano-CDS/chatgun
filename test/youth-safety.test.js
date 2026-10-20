@@ -66,12 +66,26 @@ for (const band of ['under_13','13_17','18_19']) test(`age hold ${band} blocks b
     assert.equal((await onRequest({ env, request: request('/api/social/gallery', adult, {action:'like',id:'held-photo'}) })).status, 404);
     assert.equal(objectReads,0,'Denied media never reaches R2');
     assert.equal((await authRequest({ env, request: request('/api/auth/me', youth) })).status, 200, 'Account/privacy controls stay reachable');
+    const authEnv={...env,ACCEPTANCE_FLOW_ENABLED:'true',ADULT_NOTICE_VERSION:'age-notice-v1',TERMS_VERSION:'terms-v1',PRIVACY_VERSION:'privacy-v1'};
+    const authStatus=await(await authRequest({env:authEnv,request:request('/api/auth/me',youth)})).json();
+    assert.equal(authStatus.nextPath,'/account.html?access=age-review');assert.equal(authStatus.canLinkAccounts,false);
+    const falseAdult=await authRequest({env:authEnv,request:request('/api/auth/acceptance',youth,{confirmedAdult:true,acceptedTerms:true,acknowledgedPrivacy:true,adultNoticeVersion:'age-notice-v1',termsVersion:'terms-v1',privacyVersion:'privacy-v1'})});
+    assert.equal(falseAdult.status,403);assert.equal((await falseAdult.json()).code,'age_safety_review_required');
+    assert.equal((await db.prepare("SELECT COUNT(*) n FROM account_acceptances WHERE user_id='local-held'").first()).n,0);
     await assert.rejects(db.prepare("INSERT INTO social_messages(id,sender_user_id,receiver_user_id,body,created_at)VALUES('bypass','local-adult','local-held','Must not send',?)").bind(now).run(), /age_safety_contact_denied/u);
     await assert.rejects(db.prepare("INSERT INTO album_access_requests(id,album_owner_id,requester_id,status,created_at,updated_at)VALUES('bypass-album','local-adult','local-held','pending',?,?)").bind(now, now).run(), /age_safety_contact_denied/u);
     await assert.rejects(db.prepare("UPDATE member_age_safety_holds SET state='cleared' WHERE user_id='local-held'").run(), /CHECK/u);
     await assert.rejects(db.prepare("UPDATE album_access_requests SET status='approved',revision=revision+1 WHERE id='old-grant'").run(), /age_safety_contact_denied/u);
     assert.equal((await db.prepare('SELECT COUNT(*) n FROM pragma_foreign_key_check').first()).n, 0);
     assert.equal((await db.prepare("SELECT age_band FROM age_assurance_events WHERE user_id='local-adult'").first()).age_band, 'adult_18_plus', 'Do not relabel unrelated adult declarations');
+    const deletion=await authRequest({env:authEnv,request:request('/api/auth/account-deletion/request',youth,{acknowledged:true})});
+    assert.equal(deletion.status,200,'Age hold must not block the existing deletion right');
+    const confirmation=await deletion.json();
+    const deleted=await authRequest({env:authEnv,request:request('/api/auth/account-deletion/confirm',youth,{...confirmation,confirmText:'ลบบัญชีถาวร'})});
+    assert.equal(deleted.status,200);assert.equal((await deleted.json()).accountAccessRevoked,true);
+    assert.equal((await db.prepare("SELECT COUNT(*) n FROM member_age_safety_holds WHERE user_id='local-held'").first()).n,0);
+    assert.equal((await db.prepare('SELECT COUNT(*) n FROM pragma_foreign_key_check').first()).n,0);
+    assert.equal((await authRequest({env:authEnv,request:request('/api/auth/me',youth)})).status,401);
   } finally { db.close(); }
 });
 

@@ -1,5 +1,10 @@
 # 13+ membership and Cloudflare Access: approved direction, incomplete activation
 
+> Later implementation: see [standalone Admin sessions and youth holds](../admin-access-13plus/implementation.md).
+> The historical preparation status below is superseded: standalone Admin is now
+> implemented/tested locally, not yet configured with genuine Access; schema19 is
+> applied only to the isolated test D1. Youth registration is still not activated.
+
 Decision date: 20 October 2026, Asia/Bangkok. This supersedes the proposed adults-only
 public admission direction, not the safeguards of the currently deployed owner pilot.
 

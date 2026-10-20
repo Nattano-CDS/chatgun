@@ -454,6 +454,8 @@ async function acceptRequirements(request, env) {
   if (!await requireCsrf(request, session)) return failure("คำขอหมดอายุ กรุณาลองใหม่", 403, "invalid_csrf");
   const body = await readJson(request);
   const versions = requiredAcceptanceVersions(env);
+  const ageHold = await env.DB.prepare("SELECT 1 held FROM member_age_safety_holds WHERE user_id=? AND (state='held' OR age_band<>'20_plus')").bind(session.user_id).first();
+  if (ageHold) return failure('บัญชีนี้อยู่ระหว่างตรวจสอบสิทธิ์ตามช่วงอายุ ไม่สามารถใช้การยืนยัน 18+ เพื่อเปิดสิทธิ์แทนได้',403,'age_safety_review_required');
   if (body.confirmedAdult !== true) {
     return failure("ผู้ที่มีอายุต่ำกว่า 18 ปีไม่สามารถเข้าร่วม ChatGun Beta ได้", 403, "underage_not_eligible");
   }
