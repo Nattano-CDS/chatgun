@@ -1,6 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync,mkdtempSync,writeFileSync,copyFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';
 import {approvedOwnerPilot,ownerPilotVars} from '../scripts/lib/owner-pilot-release.mjs';
+import {execFileSync} from 'node:child_process';
 test('controlled owner pilot requires recorded owner/reviewer confirmation, exact legal hashes and effective date',()=>{
   const receipt=approvedOwnerPilot('.',Date.parse('2026-10-20T01:00:00Z'));assert.equal(receipt.scope,'line-owner-pilot');
   const folder=mkdtempSync(tmpdir()+'/chatgun-policy-guard-');
@@ -10,6 +11,14 @@ test('controlled owner pilot requires recorded owner/reviewer confirmation, exac
     }
     writeFileSync(folder+'/policy-release.json',JSON.stringify(receipt));writeFileSync(folder+'/privacy.html','unapproved changed text');assert.throws(()=>approvedOwnerPilot(folder),/Approved legal text changed/);
   }finally{rmSync(folder,{recursive:true});}
+});
+test('approved public policy pages opt out of edge email rewriting without changing authorization headers',()=>{
+  const headers=readFileSync('_headers','utf8');
+  for(const path of ['/privacy*','/terms*','/data-deletion*','/beta-notice*','/canary-notice.html'])assert.ok(headers.includes(path+'\n  Cache-Control: no-cache, no-transform'));
+  assert.match(headers,/Content-Security-Policy: default-src 'self'/);assert.match(headers,/X-Frame-Options: DENY/);
+});
+test('Production invitation issuer refuses to act before specific human eligibility confirmation',()=>{
+  assert.throws(()=>execFileSync(process.execPath,['scripts/issue-production-owner-invitation.mjs'],{env:{...process.env,CHATGUN_OWNER_PARTICIPANT_CONFIRMED:''},stdio:'pipe'}),error=>error.stderr.toString().includes('Human owner/channel-role/adult eligibility confirmation required'));
 });
 test('LINE-only pilot permits onboarding but never discovery/chat/media/moderation/presence or public signup',()=>{
   const vars=ownerPilotVars(approvedOwnerPilot());assert.equal(vars.OAUTH_ENABLED_PROVIDERS,'line');assert.equal(vars.BETA_INVITATION_REGISTRATION_ENABLED,'true');assert.equal(vars.ACCEPTANCE_FLOW_ENABLED,'true');

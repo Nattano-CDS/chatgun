@@ -12,7 +12,10 @@ const ci=JSON.parse(readFileSync(out+'/pilot-ci.json'));assert.equal(ci.headSha,
 const {token}=JSON.parse(execFileSync('npx',['wrangler@4.151.1','auth','token','--json'],{encoding:'utf8'}));
 async function api(path,body){const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const j=await r.json();assert.ok(r.ok&&j.success,'Scoped pilot preflight failed');return j.result;}
 assert.equal((await api('')).id,account);const project=await api('/pages/projects/chatgun'),prod=project.deployment_configs.production;
-assert.equal(prod.d1_databases.DB.id,db);assert.deepEqual(prod.r2_buckets,{MEDIA:{name:'chatgun-media-production'}});assert.equal(prod.env_vars.OAUTH_LOGIN_ENABLED.value,'false');assert.equal(prod.env_vars.NEW_ACCOUNT_REGISTRATION_ENABLED.value,'false');
+assert.equal(prod.d1_databases.DB.id,db);assert.deepEqual(prod.r2_buckets,{MEDIA:{name:'chatgun-media-production'}});assert.equal(prod.env_vars.NEW_ACCOUNT_REGISTRATION_ENABLED.value,'false');
+if(prod.env_vars.OAUTH_LOGIN_ENABLED.value==='true'){
+  for(const [key,value]of Object.entries(ownerPilotVars(receipt)))assert.equal(prod.env_vars[key]?.value,value,'Unexpected pilot flag before corrected redeployment: '+key);
+}else assert.equal(prod.env_vars.OAUTH_LOGIN_ENABLED.value,'false');
 assert.equal(project.deployment_configs.preview.d1_databases.DB.id,'5bbfd55d-eb22-4324-8a7d-57bef14110ea');assert.equal(project.deployment_configs.preview.r2_buckets.MEDIA.name,'chatgun-media-staging');
 assert.equal((await api('/r2/buckets/chatgun-media-production/domains/managed')).enabled,false);assert.equal(((await api('/r2/buckets/chatgun-media-production/domains/custom')).domains||[]).filter(d=>d.enabled).length,0);
 const query=async sql=>(await api('/d1/database/'+db+'/query',{sql}))[0].results;

@@ -33,3 +33,18 @@
 
 /release-assets.json
   Cache-Control: no-store
+
+/privacy*
+  Cache-Control: no-cache, no-transform
+
+/terms*
+  Cache-Control: no-cache, no-transform
+
+/data-deletion*
+  Cache-Control: no-cache, no-transform
+
+/beta-notice*
+  Cache-Control: no-cache, no-transform
+
+/canary-notice.html
+  Cache-Control: no-cache, no-transform
