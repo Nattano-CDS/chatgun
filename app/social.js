@@ -203,7 +203,7 @@ function renderPeople() {
 }
 function renderRelationships() {
   const unread = state.conversations.filter((p) => !p.muted).reduce((n, p) => n + Number(p.unread_count || 0), 0);
-  unread > state.lastUnread && document.visibilityState !== "visible" && "Notification" in window && Notification.permission === "granted" && localStorage.getItem("chatgun-notifications") === "enabled" && new Notification("ChatGun", { body: "มีข้อความหรือคำขอใหม่", icon: "/favicon.svg" }), state.lastUnread = unread, $("#message-badge").hidden = !unread, $("#message-badge").textContent = String(unread), renderConversations();
+  unread > state.lastUnread && (state.activeTab !== 'chat'||document.visibilityState !== "visible") && "Notification" in window && Notification.permission === "granted" && localStorage.getItem("chatgun-notifications") === "enabled" && new Notification("ChatGun", { body: "มีข้อความหรือคำขอใหม่", icon: "/favicon.svg" }), state.lastUnread = unread, $("#message-badge").hidden = !unread, $("#message-badge").textContent = String(unread), renderConversations();
 }
 function renderConversations(friends = state.conversations) {
   const list = $("#conversation-list");
@@ -743,7 +743,7 @@ async function initialize() {
       }
       throw error;
     }
-    $("#global-status").textContent = "", delete document.body.dataset.flow, $("#social-view").hidden = !1, localStorage.getItem("chatgun-notifications") === "enabled" && ($("#notification-toggle").textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้"), fillProfile(), await refreshSections(), await monitorLocationPermission(), switchTab(state.activeTab), location.pathname === "/app/photos" && openOwnGallery(!1);
+    $("#global-status").textContent = "", delete document.body.dataset.flow, $("#social-view").hidden = !1, localStorage.getItem("chatgun-notifications") === "enabled" && ($("#notification-toggle").textContent = "ปิดการแจ้งเตือนขณะเปิดแอป"), fillProfile(), await refreshSections(), await monitorLocationPermission(), switchTab(state.activeTab), location.pathname === "/app/photos" && openOwnGallery(!1);
     const route = routedProfile();
     if(route)await showPerson(route.user,{historyMode:'none',photo:route.photo}).catch(error=>toast(error.message,true));
     if(state.config.onlineStatusEnabled)await startOnlinePresence().catch(()=>toast('สถานะออนไลน์ยังไม่พร้อม ส่วนอื่นยังใช้งานได้',true));
@@ -806,9 +806,9 @@ $("#notification-toggle").addEventListener("click", async (event) => {
   if (!("Notification" in window)) return toast("เบราว์เซอร์นี้ไม่รองรับการแจ้งเตือน", !0);
   const button = event.currentTarget;
   if (localStorage.getItem("chatgun-notifications") === "enabled")
-    return localStorage.removeItem("chatgun-notifications"), button.textContent = "เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้", toast("ปิดการแจ้งเตือนในอุปกรณ์นี้แล้ว");
+    return localStorage.removeItem("chatgun-notifications"), button.textContent = "เปิดการแจ้งเตือนขณะเปิดแอป", toast("ปิดการแจ้งเตือนในอุปกรณ์นี้แล้ว");
   if (await Notification.requestPermission() !== "granted") return toast("ไม่ได้รับอนุญาตให้แสดงการแจ้งเตือน", !0);
-  localStorage.setItem("chatgun-notifications", "enabled"), button.textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้", toast("เปิดการแจ้งเตือนแล้ว");
+  localStorage.setItem("chatgun-notifications", "enabled"), button.textContent = "ปิดการแจ้งเตือนขณะเปิดแอป", toast("เปิดการแจ้งเตือนขณะเปิดแอปแล้ว");
 });
 $("#view-own-profile").addEventListener("click", () => showPerson(state.account.user.id));
 function openOwnGallery(push = !0) {

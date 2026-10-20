@@ -112,6 +112,12 @@ test('public photo stays open without a private grant and foreground updates pre
 test('core configuration outage exposes a working recovery action without fake members',async({page})=>{
  let failed=true;await page.route('**/api/social/config',r=>failed?r.fulfill({status:503,json:{message:'Temporary failure'}}):r.fulfill({json:config}));await page.goto('/');await expect(page.locator('#disabled-view')).toBeVisible();await expect(page.locator('#people-grid .person-card')).toHaveCount(0);failed=false;await page.locator('#service-retry').click();await expect(page.locator('#social-view')).toBeVisible();await expect(page.locator('#disabled-view')).toBeHidden();
 });
+test('unread badges refresh across screens and opt-in foreground notifications do not require hidden polling',async({page})=>{
+ await page.clock.install();await page.addInitScript(()=>{window.notificationSamples=[];window.Notification=class{static permission='granted';constructor(title,options){window.notificationSamples.push({title,body:options.body});}};});let unread=0;
+ await page.route('**/api/social/conversations',r=>r.fulfill({json:{conversations:[{other_user_id:'friend-1',name:'ผู้ทดสอบ',unread_count:unread,last_message_at:1}]}}));
+ await page.goto('/');await expect(page.locator('#social-view')).toBeVisible();unread=1;await page.clock.fastForward(31000);await expect(page.locator('#message-badge')).toHaveText('1');expect(await page.evaluate(()=>window.notificationSamples.length)).toBe(0);
+ await page.evaluate(()=>localStorage.setItem('chatgun-notifications','enabled'));unread=2;await page.clock.fastForward(31000);await expect.poll(()=>page.evaluate(()=>window.notificationSamples.length)).toBe(1);expect(await page.evaluate(()=>window.notificationSamples[0].body)).toBe('มีข้อความหรือคำขอใหม่');
+});
 
 test('moderation withdrawal clears an already-open photo on permission refresh',async({page})=>{
   let released=true;
