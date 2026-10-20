@@ -24,6 +24,7 @@ for(const width of[390,768,1440])for(const kind of['owner','viewer','moderator',
  {sql:"INSERT INTO users(id,display_name,status,created_at,updated_at)VALUES(?,?,'active',?,?)",params:[id,'ระบบทดสอบแยก '+kind,now,now]},
  {sql:"INSERT INTO age_assurance_events(id,user_id,age_band,method,notice_version,declared_at)VALUES(?,?,'adult_18_plus','self_declaration','isolated-automated-fixture',?)",params:[id+'-adult',id,now]},
  {sql:'INSERT INTO member_profiles(user_id,age_assurance_id,name,created_at,updated_at)VALUES(?,?,?,?,?)',params:[id,id+'-adult','ระบบทดสอบแยก '+kind,now,now]},
+ {sql:"INSERT INTO beta_enrollments(user_id,status,created_at,activated_at)VALUES(?,'active',?,?)",params:[id,now,now]},
  ]});
  if(['owner','moderator'].includes(kind))for(const role of['report_reviewer','safety_admin'])await query('INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES(?,?,?,?,?,?)',[randomUUID(),id,role,'Isolated automated regression fixture only',now,now+7200]);
  sessions[kind+width]={...await issueSession(db,id),userId:id};

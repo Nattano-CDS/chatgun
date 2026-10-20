@@ -144,3 +144,15 @@ test('deleting the original uploader preserves other members and safely tombston
  const{db,media,now}=await fixture(t);media();db.exec(`INSERT INTO social_messages(id,sender_user_id,receiver_user_id,body,media_id,created_at)VALUES('forwarded','viewer','independent','','photo',${now})`);
  const request=await createDeletionRequest(db,'owner'),receipt=await confirmAccountDeletion(db,'owner',request.requestId,request.confirmationToken);assert.ok(receipt);assert.equal((await db.prepare("SELECT COUNT(*) n FROM users WHERE id IN('viewer','independent')").first()).n,2);const message=await db.prepare("SELECT media_id,unsent_at FROM social_messages WHERE id='forwarded'").first();assert.equal(message.media_id,null);assert.ok(message.unsent_at);assert.equal(db.database.prepare('PRAGMA foreign_key_check').all().length,0);
 });
+test('optional approved-cohort gate excludes legacy unadmitted users without changing the default member model',async t=>{
+ const{db,env,call,now}=await fixture(t);
+ assert.equal((await call('profile?user=owner','viewer')).status,200,'default behavior for existing members is preserved');
+ env.BETA_ENROLLMENT_REQUIRED='true';assert.equal((await call('profile','viewer')).status,403);
+ await db.prepare("INSERT INTO beta_enrollments(user_id,status,created_at,activated_at)VALUES('viewer','active',?,?)").bind(now,now).run();
+ for(const path of['profile?user=owner','gallery?user=owner','messages?target=owner'])assert.equal((await call(path,'viewer')).status,404,path);
+ assert.equal((await call('ratings','viewer',{target:'owner',score:5,comment:'denied scope'})).status,404);
+ assert.equal((await(await call('discovery','viewer')).json()).people.length,0);
+ env.PRESENCE_ENABLED='true';assert.deepEqual((await(await call('online?users=owner','viewer')).json()).statuses,{owner:false});
+ await db.prepare("INSERT INTO beta_enrollments(user_id,status,created_at,activated_at)VALUES('owner','active',?,?)").bind(now,now).run();assert.equal((await call('profile?user=owner','viewer')).status,200);assert.equal((await call('messages?target=owner','viewer')).status,200);
+ db.exec("UPDATE beta_enrollments SET status='revoked',revoked_at=1 WHERE user_id='owner'");assert.equal((await call('profile?user=owner','viewer')).status,404);assert.equal((await call('profile','owner')).status,403);
+});
