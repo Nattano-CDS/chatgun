@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-20T01:35:28.728Z",
+  "checkedAt": "2026-10-20T03:50:00.739Z",
   "account": "23017b53386fb67fc62a52cdd017454c",
-  "sha": "c1116c25a77e0a96f1e53f9fe662b6a9c4aab671",
+  "sha": "815c2c401e095bb2dc3e6a1a2497269f4f268fb6",
   "scope": "line-owner-pilot",
   "policyVersions": {
     "adultNotice": "adult-beta-2026-10-20-rc1",
@@ -41,8 +41,8 @@
     "OAUTH_LOGIN_ENABLED": "true",
     "LINE_EXPECTED_CLIENT_ID": "2012039306"
   },
-  "priorDeployment": "f36bcbb6-9a81-4433-b894-169ee588a7de",
-  "priorSha": "84e69ed6216681175e605ebb0774285bf31f264a",
+  "priorDeployment": "336fe5fa-c4ab-4bdd-a4da-6b91f0df1d88",
+  "priorSha": "c1116c25a77e0a96f1e53f9fe662b6a9c4aab671",
   "rollback": "Protected durable closed-prepilot package, preserve DB/R2, no schema rollback",
   "rolesGranted": 0,
   "publicRegistration": false,

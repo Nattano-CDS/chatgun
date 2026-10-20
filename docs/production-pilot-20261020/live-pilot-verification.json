@@ -1,19 +1,19 @@
 {
-  "checkedAt": "2026-10-20T01:35:56.320Z",
+  "checkedAt": "2026-10-20T03:50:40.150Z",
   "account": "23017b53386fb67fc62a52cdd017454c",
-  "productionSha": "c1116c25a77e0a96f1e53f9fe662b6a9c4aab671",
-  "deployment": "336fe5fa-c4ab-4bdd-a4da-6b91f0df1d88",
+  "productionSha": "815c2c401e095bb2dc3e6a1a2497269f4f268fb6",
+  "deployment": "6930ba48-5511-422e-9dc0-b7cdcf604d7f",
   "productionD1": "9738a051-d914-42d0-8e7b-8098ef2b959d",
   "migrationCount": 15,
   "foreignKeyViolations": 0,
   "counts": {
-    "users": 0,
-    "identities": 0,
-    "sessions": 0,
-    "account_acceptances": 0,
-    "member_profiles": 0,
-    "beta_invitations": 0,
-    "beta_enrollments": 0,
+    "users": 1,
+    "identities": 1,
+    "sessions": 3,
+    "account_acceptances": 1,
+    "member_profiles": 1,
+    "beta_invitations": 1,
+    "beta_enrollments": 1,
     "moderation_roles": 0,
     "social_messages": 0,
     "social_media": 0
@@ -85,5 +85,5 @@
   ],
   "productionWrites": 0,
   "realOAuth": "Not claimed by read-only checks; actual human journey required",
-  "ownerAccountCreated": false
+  "ownerAccountCreated": true
 }
