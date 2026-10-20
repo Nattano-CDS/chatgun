@@ -85,3 +85,20 @@ Production. Technical safeguards do not constitute legal compliance or a staffed
 
 Sources: [Cloudflare token/identity documentation](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/application-token/)
 and [origin JWT validation](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/).
+
+## Validated source and evidence
+
+Application SHA: `40a56e9e182890e7d95119fadfb31f34be8ec214`.
+Exact-source [CI passed](https://github.com/Nattano-CDS/chatgun/actions/runs/39407882882).
+Local results: **219 unit/integration/security + 87 mocked browser + 7 full-system
+local handler journeys**, zero final failures/skips. Isolated Preview serves this SHA
+and schema19; all 39 public asset hashes match. Production remains the unchanged a73
+release/schema17, with public registration and Social services off.
+
+Age-held accounts are also routed to account/privacy controls instead of adult
+acceptance/onboarding, cannot record false adult acceptance or link around the hold,
+and can use the real CSRF/recent-auth account-deletion handlers. These cases use
+synthetic in-memory accounts only. No real child or owner records were deleted.
+
+[Owner-review report](report.html), [structured results](results.json), and
+[unpublished Thai youth policy addendum](youth-policy-review.html).
