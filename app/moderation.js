@@ -236,14 +236,15 @@ function renderPriority({ userReports = [], mediaReports = [], appeals = [], med
   }
 }
 
-function renderAudit(events) {
+function renderAudit(events,accessEvents=[]) {
   const results = $("#moderation-results"); results.replaceChildren();
-  if (!events.length) return empty("ยังไม่มีประวัติการตัดสินใจ");
+  if (!events.length&&!accessEvents.length) return empty("ยังไม่มีประวัติการตัดสินใจหรือการเข้าถึง");
   for (const event of events) {
     const card = node("article", null, "moderation-card audit-card");
     card.append(cardHeader(`${labels[event.action] || event.action} · ${labels[event.category] || event.category}`, new Date(Number(event.created_at) * 1000).toLocaleString("th-TH"), event.action, event.category), node("p", event.reason), node("small", `สื่อ ${event.media_id} · รุ่น ${event.revision}`));
     results.append(card);
   }
+  for(const event of accessEvents){const card=node('article',null,'moderation-card audit-card');card.append(cardHeader('การเข้าถึง · '+event.action,new Date(Number(event.created_at)*1000).toLocaleString('th-TH')),node('p',event.purpose));results.append(card);}
 }
 
 function renderAccountOperations(items,view){
@@ -284,7 +285,7 @@ async function load(view = state.view) {
   } else if (view === "user-reports") { payload = await api("/api/social/moderation/reports?status=pending"); renderUserReports(payload.reports || []); }
   else if (view === "media-reports") { payload = await api("/api/social/moderation/media-reports?status=pending"); renderMediaReports(payload.reports || []); }
   else if (view === "appeals") { payload = await api("/api/social/moderation/appeals?status=pending"); renderAppeals(payload.appeals || []); }
-  else if (view === "audit") { payload = await api(`/api/social/moderation/audit?page=${state.page}`); renderAudit(payload.events || []); }
+  else if (view === "audit") { payload = await api(`/api/social/moderation/audit?page=${state.page}`); renderAudit(payload.events || [],payload.accessEvents||[]); }
   else if(view.startsWith('account-')){const kind={'account-restrictions':'restrictions','account-appeals':'appeals','account-history':'history'}[view];payload=await api('/api/social/moderation/accounts?view='+kind);renderAccountOperations(payload.items||[],view);}
   state.hasMore = Boolean(payload?.hasMore);
   $("#moderation-page").textContent = `หน้า ${state.page.toLocaleString("th-TH")}`;

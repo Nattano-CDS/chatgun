@@ -72,6 +72,15 @@ test("message audit requires safety_admin and records access purpose", async () 
   database.close();
 });
 
+test('safety reviewer can inspect purpose audit history without exposed actor/session identifiers',async()=>{
+ const db=new TestD1(),session=await member(db,'audit-reader'),now=unixTime();try{
+  await db.prepare("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES('audit-role','audit-reader','safety_admin','Approved local audit review fixture',?,?)").bind(now,now+3600).run();
+  const env={...environment(db),SOCIAL_APP_ENABLED:'true',MODERATION_TOOLS_ENABLED:'true'};
+  await onRequest({env,request:request('/api/social/moderation/overview',session)});
+  const response=await onRequest({env,request:request('/api/social/moderation/audit',session)});assert.equal(response.status,200);const data=await response.json();assert.ok(data.accessEvents.some(e=>e.purpose==='routine_admin_dashboard_access'));assert.ok(data.accessEvents.every(e=>!('actor_user_id'in e)&&!('token_hash'in e)));
+ }finally{db.close();}
+});
+
 test("message media audit is role-gated, private, purpose-logged, and hides unsent media", async () => {
   const database = new TestD1();
   const media = new TestR2();

@@ -12,6 +12,7 @@ for(const width of[390,768,1440])test('Admin overview, purpose boundary and ordi
    await expect(page.locator('#moderation-stats')).toContainText('สมาชิกจริง');await expect(page.locator('#moderation-daily')).toContainText('19:00–22:00');
    await page.getByRole('button',{name:'รายงานผู้ใช้',exact:true}).click();await expect(page.locator('#moderation-results')).toContainText('ไม่มีรายงานผู้ใช้');expect(prompts).toBe(1);
    await page.getByRole('button',{name:'สิทธิ์ Beta',exact:true}).click();await expect(page.locator('#moderation-results')).toContainText('ไม่มีรายการสิทธิ์ Beta');
+   await page.getByRole('button',{name:'ประวัติการดูแล',exact:true}).click();await expect(page.locator('#moderation-results')).toContainText('routine_admin_dashboard_access');
    await page.screenshot({path:`docs/production-pilot-20261020/screens/admin-local-${width}.png`});
   }else{await expect(page.locator('#moderation-status')).toContainText('ไม่มีสิทธิ์');await expect(page.locator('#moderation-stats')).not.toContainText('สมาชิกจริง');}
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);

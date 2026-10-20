@@ -1678,7 +1678,11 @@ async function moderationAudit(request, env) {
   `).bind(limit + 1, (page - 1) * limit).all();
   await auditMediaSafety(env.DB, session.user_id, "queue_view", "audit_history", purpose);
   const events = rows.results || [];
-  return json({ events: events.slice(0, limit), page, hasMore: events.length > limit });
+  const access = await env.DB.prepare(`SELECT action,purpose,created_at FROM (
+    SELECT action,purpose,created_at FROM media_safety_audit_events
+    UNION ALL SELECT action,purpose,created_at FROM moderation_audit_events
+  ) ORDER BY created_at DESC LIMIT ? OFFSET ?`).bind(limit+1,(page-1)*limit).all();
+  return json({ events: events.slice(0, limit), accessEvents:(access.results||[]).slice(0,limit), page, hasMore: events.length > limit || (access.results||[]).length>limit });
 }
 
 async function moderationNotifications(request, env) {
