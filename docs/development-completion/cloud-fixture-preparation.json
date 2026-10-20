@@ -1,12 +1,12 @@
 {
-  "checkedAt": "2026-10-20T05:15:45.118Z",
+  "checkedAt": "2026-10-20T08:51:28.294Z",
   "accountId": "23017b53386fb67fc62a52cdd017454c",
   "isolatedDatabase": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
   "migrations": 17,
   "newSyntheticUsers": 12,
   "noProviderIdentitiesCreated": true,
   "productionWrites": 0,
-  "productionSha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+  "productionSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
   "originalStagingUntouched": true,
   "privateSessionHandoff": true,
   "foreignKeyViolations": 0

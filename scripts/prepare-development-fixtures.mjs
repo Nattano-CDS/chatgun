@@ -7,7 +7,7 @@ const account='23017b53386fb67fc62a52cdd017454c',databaseId='275d9820-6aec-494a-
 const{token}=JSON.parse(execFileSync('npx',['wrangler@4.151.1','auth','token','--json'],{encoding:'utf8'}));
 async function cf(path,body){const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+path,{method:body?'POST':'GET',headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const j=await r.json();assert.ok(r.ok&&j.success,'Scoped Cloudflare request failed');return j.result;}
 const project=await cf('/pages/projects/chatgun-issue13-staging');assert.equal(project.deployment_configs.preview.d1_databases.DB.id,databaseId);assert.equal(project.deployment_configs.preview.r2_buckets.MEDIA.name,'chatgun-issue13-media');
-const production=await cf('/pages/projects/chatgun');assert.equal(production.canonical_deployment.deployment_trigger.metadata.commit_hash,'b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7');
+const production=await cf('/pages/projects/chatgun');assert.equal(production.canonical_deployment.deployment_trigger.metadata.commit_hash,JSON.parse(readFileSync('docs/production-owner-uat/summary.json')).sha);
 for(const key of['NEW_ACCOUNT_REGISTRATION_ENABLED','PUBLIC_DISCOVERY_ENABLED','MESSAGING_ENABLED','PRESENCE_ENABLED','MEDIA_UPLOAD_ENABLED','SENSITIVE_CONTENT_ENABLED'])assert.equal(production.deployment_configs.production.env_vars[key].value,'false');
 async function query(sql,params=[]){return(await cf('/d1/database/'+databaseId+'/query',{sql,params}))[0];}
 const history=(await query('SELECT COUNT(*) n FROM d1_migrations')).results[0].n;assert.ok([16,17].includes(history));

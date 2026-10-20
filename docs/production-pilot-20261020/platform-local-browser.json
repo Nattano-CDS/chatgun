@@ -235,12 +235,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 241,
+                  "duration": 473,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:19.445Z",
+                  "startTime": "2026-10-20T08:46:54.962Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -269,12 +269,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 153,
+                  "duration": 174,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:19.780Z",
+                  "startTime": "2026-10-20T08:46:55.732Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -303,12 +303,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 334,
+                  "duration": 337,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:19.938Z",
+                  "startTime": "2026-10-20T08:46:55.911Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -337,12 +337,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 418,
+                  "duration": 488,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:20.276Z",
+                  "startTime": "2026-10-20T08:46:56.253Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -371,12 +371,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 418,
+                  "duration": 534,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:20.701Z",
+                  "startTime": "2026-10-20T08:46:56.748Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -405,12 +405,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 110,
+                  "duration": 128,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:21.124Z",
+                  "startTime": "2026-10-20T08:46:57.288Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -439,12 +439,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 42,
+                  "duration": 44,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:21.239Z",
+                  "startTime": "2026-10-20T08:46:57.420Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -473,12 +473,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 248,
+                  "duration": 276,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:33.171Z",
+                  "startTime": "2026-10-20T08:47:09.831Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -507,12 +507,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 204,
+                  "duration": 226,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:33.528Z",
+                  "startTime": "2026-10-20T08:47:10.202Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -541,12 +541,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 343,
+                  "duration": 380,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:33.737Z",
+                  "startTime": "2026-10-20T08:47:10.433Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -575,12 +575,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 383,
+                  "duration": 480,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:34.084Z",
+                  "startTime": "2026-10-20T08:47:10.817Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -609,12 +609,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 451,
+                  "duration": 491,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:34.474Z",
+                  "startTime": "2026-10-20T08:47:11.305Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -643,12 +643,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 142,
+                  "duration": 193,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:34.931Z",
+                  "startTime": "2026-10-20T08:47:11.801Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -677,12 +677,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 36,
+                  "duration": 44,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:35.078Z",
+                  "startTime": "2026-10-20T08:47:12.000Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -711,12 +711,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 273,
+                  "duration": 278,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:47.413Z",
+                  "startTime": "2026-10-20T08:47:24.713Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -745,12 +745,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 342,
+                  "duration": 400,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:47.772Z",
+                  "startTime": "2026-10-20T08:47:25.087Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -779,12 +779,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 433,
+                  "duration": 453,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:48.119Z",
+                  "startTime": "2026-10-20T08:47:25.492Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -813,12 +813,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 400,
+                  "duration": 547,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:48.556Z",
+                  "startTime": "2026-10-20T08:47:25.949Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -847,12 +847,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 420,
+                  "duration": 501,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:48.961Z",
+                  "startTime": "2026-10-20T08:47:26.502Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -881,12 +881,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 163,
+                  "duration": 186,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:49.386Z",
+                  "startTime": "2026-10-20T08:47:27.008Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -915,12 +915,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 37,
+                  "duration": 43,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:49.553Z",
+                  "startTime": "2026-10-20T08:47:27.199Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -957,12 +957,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 492,
+                  "duration": 454,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:21.289Z",
+                  "startTime": "2026-10-20T08:46:57.473Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -991,12 +991,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 501,
+                  "duration": 529,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:35.122Z",
+                  "startTime": "2026-10-20T08:47:12.052Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1025,12 +1025,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 456,
+                  "duration": 444,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:49.598Z",
+                  "startTime": "2026-10-20T08:47:27.251Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1052,6 +1052,40 @@
       "line": 0,
       "specs": [
         {
+          "title": "restricted public account reaches account privacy/deletion and appeal controls instead of a retry dead end",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 139,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:57.943Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-4a9844972343bc7e19dd",
+          "file": "social.spec.js",
+          "line": 54,
+          "column": 1
+        },
+        {
           "title": "authenticated chat deep link opens the actual inbox immediately",
           "ok": true,
           "tags": [],
@@ -1067,12 +1101,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 129,
+                  "duration": 148,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:21.798Z",
+                  "startTime": "2026-10-20T08:46:58.087Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1082,7 +1116,7 @@
           ],
           "id": "d02c6404527e785b31c1-647f9d9ddec6e441d5e0",
           "file": "social.spec.js",
-          "line": 54,
+          "line": 63,
           "column": 1
         },
         {
@@ -1101,12 +1135,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 541,
+                  "duration": 635,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:21.932Z",
+                  "startTime": "2026-10-20T08:46:58.242Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1116,7 +1150,7 @@
           ],
           "id": "d02c6404527e785b31c1-554b39a3aafd48a761f5",
           "file": "social.spec.js",
-          "line": 59,
+          "line": 68,
           "column": 1
         },
         {
@@ -1135,12 +1169,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 224,
+                  "duration": 266,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:22.477Z",
+                  "startTime": "2026-10-20T08:46:58.881Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1150,7 +1184,7 @@
           ],
           "id": "d02c6404527e785b31c1-b9c976555e3452103d63",
           "file": "social.spec.js",
-          "line": 68,
+          "line": 77,
           "column": 1
         },
         {
@@ -1169,12 +1203,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2314,
+                  "duration": 2341,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:22.706Z",
+                  "startTime": "2026-10-20T08:46:59.152Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1184,7 +1218,7 @@
           ],
           "id": "d02c6404527e785b31c1-836ac9dab7dad1a7d266",
           "file": "social.spec.js",
-          "line": 81,
+          "line": 90,
           "column": 1
         },
         {
@@ -1203,12 +1237,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 170,
+                  "duration": 204,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:25.024Z",
+                  "startTime": "2026-10-20T08:47:01.498Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1218,7 +1252,7 @@
           ],
           "id": "d02c6404527e785b31c1-7e7c58c29e73fcc22e35",
           "file": "social.spec.js",
-          "line": 106,
+          "line": 115,
           "column": 1
         },
         {
@@ -1237,12 +1271,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 207,
+                  "duration": 218,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:25.198Z",
+                  "startTime": "2026-10-20T08:47:01.707Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1252,7 +1286,7 @@
           ],
           "id": "d02c6404527e785b31c1-dbea772c9c7455bfa447",
           "file": "social.spec.js",
-          "line": 112,
+          "line": 121,
           "column": 1
         },
         {
@@ -1271,12 +1305,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 294,
+                  "duration": 307,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:25.409Z",
+                  "startTime": "2026-10-20T08:47:01.930Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1286,7 +1320,7 @@
           ],
           "id": "d02c6404527e785b31c1-6d2856034e337d974c3e",
           "file": "social.spec.js",
-          "line": 115,
+          "line": 124,
           "column": 1
         },
         {
@@ -1305,12 +1339,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 164,
+                  "duration": 187,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:25.708Z",
+                  "startTime": "2026-10-20T08:47:02.242Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1320,7 +1354,7 @@
           ],
           "id": "d02c6404527e785b31c1-23e68dd49aae53af50b8",
           "file": "social.spec.js",
-          "line": 122,
+          "line": 131,
           "column": 1
         },
         {
@@ -1339,12 +1373,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 361,
+                  "duration": 314,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:25.878Z",
+                  "startTime": "2026-10-20T08:47:02.434Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1354,7 +1388,7 @@
           ],
           "id": "d02c6404527e785b31c1-d63599409254de1512f6",
           "file": "social.spec.js",
-          "line": 130,
+          "line": 139,
           "column": 1
         },
         {
@@ -1373,12 +1407,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 248,
+                  "duration": 251,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:26.244Z",
+                  "startTime": "2026-10-20T08:47:02.752Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1388,7 +1422,7 @@
           ],
           "id": "d02c6404527e785b31c1-f9c52d5e7b24b35c86f5",
           "file": "social.spec.js",
-          "line": 146,
+          "line": 155,
           "column": 1
         },
         {
@@ -1407,12 +1441,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 97,
+                  "duration": 116,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:26.497Z",
+                  "startTime": "2026-10-20T08:47:03.007Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1422,7 +1456,7 @@
           ],
           "id": "d02c6404527e785b31c1-a5d7a473e6fff9d1dfe0",
           "file": "social.spec.js",
-          "line": 155,
+          "line": 164,
           "column": 1
         },
         {
@@ -1441,12 +1475,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 236,
+                  "duration": 241,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:26.599Z",
+                  "startTime": "2026-10-20T08:47:03.128Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1456,7 +1490,7 @@
           ],
           "id": "d02c6404527e785b31c1-4c2d9ca5df20b87df035",
           "file": "social.spec.js",
-          "line": 163,
+          "line": 172,
           "column": 1
         },
         {
@@ -1475,12 +1509,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 195,
+                  "duration": 214,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:26.840Z",
+                  "startTime": "2026-10-20T08:47:03.374Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1490,7 +1524,7 @@
           ],
           "id": "d02c6404527e785b31c1-325957596f60948a3c74",
           "file": "social.spec.js",
-          "line": 175,
+          "line": 184,
           "column": 1
         },
         {
@@ -1509,12 +1543,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4861,
+                  "duration": 4918,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:27.040Z",
+                  "startTime": "2026-10-20T08:47:03.592Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1524,7 +1558,7 @@
           ],
           "id": "d02c6404527e785b31c1-4918ffb7725579909a65",
           "file": "social.spec.js",
-          "line": 184,
+          "line": 193,
           "column": 1
         },
         {
@@ -1543,12 +1577,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 114,
+                  "duration": 191,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:31.905Z",
+                  "startTime": "2026-10-20T08:47:08.516Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1558,7 +1592,7 @@
           ],
           "id": "d02c6404527e785b31c1-72c934585096f15a6c21",
           "file": "social.spec.js",
-          "line": 203,
+          "line": 212,
           "column": 1
         },
         {
@@ -1577,12 +1611,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 202,
+                  "duration": 193,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:32.024Z",
+                  "startTime": "2026-10-20T08:47:08.712Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1592,7 +1626,7 @@
           ],
           "id": "d02c6404527e785b31c1-6b58edcb7dfff12cc8cb",
           "file": "social.spec.js",
-          "line": 214,
+          "line": 223,
           "column": 1
         },
         {
@@ -1611,12 +1645,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 195,
+                  "duration": 198,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:32.230Z",
+                  "startTime": "2026-10-20T08:47:08.911Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1626,7 +1660,7 @@
           ],
           "id": "d02c6404527e785b31c1-3685b6aa4e2d3141c57b",
           "file": "social.spec.js",
-          "line": 223,
+          "line": 232,
           "column": 1
         },
         {
@@ -1645,12 +1679,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 164,
+                  "duration": 169,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:32.430Z",
+                  "startTime": "2026-10-20T08:47:09.114Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1660,7 +1694,7 @@
           ],
           "id": "d02c6404527e785b31c1-e906c524f927230af126",
           "file": "social.spec.js",
-          "line": 231,
+          "line": 240,
           "column": 1
         },
         {
@@ -1679,12 +1713,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 330,
+                  "duration": 281,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:32.598Z",
+                  "startTime": "2026-10-20T08:47:09.288Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1694,7 +1728,41 @@
           ],
           "id": "d02c6404527e785b31c1-8ba6de63f6583ff84273",
           "file": "social.spec.js",
-          "line": 242,
+          "line": 251,
+          "column": 1
+        },
+        {
+          "title": "restricted public account reaches account privacy/deletion and appeal controls instead of a retry dead end",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 145,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:12.599Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-5dcfd2a2de8ebbc2983a",
+          "file": "social.spec.js",
+          "line": 54,
           "column": 1
         },
         {
@@ -1713,12 +1781,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 134,
+                  "duration": 154,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:35.638Z",
+                  "startTime": "2026-10-20T08:47:12.749Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1728,7 +1796,7 @@
           ],
           "id": "d02c6404527e785b31c1-8fa77c20d8ad4f3043b5",
           "file": "social.spec.js",
-          "line": 54,
+          "line": 63,
           "column": 1
         },
         {
@@ -1747,12 +1815,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 699,
+                  "duration": 630,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:35.777Z",
+                  "startTime": "2026-10-20T08:47:12.907Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1762,7 +1830,7 @@
           ],
           "id": "d02c6404527e785b31c1-ef06f04a08782da0853b",
           "file": "social.spec.js",
-          "line": 59,
+          "line": 68,
           "column": 1
         },
         {
@@ -1781,12 +1849,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 271,
+                  "duration": 305,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:36.481Z",
+                  "startTime": "2026-10-20T08:47:13.543Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1796,7 +1864,7 @@
           ],
           "id": "d02c6404527e785b31c1-386d1e5b1b7fbcd5ff6a",
           "file": "social.spec.js",
-          "line": 68,
+          "line": 77,
           "column": 1
         },
         {
@@ -1815,12 +1883,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2326,
+                  "duration": 2316,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:36.756Z",
+                  "startTime": "2026-10-20T08:47:13.854Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1830,7 +1898,7 @@
           ],
           "id": "d02c6404527e785b31c1-1f0a85b2c783f8f8ce0d",
           "file": "social.spec.js",
-          "line": 81,
+          "line": 90,
           "column": 1
         },
         {
@@ -1849,12 +1917,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 166,
+                  "duration": 196,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:39.087Z",
+                  "startTime": "2026-10-20T08:47:16.175Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1864,7 +1932,7 @@
           ],
           "id": "d02c6404527e785b31c1-6a0549ac29dcbde053d9",
           "file": "social.spec.js",
-          "line": 106,
+          "line": 115,
           "column": 1
         },
         {
@@ -1883,12 +1951,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 235,
+                  "duration": 240,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:39.257Z",
+                  "startTime": "2026-10-20T08:47:16.375Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1898,7 +1966,7 @@
           ],
           "id": "d02c6404527e785b31c1-c5cecaf2342a8579e458",
           "file": "social.spec.js",
-          "line": 112,
+          "line": 121,
           "column": 1
         },
         {
@@ -1917,12 +1985,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 337,
+                  "duration": 336,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:39.499Z",
+                  "startTime": "2026-10-20T08:47:16.620Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1932,7 +2000,7 @@
           ],
           "id": "d02c6404527e785b31c1-6a6ad72d37c7110195c2",
           "file": "social.spec.js",
-          "line": 115,
+          "line": 124,
           "column": 1
         },
         {
@@ -1951,12 +2019,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 148,
+                  "duration": 173,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:39.842Z",
+                  "startTime": "2026-10-20T08:47:16.960Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1966,7 +2034,7 @@
           ],
           "id": "d02c6404527e785b31c1-0a9eea6227667f11b27a",
           "file": "social.spec.js",
-          "line": 122,
+          "line": 131,
           "column": 1
         },
         {
@@ -1985,12 +2053,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 345,
+                  "duration": 335,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:39.994Z",
+                  "startTime": "2026-10-20T08:47:17.138Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2000,7 +2068,7 @@
           ],
           "id": "d02c6404527e785b31c1-5e2dc7ef69e71e9f0053",
           "file": "social.spec.js",
-          "line": 130,
+          "line": 139,
           "column": 1
         },
         {
@@ -2019,12 +2087,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 230,
+                  "duration": 253,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:40.344Z",
+                  "startTime": "2026-10-20T08:47:17.477Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2034,7 +2102,7 @@
           ],
           "id": "d02c6404527e785b31c1-b5155f12b17082c8dc73",
           "file": "social.spec.js",
-          "line": 146,
+          "line": 155,
           "column": 1
         },
         {
@@ -2053,12 +2121,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 96,
+                  "duration": 104,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:40.578Z",
+                  "startTime": "2026-10-20T08:47:17.735Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2068,7 +2136,7 @@
           ],
           "id": "d02c6404527e785b31c1-5dda342e27230c35b6a2",
           "file": "social.spec.js",
-          "line": 155,
+          "line": 164,
           "column": 1
         },
         {
@@ -2087,12 +2155,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 273,
+                  "duration": 281,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:40.678Z",
+                  "startTime": "2026-10-20T08:47:17.843Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2102,7 +2170,7 @@
           ],
           "id": "d02c6404527e785b31c1-441f5741a2e4ab5d5fe2",
           "file": "social.spec.js",
-          "line": 163,
+          "line": 172,
           "column": 1
         },
         {
@@ -2121,12 +2189,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 206,
+                  "duration": 242,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:40.956Z",
+                  "startTime": "2026-10-20T08:47:18.129Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2136,7 +2204,7 @@
           ],
           "id": "d02c6404527e785b31c1-8e358ae9b73fc2c0cb60",
           "file": "social.spec.js",
-          "line": 175,
+          "line": 184,
           "column": 1
         },
         {
@@ -2155,12 +2223,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4916,
+                  "duration": 4938,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:41.168Z",
+                  "startTime": "2026-10-20T08:47:18.376Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2170,7 +2238,7 @@
           ],
           "id": "d02c6404527e785b31c1-a5e7128be3a4cf2f12e5",
           "file": "social.spec.js",
-          "line": 184,
+          "line": 193,
           "column": 1
         },
         {
@@ -2189,12 +2257,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 147,
+                  "duration": 155,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:46.089Z",
+                  "startTime": "2026-10-20T08:47:23.320Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2204,7 +2272,7 @@
           ],
           "id": "d02c6404527e785b31c1-52788c7db9d3df53fdbb",
           "file": "social.spec.js",
-          "line": 203,
+          "line": 212,
           "column": 1
         },
         {
@@ -2223,12 +2291,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 223,
+                  "duration": 252,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:46.240Z",
+                  "startTime": "2026-10-20T08:47:23.480Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2238,7 +2306,7 @@
           ],
           "id": "d02c6404527e785b31c1-6a2e1d0fb35b02f0c9a7",
           "file": "social.spec.js",
-          "line": 214,
+          "line": 223,
           "column": 1
         },
         {
@@ -2257,12 +2325,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 180,
+                  "duration": 186,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:46.468Z",
+                  "startTime": "2026-10-20T08:47:23.737Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2272,7 +2340,7 @@
           ],
           "id": "d02c6404527e785b31c1-bccceff22e7bb8d9abdb",
           "file": "social.spec.js",
-          "line": 223,
+          "line": 232,
           "column": 1
         },
         {
@@ -2291,12 +2359,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 206,
+                  "duration": 196,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:46.653Z",
+                  "startTime": "2026-10-20T08:47:23.927Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2306,7 +2374,7 @@
           ],
           "id": "d02c6404527e785b31c1-396f4a4801961adab451",
           "file": "social.spec.js",
-          "line": 231,
+          "line": 240,
           "column": 1
         },
         {
@@ -2325,12 +2393,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 316,
+                  "duration": 334,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:46.863Z",
+                  "startTime": "2026-10-20T08:47:24.128Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2340,11 +2408,11 @@
           ],
           "id": "d02c6404527e785b31c1-077ef277080e111da9a2",
           "file": "social.spec.js",
-          "line": 242,
+          "line": 251,
           "column": 1
         },
         {
-          "title": "authenticated chat deep link opens the actual inbox immediately",
+          "title": "restricted public account reaches account privacy/deletion and appeal controls instead of a retry dead end",
           "ok": true,
           "tags": [],
           "tests": [
@@ -2359,12 +2427,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 167,
+                  "duration": 184,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:50.069Z",
+                  "startTime": "2026-10-20T08:47:27.711Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2372,523 +2440,13 @@
               "status": "expected"
             }
           ],
-          "id": "d02c6404527e785b31c1-38b7d941f398206cc176",
+          "id": "d02c6404527e785b31c1-6c0117c90d74cc5b2271",
           "file": "social.spec.js",
           "line": 54,
           "column": 1
         },
         {
-          "title": "root is the authenticated discovery entry while welcome retains marketing",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 573,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:50.241Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-b8577816a1c49d6a4ddc",
-          "file": "social.spec.js",
-          "line": 59,
-          "column": 1
-        },
-        {
-          "title": "authenticated shortcut is session-owned, deduplicated and independent of discovery visibility",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 327,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:50.819Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-d7967a1ed16d6e24a08c",
-          "file": "social.spec.js",
-          "line": 68,
-          "column": 1
-        },
-        {
-          "title": "gallery failed comment keeps its draft and inline reason; likes are disabled while pending",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 2388,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:51.150Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-66a4ca111d3a7fa213b8",
-          "file": "social.spec.js",
-          "line": 81,
-          "column": 1
-        },
-        {
-          "title": "public photo stays open without a private grant and foreground updates preserve comment draft",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 186,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:53.542Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-2925b7f637f2701acd4b",
-          "file": "social.spec.js",
-          "line": 106,
-          "column": 1
-        },
-        {
-          "title": "core configuration outage exposes a working recovery action without fake members",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 261,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:53.732Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-a7f0281bfcc5b1500c1c",
-          "file": "social.spec.js",
-          "line": 112,
-          "column": 1
-        },
-        {
-          "title": "unread badges refresh across screens and opt-in foreground notifications do not require hidden polling",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 333,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:53.998Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-7e78e86c3125468c4776",
-          "file": "social.spec.js",
-          "line": 115,
-          "column": 1
-        },
-        {
-          "title": "moderation withdrawal clears an already-open photo on permission refresh",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 151,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:54.337Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-44f0f3bbd0db7361c411",
-          "file": "social.spec.js",
-          "line": 122,
-          "column": 1
-        },
-        {
-          "title": "desktop social shell preserves discovery, direct chat, reviews, and profile without game",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 351,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:54.492Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-05e1c54408d658240c89",
-          "file": "social.spec.js",
-          "line": 130,
-          "column": 1
-        },
-        {
-          "title": "mobile social shell uses bottom navigation and remains usable",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 242,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:54.847Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-8bd68207421564959091",
-          "file": "social.spec.js",
-          "line": 146,
-          "column": 1
-        },
-        {
-          "title": "disabled social environment reveals no member features",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 101,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:55.094Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-ba2b4070db446170d897",
-          "file": "social.spec.js",
-          "line": 155,
-          "column": 1
-        },
-        {
-          "title": "member profile routes are deep-linkable and preserve browser history",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 334,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:55.199Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-a651dbf6c5b5d4eeae1e",
-          "file": "social.spec.js",
-          "line": 163,
-          "column": 1
-        },
-        {
-          "title": "coarse live distance does not silently remove the server-authorized rating workflow",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 223,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:55.537Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-12af7739e4deefb43142",
-          "file": "social.spec.js",
-          "line": 175,
-          "column": 1
-        },
-        {
-          "title": "source header switches out discovery controls; gallery distinguishes loading failure from empty and retries",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 451,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:55.766Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-b5f7835973aaf5eff42e",
-          "file": "social.spec.js",
-          "line": 184,
-          "column": 1
-        },
-        {
-          "title": "retired demo cannot be re-enabled by a stale configuration flag",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 136,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:56.222Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-e8b7942230ba7e4e9d0c",
-          "file": "social.spec.js",
-          "line": 203,
-          "column": 1
-        },
-        {
-          "title": "profile names cannot break out of text or media attributes",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "viewport-1440",
-              "projectName": "viewport-1440",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 299,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-20T05:13:56.362Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d02c6404527e785b31c1-bd9deb1c05353d444a73",
-          "file": "social.spec.js",
-          "line": 214,
-          "column": 1
-        },
-        {
-          "title": "real-data shell never substitutes demo photos when uploads are disabled",
+          "title": "authenticated chat deep link opens the actual inbox immediately",
           "ok": true,
           "tags": [],
           "tests": [
@@ -2908,7 +2466,551 @@
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:56.665Z",
+                  "startTime": "2026-10-20T08:47:27.900Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-38b7d941f398206cc176",
+          "file": "social.spec.js",
+          "line": 63,
+          "column": 1
+        },
+        {
+          "title": "root is the authenticated discovery entry while welcome retains marketing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 639,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:28.077Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-b8577816a1c49d6a4ddc",
+          "file": "social.spec.js",
+          "line": 68,
+          "column": 1
+        },
+        {
+          "title": "authenticated shortcut is session-owned, deduplicated and independent of discovery visibility",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 378,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:28.721Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-d7967a1ed16d6e24a08c",
+          "file": "social.spec.js",
+          "line": 77,
+          "column": 1
+        },
+        {
+          "title": "gallery failed comment keeps its draft and inline reason; likes are disabled while pending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2415,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:29.106Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-66a4ca111d3a7fa213b8",
+          "file": "social.spec.js",
+          "line": 90,
+          "column": 1
+        },
+        {
+          "title": "public photo stays open without a private grant and foreground updates preserve comment draft",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 220,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:31.525Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-2925b7f637f2701acd4b",
+          "file": "social.spec.js",
+          "line": 115,
+          "column": 1
+        },
+        {
+          "title": "core configuration outage exposes a working recovery action without fake members",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 267,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:31.750Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-a7f0281bfcc5b1500c1c",
+          "file": "social.spec.js",
+          "line": 121,
+          "column": 1
+        },
+        {
+          "title": "unread badges refresh across screens and opt-in foreground notifications do not require hidden polling",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 344,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:32.022Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-7e78e86c3125468c4776",
+          "file": "social.spec.js",
+          "line": 124,
+          "column": 1
+        },
+        {
+          "title": "moderation withdrawal clears an already-open photo on permission refresh",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 195,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:32.371Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-44f0f3bbd0db7361c411",
+          "file": "social.spec.js",
+          "line": 131,
+          "column": 1
+        },
+        {
+          "title": "desktop social shell preserves discovery, direct chat, reviews, and profile without game",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 372,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:32.570Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-05e1c54408d658240c89",
+          "file": "social.spec.js",
+          "line": 139,
+          "column": 1
+        },
+        {
+          "title": "mobile social shell uses bottom navigation and remains usable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 294,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:32.947Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-8bd68207421564959091",
+          "file": "social.spec.js",
+          "line": 155,
+          "column": 1
+        },
+        {
+          "title": "disabled social environment reveals no member features",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 123,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:33.246Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-ba2b4070db446170d897",
+          "file": "social.spec.js",
+          "line": 164,
+          "column": 1
+        },
+        {
+          "title": "member profile routes are deep-linkable and preserve browser history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 341,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:33.373Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-a651dbf6c5b5d4eeae1e",
+          "file": "social.spec.js",
+          "line": 172,
+          "column": 1
+        },
+        {
+          "title": "coarse live distance does not silently remove the server-authorized rating workflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 232,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:33.718Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-12af7739e4deefb43142",
+          "file": "social.spec.js",
+          "line": 184,
+          "column": 1
+        },
+        {
+          "title": "source header switches out discovery controls; gallery distinguishes loading failure from empty and retries",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 457,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:33.955Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-b5f7835973aaf5eff42e",
+          "file": "social.spec.js",
+          "line": 193,
+          "column": 1
+        },
+        {
+          "title": "retired demo cannot be re-enabled by a stale configuration flag",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 157,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:34.417Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-e8b7942230ba7e4e9d0c",
+          "file": "social.spec.js",
+          "line": 212,
+          "column": 1
+        },
+        {
+          "title": "profile names cannot break out of text or media attributes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 321,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:34.579Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-bd9deb1c05353d444a73",
+          "file": "social.spec.js",
+          "line": 223,
+          "column": 1
+        },
+        {
+          "title": "real-data shell never substitutes demo photos when uploads are disabled",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 182,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:34.906Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2918,7 +3020,7 @@
           ],
           "id": "d02c6404527e785b31c1-e4f63ee73c05e79d2413",
           "file": "social.spec.js",
-          "line": 223,
+          "line": 232,
           "column": 1
         },
         {
@@ -2937,12 +3039,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 199,
+                  "duration": 210,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:56.842Z",
+                  "startTime": "2026-10-20T08:47:35.093Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2952,7 +3054,7 @@
           ],
           "id": "d02c6404527e785b31c1-321e4ce09d6b3b57cfff",
           "file": "social.spec.js",
-          "line": 231,
+          "line": 240,
           "column": 1
         },
         {
@@ -2971,12 +3073,12 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 339,
+                  "duration": 361,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T05:13:57.046Z",
+                  "startTime": "2026-10-20T08:47:35.307Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2986,7 +3088,7 @@
           ],
           "id": "d02c6404527e785b31c1-ae610599d6aee2d59928",
           "file": "social.spec.js",
-          "line": 242,
+          "line": 251,
           "column": 1
         }
       ]
@@ -2994,9 +3096,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-20T05:13:19.109Z",
-    "duration": 38323.658,
-    "expected": 81,
+    "startTime": "2026-10-20T08:46:54.529Z",
+    "duration": 41191.901999999995,
+    "expected": 84,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

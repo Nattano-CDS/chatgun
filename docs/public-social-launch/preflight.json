@@ -1,0 +1,55 @@
+{
+  "checkedAt": "2026-10-20T08:58:59.486Z",
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "productionSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "productionMigrationCount": 17,
+  "foreignKeyViolations": 0,
+  "productionCounts": {
+    "users": 1,
+    "identities": 1,
+    "member_profiles": 1,
+    "social_messages": 0,
+    "social_media": 0
+  },
+  "protectedStagingCountsUnchanged": true,
+  "productionR2Private": true,
+  "previewBindingsPreserved": true,
+  "moderationRoles": [
+    {
+      "role": "report_reviewer",
+      "expires_at": 1793073705
+    },
+    {
+      "role": "safety_admin",
+      "expires_at": 1793073705
+    }
+  ],
+  "lineProductionStatus": "Published",
+  "lineStatusEvidence": "Owner completed publication; visible LINE Developers Console status verified, without reading credentials",
+  "publicScopeAuthorizedByOwner": true,
+  "registrationEnabled": false,
+  "discoveryEnabled": false,
+  "messagingEnabled": false,
+  "presenceEnabled": false,
+  "uploadsEnabled": false,
+  "sensitiveEnabled": false,
+  "cleanup": {
+    "chatgun-media-cleanup-production": {
+      "verified": false,
+      "scheduleCount": null,
+      "ready": false,
+      "note": "Worker unavailable/not deployed; no schedule readiness claim"
+    },
+    "chatgun-privacy-cleanup-production": {
+      "verified": false,
+      "scheduleCount": null,
+      "ready": false,
+      "note": "Worker unavailable/not deployed; no schedule readiness claim"
+    }
+  },
+  "policyDraftSha256": "ca59a13782ec9082bc405cf8c532fac435fd3cdca38c3253968bf8eb5971f4c2",
+  "policyPublished": false,
+  "qualifiedPublicScopeReviewConfirmed": false,
+  "productionWrites": 0,
+  "newProductionDeployments": 0
+}
