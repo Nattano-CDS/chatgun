@@ -123,6 +123,7 @@ test("staging social and private media activation remain isolated from productio
   assert.match(wrangler, /"database_name": "chatgun-auth-staging"/u);
   assert.match(wrangler, /"binding": "MEDIA"[\s\S]*"bucket_name": "chatgun-media-staging"/u);
   assert.match(production, /"database_name": "chatgun-auth"/u);
-  assert.match(production, /"r2_buckets": \[\]/u);
-  assert.doesNotMatch(production, /"binding": "MEDIA"/u);
+  const configured=JSON.parse(wrangler).env.production;
+  assert.deepEqual(configured.r2_buckets,[{binding:'MEDIA',bucket_name:'chatgun-media-production'}]);
+  assert.equal(configured.vars.MEDIA_UPLOAD_ENABLED,'false');
 });

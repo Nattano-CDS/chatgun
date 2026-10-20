@@ -81,7 +81,7 @@
           "migrations_dir": "migrations"
         }
       ],
-      "r2_buckets": []
+      "r2_buckets": [{"binding":"MEDIA","bucket_name":"chatgun-media-production"}]
     }
   }
 }

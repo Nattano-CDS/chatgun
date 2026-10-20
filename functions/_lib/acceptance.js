@@ -16,6 +16,10 @@ export function requiredAcceptanceVersions(env) {
   if (!versions.adultNotice || !versions.terms || !versions.privacy) {
     throw new Error("missing_acceptance_versions");
   }
+  // Enabling a flag must never turn a placeholder policy into accepted evidence.
+  if (Object.values(versions).some(version => /(?:pending|draft|unapproved|owner[-_ ]approval|tbd)/iu.test(version))) {
+    throw new Error("unapproved_acceptance_versions");
+  }
   return versions;
 }
 

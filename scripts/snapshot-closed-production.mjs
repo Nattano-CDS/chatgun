@@ -3,12 +3,13 @@ import {execFileSync} from 'node:child_process';
 import {writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
+import {assertProductionMediaBinding} from './lib/production-media-binding.mjs';
 const account='23017b53386fb67fc62a52cdd017454c',db='9738a051-d914-42d0-8e7b-8098ef2b959d';
 const {token}=JSON.parse(execFileSync('npx',['wrangler@4.151.1','auth','token','--json'],{encoding:'utf8'}));
 async function api(path,body){const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}${path}`,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const j=await r.json();assert.ok(r.ok&&j.success,JSON.stringify(j.errors?.map(e=>({code:e.code,message:e.message}))));return j.result;}
 async function select(sql){const r=await api(`/d1/database/${db}/query`,{sql});assert.equal(r[0].meta.changed_db,false);return r[0].results;}
 const project=await api('/pages/projects/chatgun'),prod=project.deployment_configs.production,preview=project.deployment_configs.preview;
-assert.equal(prod.d1_databases.DB.id,db);assert.equal(preview.d1_databases.DB.id,'5bbfd55d-eb22-4324-8a7d-57bef14110ea');assert.equal(Object.keys(prod.r2_buckets||{}).length,0);
+assert.equal(prod.d1_databases.DB.id,db);assert.equal(preview.d1_databases.DB.id,'5bbfd55d-eb22-4324-8a7d-57bef14110ea');assertProductionMediaBinding(prod.r2_buckets);
 const names=await select("SELECT name,type,sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' AND name NOT LIKE '\\_cf\\_%' ESCAPE '\\' ORDER BY type,name");
 const tables=names.filter(n=>n.type==='table'),counts=[];
 // Scalar subqueries avoid D1's restricted compound-SELECT allowance.
