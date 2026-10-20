@@ -46,5 +46,5 @@
 /beta-notice*
   Cache-Control: no-cache, no-transform
 
-/canary-notice.html
+/canary-notice*
   Cache-Control: no-cache, no-transform

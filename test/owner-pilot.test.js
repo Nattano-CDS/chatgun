@@ -14,7 +14,7 @@ test('controlled owner pilot requires recorded owner/reviewer confirmation, exac
 });
 test('approved public policy pages opt out of edge email rewriting without changing authorization headers',()=>{
   const headers=readFileSync('_headers','utf8');
-  for(const path of ['/privacy*','/terms*','/data-deletion*','/beta-notice*','/canary-notice.html'])assert.ok(headers.includes(path+'\n  Cache-Control: no-cache, no-transform'));
+  for(const path of ['/privacy*','/terms*','/data-deletion*','/beta-notice*','/canary-notice*'])assert.ok(headers.includes(path+'\n  Cache-Control: no-cache, no-transform'));
   assert.match(headers,/Content-Security-Policy: default-src 'self'/);assert.match(headers,/X-Frame-Options: DENY/);
 });
 test('Production invitation issuer refuses to act before specific human eligibility confirmation',()=>{
