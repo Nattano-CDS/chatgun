@@ -1,5 +1,5 @@
 // No location, login-history, or client-invented status. Server booleans only.
-export function createOnlinePresence({request,targets,apply,preference=()=>{},doc=document,now=()=>performance.now(),every=setInterval,cancel=clearInterval,later=setTimeout,clearLater=clearTimeout}) {
+export function createOnlinePresence({request,targets,apply,preference=()=>{},doc=document,isOnline=()=>typeof navigator==='undefined'||navigator.onLine!==false,now=()=>performance.now(),every=setInterval,cancel=clearInterval,later=setTimeout,clearLater=clearTimeout}) {
   const tabId=crypto.randomUUID().replaceAll('-','');
   let enabled=false,stopped=false,busy=false,queued=false,lastActivity=now(),lastBeat=-Infinity,generation=0,timer,validity;
   const clear=()=>{clearLater(validity);apply(Object.fromEntries(targets().map(id=>[id,false])));};
@@ -7,7 +7,7 @@ export function createOnlinePresence({request,targets,apply,preference=()=>{},do
   const tick=async()=>{
     if(stopped)return;
     if(busy){queued=true;return;}
-    if(doc.visibilityState!=='visible'){clear();return;}
+    if(doc.visibilityState!=='visible'||!isOnline()){clear();return;}
     busy=true;
     const revision=generation;
     try {

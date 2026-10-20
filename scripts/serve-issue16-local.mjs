@@ -9,21 +9,22 @@ import {issueSession,unixTime} from '../functions/_lib/db.js';
 import {onRequest as social} from '../functions/api/social/[[path]].js';
 import {onRequest as auth} from '../functions/api/auth/[[path]].js';
 import {onRequestGet as health} from '../functions/api/health.js';
-const db=new TestD1(),now=unixTime(),sessions={};
+const db=new TestD1(),now=unixTime(),sessions={},fullSystem=process.env.CHATGUN_FULL_SYSTEM_LOCAL==='true',objects=new Map();
 const tls=mkdtempSync(resolve(tmpdir(),'chatgun-issue16-local-tls-'));
 execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',tls+'/key.pem','-out',tls+'/cert.pem','-subj','/CN=localhost','-days','1'],{stdio:'pipe'});
 const tlsOptions={key:readFileSync(tls+'/key.pem'),cert:readFileSync(tls+'/cert.pem')};
-for(const width of [390,768,1440])for(const [kind,name] of [['viewer','ผู้ทดสอบระบบผู้ชม'],['owner','ผู้ทดสอบชื่อภาษาไทยยาวสำหรับตรวจการตัดบรรทัด'],['other','ผู้ทดสอบบัญชีอื่น']]){
+for(const width of [390,768,1440])for(const [kind,name] of [['viewer','ผู้ทดสอบระบบผู้ชม'],['owner','ผู้ทดสอบชื่อภาษาไทยยาวสำหรับตรวจการตัดบรรทัด'],['other','ผู้ทดสอบบัญชีอื่น'],...(fullSystem?[['moderator','ผู้ตรวจระบบแยก']]:[])]){
   const id=kind+width;
   db.exec(`INSERT INTO users(id,display_name,status,created_at,updated_at)VALUES('${id}','${name}','active',${now},${now});
     INSERT INTO age_assurance_events VALUES('${id}-adult','${id}','adult_18_plus','self_declaration','local-test',${now},NULL);
     INSERT INTO member_profiles(user_id,age_assurance_id,name,discovery_visible,latitude,longitude,accuracy,located_at,created_at,updated_at)
       VALUES('${id}','${id}-adult','${name}',1,0,0,10,${now},${now},${now});`);
   sessions[id]=await issueSession(db,id);
-  if(kind==='owner')for(const role of ['report_reviewer','safety_admin'])await db.prepare('INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at) VALUES(?,?,?,?,?,?)').bind(id+'-'+role,id,role,'Local-only browser authorization fixture',now,now+86400).run();
+  if(kind==='owner'||kind==='moderator')for(const role of ['report_reviewer','safety_admin'])await db.prepare('INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at) VALUES(?,?,?,?,?,?)').bind(id+'-'+role,id,role,'Local-only browser authorization fixture',now,now+86400).run();
 }
 writeFileSync('/tmp/chatgun-issue16-local-sessions.json',JSON.stringify(sessions),{mode:0o600});
 const base={...environment(db),SOCIAL_APP_ENABLED:'true',PRESENCE_ENABLED:'true',PUBLIC_DISCOVERY_ENABLED:'true',MESSAGING_ENABLED:'true',MODERATION_TOOLS_ENABLED:'true',ACCOUNT_MODERATION_ENABLED:'true',MEDIA_UPLOAD_ENABLED:'false',RATINGS_ENABLED:'false',IDENTITY_VERIFICATION_ENABLED:'false',OAUTH_LOGIN_ENABLED:'false',NEW_ACCOUNT_REGISTRATION_ENABLED:'false',DEMO_MODE_ENABLED:'false',DEMO_AUTO_START_ENABLED:'false'};
+if(fullSystem)Object.assign(base,{MEDIA_UPLOAD_ENABLED:'true',MEDIA_QUARANTINE_ENABLED:'true',RATINGS_ENABLED:'true',MEDIA:{async put(key,bytes){objects.set(key,new Uint8Array(bytes));},async head(key){return objects.has(key)?{}:null;},async get(key){return objects.has(key)?{body:objects.get(key)}:null;},async delete(key){objects.delete(key);}}});
 const dist=resolve('dist'),mime={'.js':'text/javascript','.css':'text/css','.html':'text/html','.svg':'image/svg+xml','.json':'application/json','.png':'image/png','.woff2':'font/woff2'};
 for(const [port,enabled] of [[8797,true],[8798,false]])createServer(tlsOptions,async(req,res)=>{
   try{

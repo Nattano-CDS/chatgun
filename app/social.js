@@ -1,5 +1,7 @@
 import { offerDemoRetirement } from "./retire-demo.js";
 import { createOnlinePresence } from "./online-presence.js";
+import { createMessageDelivery } from "./message-delivery.js";
+const deliverMessage=createMessageDelivery((path,options)=>api(path,options));
 let onlinePresence;
 const onlineSlot=(person,id)=>window.ChatgunNearComponents.online(person,id,escapeHtml);
 async function startOnlinePresence() {
@@ -68,7 +70,7 @@ function cookie(name) {
 async function api(path, options = {}) {
   const headers = { accept: "application/json", ...options.headers || {} }, method = options.method || "GET";
   options.body !== void 0 && (headers["content-type"] = "application/json", options.body = JSON.stringify(options.body)), method !== "GET" && method !== "HEAD" && (headers["x-csrf-token"] = decodeURIComponent(cookie("__Host-cg_csrf")));
-  const response = await fetch(path, { credentials: "same-origin", ...options, method, headers }), payload = await response.json().catch(() => ({}));
+  const response = await fetch(path, { credentials: "same-origin", signal:AbortSignal.timeout(12000), ...options, method, headers }), payload = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(payload.message || payload.error || "ไม่สามารถดำเนินการได้");
     throw error.code = payload.code || "request_failed", error.status = response.status, error;
@@ -181,7 +183,7 @@ function personCard(person, context = "near") {
   });
 }
 function renderPeople() {
-  const interestSelect = $("#interest-filter"), interests = [...new Set(state.people.flatMap((p) => String(p.interests || "").split(",").map((s) => s.trim()).filter(Boolean)))].sort((a, b) => a.localeCompare(b, "th")), optionKey = JSON.stringify(interests);
+  const interestSelect = $("#interest-filter"), interests = [...new Set([...state.people.flatMap((p) => String(p.interests || "").split(",").map((s) => s.trim()).filter(Boolean)),...interestSelect.value?[interestSelect.value]:[]])].sort((a, b) => a.localeCompare(b, "th")), optionKey = JSON.stringify(interests);
   if (interestSelect.dataset.options !== optionKey) {
     const selected = interestSelect.value;
     interestSelect.innerHTML = '<option value="">ทั้งหมด</option>' + interests.map((i) => `<option value="${escapeHtml(i)}">${escapeHtml(i)}</option>`).join(""), interestSelect.value = interests.includes(selected) ? selected : "", interestSelect.dataset.options = optionKey;
@@ -261,7 +263,7 @@ function renderMediaSafety() {
   const appealable = $("#appealable-media");
   appealable.innerHTML = state.appealableMedia.length ? state.appealableMedia.map((item) => `<article class="blocked-row"><span><strong>รูป ${escapeHtml(item.media_id)}</strong><small>${escapeHtml(item.decision_reason || "ถูกจำกัดการเข้าถึง")}</small></span><button class="secondary" data-media-appeal="${escapeHtml(item.media_id)}">ยื่นอุทธรณ์</button></article>`).join("") : '<p class="subtitle">ไม่มีรูปที่ยื่นอุทธรณ์ได้</p>';
   const notificationLabels = { media_approved_general: "รูปได้รับอนุมัติเป็นเนื้อหาทั่วไป", media_approved_sensitive: "รูปได้รับอนุมัติเป็นเนื้อหาละเอียดอ่อน", media_rejected_prohibited: "รูปถูกปฏิเสธและจำกัดการเข้าถึง", appeal_granted: "คำอุทธรณ์ได้รับอนุมัติ", appeal_denied: "ยืนยันคำตัดสินเดิมหลังตรวจอุทธรณ์" };
-  $("#moderation-notifications").innerHTML = state.moderationNotifications.length ? state.moderationNotifications.map((item) => `<p class="notification-row"><strong>${escapeHtml(notificationLabels[item.message_code] || "มีผลการดูแลสื่อ")}</strong><small>${new Date(Number(item.created_at) * 1e3).toLocaleString("th-TH")}</small></p>`).join("") : '<p class="subtitle">ยังไม่มีการแจ้งผลการดูแล</p>';
+  $("#moderation-notifications").innerHTML = state.moderationNotifications.length ? state.moderationNotifications.map((item) => `<p class="notification-row"><strong>${escapeHtml(notificationLabels[item.message_code] || "มีผลการดูแลสื่อ")}</strong><small>${new Date(Number(item.created_at) * 1e3).toLocaleString("th-TH")}</small>${item.read_at?'':`<button type="button" class="secondary small" data-notification-read="${escapeHtml(item.id)}">อ่านแล้ว</button>`}</p>`).join("") : '<p class="subtitle">ยังไม่มีการแจ้งผลการดูแล</p>';
 }
 async function loadMediaSafety() {
   const [appeals, notifications] = await Promise.all([api("/api/social/media/appeals"), api("/api/social/moderation/notifications")]);
@@ -278,7 +280,7 @@ async function loadRelationships() {
   const result = await api("/api/social/conversations");
   state.conversations = result.conversations, state.conversationMore = !!result.hasMore, state.conversationOffset = result.nextOffset || state.conversations.length, renderRelationships();
 }
-async function loadPeople() {
+async function loadPeople(append=false) {
   if (!state.config.publicDiscoveryEnabled) {
     state.people = [];
     $("#location-toggle").disabled = true;
@@ -286,12 +288,32 @@ async function loadPeople() {
     $("#people-grid .empty").innerHTML = '<h2>ระยะทดสอบโปรไฟล์ของคุณ</h2><p>การค้นหาสมาชิกและการเผยแพร่ตำแหน่งยังไม่เปิดใช้งาน</p>';
     return;
   }
-  const result = await api("/api/social/discovery");
-  state.people = result.people, state.locationFresh = result.locationFresh, $("#location-banner").classList.toggle("active", state.locationFresh), $("#location-toggle").textContent = state.locationFresh ? "ปิดตำแหน่ง" : "เปิดตำแหน่ง", renderPeople();
+  const query=new URLSearchParams({paged:'1',q:$('#people-search').value.trim(),gender:$('#gender-filter').value==='ทั้งหมด'?'':$('#gender-filter').value,interest:$('#interest-filter').value,radius:String(Math.max(500,Number($('#radius-filter').value)))});
+  if(append&&state.discoveryCursor)query.set('after',state.discoveryCursor);
+  const generation=state.discoveryGeneration=(state.discoveryGeneration||0)+1,result = await api('/api/social/discovery?'+query);
+  if(generation!==state.discoveryGeneration)return;
+  state.discoveryCursor=result.nextCursor;$('#discovery-more').hidden=!result.hasMore;
+  state.people = append?[...new Map([...state.people,...result.people].map(p=>[p.user_id,p])).values()]:result.people, state.locationFresh = result.locationFresh, $("#location-banner").classList.toggle("active", state.locationFresh), $("#location-toggle").textContent = state.locationFresh ? "ปิดตำแหน่ง" : "เปิดตำแหน่ง", renderPeople();
 }
-async function loadRatings() {
-  state.config.ratingsEnabled && (state.ratings = (await api("/api/social/ratings")).ratings, renderRatings());
+$('#discovery-more').addEventListener('click',async(event)=>{setBusy(event.currentTarget,true);try{await loadPeople(true);}catch(error){toast(error.message,true);}finally{setBusy(event.currentTarget,false);}});
+async function loadRatings(append=false) {
+  if(!state.config.ratingsEnabled)return;
+  const page=append?(state.ratingsPage||1)+1:1,result=await api('/api/social/ratings?page='+page);
+  state.ratingsPage=page;state.ratings=append?[...state.ratings,...result.ratings]:result.ratings;
+  $('#reviews-more').hidden=!result.hasMore;renderRatings();
 }
+const sectionFailures=new Map();
+async function loadModerationCapability(){if(!state.config.moderationToolsEnabled)return;const c=await api('/api/social/moderation/capabilities');$('#moderation-link').hidden=!(c.canReviewReports||c.canReviewMedia);}
+const sectionLoaders=()=>[['ค้นหาสมาชิก',loadPeople],['กล่องแชท',loadRelationships],['ความคิดเห็น',loadRatings],['รายชื่อที่บล็อก',loadBlocked],['รูปภาพของคุณ',loadOwnGallery],['โควตารูปภาพ',loadUploadQuotas],['การยืนยันตัวตน',loadVerification],['ผลการดูแลสื่อ',loadMediaSafety],['สิทธิ์เครื่องมือดูแล',loadModerationCapability]];
+async function refreshSections(onlyFailed=false){
+  const loaders=sectionLoaders().filter(([name])=>!onlyFailed||sectionFailures.has(name));
+  await Promise.all(loaders.map(async([name,load])=>{try{await load();sectionFailures.delete(name);}catch(error){sectionFailures.set(name,error.status===401?'กรุณาเข้าสู่ระบบใหม่':'โหลดไม่สำเร็จ');}}));
+  $('#section-recovery').hidden=!sectionFailures.size;
+  $('#section-recovery-message').textContent=[...sectionFailures].map(([name,error])=>`${name}: ${error}`).join(' · ');
+  return !sectionFailures.size;
+}
+$('#section-retry').addEventListener('click',async(event)=>{setBusy(event.currentTarget,true);try{await refreshSections(true);}finally{setBusy(event.currentTarget,false);}});
+$('#reviews-more').addEventListener('click',async(event)=>{setBusy(event.currentTarget,true);try{await loadRatings(true);}catch(error){toast(error.message,true);}finally{setBusy(event.currentTarget,false);}});
 async function loadBlocked() {
   state.blocked = (await api("/api/social/blocks")).blocked, renderBlocked();
 }
@@ -712,9 +734,10 @@ async function initialize() {
       }
       throw error;
     }
-    $("#global-status").textContent = "", delete document.body.dataset.flow, $("#social-view").hidden = !1, localStorage.getItem("chatgun-notifications") === "enabled" && ($("#notification-toggle").textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้"), fillProfile(), await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked(), loadOwnGallery(), loadUploadQuotas(), loadVerification(), loadMediaSafety()]), await monitorLocationPermission(), switchTab(state.activeTab), location.pathname === "/app/photos" && openOwnGallery(!1);
+    $("#global-status").textContent = "", delete document.body.dataset.flow, $("#social-view").hidden = !1, localStorage.getItem("chatgun-notifications") === "enabled" && ($("#notification-toggle").textContent = "ปิดการแจ้งเตือนข้อความในอุปกรณ์นี้"), fillProfile(), await refreshSections(), await monitorLocationPermission(), switchTab(state.activeTab), location.pathname === "/app/photos" && openOwnGallery(!1);
     const route = routedProfile();
-    route && await showPerson(route.user, { historyMode: "none", photo: route.photo }), state.config.onlineStatusEnabled && await startOnlinePresence();
+    if(route)await showPerson(route.user,{historyMode:'none',photo:route.photo}).catch(error=>toast(error.message,true));
+    if(state.config.onlineStatusEnabled)await startOnlinePresence().catch(()=>toast('สถานะออนไลน์ยังไม่พร้อม ส่วนอื่นยังใช้งานได้',true));
   } catch {
     $("#global-status").textContent = "", $("#disabled-view").hidden = !1, document.body.dataset.prelaunch = "true", $("#service-status").textContent = "ระบบสมาชิกยังไม่พร้อมให้บริการในขณะนี้ กรุณากลับมาใหม่ภายหลัง";
   } finally {
@@ -729,6 +752,8 @@ $("#primary-nav").addEventListener("click", (event) => {
   // Refresh when entering a surface instead of polling hidden tabs indefinitely.
   if (button.dataset.tab === "near") void loadPeople().catch(() => {});
   if (button.dataset.tab === "chat") void loadRelationships().catch(() => {});
+  if(button.dataset.tab==='reviews')void loadRatings().catch(error=>toast(error.message,true));
+  if(button.dataset.tab==='profile')void loadMediaSafety().catch(error=>toast(error.message,true));
 });
 $("#onboarding-form").addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -853,13 +878,16 @@ $("#discovery-filters").addEventListener("close", () => {
 });
 $("#refresh").addEventListener("click", async () => {
   try {
-    await Promise.all([loadPeople(), loadRelationships(), loadRatings(), loadBlocked()]), toast("อัปเดตข้อมูลแล้ว");
+    const complete=await refreshSections();toast(complete?'อัปเดตข้อมูลแล้ว':'ข้อมูลบางส่วนยังโหลดไม่สำเร็จ กดลองอีกครั้งได้',!complete);
   } catch (error) {
     toast(error.message, !0);
   }
 });
-[$("#people-search"), $("#radius-filter"), $("#gender-filter"), $("#interest-filter")].forEach((input) => input.addEventListener("input", renderPeople));
+let discoveryFilterTimer;
+[$("#people-search"), $("#radius-filter"), $("#gender-filter"), $("#interest-filter")].forEach((input) => input.addEventListener("input", ()=>{renderPeople();clearTimeout(discoveryFilterTimer);if(state.config?.publicDiscoveryEnabled)discoveryFilterTimer=setTimeout(()=>loadPeople().catch(error=>toast(error.message,true)),350);}));
 document.addEventListener("click", async (event) => {
+  const notificationRead=event.target.closest('[data-notification-read]');
+  if(notificationRead){notificationRead.disabled=true;try{await api('/api/social/moderation/notifications',{method:'POST',body:{id:notificationRead.dataset.notificationRead}});await loadMediaSafety();}catch(error){notificationRead.disabled=false;toast(error.message,true);}return;}
   if (event.target.closest("[data-gallery-upload-route]")) {
     if (event.preventDefault(), profileContext(state.selectedPerson).id !== currentActor()) return;
     await showPerson(currentActor(), { photo: "upload" });
@@ -925,8 +953,8 @@ document.addEventListener("click", async (event) => {
   if (event.target.closest(".picker-toggle")) {
     const picker = $("#thread .chat-image-picker");
     if (picker.hidden = !picker.hidden, $("#thread .picker-toggle").setAttribute("aria-expanded", String(!picker.hidden)), picker.hidden && (state.chosenAsset = null, $("#thread input[name=body]").disabled = !1), !picker.hidden) try {
-      const { assets } = await api("/api/social/chat-assets");
-      $(".image-picker-carousel", picker).innerHTML = assets.length ? assets.map((a) => `<button type="button" data-picker-asset="${escapeHtml(a.id)}" aria-label="เลือกรูปนี้" aria-pressed="false"><img src="${escapeHtml(chatMediaUrl(a.id))}" alt="รูปแชทเดิม"></button>`).join("") : "<p>ยังไม่มีรูปแชทเดิม เลือกอัปโหลดรูปใหม่ได้</p>";
+      const result = await api('/api/social/chat-assets?target='+encodeURIComponent(state.selectedChat)),assets=[...result.assets,...result.gallery||[]];
+      $(".image-picker-carousel", picker).innerHTML = assets.length ? assets.map((a) => `<button type="button" data-picker-asset="${escapeHtml(a.id)}" aria-label="เลือกรูปนี้" aria-pressed="false"><img src="${escapeHtml(a.purpose==='gallery'?galleryMediaUrl(a.id):chatMediaUrl(a.id))}" alt="${a.purpose==='gallery'?'รูปจาก Gallery ที่ผู้รับมีสิทธิ์ดู':'รูปแชทเดิม'}"></button>`).join("") : "<p>ยังไม่มีรูปที่ส่งได้ เลือกอัปโหลดรูปใหม่ได้</p>";
       const upload2 = $("[data-picker-upload]", picker);
       upload2.disabled = Number(state.uploadQuotas.chat.remaining) <= 0;
     } catch (error) {
@@ -1049,7 +1077,7 @@ document.addEventListener("click", async (event) => {
   if (forward) {
     setBusy(forward, !0);
     try {
-      await api("/api/social/messages", { method: "POST", body: { action: "send", target: forward.dataset.forwardUser, mediaId: forward.dataset.forwardAsset, body: "" } }), $("#asset-dialog").close(), await openChat(forward.dataset.forwardUser);
+      await deliverMessage({target: forward.dataset.forwardUser, mediaId: forward.dataset.forwardAsset, body: ""}), $("#asset-dialog").close(), await openChat(forward.dataset.forwardUser);
     } catch (error) {
       toast(error.message, !0), setBusy(forward, !1);
     }
@@ -1184,12 +1212,14 @@ $("#thread").addEventListener("change", (event) => {
 $("#thread").addEventListener("submit", async (event) => {
   if (!event.target.matches(".composer")) return;
   event.preventDefault();
+  if(event.target.dataset.sending==='true')return;
   const input = $("input[name=body]", event.target), file = $("input[name=file]", event.target)?.files?.[0], body = input.value.trim();
   if (!(!body && !file && !state.chosenAsset)) {
+    event.target.dataset.sending='true';
     setBusy(event.submitter, !0);
     try {
       if (state.chosenAsset) {
-        await api("/api/social/messages", { method: "POST", body: { action: "send", target: state.selectedChat, mediaId: state.chosenAsset, body: "" } }), state.chosenAsset = null, await openChat(state.selectedChat);
+        await deliverMessage({target: state.selectedChat, mediaId: state.chosenAsset, body: ""}), state.chosenAsset = null, await openChat(state.selectedChat);
         return;
       }
       if (file) {
@@ -1202,11 +1232,12 @@ $("#thread").addEventListener("submit", async (event) => {
             throw payload.code === "daily_upload_limit_reached" && await loadUploadQuotas(), new Error(payload.message || payload.error || "ส่งรูปไม่สำเร็จ");
           delete event.target.dataset.idempotencyKey, await loadUploadQuotas();
         }
-      } else await api("/api/social/messages", { method: "POST", body: { action: "send", target: state.selectedChat, body } });
+      } else await deliverMessage({target: state.selectedChat, body});
       input.value = "", event.target.reset(), await loadRelationships(), await openChat(state.selectedChat);
     } catch (error) {
       toast(error.message, !0);
     } finally {
+      delete event.target.dataset.sending;
       setBusy(event.submitter, !1);
     }
   }
@@ -1282,10 +1313,11 @@ document.addEventListener("visibilitychange", () => {
 setInterval(() => {
   if (document.visibilityState !== "visible" || !navigator.onLine ||
       !state.config?.socialAppEnabled || !state.profile) return;
-  // Each inactive screen used to call both APIs every 30 seconds.
-  // Keep visible Discovery/Chat fresh without paying for hidden surfaces.
+  // Discovery is screen-scoped. Unread badges are visible throughout the app,
+  // but the inbox is never polled when messaging is disabled or the tab hidden.
   if (state.activeTab === "near") void loadPeople().catch(() => {});
-  else if (state.activeTab === "chat") void loadRelationships().catch(() => {});
+  if(state.config.messagingEnabled)void loadRelationships().catch(()=>{});
+  if(state.activeTab==='profile'&&state.myGallery.some(p=>p.review_status==='pending'))void Promise.all([loadOwnGallery(),loadMediaSafety()]).catch(()=>{});
 }, 3e4);
 setInterval(() => {
   document.visibilityState === "visible" && navigator.onLine && (refreshOpenThread().catch(() => {

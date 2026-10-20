@@ -80,6 +80,7 @@ function setStatus(text, error = false) {
   const status = $("#moderation-status");
   status.textContent = text;
   status.classList.toggle("error", error);
+  $("#moderation-retry").hidden=!error;
 }
 
 function cardHeader(title, detail, status, category) {
@@ -178,7 +179,7 @@ function renderUserReports(reports) {
   const results = $("#moderation-results"); results.replaceChildren();
   if (!reports.length) return empty("ไม่มีรายงานผู้ใช้ที่รอดำเนินการ");
   for (const report of reports) {
-    const card = node("article", null, "moderation-card"); card.dataset.userReport = report.id;
+    const card = node("article", null, "moderation-card"); card.dataset.userReport = report.id;card.dataset.revision=String(report.revision||0);
     const severity = applySeverity(card, report.reason_code || report.category, report.status);
     card.append(
       cardHeader(`${report.reason_code || report.category} · ${report.subject_name || "ไม่แสดงชื่อ"}`, new Date(Number(report.created_at) * 1000).toLocaleString("th-TH"), report.status),
@@ -195,7 +196,7 @@ function renderMediaReports(reports) {
   const results = $("#moderation-results"); results.replaceChildren();
   if (!reports.length) return empty("ไม่มีรายงานสื่อที่รอดำเนินการ");
   for (const report of reports) {
-    const card = node("article", null, "moderation-card"); card.dataset.mediaReport = report.id;
+    const card = node("article", null, "moderation-card"); card.dataset.mediaReport = report.id;card.dataset.revision=String(report.revision||0);
     const severity = applySeverity(card, report.reason_code, report.status);
     card.append(cardHeader(`${report.reason_code} · ${report.media_purpose}`, new Date(Number(report.created_at) * 1000).toLocaleString("th-TH"), report.status, report.category), badge(severity), node("p", report.details), node("small", ageText(report.created_at)));
     const actions = node("div", null, "dialog-actions");
@@ -215,14 +216,16 @@ function renderAppeals(appeals) {
     const category = node("select"); category.setAttribute("aria-label", `หมวดหมู่หลังอนุมัติอุทธรณ์ ${appeal.id}`);
     for (const [value, text] of [["general", "ทั่วไป"], ["sensitive", "ละเอียดอ่อน"]]) { const option = node("option", text); option.value = value; category.append(option); }
     const actions = node("div", null, "dialog-actions"); actions.append(button("อนุมัติอุทธรณ์", "appeal", "granted", "primary"), button("ยืนยันคำตัดสินเดิม", "appeal", "denied", "danger"));
+    if(itemConflict(appeal)){actions.querySelectorAll('button').forEach(b=>b.disabled=true);card.append(node('p','คุณเป็นผู้ตัดสินเดิม ต้องให้ผู้ตรวจคนอื่นพิจารณาอุทธรณ์นี้','error'));}
     card.append(category, actions); results.append(card);
   }
 }
+function itemConflict(item){return item.reviewer_conflict===1||item.reviewer_conflict===true;}
 
 function renderPriority({ userReports = [], mediaReports = [], appeals = [], media = [] }) {
   const results = $("#moderation-results"); results.replaceChildren();
   const items = [
-    ...userReports.map((item) => ({ kind: "รายงานผู้ใช้", reason: item.reason_code || item.category, status: item.status, created_at: item.created_at, title: item.subject_name || "ไม่แสดงชื่อ", detail: item.details })),
+    ...userReports.map((item) => ({ view:'user-reports',kind: "รายงานผู้ใช้", reason: item.reason_code || item.category, status: item.status, created_at: item.created_at, title: item.subject_name || "ไม่แสดงชื่อ", detail: item.details })),
     ...mediaReports.map((item) => ({ kind: "รายงานสื่อ", reason: item.reason_code, status: item.status, created_at: item.created_at, title: item.media_purpose, detail: item.details })),
     ...appeals.map((item) => ({ kind: "คำอุทธรณ์", reason: "appeal", status: item.status, created_at: item.created_at, title: item.media_id, detail: item.reason, fixedSeverity: "medium" })),
     ...media.map((item) => ({ kind: "สื่อรอตรวจ", reason: item.report_count > 0 ? "privacy" : "pending", status: item.status, created_at: item.created_at, title: item.media_purpose, detail: `รายงานที่เปิดอยู่ ${Number(item.report_count || 0)}`, fixedSeverity: item.report_count > 0 ? "high" : "low" })),
@@ -232,7 +235,7 @@ function renderPriority({ userReports = [], mediaReports = [], appeals = [], med
   for (const item of items) {
     const card = node("article", null, `moderation-card ${item.severity}`);
     card.append(cardHeader(`${item.kind} · ${item.title}`, new Date(Number(item.created_at) * 1000).toLocaleString("th-TH")), badge(item.severity), node("p", item.detail), node("small", ageText(item.created_at)));
-    results.append(card);
+    const open=button('เปิดคิวเพื่อดำเนินการ','open-queue',item.view||(item.kind==='รายงานสื่อ'?'media-reports':item.kind==='คำอุทธรณ์'?'appeals':'pending'));card.append(open);results.append(card);
   }
 }
 
@@ -262,12 +265,18 @@ function renderAccountOperations(items,view){
 }
 
 async function load(view = state.view) {
+  const previousView=state.view;
   state.view = view; setStatus("กำลังโหลด…");
   document.querySelectorAll("[data-load]").forEach((item) => item.classList.toggle("active", item.dataset.load === view));
   $("#moderation-stats").hidden = view !== "overview";
   $("#moderation-daily").hidden = view !== "overview";
-  $("#moderation-filters").hidden = !["pending", "approved", "sensitive", "rejected"].includes(view);
-  $("#moderation-pagination").hidden = !["pending", "approved", "sensitive", "rejected", "audit"].includes(view);
+  const mediaView=["pending", "approved", "sensitive", "rejected"].includes(view),caseView=['user-reports','media-reports','appeals'].includes(view);
+  $("#moderation-filters").hidden = !mediaView&&!caseView;
+  $("#moderation-category").closest('label').hidden=!mediaView;
+  $("#moderation-case-status-label").hidden=!caseView;
+  if(caseView&&previousView!==view){const choices=view==='appeals'?[['pending','รอดำเนินการ'],['granted','อนุมัติ'],['denied','ยืนยันคำตัดสินเดิม'],['withdrawn','ถอนคำอุทธรณ์']]:[['pending','รอดำเนินการ'],['escalated','ยกระดับ'],['reviewed','ตรวจแล้ว'],['closed','ปิดรายการ']];$('#moderation-case-status').replaceChildren(...choices.map(([value,label])=>{const el=node('option',label);el.value=value;return el;}));}
+  $("#moderation-pagination").hidden = !mediaView&&!caseView&&view!=='audit'&&!view.startsWith('account-');
+  const caseQuery=new URLSearchParams({page:String(state.page),status:$('#moderation-case-status').value||'pending',q:$('#moderation-search').value.trim()});
   let payload;
   if (view === "overview") { payload = await api("/api/social/moderation/overview", { routine: true }); renderStats(payload.counts); renderDaily(payload.daily, payload.cleanup); renderCoverage(payload.coverage); empty("เลือกงานด่วนหรือคิวด้านบนเพื่อเริ่มตรวจสอบ"); }
   else if (view === "priority") {
@@ -282,11 +291,11 @@ async function load(view = state.view) {
     const category = view === "sensitive" ? "sensitive" : $("#moderation-category").value;
     const query = new URLSearchParams({ status, category, q: $("#moderation-search").value.trim(), page: String(state.page) });
     payload = await api(`/api/social/moderation/media?${query}`); renderMedia(payload.media || []);
-  } else if (view === "user-reports") { payload = await api("/api/social/moderation/reports?status=pending"); renderUserReports(payload.reports || []); }
-  else if (view === "media-reports") { payload = await api("/api/social/moderation/media-reports?status=pending"); renderMediaReports(payload.reports || []); }
-  else if (view === "appeals") { payload = await api("/api/social/moderation/appeals?status=pending"); renderAppeals(payload.appeals || []); }
+  } else if (view === "user-reports") { payload = await api('/api/social/moderation/reports?'+caseQuery); renderUserReports(payload.reports || []); }
+  else if (view === "media-reports") { payload = await api('/api/social/moderation/media-reports?'+caseQuery); renderMediaReports(payload.reports || []); }
+  else if (view === "appeals") { payload = await api('/api/social/moderation/appeals?'+caseQuery); renderAppeals(payload.appeals || []); }
   else if (view === "audit") { payload = await api(`/api/social/moderation/audit?page=${state.page}`); renderAudit(payload.events || [],payload.accessEvents||[]); }
-  else if(view.startsWith('account-')){const kind={'account-restrictions':'restrictions','account-appeals':'appeals','account-history':'history'}[view];payload=await api('/api/social/moderation/accounts?view='+kind);renderAccountOperations(payload.items||[],view);}
+  else if(view.startsWith('account-')){const kind={'account-restrictions':'restrictions','account-appeals':'appeals','account-history':'history'}[view];payload=await api('/api/social/moderation/accounts?view='+kind+'&page='+state.page);renderAccountOperations(payload.items||[],view);}
   state.hasMore = Boolean(payload?.hasMore);
   $("#moderation-page").textContent = `หน้า ${state.page.toLocaleString("th-TH")}`;
   $("[data-page='previous']").disabled = state.page <= 1;
@@ -311,6 +320,7 @@ async function showMedia(id) {
 }
 
 document.addEventListener("click", async (event) => {
+  if(event.target.closest('#moderation-retry')){try{await load();}catch(error){setStatus(error.message,true);}return;}
   const close = event.target.closest(".dialog-close");
   if (close) return close.closest("dialog").close();
   const loader = event.target.closest("[data-load]");
@@ -321,6 +331,7 @@ document.addEventListener("click", async (event) => {
   const action = event.target.closest("[data-action]");
   if (!action) return;
   try {
+    if(action.dataset.action==='open-queue'){state.page=1;await load(action.dataset.value);return;}
     if(action.dataset.action.startsWith('account-')){
       const reason=prompt('บันทึกเหตุผลสำหรับการตัดสินสิทธิ์ Beta (อย่างน้อย 10 ตัวอักษร)');if(!reason||reason.trim().length<10)return;
       const card=action.closest('[data-account-item]');let body;
@@ -345,11 +356,11 @@ document.addEventListener("click", async (event) => {
     }
     if (action.dataset.action === "media-report") {
       const note = prompt("บันทึกเหตุผลการดำเนินการกับรายงาน (จำเป็น)"); if (!note?.trim()) return;
-      await api("/api/social/moderation/media-reports", { method: "POST", body: { id: action.closest("[data-media-report]").dataset.mediaReport, status: action.dataset.value, note } }); await load();
+      const card=action.closest('[data-media-report]');await api("/api/social/moderation/media-reports", { method: "POST", body: { id: card.dataset.mediaReport,revision:Number(card.dataset.revision), status: action.dataset.value, note } }); await load();
     }
     if (action.dataset.action === "user-report") {
       const note = prompt("บันทึกเหตุผลการดำเนินการกับรายงานผู้ใช้ (จำเป็น)"); if (!note?.trim()) return;
-      await api("/api/social/moderation/reports", { method: "POST", body: { id: action.closest("[data-user-report]").dataset.userReport, status: action.dataset.value, note } }); await load();
+      const card=action.closest('[data-user-report]');await api("/api/social/moderation/reports", { method: "POST", body: { id: card.dataset.userReport,revision:Number(card.dataset.revision), status: action.dataset.value, note } }); await load();
     }
     if (action.dataset.action === "appeal") {
       const card = action.closest("[data-appeal]"); const reason = prompt("บันทึกเหตุผลผลอุทธรณ์ (จำเป็น)"); if (!reason?.trim()) return;
@@ -359,4 +370,9 @@ document.addEventListener("click", async (event) => {
 });
 
 load("overview").catch((error) => setStatus(error.message, true));
-api('/api/social/config',{routine:true}).then(c=>{state.accountOps=c.accountModerationEnabled===true;document.querySelectorAll('[data-account-ops]').forEach(el=>el.hidden=!state.accountOps);}).catch(()=>{});
+api('/api/social/config',{routine:true}).then(async c=>{state.accountOps=c.accountModerationEnabled===true;document.querySelectorAll('[data-account-ops]').forEach(el=>el.hidden=!state.accountOps);
+ if(!c.moderationToolsEnabled)return;
+ const grants=await api('/api/social/moderation/capabilities',{routine:true});
+ state.accountOps=grants.canModerateAccounts;
+ document.querySelectorAll('[data-load]').forEach(el=>{const view=el.dataset.load;if(view.startsWith('account-'))el.hidden=!grants.canModerateAccounts;else if(['pending','approved','sensitive','rejected','appeals','audit'].includes(view))el.hidden=!grants.canReviewMedia;else if(['priority','user-reports','media-reports'].includes(view))el.hidden=!grants.canReviewReports;});
+}).catch(()=>{});

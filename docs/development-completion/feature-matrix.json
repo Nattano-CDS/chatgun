@@ -1,0 +1,33 @@
+{
+  "scope": "PR17 development first; no human reauthentication until one consolidated UAT",
+  "canonicalNear": "98bb83e44bf88eddb9822d7875f18cd4fe833ee2",
+  "baselineHead": "244c5bc474978c3c5fd24eade0c4658a1e2fce50",
+  "productionUnchanged": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+  "phase": "AUDIT — source inventory complete; current regression evidence must be refreshed after implementation",
+  "features": [
+    {"feature":"Navigation, responsive NEAR shell and recovery","status":"PARTIAL","source":["app/index.html","app/social.js","app/near-components.js"],"gap":"Check all enabled actions against handler-driven browser journeys, stale state and failures"},
+    {"feature":"Google/Facebook/LINE authentication","status":"REQUIRES EXTERNAL APPROVAL","source":["functions/_lib/oauth.js","functions/api/auth/[[path]].js","test/auth.test.js"],"gap":"Technical implementation exists; Google/Meta Production publication and consolidated genuine UAT remain external"},
+    {"feature":"Invitation, acceptance, adult onboarding","status":"COMPLETE","source":["test/acceptance.test.js","test/beta-admission.test.js","test/controlled-beta.test.js"],"gap":"Existing implementation; rerun unchanged guards, no actual invitations"},
+    {"feature":"Sessions, CSRF, logout, linking, duplicate prevention","status":"COMPLETE","source":["functions/_lib/db.js","test/auth.test.js","test/privacy-safety.test.js"]},
+    {"feature":"Profile edit and privacy settings","status":"PARTIAL","source":["app/social.js","functions/api/social/[[path]].js"],"gap":"Cross-surface invalidation, gated service behavior and refresh persistence need handler-driven proof"},
+    {"feature":"Discovery filters and pagination","status":"PARTIAL","source":["app/social.js","functions/api/social/[[path]].js"],"gap":"Server truncates unordered candidates at 500; filters/pagination client-only, no bounded server query contract"},
+    {"feature":"Location expiry and inference protection","status":"PARTIAL","source":["functions/api/social/[[path]].js","functions/_lib/retention.js"],"gap":"Inspect eligible direct profile access, independent contact preference and location removal while discovery flag off"},
+    {"feature":"Direct chat and inbox","status":"PARTIAL","source":["app/social.js","functions/api/social/[[path]].js"],"gap":"Send retries lack durable idempotency; verify read/unread and refresh behavior"},
+    {"feature":"Chat media and recent five-image library","status":"PARTIAL","source":["test/social-media.test.js","test/media-moderation.test.js"],"gap":"Verify multipart retries, ownership, quarantine and failure cleanup in consolidated isolated tests"},
+    {"feature":"Private Album request/approve/reject/revoke","status":"PARTIAL","source":["test/direct-chat-albums.test.js","e2e/isolated-albums-live.spec.js"],"gap":"Verify multi-surface permission invalidation, replay and blocked users"},
+    {"feature":"Public/private Gallery, viewer, captions, likes/comments","status":"PARTIAL","source":["app/gallery-approved.js","app/social.js","test/gallery-approved.test.js"],"gap":"Inspect real API wiring and persistence instead of retired demo tests"},
+    {"feature":"Capacity12, independent daily quotas, private R2","status":"COMPLETE","source":["migrations/0011_daily_media_upload_quotas.sql","migrations/0014_gallery_capacity.sql","test/social-media.test.js","test/media-cleanup.test.js"]},
+    {"feature":"Online status","status":"PARTIAL","source":["app/online-presence.js","functions/_lib/online-presence.js","test/online-presence.test.js"],"gap":"Verify privacy opt-out, multiple tabs/devices, hidden/offline read suppression and TTL"},
+    {"feature":"Ratings and private reviews","status":"PARTIAL","source":["functions/api/social/[[path]].js","app/social.js"],"gap":"Target eligibility not checked before rating; private review list unbounded and block behavior needs regression"},
+    {"feature":"Blocking and user reports","status":"PARTIAL","source":["functions/api/social/[[path]].js","test/social.test.js"],"gap":"Verify lifecycle and all downstream permissions, retained case pagination"},
+    {"feature":"Moderation overview and workload","status":"COMPLETE","source":["test/account-moderation.test.js","e2e/issue16-admin.spec.js","docs/production-pilot-20261020/owner-admin-live.json"]},
+    {"feature":"Moderation queues, search, pagination","status":"PARTIAL","source":["app/moderation.js","functions/api/social/[[path]].js"],"gap":"Reports/appeals capped at100 without pagination; priority cards lack direct case actions"},
+    {"feature":"Media decisions, appeals and audit","status":"BROKEN","source":["functions/api/social/[[path]].js","test/media-moderation.test.js"],"gap":"Appeal restore writes are not gated on successful revision claim; same reviewer conflict not enforced; media report POST lacks purpose boundary used by GET"},
+    {"feature":"Account moderation/appeals","status":"PARTIAL","source":["migrations/0016_beta_account_moderation.sql","test/account-moderation.test.js"],"gap":"Staged technical implementation exists; independently review concurrency and pagination; Production flag stays off"},
+    {"feature":"Role assignment/revocation and expiry","status":"COMPLETE","source":["test/moderation.test.js","test/owner-admin-bootstrap.test.js"],"gap":"No real role extension or new grant authorized"},
+    {"feature":"Notifications and cross-feature refresh","status":"PARTIAL","source":["app/social.js","functions/api/social/[[path]].js"],"gap":"Inspect read acknowledgement, moderation notifications and foreground-only synchronization"},
+    {"feature":"Account deletion and retention","status":"PARTIAL","source":["account.js","functions/_lib/retention.js","test/privacy-safety.test.js","test/media-cleanup.test.js"],"gap":"Verify new tables cascade/retry preservation; no genuine owner deletion, no new retention promises"},
+    {"feature":"Legal, staffing, scanner and public activation","status":"REQUIRES EXTERNAL APPROVAL","source":["docs/production-pilot-20261020/policy-approval.html","docs/production-pilot-20261020/admin-operations-draft.html"],"gap":"Existing owner-only policy scope is not expanded service approval; no second participant, scanner vendor, independent reviewer or backup operator assumed"},
+    {"feature":"Game, OTP and fictional Demo","status":"COMPLETE","source":["test/prelaunch-build.test.js","test/demo-compatibility.test.js"],"gap":"Intentionally excluded/disabled, not missing functionality"}
+  ]
+}

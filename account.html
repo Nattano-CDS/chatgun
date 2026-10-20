@@ -17,6 +17,7 @@
     <h1>ยินดีต้อนรับสู่ ChatGun</h1>
     <p id="status">กำลังตรวจสอบบัญชี...</p>
     <a id="open-social" class="button" href="./app/" hidden>เปิด ChatGun Social</a>
+    <a id="account-moderation-link" class="button" href="/app/moderation.html" hidden>ศูนย์ดูแลและรายงาน</a>
     <section id="linking" class="account-section" hidden>
       <h2>เชื่อมบัญชีเข้าสู่ระบบ</h2>
       <p class="section-lead">เพิ่มวิธีเข้าสู่ระบบให้บัญชีนี้อย่างปลอดภัย</p>
@@ -36,6 +37,7 @@
       </form>
       <p id="delete-message" class="account-message" role="status" aria-live="polite"></p>
     </section>
+    <section id="session-management" class="account-section" hidden><h2>การเข้าสู่ระบบที่ยังใช้งาน</h2><div id="session-list"></div><button type="button" class="button" id="revoke-other-sessions">ออกจากระบบบนเซสชันอื่นทั้งหมด</button><p id="session-message" role="status"></p><a href="/signup">เข้าสู่ระบบใหม่เมื่อจำเป็นต้องยืนยันตัวตน</a></section>
     <button id="logout" class="button" hidden>ออกจากระบบ</button>
     <a id="account-appeals-link" href="/app/appeals.html" hidden>ดูหรืออุทธรณ์การระงับสิทธิ์ Beta</a>
   </main>

@@ -396,7 +396,8 @@ async function oauthCallback(request, env, provider) {
     const journey = await accountJourney(env.DB, userId, env);
     return redirect(journey.nextPath, [cookie(OAUTH_COOKIE, "", 0), ...session.cookies]);
   } catch (error) {
-    console.error(JSON.stringify({ event: "oauth_callback_failed", provider, reason: error?.message || "unknown" }));
+    const safeReason=['identity_already_linked','registration_closed','invitation_unavailable','reauth_session_mismatch','reauth_identity_mismatch','reauth_session_expired'].includes(error?.message)?error.message:'provider_or_validation_failed';
+    console.error(JSON.stringify({ event: "oauth_callback_failed", provider, reason: safeReason }));
     const redirectCode = error?.message === "identity_already_linked"
       ? "identity_linked"
       : error?.message === "registration_closed" ? "registration_closed"
@@ -600,6 +601,24 @@ async function logout(request, env) {
   ]);
 }
 
+async function accountSessions(request,env){
+  const session=await getSession(request,env.DB);
+  if(!session)return failure('กรุณาเข้าสู่ระบบ',401,'unauthorized');
+  const now=unixTime();
+  if(request.method==='POST'){
+    requireSameOrigin(request);
+    if(!await requireCsrf(request,session))return failure('คำขอหมดอายุ กรุณาลองใหม่',403,'invalid_csrf');
+    if(!hasRecentAuthentication(session))return failure('กรุณาเข้าสู่ระบบใหม่ก่อนเพิกถอนเซสชัน',428,'recent_auth_required');
+    if(!await rateLimit(env.DB,'session_management',session.user_id,20,3600,env.RATE_LIMIT_PEPPER))return failure('ดำเนินการบ่อยเกินไป กรุณารอ',429,'rate_limited');
+    const body=await readJson(request);
+    if(body.action!=='revoke_others')return failure('คำขอไม่ถูกต้อง',400,'invalid_action');
+    const result=await env.DB.prepare('UPDATE sessions SET revoked_at=? WHERE user_id=? AND token_hash<>? AND revoked_at IS NULL AND expires_at>?').bind(now,session.user_id,session.token_hash,now).run();
+    return json({ok:true,revoked:Number(result.meta?.changes||0)});
+  }
+  const rows=await env.DB.prepare('SELECT token_hash,created_at,expires_at FROM sessions WHERE user_id=? AND revoked_at IS NULL AND expires_at>? ORDER BY created_at DESC LIMIT 101').bind(session.user_id,now).all();
+  return json({sessions:await Promise.all((rows.results||[]).slice(0,100).map(async row=>({id:await sha256('session-display:'+session.user_id+':'+row.token_hash),createdAt:row.created_at,expiresAt:row.expires_at,current:row.token_hash===session.token_hash}))),hasMore:(rows.results||[]).length>100});
+}
+
 export async function onRequest({ request, env }) {
   const requestId = safeUuid();
   try {
@@ -639,6 +658,7 @@ export async function onRequest({ request, env }) {
     if (request.method === "POST" && path === "/api/auth/acceptance") return await acceptRequirements(request, env);
     if (request.method === "POST" && path === "/api/auth/acceptance/decline") return await declineAcceptance(request, env);
     if (request.method === "POST" && path === "/api/auth/logout") return await logout(request, env);
+    if(path==='/api/auth/sessions'&&['GET','POST'].includes(request.method))return await accountSessions(request,env);
     if (request.method === "POST" && path === "/api/auth/account-deletion/request") {
       return await requestAccountDeletion(request, env);
     }
@@ -656,7 +676,7 @@ export async function onRequest({ request, env }) {
       };
       return failure(messages[error.code] || "คำขอไม่ถูกต้อง", error.status, error.code, requestId);
     }
-    console.error(JSON.stringify({ event: "auth_request_failed", requestId, reason: error?.message || "unknown" }));
+    console.error(JSON.stringify({ event: "auth_request_failed", requestId, reason: "internal_error" }));
     return failure(GENERIC_ERROR, 500, "internal_error", requestId);
   }
 }

@@ -34,6 +34,13 @@ function enabled(value) {
   return String(value || "").trim().toLowerCase() === "true";
 }
 
+function queuePage(request,limit=50){
+  const params=new URL(request.url).searchParams,page=Number(params.get('page')||1),q=String(params.get('q')||'').trim();
+  if(!Number.isSafeInteger(page)||page<1||page>10000||q.length>80)throw new SocialError('invalid_cursor','ตัวกรองหรือหน้ารายการไม่ถูกต้อง');
+  return{page,limit,offset:(page-1)*limit,q};
+}
+function queueResult(rows,key,paging){const items=rows.results||[];return json({[key]:items.slice(0,paging.limit),page:paging.page,hasMore:items.length>paging.limit});}
+
 export function bangkokUploadWindow(timestampMs = Date.now()) {
   const shifted = new Date(timestampMs + 7 * 60 * 60 * 1000);
   const localDay = shifted.toISOString().slice(0, 10);
@@ -572,6 +579,9 @@ async function discovery(request, env) {
   const ownLocation = await env.DB.prepare(
     "SELECT latitude, longitude FROM member_profiles WHERE user_id = ?",
   ).bind(session.user_id).first();
+  const query=new URL(request.url).searchParams,paged=query.get('paged')==='1',after=query.get('after')||'',search=cleanText(query.get('q'),80),gender=query.get('gender')||'',interest=cleanText(query.get('interest'),100),radius=Number(query.get('radius')||5000),limit=paged?100:500;
+  if(after.length>128||(gender&&!ALLOWED_GENDERS.has(gender))||![500,1000,5000].includes(radius))throw new SocialError('invalid_filter','ตัวกรองค้นหาไม่ถูกต้อง');
+  const longitudeRange=Math.min(360,0.06/Math.max(0.001,Math.cos(radians(Number(ownLocation.latitude)))));
   const rows = await env.DB.prepare(`
     SELECT p.user_id, p.name, p.gender, p.bio, p.interests, p.selected_photo_id,p.direct_messages_enabled,
            p.latitude, p.longitude,
@@ -582,30 +592,37 @@ async function discovery(request, env) {
     WHERE p.user_id <> ? AND u.status = 'active' AND p.discovery_visible = 1 AND ${eligibleSql('p.user_id')}
       AND p.located_at > ? AND p.accuracy <= 50
       AND p.latitude BETWEEN ? AND ?
+      AND (ABS(p.longitude-?)<=? OR ABS(p.longitude-?)>=360-?)
+      AND p.user_id>? AND (?='' OR instr(lower(p.name||' '||p.bio||' '||p.interests),lower(?))>0)
+      AND (?='' OR p.gender=?) AND (?='' OR instr(lower(p.interests),lower(?))>0)
       AND NOT EXISTS (
         SELECT 1 FROM social_blocks b
         WHERE (b.blocker_user_id = ? AND b.blocked_user_id = p.user_id)
            OR (b.blocker_user_id = p.user_id AND b.blocked_user_id = ?)
       )
-    LIMIT 500
+    ORDER BY p.user_id LIMIT ?
   `).bind(
     session.user_id,
     timestamp - LOCATION_FRESH_SECONDS,
     Number(ownLocation.latitude) - 0.06,
     Number(ownLocation.latitude) + 0.06,
+    Number(ownLocation.longitude),longitudeRange,Number(ownLocation.longitude),longitudeRange,
+    after,search,search,gender,gender,interest,interest,
     session.user_id,
     session.user_id,
+    limit+1,
   ).all();
-  const people = (rows.results || []).map((person) => {
+  const candidates=(rows.results||[]).slice(0,limit);
+  const people = candidates.map((person) => {
     const metres = distanceMetres(ownLocation, person);
     const { latitude, longitude, ...safe } = person;
     return { ...safe, _distance: metres, ...privateDistance(metres) };
-  }).filter((person) => person._distance <= 5000)
+  }).filter((person) => person._distance <= 5000&&person.distance<=radius)
     .sort((a, b) => a.distance - b.distance || String(a.user_id).localeCompare(String(b.user_id)))
     .map(({ _distance, ...person }) => person);
   for (const person of people) person.selected_photo_id=await publicPortrait(env.DB,person.selected_photo_id,person.user_id);
   if(enabled(env.PRESENCE_ENABLED))for(let start=0;start<people.length;start+=50){const group=people.slice(start,start+50),statuses=await onlineStatuses(env.DB,session.user_id,group.map(p=>p.user_id));for(const person of group)person.is_online=statuses[person.user_id];}
-  return json({ people, locationFresh: true });
+  return json({ people, locationFresh: true,hasMore:(rows.results||[]).length>limit,nextCursor:candidates.at(-1)?.user_id||null });
 }
 
 async function relationships(request,env) { capability(env,'SOCIAL_APP_ENABLED');throw new SocialError('feature_removed','ไม่ต้องเพิ่มเพื่อนก่อนเริ่มแชท',410); }
@@ -859,11 +876,29 @@ async function messages(request, env) {
     if (mediaId) {
       const reusable = await accessibleChatAsset(env, mediaId, session.user_id);
       if (!reusable) throw new SocialError("media_not_found", "ไม่พบรูปภาพที่ส่งได้", 404);
+      if(reusable.purpose==='gallery'&&!await canViewPhoto(env.DB,target,reusable))throw new SocialError('media_not_found','ผู้รับยังไม่มีสิทธิ์ดูรูปในอัลบั้มนี้',404);
     }
-    await env.DB.prepare(`
-      INSERT INTO social_messages(id, sender_user_id, receiver_user_id, body, media_id, created_at)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).bind(safeUuid(), session.user_id, target, text, mediaId, unixTime()).run();
+    const requestId=body.clientRequestId===undefined?null:String(body.clientRequestId);
+    if(requestId!==null&&!/^[A-Za-z0-9_-]{16,80}$/.test(requestId))throw new SocialError('invalid_request_id','รหัสการส่งไม่ถูกต้อง');
+    // Retries use the original durable message, not another INSERT (and therefore
+    // do not trigger duplicate-content/spam rules or recreate an unsent message).
+    const prior=requestId?await env.DB.prepare('SELECT id,receiver_user_id,body,media_id FROM social_messages WHERE sender_user_id=? AND client_request_id=?').bind(session.user_id,requestId).first():null;
+    if(prior){
+      if(prior.receiver_user_id!==target||prior.body!==text||prior.media_id!==mediaId)throw new SocialError('idempotency_conflict','คำขอส่งเดิมมีข้อมูลต่างกัน กรุณาเริ่มส่งใหม่',409);
+      return json({ok:true,messageId:prior.id,idempotentReplay:true});
+    }
+    const messageId=safeUuid();
+    try{await env.DB.prepare(`
+      INSERT INTO social_messages(id, sender_user_id, receiver_user_id, body, media_id, created_at,client_request_id)
+      VALUES (?, ?, ?, ?, ?, ?,?)
+    `).bind(messageId, session.user_id, target, text, mediaId, unixTime(),requestId).run();}
+    catch(error){
+      const saved=requestId?await env.DB.prepare('SELECT id,receiver_user_id,body,media_id FROM social_messages WHERE sender_user_id=? AND client_request_id=?').bind(session.user_id,requestId).first():null;
+      if(!saved)throw error;
+      if(saved.receiver_user_id!==target||saved.body!==text||saved.media_id!==mediaId)throw new SocialError('idempotency_conflict','คำขอส่งเดิมมีข้อมูลต่างกัน',409);
+      return json({ok:true,messageId:saved.id,idempotentReplay:true});
+    }
+    return json({ok:true,messageId});
   } else {
     throw new SocialError("invalid_action", "คำขอไม่ถูกต้อง");
   }
@@ -871,6 +906,10 @@ async function messages(request, env) {
 }
 
 async function accessibleChatAsset(env, mediaId, userId) {
+  const ownedGallery=await env.DB.prepare(`SELECT m.id,m.object_key,m.content_type,m.byte_size,m.created_at,m.purpose,p.owner_user_id,p.visibility
+    FROM social_media m JOIN profile_photos p ON p.media_id=m.id JOIN media_safety_reviews r ON r.media_id=m.id
+    WHERE m.id=? AND p.owner_user_id=? AND m.state='active' AND m.purpose='gallery' AND r.status='released' AND r.category='general'`).bind(mediaId,userId).first();
+  if(ownedGallery)return ownedGallery;
   return env.DB.prepare(`
     SELECT media.id, media.object_key, media.content_type, media.byte_size, media.created_at
     FROM social_media media
@@ -941,13 +980,21 @@ async function chatAssets(request, env) {
     )
     ORDER BY media.created_at DESC, media.id DESC LIMIT 5
   `).bind(enabled(env.SENSITIVE_CONTENT_ENABLED) ? 1 : 0, session.user_id, unixTime(), session.user_id, session.user_id, session.user_id).all();
-  return json({ assets: rows.results || [] });
+  const gallery=await env.DB.prepare(`SELECT m.id,m.purpose,m.content_type,p.owner_user_id,p.visibility FROM social_media m
+    JOIN profile_photos p ON p.media_id=m.id JOIN media_safety_reviews r ON r.media_id=m.id
+    WHERE p.owner_user_id=? AND m.state='active' AND r.status='released' AND r.category='general' ORDER BY m.created_at DESC,m.id LIMIT 12`).bind(session.user_id).all();
+  const target=new URL(request.url).searchParams.get('target'),allowed=[];
+  if(target&&await canContact(env.DB,session.user_id,target))for(const photo of gallery.results||[])if(await canViewPhoto(env.DB,target,photo))allowed.push(photo);
+  return json({ assets: rows.results || [],gallery:allowed });
 }
 
 async function chatMedia(request, env, id) {
   capability(env, "SOCIAL_APP_ENABLED");
   capability(env, "MESSAGING_ENABLED");
   const session = await authenticated(request, env);
+  const galleryMessage=await env.DB.prepare(`SELECT 1 ok FROM social_messages m JOIN profile_photos p ON p.media_id=m.media_id
+    WHERE m.media_id=? AND m.unsent_at IS NULL AND (m.sender_user_id=? OR m.receiver_user_id=?) LIMIT 1`).bind(id,session.user_id,session.user_id).first();
+  if(galleryMessage)return mediaFile(request,env,id);
   await requireProfile(env.DB,session.user_id);
   const media = await accessibleChatAsset(env, id, session.user_id);
   if (!media || !env.MEDIA) {
@@ -1021,6 +1068,15 @@ async function moderationAccess(request, env, roles, options = {}) {
   `).bind(session.user_id, unixTime(), session.user_id, ...roles).first();
   if (!role) throw new SocialError("forbidden", "ไม่มีสิทธิ์เข้าถึงเครื่องมือดูแล", 403);
   return { session, purpose, role: role.role };
+}
+
+async function moderationCapabilities(request,env){
+  capability(env,'SOCIAL_APP_ENABLED');capability(env,'MODERATION_TOOLS_ENABLED');
+  const session=await authenticated(request,env),now=unixTime();
+  const rows=await env.DB.prepare(`SELECT role FROM moderation_access_grants WHERE user_id=? AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at>?)
+    UNION SELECT role FROM moderation_roles WHERE user_id=?`).bind(session.user_id,now,session.user_id).all();
+  const roles=new Set((rows.results||[]).map(row=>row.role));
+  return json({canReviewReports:roles.has('report_reviewer')||roles.has('safety_admin'),canReviewMedia:roles.has('safety_admin'),canManageRoles:roles.has('moderation_admin'),canReviewIdentity:enabled(env.IDENTITY_VERIFICATION_ENABLED)&&roles.has('identity_reviewer'),canModerateAccounts:enabled(env.ACCOUNT_MODERATION_ENABLED)&&roles.has('safety_admin'),recentAuthentication:hasRecentAuthentication(session)});
 }
 
 const MODERATION_ROLES = new Set(["moderation_admin", "report_reviewer", "identity_reviewer", "safety_admin"]);
@@ -1138,15 +1194,17 @@ async function moderationReports(request, env) {
   if (request.method === "GET") {
     const status = new URL(request.url).searchParams.get("status") || "pending";
     if (!["pending", "reviewed", "escalated", "closed"].includes(status)) throw new SocialError("invalid_status", "สถานะไม่ถูกต้อง");
+    const paging=queuePage(request);
     const rows = await env.DB.prepare(`
-      SELECT r.id, r.category, r.reason_code, r.details, r.status, r.created_at, r.reviewed_at,
+      SELECT r.id, r.category, r.reason_code, r.details, r.status, r.created_at, r.reviewed_at,r.revision,
              subject.name subject_name, r.subject_user_id
       FROM social_reports r
       JOIN member_profiles subject ON subject.user_id = r.subject_user_id
-      WHERE r.status = ? ORDER BY r.created_at ASC LIMIT 100
-    `).bind(status).all();
+      WHERE r.status = ? AND (?='' OR instr(r.id,?)>0 OR instr(r.details,?)>0 OR instr(subject.name,?)>0)
+      ORDER BY CASE WHEN COALESCE(r.reason_code,r.category) IN ('threat','ncii','child_safety') THEN 0 WHEN COALESCE(r.reason_code,r.category) IN ('violence','privacy','sexual_content') THEN 1 ELSE 2 END,r.created_at,r.id LIMIT ? OFFSET ?
+    `).bind(status,paging.q,paging.q,paging.q,paging.q,paging.limit+1,paging.offset).all();
     await auditModeration(env.DB, session.user_id, "report_view", "report", `queue:${status}`, purpose);
-    return json({ reports: rows.results || [] });
+    return queueResult(rows,'reports',paging);
   }
   const body = await readJson(request);
   const id = String(body.id || "");
@@ -1154,18 +1212,20 @@ async function moderationReports(request, env) {
   if (!["reviewed", "escalated", "closed"].includes(status)) throw new SocialError("invalid_status", "สถานะไม่ถูกต้อง");
   const decisionPurpose = `${purpose}; ${cleanText(body.note, 300, { required: true })}`.slice(0, 300);
   const timestamp = unixTime();
+  const current=await env.DB.prepare("SELECT revision FROM social_reports WHERE id=? AND status<>'closed'").bind(id).first();
+  if(!current)throw new SocialError('not_found','ไม่พบรายงานที่ดำเนินการได้',404);
+  const revision=body.revision??current.revision,nonce=safeUuid();
+  if(!Number.isSafeInteger(revision)||revision<0)throw new SocialError('revision_required','กรุณาโหลดรายงานใหม่',409);
   const results = await env.DB.batch([
+    env.DB.prepare("UPDATE social_reports SET status=?,reviewed_at=?,revision=revision+1,decision_nonce=? WHERE id=? AND revision=? AND status<>'closed'").bind(status,timestamp,nonce,id,revision),
     env.DB.prepare(`
       INSERT INTO moderation_audit_events(id,actor_user_id,action,subject_type,subject_id,purpose,created_at)
       SELECT ?,?,'report_review','report',?,?,? WHERE EXISTS(
-        SELECT 1 FROM social_reports WHERE id = ? AND status <> 'closed'
+        SELECT 1 FROM social_reports WHERE id = ? AND decision_nonce=?
       )
-    `).bind(safeUuid(), session.user_id, id, decisionPurpose, timestamp, id),
-    env.DB.prepare(`
-      UPDATE social_reports SET status = ?, reviewed_at = ? WHERE id = ? AND status <> 'closed'
-    `).bind(status, timestamp, id),
+    `).bind(safeUuid(), session.user_id, id, decisionPurpose, timestamp, id,nonce),
   ]);
-  if (!Number(results[1]?.meta?.changes || 0)) throw new SocialError("not_found", "ไม่พบรายงานที่ดำเนินการได้", 404);
+  if (!Number(results[0]?.meta?.changes || 0)) throw new SocialError("decision_conflict", "รายงานถูกแก้ไขแล้ว กรุณาโหลดใหม่", 409);
   return json({ ok: true });
 }
 
@@ -1305,7 +1365,7 @@ async function moderationMedia(request, env) {
     `).bind(media.object_key, safeUuid(), timestamp + 7 * 86400, timestamp, mediaId, decisionNonce));
   }
   if (category !== "general") {
-    statements.push(env.DB.prepare("UPDATE member_profiles SET selected_photo_id=NULL,updated_at=? WHERE selected_photo_id=?").bind(timestamp, mediaId));
+    statements.push(env.DB.prepare("UPDATE member_profiles SET selected_photo_id=NULL,updated_at=? WHERE selected_photo_id=? AND EXISTS(SELECT 1 FROM media_safety_reviews WHERE media_id=? AND decision_nonce=?)").bind(timestamp, mediaId,mediaId,decisionNonce));
   }
   const results = await env.DB.batch(statements);
   if (!Number(results[0]?.meta?.changes || 0)) throw new SocialError("decision_conflict", "รายการนี้ถูกแก้ไขแล้ว กรุณาโหลดใหม่", 409);
@@ -1362,17 +1422,18 @@ async function moderationAccounts(request,env){
   const{session,purpose}=await moderationAccess(request,env,['safety_admin']);
   if(request.method==='GET'){
     const view=new URL(request.url).searchParams.get('view')||'restrictions';
+    const paging=queuePage(request);
     let rows;
     if(view==='appeals')rows=await env.DB.prepare(`SELECT a.id,a.restriction_id,a.reason,a.status,a.revision,a.created_at,
       p.name subject_name,r.reason restriction_reason,r.created_by=? AS reviewer_conflict
       FROM beta_account_appeals a JOIN beta_account_restrictions r ON r.id=a.restriction_id
-      LEFT JOIN member_profiles p ON p.user_id=a.user_id WHERE a.status='pending' ORDER BY a.created_at LIMIT 100`).bind(session.user_id).all();
+      LEFT JOIN member_profiles p ON p.user_id=a.user_id WHERE a.status='pending' ORDER BY a.created_at,a.id LIMIT ? OFFSET ?`).bind(session.user_id,paging.limit+1,paging.offset).all();
     else if(view==='restrictions')rows=await env.DB.prepare(`SELECT r.id,r.status,r.reason,r.revision,r.created_at,p.name subject_name
-      FROM beta_account_restrictions r LEFT JOIN member_profiles p ON p.user_id=r.user_id ORDER BY r.created_at DESC LIMIT 100`).all();
-    else if(view==='history')rows=await env.DB.prepare('SELECT action,reason,revision,created_at FROM beta_account_moderation_events ORDER BY created_at DESC LIMIT 100').all();
+      FROM beta_account_restrictions r LEFT JOIN member_profiles p ON p.user_id=r.user_id ORDER BY r.created_at DESC,r.id LIMIT ? OFFSET ?`).bind(paging.limit+1,paging.offset).all();
+    else if(view==='history')rows=await env.DB.prepare('SELECT action,reason,revision,created_at FROM beta_account_moderation_events ORDER BY created_at DESC,id LIMIT ? OFFSET ?').bind(paging.limit+1,paging.offset).all();
     else throw new SocialError('invalid_input','คิวไม่ถูกต้อง');
     await env.DB.prepare("INSERT INTO beta_account_moderation_events(id,actor_user_id,action,reason,created_at) VALUES(?,?,'queue_view',?,?)").bind(safeUuid(),session.user_id,purpose,unixTime()).run();
-    return json({items:rows.results||[]});
+    return queueResult(rows,'items',paging);
   }
   await limited(env,'account_moderation_hour',session.user_id,20,3600);
   const body=await readJson(request),reason=cleanText(body.reason,300,{required:true}),now=unixTime();
@@ -1411,16 +1472,16 @@ async function moderationAccounts(request,env){
     }else restriction=await env.DB.prepare("SELECT * FROM beta_account_restrictions WHERE id=? AND status='active' AND revision=?").bind(identifier(body.id),body.revision).first();
     if(!restriction||!restriction.user_id||restriction.user_id===session.user_id)throw new SocialError('decision_conflict','ไม่พบรายการที่ดำเนินการได้',409);
     if(appeal&&restriction.created_by===session.user_id&&body.conflictAcknowledged!==true)throw new SocialError('reviewer_conflict','ผู้ตัดสินเดิมต้องบันทึกข้อขัดแย้งและยืนยันการทบทวนที่ไม่เป็นอิสระ',409);
-    const lift=!appeal||body.decision==='lifted',revision=restriction.revision+1,statements=[];
-    if(appeal)statements.push(env.DB.prepare(`UPDATE beta_account_appeals SET status=?,reviewed_by=?,reviewed_at=?,decision_reason=?,revision=revision+1
-      WHERE id=? AND status='pending' AND revision=?`).bind(body.decision,session.user_id,now,reason,appeal.id,body.revision));
-    statements.push(env.DB.prepare(`UPDATE beta_account_restrictions SET status=?,resolved_by=?,resolved_at=?,resolution_reason=?,revision=revision+1
-      WHERE id=? AND status='active' AND revision=?`).bind(lift?'lifted':'active',session.user_id,now,reason,restriction.id,restriction.revision));
+    const lift=!appeal||body.decision==='lifted',revision=restriction.revision+1,statements=[],nonce=safeUuid();
+    if(appeal)statements.push(env.DB.prepare(`UPDATE beta_account_appeals SET status=?,reviewed_by=?,reviewed_at=?,decision_reason=?,revision=revision+1,decision_nonce=?
+      WHERE id=? AND status='pending' AND revision=? AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=? AND status='active' AND revision=?)`).bind(body.decision,session.user_id,now,reason,nonce,appeal.id,body.revision,restriction.id,restriction.revision));
+    statements.push(env.DB.prepare(`UPDATE beta_account_restrictions SET status=?,resolved_by=?,resolved_at=?,resolution_reason=?,revision=revision+1,decision_nonce=?
+      WHERE id=? AND status='active' AND revision=? AND (? IS NULL OR EXISTS(SELECT 1 FROM beta_account_appeals WHERE id=? AND decision_nonce=?))`).bind(lift?'lifted':'active',session.user_id,now,reason,nonce,restriction.id,restriction.revision,appeal?.id||null,appeal?.id||null,nonce));
     if(lift)statements.push(env.DB.prepare(`UPDATE beta_enrollments SET status='active',revoked_at=NULL
       WHERE user_id=? AND status='revoked' AND EXISTS(SELECT 1 FROM users WHERE id=? AND status='active' AND account_state='active')
-        AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=? AND status='lifted' AND revision=?)`).bind(restriction.user_id,restriction.user_id,restriction.id,revision));
+        AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=? AND status='lifted' AND decision_nonce=?)`).bind(restriction.user_id,restriction.user_id,restriction.id,nonce));
     statements.push(env.DB.prepare(`INSERT INTO beta_account_moderation_events(id,restriction_id,actor_user_id,action,reason,revision,created_at)
-      SELECT ?,id,?,?,?,?,? FROM beta_account_restrictions WHERE id=? AND revision=? AND resolved_by=? AND resolved_at=?`).bind(safeUuid(),session.user_id,appeal?(lift?'appeal_lifted':'appeal_upheld'):'lift',`${purpose}; ${reason}${appeal&&restriction.created_by===session.user_id?'; original reviewer conflict acknowledged':''}`.slice(0,300),revision,now,restriction.id,revision,session.user_id,now));
+      SELECT ?,id,?,?,?,?,? FROM beta_account_restrictions WHERE id=? AND decision_nonce=?`).bind(safeUuid(),session.user_id,appeal?(lift?'appeal_lifted':'appeal_upheld'):'lift',`${purpose}; ${reason}${appeal&&restriction.created_by===session.user_id?'; original reviewer conflict acknowledged':''}`.slice(0,300),revision,now,restriction.id,nonce));
     const results=await env.DB.batch(statements);if(!results[0]?.meta.changes)throw new SocialError('decision_conflict','ข้อมูลถูกแก้ไขแล้ว',409);
     return json({ok:true});
   }
@@ -1530,17 +1591,20 @@ async function moderationMediaReports(request, env) {
   if (request.method === "GET") {
     const status = new URL(request.url).searchParams.get("status") || "pending";
     if (!["pending", "reviewed", "escalated", "closed"].includes(status)) throw new SocialError("invalid_status", "สถานะไม่ถูกต้อง");
+    const paging=queuePage(request);
     const rows = await env.DB.prepare(`
-      SELECT report.id,report.media_id,report.reason_code,report.details,report.status,
+      SELECT report.id,report.media_id,report.reason_code,report.details,report.status,report.revision,
              report.created_at,report.reviewed_at,media.purpose media_purpose,
              review.status media_status,review.category
       FROM media_reports report
       JOIN social_media media ON media.id=report.media_id
       JOIN media_safety_reviews review ON review.media_id=report.media_id
-      WHERE report.status=? AND media.purpose IN ('profile','gallery','chat') ORDER BY report.created_at ASC LIMIT 100
-    `).bind(status).all();
+      WHERE report.status=? AND media.purpose IN ('profile','gallery','chat')
+        AND (?='' OR instr(report.id,?)>0 OR instr(report.details,?)>0 OR instr(report.media_id,?)>0)
+      ORDER BY CASE WHEN report.reason_code IN ('ncii','minor_safety') THEN 0 WHEN report.reason_code IN ('violence','privacy','sexual_content') THEN 1 ELSE 2 END,report.created_at,report.id LIMIT ? OFFSET ?
+    `).bind(status,paging.q,paging.q,paging.q,paging.q,paging.limit+1,paging.offset).all();
     await auditMediaSafety(env.DB, session.user_id, "queue_view", `reports:${status}`, purpose);
-    return json({ reports: rows.results || [] });
+    return queueResult(rows,'reports',paging);
   }
   const body = await readJson(request);
   const id = identifier(body.id, "ไม่พบรายงาน");
@@ -1548,13 +1612,15 @@ async function moderationMediaReports(request, env) {
   if (!["reviewed", "escalated", "closed"].includes(status)) throw new SocialError("invalid_status", "สถานะไม่ถูกต้อง");
   const note = cleanText(body.note, 300, { required: true });
   const timestamp = unixTime();
-  const report = await env.DB.prepare("SELECT media_id FROM media_reports WHERE id=? AND status<>'closed'").bind(id).first();
+  const report = await env.DB.prepare("SELECT report.media_id,report.revision FROM media_reports report JOIN social_media m ON m.id=report.media_id WHERE report.id=? AND report.status<>'closed' AND m.purpose IN ('profile','gallery','chat')").bind(id).first();
   if (!report) throw new SocialError("not_found", "ไม่พบรายงานที่ดำเนินการได้", 404);
-  const result = await env.DB.prepare(`
-    UPDATE media_reports SET status=?,reviewed_at=?,reviewed_by=? WHERE id=? AND status<>'closed'
-  `).bind(status, timestamp, session.user_id, id).run();
-  if (!Number(result.meta?.changes || 0)) throw new SocialError("decision_conflict", "รายงานนี้ถูกแก้ไขแล้ว", 409);
-  await auditMediaSafety(env.DB, session.user_id, "decision", report.media_id, `${purpose}; ${note}`.slice(0, 300));
+  const revision=body.revision??report.revision,nonce=safeUuid();
+  if(!Number.isSafeInteger(revision)||revision<0)throw new SocialError('revision_required','กรุณาโหลดรายงานใหม่',409);
+  const results=await env.DB.batch([
+    env.DB.prepare("UPDATE media_reports SET status=?,reviewed_at=?,reviewed_by=?,revision=revision+1,decision_nonce=? WHERE id=? AND revision=? AND status<>'closed'").bind(status,timestamp,session.user_id,nonce,id,revision),
+    env.DB.prepare("INSERT INTO media_safety_audit_events(id,actor_user_id,action,media_id,purpose,created_at) SELECT ?,?,'decision',?,?,? FROM media_reports WHERE id=? AND decision_nonce=?").bind(safeUuid(),session.user_id,report.media_id,`${purpose}; ${note}`.slice(0,300),timestamp,id,nonce),
+  ]);
+  if (!Number(results[0]?.meta?.changes || 0)) throw new SocialError("decision_conflict", "รายงานนี้ถูกแก้ไขแล้ว", 409);
   return json({ ok: true });
 }
 
@@ -1606,15 +1672,18 @@ async function moderationAppeals(request, env) {
   if (request.method === "GET") {
     const status = new URL(request.url).searchParams.get("status") || "pending";
     if (!["pending", "granted", "denied", "withdrawn"].includes(status)) throw new SocialError("invalid_status", "สถานะไม่ถูกต้อง");
+    const paging=queuePage(request);
     const rows = await env.DB.prepare(`
       SELECT appeal.id,appeal.media_id,appeal.reason,appeal.status,appeal.revision,
-             appeal.created_at,appeal.reviewed_at,review.category,review.reason decision_reason
+             appeal.created_at,appeal.reviewed_at,review.category,review.reason decision_reason,review.reviewed_by=? reviewer_conflict
       FROM media_appeals appeal JOIN media_safety_reviews review ON review.media_id=appeal.media_id
       JOIN social_media media ON media.id=appeal.media_id
-      WHERE appeal.status=? AND media.purpose IN ('profile','gallery','chat') ORDER BY appeal.created_at ASC LIMIT 100
-    `).bind(status).all();
+      WHERE appeal.status=? AND media.purpose IN ('profile','gallery','chat')
+        AND (?='' OR instr(appeal.id,?)>0 OR instr(appeal.reason,?)>0 OR instr(appeal.media_id,?)>0)
+      ORDER BY appeal.created_at,appeal.id LIMIT ? OFFSET ?
+    `).bind(session.user_id,status,paging.q,paging.q,paging.q,paging.q,paging.limit+1,paging.offset).all();
     await auditMediaSafety(env.DB, session.user_id, "queue_view", `appeals:${status}`, purpose);
-    return json({ appeals: rows.results || [] });
+    return queueResult(rows,'appeals',paging);
   }
   const body = await readJson(request);
   const id = identifier(body.id, "ไม่พบคำอุทธรณ์");
@@ -1627,41 +1696,49 @@ async function moderationAppeals(request, env) {
   if (decision === "granted" && !["general", "sensitive"].includes(category)) throw new SocialError("invalid_category", "หมวดหมู่ไม่ถูกต้อง");
   const appeal = await env.DB.prepare(`
     SELECT appeal.media_id,appeal.appellant_user_id,appeal.revision,media.object_key,
-           review.status,review.category,review.revision review_revision
+           review.status,review.category,review.reviewed_by,review.revision review_revision
     FROM media_appeals appeal
     JOIN social_media media ON media.id=appeal.media_id
     JOIN media_safety_reviews review ON review.media_id=appeal.media_id
     WHERE appeal.id=? AND appeal.status='pending' AND media.purpose IN ('profile','gallery','chat')
   `).bind(id).first();
   if (!appeal) throw new SocialError("not_found", "ไม่พบคำอุทธรณ์ที่รอตรวจ", 404);
+  if(appeal.reviewed_by===session.user_id)throw new SocialError('independent_review_required','คำอุทธรณ์นี้ต้องให้ผู้ตรวจคนอื่นพิจารณา ห้ามผู้ตัดสินเดิมตัดสินซ้ำ',409);
   if (Number(appeal.revision) !== expectedRevision) throw new SocialError("decision_conflict", "คำอุทธรณ์นี้ถูกแก้ไขแล้ว", 409);
+  if(appeal.status!=='rejected')throw new SocialError('decision_conflict','สถานะสื่อเปลี่ยนแปลงแล้ว กรุณาโหลดใหม่',409);
+  if(decision==='granted'&&(!env.MEDIA||!await (env.MEDIA.head?env.MEDIA.head(appeal.object_key):env.MEDIA.get(appeal.object_key))))throw new SocialError('media_unavailable','ไฟล์ถูกลบหรือไม่พร้อมใช้งาน ไม่สามารถคืนสิทธิ์ได้',409);
   const timestamp = unixTime();
+  const decisionNonce=safeUuid();
   const nextAppealRevision = expectedRevision + 1;
   const nextMediaRevision = Number(appeal.review_revision) + 1;
   const statements = [
     env.DB.prepare(`
-      UPDATE media_appeals SET status=?,decision_reason=?,reviewed_at=?,reviewed_by=?,revision=?
-      WHERE id=? AND status='pending' AND revision=?
-    `).bind(decision, reason, timestamp, session.user_id, nextAppealRevision, id, expectedRevision),
+      UPDATE media_appeals SET status=?,decision_reason=?,reviewed_at=?,reviewed_by=?,revision=?,decision_nonce=?
+      WHERE id=? AND status='pending' AND revision=? AND EXISTS(
+        SELECT 1 FROM media_safety_reviews r JOIN social_media m ON m.id=r.media_id
+        WHERE r.media_id=media_appeals.media_id AND r.status='rejected' AND r.revision=?
+          AND m.state IN ('active','pending_deletion')
+          AND NOT EXISTS(SELECT 1 FROM media_deletion_queue q WHERE q.object_key=m.object_key AND q.completed_at IS NULL AND q.processing_nonce IS NOT NULL))
+    `).bind(decision, reason, timestamp, session.user_id, nextAppealRevision,decisionNonce, id, expectedRevision,appeal.review_revision),
     env.DB.prepare(`
       INSERT INTO moderation_notifications(id,user_id,kind,media_id,appeal_id,message_code,created_at)
-      SELECT ?,?,'appeal_decision',?,?,?,? FROM media_appeals WHERE id=? AND revision=?
-    `).bind(safeUuid(), appeal.appellant_user_id, appeal.media_id, id, decision === "granted" ? "appeal_granted" : "appeal_denied", timestamp, id, nextAppealRevision),
+      SELECT ?,?,'appeal_decision',?,?,?,? FROM media_appeals WHERE id=? AND decision_nonce=?
+    `).bind(safeUuid(), appeal.appellant_user_id, appeal.media_id, id, decision === "granted" ? "appeal_granted" : "appeal_denied", timestamp, id,decisionNonce),
   ];
   if (decision === "granted") {
     statements.push(
-      env.DB.prepare("UPDATE social_media SET state='active' WHERE id=?").bind(appeal.media_id),
-      env.DB.prepare(`UPDATE media_safety_reviews SET status='released',category=?,reason=?,reviewed_at=?,reviewed_by=?,revision=? WHERE media_id=? AND status='rejected'`)
-        .bind(category, reason, timestamp, session.user_id, nextMediaRevision, appeal.media_id),
-      env.DB.prepare("DELETE FROM media_deletion_queue WHERE object_key=? AND completed_at IS NULL").bind(appeal.object_key),
+      env.DB.prepare("UPDATE social_media SET state='active' WHERE id=? AND EXISTS(SELECT 1 FROM media_appeals WHERE id=? AND decision_nonce=?)").bind(appeal.media_id,id,decisionNonce),
+      env.DB.prepare(`UPDATE media_safety_reviews SET status='released',category=?,reason=?,reviewed_at=?,reviewed_by=?,revision=? WHERE media_id=? AND status='rejected' AND EXISTS(SELECT 1 FROM media_appeals WHERE id=? AND decision_nonce=?)`)
+        .bind(category, reason, timestamp, session.user_id, nextMediaRevision, appeal.media_id,id,decisionNonce),
+      env.DB.prepare("DELETE FROM media_deletion_queue WHERE object_key=? AND completed_at IS NULL AND EXISTS(SELECT 1 FROM media_appeals WHERE id=? AND decision_nonce=?)").bind(appeal.object_key,id,decisionNonce),
     );
   } else {
-    statements.push(env.DB.prepare("UPDATE media_deletion_queue SET next_attempt_at=? WHERE object_key=? AND completed_at IS NULL").bind(timestamp, appeal.object_key));
+    statements.push(env.DB.prepare("UPDATE media_deletion_queue SET next_attempt_at=? WHERE object_key=? AND completed_at IS NULL AND EXISTS(SELECT 1 FROM media_appeals WHERE id=? AND decision_nonce=?)").bind(timestamp, appeal.object_key,id,decisionNonce));
   }
   statements.push(env.DB.prepare(`
     INSERT INTO media_moderation_decisions(id,media_id,actor_user_id,previous_status,new_status,previous_category,new_category,reason,revision,created_at)
-    SELECT ?,?,?,?,?,?,?,?,?,? FROM media_appeals WHERE id=? AND revision=?
-  `).bind(safeUuid(), appeal.media_id, session.user_id, appeal.status, decision === "granted" ? "released" : "rejected", appeal.category, category, reason, nextMediaRevision, timestamp, id, nextAppealRevision));
+    SELECT ?,?,?,?,?,?,?,?,?,? FROM media_appeals WHERE id=? AND decision_nonce=?
+  `).bind(safeUuid(), appeal.media_id, session.user_id, appeal.status, decision === "granted" ? "released" : "rejected", appeal.category, category, reason, nextMediaRevision, timestamp, id,decisionNonce));
   const results = await env.DB.batch(statements);
   if (!Number(results[0]?.meta?.changes || 0)) throw new SocialError("decision_conflict", "คำอุทธรณ์นี้ถูกแก้ไขแล้ว", 409);
   await auditMediaSafety(env.DB, session.user_id, "decision", appeal.media_id, `${purpose}; ${reason}`.slice(0, 300));
@@ -1708,17 +1785,20 @@ async function ratings(request, env) {
   const session = await authenticated(request, env, { csrf: request.method === "POST" });
   const me = await requireProfile(env.DB, session.user_id);
   if (request.method === "GET") {
+    const paging=queuePage(request);
     const rows = await env.DB.prepare(`
       SELECT r.id, r.score, r.comment, r.created_at, p.name sender_name
       FROM proximity_ratings r JOIN member_profiles p ON p.user_id = r.sender_user_id
-      WHERE r.receiver_user_id = ? ORDER BY r.created_at DESC
-    `).bind(session.user_id).all();
-    return json({ ratings: rows.results || [] });
+      WHERE r.receiver_user_id = ? AND ${unblockedSql('r.sender_user_id','r.receiver_user_id')}
+      ORDER BY r.created_at DESC,r.id DESC LIMIT ? OFFSET ?
+    `).bind(session.user_id,paging.limit+1,paging.offset).all();
+    return queueResult(rows,'ratings',paging);
   }
   await limited(env, "rating_user_day", session.user_id, 30, 86400);
   const body = await readJson(request);
   const target = String(body.target || "");
   if (!target || target === session.user_id) throw new SocialError("invalid_target", "ไม่พบผู้ใช้", 404);
+  if(!await env.DB.prepare(`SELECT 1 ok WHERE ${eligibleSql('?')}`).bind(target).first())throw new SocialError('invalid_target','ไม่พบผู้ใช้',404);
   const score = Number(body.score);
   if (!Number.isInteger(score) || score < 1 || score > 5) throw new SocialError("invalid_score", "เลือกคะแนน 1–5");
   if (await isBlocked(env.DB, session.user_id, target)) throw new SocialError("blocked", "ไม่สามารถให้คะแนนผู้ใช้นี้", 403);
@@ -2036,7 +2116,7 @@ async function verification(request, env) {
 
 async function moderationVerification(request, env) {
   capability(env, "IDENTITY_VERIFICATION_ENABLED");
-  const { session, purpose } = await moderationAccess(request, env, ["identity_reviewer", "safety_admin"]);
+  const { session, purpose } = await moderationAccess(request, env, ["identity_reviewer"]);
   if (request.method === "GET") {
     const rows = await env.DB.prepare(`
       SELECT v.user_id, v.id_media_id, v.selfie_media_id, v.status, v.created_at, p.name
@@ -2092,7 +2172,7 @@ async function moderationVerification(request, env) {
 
 async function verificationMedia(request, env, id) {
   capability(env, "IDENTITY_VERIFICATION_ENABLED");
-  const { session, purpose } = await moderationAccess(request, env, ["identity_reviewer", "safety_admin"]);
+  const { session, purpose } = await moderationAccess(request, env, ["identity_reviewer"]);
   const media = await env.DB.prepare(`
     SELECT m.object_key, m.content_type, m.owner_user_id FROM social_media m
     JOIN identity_verification_requests v ON v.id_media_id = m.id OR v.selfie_media_id = m.id
@@ -2141,6 +2221,7 @@ export async function onRequest({ request, env }) {
     if (path === "/api/social/media/appeals" && ["GET", "POST"].includes(request.method)) return await mediaAppeals(request, env);
     if (path === "/api/social/moderation/notifications" && ["GET", "POST"].includes(request.method)) return await moderationNotifications(request, env);
     if (request.method === "GET" && path === "/api/social/moderation/overview") return await moderationOverview(request, env);
+    if(request.method==='GET'&&path==='/api/social/moderation/capabilities')return await moderationCapabilities(request,env);
     if (path === '/api/social/account-appeals' && ['GET','POST'].includes(request.method)) return await accountAppeals(request,env);
     if (path === '/api/social/moderation/accounts' && ['GET','POST'].includes(request.method)) return await moderationAccounts(request,env);
     if (path === "/api/social/moderation/roles" && ["GET", "POST"].includes(request.method)) return await moderationRoleManagement(request, env);
@@ -2171,7 +2252,7 @@ export async function onRequest({ request, env }) {
     if (/direct_chat_(recipient_limit|duplicate)/u.test(String(error?.message))) return failure('ส่งข้อความซ้ำหรือติดต่อสมาชิกใหม่บ่อยเกินไป กรุณารอ',429,'chat_spam_limited');
     if (error instanceof RequestError) return failure("คำขอไม่ถูกต้อง", error.status, error.code);
     if (error instanceof SocialError) return failure(error.message, error.status, error.code);
-    console.error(JSON.stringify({ event: "social_request_failed", reason: error?.message || "unknown" }));
+    console.error(JSON.stringify({ event: "social_request_failed", reason: "internal_error", type: error?.name === 'Error' ? 'Error' : 'Unhandled' }));
     return failure("ไม่สามารถดำเนินการได้ กรุณาลองใหม่", 500, "internal_error");
   }
 }

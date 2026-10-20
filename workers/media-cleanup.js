@@ -19,11 +19,20 @@ export async function drainMediaDeletionQueue(env, timestamp = unixTime()) {
   const due = await env.DB.prepare(`
     SELECT object_key, attempts FROM media_deletion_queue
     WHERE completed_at IS NULL AND next_attempt_at <= ? AND attempts < ?
+      AND (processing_nonce IS NULL OR lease_until<=?)
     ORDER BY created_at, object_key LIMIT ?
-  `).bind(timestamp, MAX_ATTEMPTS, BATCH_SIZE).all();
+  `).bind(timestamp, MAX_ATTEMPTS,timestamp, BATCH_SIZE).all();
   let completed = 0;
   let failed = 0;
   for (const row of due.results || []) {
+    const nonce=crypto.randomUUID();
+    // Claim before touching R2. An appeal cannot release an object being deleted;
+    // two cleanup invocations cannot both own the same operation.
+    const claim=await env.DB.prepare(`UPDATE media_deletion_queue SET processing_nonce=?,lease_until=?
+      WHERE object_key=? AND completed_at IS NULL AND (processing_nonce IS NULL OR lease_until<=?) AND next_attempt_at<=? AND attempts<10
+        AND NOT EXISTS(SELECT 1 FROM social_media m WHERE m.object_key=media_deletion_queue.object_key AND m.state<>'pending_deletion')`)
+      .bind(nonce,timestamp+300,row.object_key,timestamp,timestamp).run();
+    if(!claim.meta?.changes)continue;
     try {
       await env.MEDIA.delete(row.object_key);
       await env.DB.batch([
@@ -33,17 +42,17 @@ export async function drainMediaDeletionQueue(env, timestamp = unixTime()) {
         env.DB.prepare(`
           UPDATE media_deletion_queue
           SET completed_at = ?, attempts = attempts + 1, last_error_code = NULL
-          WHERE object_key = ? AND completed_at IS NULL
-        `).bind(timestamp, row.object_key),
+          WHERE object_key = ? AND completed_at IS NULL AND processing_nonce=?
+        `).bind(timestamp, row.object_key,nonce),
       ]);
       completed += 1;
     } catch {
       const attempts = Number(row.attempts || 0) + 1;
       await env.DB.prepare(`
         UPDATE media_deletion_queue
-        SET attempts = ?, next_attempt_at = ?, last_error_code = 'r2_delete_failed'
-        WHERE object_key = ? AND completed_at IS NULL
-      `).bind(attempts, timestamp + retryDelay(attempts), row.object_key).run();
+        SET attempts = ?, next_attempt_at = ?, last_error_code = 'r2_delete_failed',processing_nonce=NULL,lease_until=NULL
+        WHERE object_key = ? AND completed_at IS NULL AND processing_nonce=?
+      `).bind(attempts, timestamp + retryDelay(attempts), row.object_key,nonce).run();
       failed += 1;
     }
   }

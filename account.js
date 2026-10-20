@@ -122,11 +122,13 @@ fetch("/api/auth/me", { credentials: "same-origin" })
     document.getElementById("logout").hidden = false;
     document.getElementById("linking").hidden = !account.canLinkAccounts;
     document.getElementById("deletion").hidden = false;
+    document.getElementById('session-management').hidden=false;loadSessions();
     fetch("/api/social/config", { credentials: "same-origin" })
       .then((response) => response.ok ? response.json() : null)
       .then((config) => {
         if (config?.socialAppEnabled && account.nextPath === "/app/") document.getElementById("open-social").hidden = false;
         document.getElementById('account-appeals-link').hidden = !config?.accountModerationEnabled;
+        if(config?.moderationToolsEnabled)fetch('/api/social/moderation/capabilities',{credentials:'same-origin'}).then(r=>r.ok?r.json():null).then(c=>{document.getElementById('account-moderation-link').hidden=!(c?.canReviewReports||c?.canReviewMedia);}).catch(()=>{});
       })
       .catch(() => {});
     if (new URLSearchParams(window.location.search).get("reauth") === "account_deletion") {
@@ -207,4 +209,15 @@ document.getElementById("logout").addEventListener("click", async () => {
     headers: { "X-CSRF-Token": readCookie("__Host-cg_csrf") },
   });
   if (response.ok) window.location.replace("./");
+});
+
+async function loadSessions(){
+  try{const r=await fetch('/api/auth/sessions',{credentials:'same-origin'}),j=await r.json();if(!r.ok)throw Error(j.message||'โหลดเซสชันไม่สำเร็จ');const host=document.getElementById('session-list');host.replaceChildren(...j.sessions.map(s=>{const p=document.createElement('p');p.textContent=`${s.current?'เซสชันนี้':'เซสชันอื่น'} · เริ่ม ${new Date(s.createdAt*1000).toLocaleString('th-TH')} · หมดอายุ ${new Date(s.expiresAt*1000).toLocaleString('th-TH')}`;return p;}));document.getElementById('revoke-other-sessions').disabled=!j.sessions.some(s=>!s.current)&&!j.hasMore;}
+  catch(error){document.getElementById('session-message').textContent=error.message||'โหลดเซสชันไม่สำเร็จ กรุณารีเฟรชหน้า';}
+}
+document.getElementById('revoke-other-sessions').addEventListener('click',async(event)=>{
+  if(!confirm('ยืนยันออกจากระบบบนเซสชันอื่นทั้งหมดหรือไม่? เซสชันนี้จะยังใช้งานได้'))return;
+  event.currentTarget.disabled=true;
+  try{const r=await fetch('/api/auth/sessions',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json','x-csrf-token':readCookie('__Host-cg_csrf')},body:JSON.stringify({action:'revoke_others'})}),j=await r.json();if(!r.ok)throw Error(j.message||'ไม่สามารถเพิกถอนเซสชันได้');document.getElementById('session-message').textContent=`เพิกถอนเซสชันอื่นแล้ว ${j.revoked} รายการ`;await loadSessions();}
+  catch(error){document.getElementById('session-message').textContent=error.message;event.currentTarget.disabled=false;}
 });

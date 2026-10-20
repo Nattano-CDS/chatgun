@@ -33,6 +33,7 @@ jobs:
         env:
           CHATGUN_RELEASE_MODE: controlled-beta
       - run: npx playwright test --config=playwright.platform-local.config.js
+      - run: npx playwright test --config=playwright.full-system-local.config.js
       - run: npm run build
         env:
           CHATGUN_RELEASE_MODE: closed-prelaunch

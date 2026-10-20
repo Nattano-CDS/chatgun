@@ -67,7 +67,7 @@ test("root is the authenticated discovery entry while welcome retains marketing"
 
 test('authenticated shortcut is session-owned, deduplicated and independent of discovery visibility',async({page})=>{
  await page.route('**/api/social/profile',r=>r.fulfill({json:{profile:{user_id:'me',name:'นัท',bio:'โปรไฟล์ส่วนตัว',discovery_visible:0}}}));
- await page.route('**/api/social/discovery',r=>r.fulfill({json:{locationFresh:true,people:[{user_id:'me',name:'stale API copy',distance:1},{user_id:'other',name:'สมาชิกอื่น',distance:250}]}}));
+ await page.route('**/api/social/discovery?*',r=>r.fulfill({json:{locationFresh:true,people:[{user_id:'me',name:'stale API copy',distance:1},{user_id:'other',name:'สมาชิกอื่น',distance:250}]}}));
  await page.goto('/');
  const first=page.locator('#people-grid .person-card').first();
  await expect(first).toHaveAttribute('data-person','me');await expect(first.locator('.person-name')).toHaveText('นัท');

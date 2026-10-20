@@ -88,6 +88,7 @@ test("retention cleanup removes only expired or aged security records", async ()
     deletionRequests: 0,
     deletionReceipts: 0,
     stalePresence: 1,
+    expiredOnlineLeases:0,
     revokedAgeAssurance: 1,
     completedMediaQueue: 1,
   });

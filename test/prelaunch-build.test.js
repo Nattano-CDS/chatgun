@@ -24,7 +24,7 @@ test('runtime only polls the member\'s visible social surface',()=>{
   // Guard against reintroducing wasteful API traffic after Chat is hidden.
   assert.match(source,/state\.activeTab !== "chat" \|\| document\.visibilityState !== "visible" \|\| !navigator\.onLine/);
   assert.match(source,/if \(state\.activeTab === "near"\) void loadPeople\(\)/);
-  assert.match(source,/else if \(state\.activeTab === "chat"\) void loadRelationships\(\)/);
+  assert.match(source,/if\(state\.config\.messagingEnabled\)void loadRelationships\(\)/);
   assert.doesNotMatch(source,/setInterval\(\(\) => \{\s*document\.visibilityState === "visible" && navigator\.onLine && state\.config\?\.socialAppEnabled && state\.profile && Promise\.all\(\[loadPeople\(\), loadRelationships\(\)\]\)/);
 });
 

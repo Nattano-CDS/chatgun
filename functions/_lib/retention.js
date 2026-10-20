@@ -83,6 +83,11 @@ const CLEANUP_TARGETS = [
     values: (now, limit) => [now, now - STALE_PRESENCE_GRACE_SECONDS, limit],
   },
   {
+    name:'expiredOnlineLeases',
+    sql:'DELETE FROM member_presence_leases WHERE rowid IN (SELECT rowid FROM member_presence_leases WHERE touched_at<=? LIMIT ?)',
+    values:(now,limit)=>[now-90,limit],
+  },
+  {
     name: "revokedAgeAssurance",
     sql: `DELETE FROM age_assurance_events WHERE rowid IN (
       SELECT rowid FROM age_assurance_events
