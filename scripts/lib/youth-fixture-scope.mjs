@@ -7,7 +7,7 @@ export async function issueYouthFixtureSession(db,userId,{now,authenticatedAt=no
  return issueBoundedFixtureSession(db,userId,{now,authenticatedAt,expired});
 }
 export async function issueDevelopmentFixtureSession(db,userId,{now}){
- assert.ok(/^development-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}-(?:owner|viewer|moderator|other)(?:390|768|1440)$/u.test(userId),'Not a scoped development actor');
+ assert.ok(/^development-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}-(?:owner|viewer|moderator|other|held)(?:390|768|1440)$/u.test(userId),'Not a scoped development actor');
  return issueBoundedFixtureSession(db,userId,{now,authenticatedAt:now,expired:false});
 }
 async function issueBoundedFixtureSession(db,userId,{now,authenticatedAt,expired}){

@@ -5,7 +5,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { chmodSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 if(process.env.CHATGUN_ISOLATED_STAGING!=='issue13')throw Error('Explicit isolated staging acknowledgement required');
-const root='docs/development-completion/',result=JSON.parse(readFileSync(root+'full-system-cloud-browser.json'));assert.equal(result.stats.unexpected,0);assert.equal(result.stats.expected,7);
+const root='docs/development-completion/',result=JSON.parse(readFileSync(root+'full-system-cloud-browser.json'));assert.equal(result.stats.unexpected,0);assert.ok([7,10].includes(result.stats.expected));
 const account='23017b53386fb67fc62a52cdd017454c',database='275d9820-6aec-494a-8bb5-b7ed9b8b74cc',bucket='chatgun-issue13-media',origin='https://issue13.chatgun-issue13-staging.pages.dev';
 const{token}=JSON.parse(execFileSync('npx',['wrangler@4.151.1','auth','token','--json'],{encoding:'utf8'}));
 async function cf(path,body){const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+path,{method:body?'POST':'GET',headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})}),j=await r.json();assert.ok(r.ok&&j.success,'Scoped fixture request failed');return j.result;}

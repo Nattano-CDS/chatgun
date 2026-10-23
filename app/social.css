@@ -300,7 +300,7 @@ body:not([data-active-tab="near"]) .app .toolbar h1{font-size: 25px; color: var(
 .moderation-daily-grid strong, .moderation-daily-grid span{display: block;}
 .moderation-daily-grid strong{margin-bottom: 3px; font-size: 20px;}
 .moderation-daily-grid span{color: var(--muted); font-size: 12px;}
-.moderation-results{display: grid; gap: 12px;}
+.moderation-results{display: grid; gap: 12px; min-width:0; overflow-wrap:anywhere;}
 .moderation-card{padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: rgb(255, 255, 255); box-shadow: rgba(43, 33, 74, 0.04) 0px 8px 26px;}
 .moderation-card header{display: flex; justify-content: space-between; gap: 12px;}
 .moderation-card header > div:first-child{display: grid; gap: 4px;}

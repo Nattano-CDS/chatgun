@@ -43,8 +43,8 @@ test('optional API failure leaves profile and navigation usable, with explicit r
 });
 
 for(const width of[390,768,1440])test(`held account real-handler privacy and deletion journey ${width}`,async({browser})=>{
- test.skip(Boolean(cloud),'Local-only held fixtures; never create or modify remote youth accounts');
- const s=JSON.parse(readFileSync('/tmp/chatgun-issue16-local-sessions.json'))['held'+width];
+ const fixtureSessions=cloud?.sessions||JSON.parse(readFileSync('/tmp/chatgun-issue16-local-sessions.json'));
+ const s=fixtureSessions['held'+width];
  const context=await browser.newContext({baseURL:origin,ignoreHTTPSErrors:true,viewport:{width,height:900}});
  try{
   for(const[name,value]of[['__Host-cg_session',s.token],['__Host-cg_csrf',s.csrf]])await context.addCookies([{name,value,url:origin,secure:true,sameSite:'Lax'}]);
@@ -58,17 +58,17 @@ for(const width of[390,768,1440])test(`held account real-handler privacy and del
   await page.locator('#eligibility-form button').click();await expect(page.locator('#eligibility-history')).toContainText('รอทบทวน');
   page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'ถอนคำขอทบทวน (ข้อจำกัดยังคงอยู่)',exact:true}).click();await expect(page.locator('#eligibility-history')).toContainText('ถอนคำขอแล้ว');
   await page.locator('#eligibility-reason').fill('ยื่นข้อมูลคำขอแก้ไขใหม่สำหรับการตรวจสิทธิ์ตามแบบทดสอบระบบ');await page.locator('#eligibility-form button').click();await expect(page.locator('#eligibility-form')).toBeHidden();
-  const admin=JSON.parse(readFileSync('/tmp/chatgun-issue16-local-sessions.json'))['moderator'+width],adminContext=await browser.newContext({baseURL:origin,ignoreHTTPSErrors:true,viewport:{width,height:900}});
+  const admin=fixtureSessions['moderator'+width],otherId=fixtureSessions['other'+width].userId||'other'+width,adminContext=await browser.newContext({baseURL:origin,ignoreHTTPSErrors:true,viewport:{width,height:900}});
   try{
     for(const[name,value]of[['__Host-cg_session',admin.token],['__Host-cg_csrf',admin.csrf]])await adminContext.addCookies([{name,value,url:origin,secure:true,sameSite:'Lax'}]);
-    const adminPage=await adminContext.newPage();adminPage.on('dialog',d=>d.accept(d.message().includes('รหัสบัญชีภายใน')?'other'+width:d.message().startsWith('บทบาท:')?'report_reviewer':d.message().includes('ระยะเวลาสิทธิ์')?'168':'รอแนวทางกฎหมายและมาตรการคุ้มครองที่ได้รับอนุมัติ'));await adminPage.goto('/app/moderation.html');
+    const adminPage=await adminContext.newPage();adminPage.on('dialog',d=>d.accept(d.message().includes('รหัสบัญชีภายใน')?otherId:d.message().startsWith('บทบาท:')?'report_reviewer':d.message().includes('ระยะเวลาสิทธิ์')?'2':'รอแนวทางกฎหมายและมาตรการคุ้มครองที่ได้รับอนุมัติ'));await adminPage.goto('/app/moderation.html');
     await adminPage.getByRole('button',{name:'คำขอทบทวนสิทธิ์ตามอายุ',exact:true}).click();await expect(adminPage.locator('[data-eligibility]')).toHaveCount(1);
     await adminPage.getByRole('button',{name:'รอแนวทางอนุมัติ',exact:true}).click();await expect(adminPage.locator('[data-eligibility]')).toHaveCount(0);
     await adminPage.getByRole('button',{name:'บัญชีสมาชิก',exact:true}).click();await expect(adminPage.locator('#moderation-results')).toContainText('คิวอ่านอย่างเดียว');
     expect(await adminPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     await adminPage.getByRole('button',{name:'คำขอลบบัญชี',exact:true}).click();await expect(adminPage.locator('#moderation-status')).toContainText('โหลดข้อมูลเรียบร้อย');
     await adminPage.getByRole('button',{name:'สิทธิ์ผู้ดูแล',exact:true}).click();await adminPage.getByRole('button',{name:'ให้สิทธิ์ที่มีวันหมดอายุ',exact:true}).click();
-    const granted=adminPage.locator('#moderation-results article').filter({has:adminPage.getByRole('heading',{name:'other'+width,exact:true})});await expect(granted).toHaveCount(1);
+    const granted=adminPage.locator('#moderation-results article').filter({has:adminPage.getByRole('heading',{name:otherId,exact:true})});await expect(granted).toHaveCount(1);
     await granted.getByRole('button',{name:'ถอนสิทธิ์',exact:true}).click();await expect(granted).toHaveCount(0);
     await adminPage.screenshot({path:dir+'/admin-member-operations-'+width+'.png',fullPage:true});
   }finally{await adminContext.close();}

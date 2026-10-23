@@ -24,7 +24,7 @@ const db={prepare(sql){let params=[];return{bind(...v){params=v;return this;},as
 // Parameterized adapter with genuine remote D1 batch semantics.
 db.prepare=sql=>{let params=[];return{bind(...v){params=v;return this;},parameters(){return{sql,params};},async run(){return query(sql,params);},async first(){return(await query(sql,params)).results[0]||null;}};};
 const run='development-'+randomUUID(),now=unixTime(),sessions={};
-for(const width of[390,768,1440])for(const kind of['owner','viewer','moderator','other']){
+for(const width of[390,768,1440])for(const kind of['owner','viewer','moderator','other','held']){
  const id=run+'-'+kind+width;
  await cf('/d1/database/'+databaseId+'/query',{batch:[
  {sql:"INSERT INTO users(id,display_name,status,created_at,updated_at)VALUES(?,?,'active',?,?)",params:[id,'ระบบทดสอบแยก '+kind,now,now]},
@@ -32,7 +32,9 @@ for(const width of[390,768,1440])for(const kind of['owner','viewer','moderator',
  {sql:'INSERT INTO member_profiles(user_id,age_assurance_id,name,created_at,updated_at)VALUES(?,?,?,?,?)',params:[id,id+'-adult','ระบบทดสอบแยก '+kind,now,now]},
  {sql:"INSERT INTO beta_enrollments(user_id,status,created_at,activated_at)VALUES(?,'active',?,?)",params:[id,now,now]},
  ]});
+ if(kind==='held')await query("INSERT INTO member_age_safety_holds VALUES(?,'13_17','held','isolated-automated-fixture',?,?)",[id,now,now]);
  if(['owner','moderator'].includes(kind))for(const role of['report_reviewer','safety_admin'])await query('INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES(?,?,?,?,?,?)',[randomUUID(),id,role,'Isolated automated regression fixture only',now,now+1800]);
+ if(kind==='moderator')await query("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES(?,?,'moderation_admin','Isolated automated role UI verification only',?,?)",[randomUUID(),id,now,now+1800]);
  sessions[kind+width]={...await issueDevelopmentFixtureSession(db,id,{now}),userId:id};
 }
 const deletionMedia=[];
@@ -43,4 +45,4 @@ for(const width of[390,768,1440]){
 }
 const bundle={origin,databaseId,run,sessions,deletionMedia,preserved,applicationSha:release.commit,createdAt:now,syntheticOnly:true};const bundleFile=join(directory,'sessions.json');writeFileSync(bundleFile,JSON.stringify(bundle),{mode:0o600});
 writeFileSync('/tmp/chatgun-development-fixture-path',bundleFile,{mode:0o600});
-mkdirSync('docs/development-completion',{recursive:true});writeFileSync('docs/development-completion/cloud-fixture-preparation.json',JSON.stringify({checkedAt:new Date().toISOString(),accountId:account,isolatedDatabase:databaseId,migrations:21,newSyntheticUsers:12,noProviderIdentitiesCreated:true,productionWrites:0,productionSha:production.canonical_deployment.deployment_trigger.metadata.commit_hash,originalStagingUntouched:true,privateSessionHandoff:true,foreignKeyViolations:(await query('SELECT COUNT(*) n FROM pragma_foreign_key_check')).results[0].n},null,2)+'\n');console.log('12 new isolated fixtures prepared. Session bundle stays private; pointer saved locally. No Production writes.');
+mkdirSync('docs/development-completion',{recursive:true});writeFileSync('docs/development-completion/cloud-fixture-preparation.json',JSON.stringify({checkedAt:new Date().toISOString(),accountId:account,isolatedDatabase:databaseId,migrations:21,newSyntheticUsers:15,noProviderIdentitiesCreated:true,productionWrites:0,productionSha:production.canonical_deployment.deployment_trigger.metadata.commit_hash,originalStagingUntouched:true,privateSessionHandoff:true,foreignKeyViolations:(await query('SELECT COUNT(*) n FROM pragma_foreign_key_check')).results[0].n},null,2)+'\n');console.log('15 new isolated fixtures prepared. Session bundle stays private; pointer saved locally. No Production writes.');

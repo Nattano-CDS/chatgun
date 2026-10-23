@@ -8,7 +8,7 @@ import {randomUUID,createHash} from 'node:crypto';
 import {assertYouthFixtureScope,issueYouthFixtureSession} from './lib/youth-fixture-scope.mjs';
 
 assert.equal(process.env.CHATGUN_ISOLATED_STAGING,'issue13');
-const mode=process.argv[2];assert.ok(['prepare','verify'].includes(mode));
+const mode=process.argv[2];assert.ok(['prepare','verify','revoke'].includes(mode));
 const account='23017b53386fb67fc62a52cdd017454c',database='275d9820-6aec-494a-8bb5-b7ed9b8b74cc';
 const origin='https://issue13.chatgun-issue13-staging.pages.dev',privateRoot='/Users/nattano/.codex/private-backups/chatgun/';
 const pointer='/tmp/chatgun-youth-e2e-manifest-path';
@@ -73,6 +73,10 @@ if(mode==='prepare'){
  for(const a of m.actors){
   assert.ok(a.id.startsWith(m.run+'-'));
   await query('UPDATE sessions SET revoked_at=? WHERE user_id=? AND revoked_at IS NULL',[Math.floor(Date.now()/1000),a.id]);
+ }
+ if(mode==='revoke'){
+  console.log('Exact synthetic batch sessions revoked; accounts retained. No E2E or baseline-preservation PASS is claimed.');
+  process.exit(0);
  }
  for(const a of m.actors){
   assert.ok(a.id.startsWith(m.run+'-'));
