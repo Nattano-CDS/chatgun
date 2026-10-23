@@ -1,0 +1,78 @@
+{
+  "checkedAt": "2026-10-23T20:04:17.658Z",
+  "counts": {
+    "users": 0,
+    "identities": 0,
+    "sessions": 0,
+    "social_media": 0,
+    "moderation_access_grants": 0,
+    "beta_invitations": 0,
+    "cloudflare_admin_sessions": 0
+  },
+  "foreignKeyViolations": 0,
+  "schema": 21,
+  "workers": [
+    {
+      "name": "chatgun-final-uat-privacy-cleanup",
+      "bindings": [
+        {
+          "name": "DB",
+          "type": "d1",
+          "id": "e3cb426c-b88a-4b93-90fd-39df524f68ae"
+        },
+        {
+          "name": "RETENTION_CLEANUP_ENABLED",
+          "type": "plain_text"
+        }
+      ],
+      "cron": "17 3 * * *",
+      "publicEndpoint": false,
+      "actualScheduledExecution": "NOT RUN",
+      "manualScopedCleanup": "PASS (media queue)"
+    },
+    {
+      "name": "chatgun-final-uat-media-cleanup",
+      "bindings": [
+        {
+          "name": "DB",
+          "type": "d1",
+          "id": "e3cb426c-b88a-4b93-90fd-39df524f68ae"
+        },
+        {
+          "name": "MEDIA",
+          "type": "r2_bucket",
+          "bucket_name": "chatgun-final-uat-media"
+        },
+        {
+          "name": "MEDIA_CLEANUP_ENABLED",
+          "type": "plain_text"
+        }
+      ],
+      "cron": "37 3 * * *",
+      "publicEndpoint": false,
+      "actualScheduledExecution": "NOT RUN",
+      "manualScopedCleanup": "PASS (media queue)"
+    }
+  ],
+  "emptyDatabaseReadProbe": {
+    "rowsRead": 0,
+    "rowsWritten": 0,
+    "durationMs": 0.1308
+  },
+  "readProbeLimit": "Empty UAT sentinel query; not real-member traffic/capacity evidence",
+  "remainingDeployments": [
+    {
+      "id": "0759f84c-85d7-4c8e-8caf-09fbe7122bba",
+      "environment": "preview",
+      "branch": "engineering",
+      "sha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a"
+    },
+    {
+      "id": "d4aab7fb-9cb7-44dc-9711-ef9802b37e8c",
+      "environment": "preview",
+      "branch": "uat",
+      "sha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a"
+    }
+  ],
+  "productionMutations": 0
+}

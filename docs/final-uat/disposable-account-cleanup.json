@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-23T19:59:59.850Z",
+  "exactManifestActors": 15,
+  "alreadyDeletedByAuthorizedBrowserTests": -165,
+  "remainingSyntheticAccountsDeleted": 180,
+  "remainingUsers": 0,
+  "remainingIdentities": 0,
+  "remainingMedia": 0,
+  "foreignKeyViolations": 0,
+  "protectedBackup": true,
+  "sqliteRestore": "PASS",
+  "productionWrites": 0,
+  "protectedStagingWrites": 0,
+  "minimizedTestAuditRecordsPreserved": true
+}
