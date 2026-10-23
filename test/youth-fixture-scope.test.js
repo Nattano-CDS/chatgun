@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {assertYouthFixtureScope,issueYouthFixtureSession} from '../scripts/lib/youth-fixture-scope.mjs';
+import {assertYouthFixtureScope,issueYouthFixtureSession,issueDevelopmentFixtureSession} from '../scripts/lib/youth-fixture-scope.mjs';
 import {TestD1} from './helpers/d1.js';
 function manifest(){const run='youth-e2e-00000000-0000-4000-8000-000000000001',session={token:'x'.repeat(43),csrf:'y'.repeat(43)};
  return{syntheticOnly:true,database:'275d9820-6aec-494a-8bb5-b7ed9b8b74cc',origin:'https://issue13.chatgun-issue13-staging.pages.dev',applicationSha:'a'.repeat(40),run,
@@ -28,5 +28,13 @@ test('failure between fixture inserts cannot leave an unbounded or fresh-auth se
   await assert.rejects(issueYouthFixtureSession(failing,id,{now:1000}),/setup interruption/);
   assert.equal((await db.prepare('SELECT expires_at FROM sessions').first()).expires_at,2800);
   assert.equal((await db.prepare('SELECT COUNT(*) n FROM session_auth_evidence').first()).n,0);
+ }finally{db.close();}
+});
+test('development fixture sessions reject unrelated IDs and expire in thirty minutes from their first insert',async()=>{
+ const db=new TestD1(),id='development-00000000-0000-4000-8000-000000000001-owner390';try{
+  await assert.rejects(issueDevelopmentFixtureSession(db,'real-owner',{now:1000}),/scoped development actor/);
+  await db.prepare("INSERT INTO users(id,status,created_at,updated_at)VALUES(?,'active',1,1)").bind(id).run();
+  await issueDevelopmentFixtureSession(db,id,{now:1000});
+  const row=await db.prepare('SELECT expires_at FROM sessions').first();assert.equal(row.expires_at,2800);
  }finally{db.close();}
 });

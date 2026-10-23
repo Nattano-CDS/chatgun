@@ -1,16 +1,23 @@
 // Exact manifests from this workstream only. Never resets a database or touches
 // pre-existing fixture users/objects. Production is not a selectable target.
 import assert from'node:assert/strict';import{execFileSync}from'node:child_process';import{readFileSync,writeFileSync}from'node:fs';import{drainMediaDeletionQueue}from'../workers/media-cleanup.js';
+import { DatabaseSync } from 'node:sqlite';
+import { chmodSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 if(process.env.CHATGUN_ISOLATED_STAGING!=='issue13')throw Error('Explicit isolated staging acknowledgement required');
 const root='docs/development-completion/',result=JSON.parse(readFileSync(root+'full-system-cloud-browser.json'));assert.equal(result.stats.unexpected,0);assert.equal(result.stats.expected,7);
 const account='23017b53386fb67fc62a52cdd017454c',database='275d9820-6aec-494a-8bb5-b7ed9b8b74cc',bucket='chatgun-issue13-media',origin='https://issue13.chatgun-issue13-staging.pages.dev';
 const{token}=JSON.parse(execFileSync('npx',['wrangler@4.151.1','auth','token','--json'],{encoding:'utf8'}));
 async function cf(path,body){const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+path,{method:body?'POST':'GET',headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})}),j=await r.json();assert.ok(r.ok&&j.success,'Scoped fixture request failed');return j.result;}
 const p=await cf('/pages/projects/chatgun-issue13-staging');assert.equal(p.deployment_configs.preview.d1_databases.DB.id,database);assert.equal(p.deployment_configs.preview.r2_buckets.MEDIA.name,bucket);
+assert.equal((await cf('')).id,account);
 const query=async(sql,params=[])=>(await cf('/d1/database/'+database+'/query',{sql,params}))[0];
 const db={prepare(sql){let params=[];return{bind(...v){params=v;return this;},parameters(){return{sql,params};},async run(){return query(sql,params);},async all(){return query(sql,params);},async first(){return(await query(sql,params)).results[0]||null;}};},batch:statements=>cf('/d1/database/'+database+'/query',{batch:statements.map(s=>s.parameters())})};
-const paths=JSON.parse(readFileSync('/tmp/chatgun-development-fixture-history.json')),keys=new Set(),ids=new Set();let queued=0,revoked=0,grants=0;const checks=[];
-for(const file of paths){assert.ok(file.startsWith('/Users/nattano/.codex/private-backups/chatgun/development-fixtures-')&&file.endsWith('/sessions.json'));const b=JSON.parse(readFileSync(file));assert.equal(b.databaseId,database);assert.equal(b.origin,origin);assert.match(b.run,/^development-[a-f0-9-]{36}$/);
+// Only this explicitly selected batch, never a shared historical manifest list.
+assert.ok(process.env.CHATGUN_FULL_SYSTEM_BUNDLE,'Exact current manifest required');
+const paths=[process.env.CHATGUN_FULL_SYSTEM_BUNDLE],keys=new Set(),ids=new Set();let queued=0,revoked=0,grants=0;const checks=[];
+for(const file of paths){assert.ok(file.startsWith('/Users/nattano/.codex/private-backups/chatgun/development-fixtures-')&&file.endsWith('/sessions.json'));const b=JSON.parse(readFileSync(file));assert.equal(b.databaseId,database);assert.equal(b.origin,origin);assert.match(b.run,/^development-[a-f0-9-]{36}$/);assert.ok(b.preserved,'Protected baseline required');
+ assert.equal((await(await fetch(origin+'/release.json')).json()).commit,b.applicationSha);
  for(const entry of b.deletionMedia||[]){assert.ok(entry.ownerId.startsWith(b.run+'-'));keys.add(entry.objectKey);}
  for(const s of Object.values(b.sessions)){
   assert.ok(s.userId.startsWith(b.run+'-'));ids.add(s.userId);
@@ -30,4 +37,11 @@ assert.equal((await query('SELECT COUNT(*) n FROM pragma_foreign_key_check')).re
 const memberIds=[...ids],placeholders=memberIds.map(()=>'?').join(',');assert.equal((await query(`SELECT COUNT(*) n FROM sessions WHERE user_id IN (${placeholders}) AND revoked_at IS NULL`,memberIds)).results[0].n,0);assert.equal((await query(`SELECT COUNT(*) n FROM moderation_access_grants WHERE user_id IN (${placeholders}) AND revoked_at IS NULL`,memberIds)).results[0].n,0);
 assert.equal((await query(`SELECT COUNT(*) n FROM beta_enrollments WHERE user_id IN (${placeholders}) AND status='active'`,memberIds)).results[0].n,0);
 checks.push({name:'Only exact manifest-owned R2 objects deleted; unrelated queues unchanged',status:'PASS'},{name:'All fixture sessions and temporary grants revoked',status:'PASS'},{name:'Foreign keys valid after fixture account deletion and R2 cleanup',status:'PASS'});
+const manifest=JSON.parse(readFileSync(paths[0])),after=paths[0].replace('/sessions.json','/isolated-after-fixtures.sql');
+execFileSync('npx',['wrangler@4.151.1','d1','export',database,'--remote','--output='+after,'--config=wrangler.issue13.jsonc'],{env:{...process.env,CLOUDFLARE_ACCOUNT_ID:account},stdio:'pipe'});chmodSync(after,0o600);
+const local=new DatabaseSync(':memory:');local.exec('PRAGMA foreign_keys=OFF');local.exec(readFileSync(after,'utf8'));assert.equal(local.prepare('PRAGMA foreign_key_check').all().length,0);
+for(const[name,hashes]of Object.entries(manifest.preserved)){
+ const current=new Set(local.prepare('SELECT * FROM "'+name.replaceAll('"','""')+'"').all().map(row=>createHash('sha256').update(JSON.stringify(row)).digest('hex')));
+ assert.ok(hashes.every(hash=>current.has(hash)),'Existing isolated rows changed in '+name);
+}local.close();checks.push({name:'Every pre-existing isolated row preserved by private backup hashes',status:'PASS'});
 writeFileSync(root+'cloud-cleanup.json',JSON.stringify({checkedAt:new Date().toISOString(),database,bucket,fixtureBatches:paths.length,manifestFixtureUsers:ids.size,fixtureMediaQueued:queued,objectsCompleted:keyList.length,sessionsRevokedInThisRun:revoked,temporaryGrantsRevokedInThisRun:grants,activeFixtureSessionsRemaining:0,activeFixtureGrantsRemaining:0,unrelatedPendingQueueRowsUnchanged:unrelatedBefore,cleanup,checks,productionWrites:0,existingFixtureUsersDeleted:0,protectedStagingWrites:0},null,2)+'\n');console.log('Exact new-fixture R2 cleanup, session revocation and foreign-key verification completed. Existing fixture accounts preserved.');

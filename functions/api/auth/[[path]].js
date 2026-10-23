@@ -1,5 +1,6 @@
 import { constantTimeEqual, hmac, randomOtp, randomToken, safeUuid, sha256 } from "../../_lib/crypto.js";
 import { enabledOAuthProviders } from "../../_lib/oauth-provider-gates.js";
+import { eligibilityRequest } from '../../_lib/eligibility-review.js';
 import {
   CSRF_COOKIE,
   OAUTH_COOKIE,
@@ -657,6 +658,7 @@ export async function onRequest({ request, env }) {
       return failure("ไม่อนุญาตวิธีเรียกนี้", 405, "method_not_allowed");
     }
     if (request.method === "GET" && path === "/api/auth/me") return await currentUser(request, env);
+    if (path === '/api/auth/eligibility-review' && ['GET','POST'].includes(request.method)) return await eligibilityRequest(request, env);
     if (request.method === "GET" && path === "/api/auth/acceptance") return await acceptanceStatus(request, env);
     if (request.method === "POST" && path === "/api/auth/acceptance") return await acceptRequirements(request, env);
     if (request.method === "POST" && path === "/api/auth/acceptance/decline") return await declineAcceptance(request, env);

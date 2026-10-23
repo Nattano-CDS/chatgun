@@ -272,12 +272,13 @@ async function load(view = state.view) {
   document.querySelectorAll("[data-load]").forEach((item) => item.classList.toggle("active", item.dataset.load === view));
   $("#moderation-stats").hidden = view !== "overview";
   $("#moderation-daily").hidden = view !== "overview";
-  const mediaView=["pending", "approved", "sensitive", "rejected"].includes(view),caseView=['user-reports','media-reports','appeals'].includes(view);
-  $("#moderation-filters").hidden = !mediaView&&!caseView;
+  const mediaView=["pending", "approved", "sensitive", "rejected"].includes(view),caseView=['user-reports','media-reports','appeals','eligibility'].includes(view);
+  $("#moderation-filters").hidden = !mediaView&&!caseView&&view!=='members';
+  $('#moderation-search').closest('label').hidden=view==='eligibility';
   $("#moderation-category").closest('label').hidden=!mediaView;
   $("#moderation-case-status-label").hidden=!caseView;
-  if(caseView&&previousView!==view){const choices=view==='appeals'?[['pending','รอดำเนินการ'],['granted','อนุมัติ'],['denied','ยืนยันคำตัดสินเดิม'],['withdrawn','ถอนคำอุทธรณ์']]:[['pending','รอดำเนินการ'],['escalated','ยกระดับ'],['reviewed','ตรวจแล้ว'],['closed','ปิดรายการ']];$('#moderation-case-status').replaceChildren(...choices.map(([value,label])=>{const el=node('option',label);el.value=value;return el;}));}
-  $("#moderation-pagination").hidden = !mediaView&&!caseView&&view!=='audit'&&!view.startsWith('account-');
+  if(caseView&&previousView!==view){const choices=view==='eligibility'?[['pending','รอทบทวน'],['withdrawn','ถอนคำขอ'],['upheld','คงข้อจำกัด'],['deferred','รอแนวทางอนุมัติ']]:view==='appeals'?[['pending','รอดำเนินการ'],['granted','อนุมัติ'],['denied','ยืนยันคำตัดสินเดิม'],['withdrawn','ถอนคำอุทธรณ์']]:[['pending','รอดำเนินการ'],['escalated','ยกระดับ'],['reviewed','ตรวจแล้ว'],['closed','ปิดรายการ']];$('#moderation-case-status').replaceChildren(...choices.map(([value,label])=>{const el=node('option',label);el.value=value;return el;}));}
+  $("#moderation-pagination").hidden = !mediaView&&!caseView&&!['audit','eligibility','members','deletions'].includes(view)&&!view.startsWith('account-');
   const caseQuery=new URLSearchParams({page:String(state.page),status:$('#moderation-case-status').value||'pending',q:$('#moderation-search').value.trim()});
   let payload;
   if (view === "overview") { payload = await api("/api/social/moderation/overview", { routine: true }); renderStats(payload.counts); renderDaily(payload.daily, payload.cleanup); renderCoverage(payload.coverage); empty("เลือกงานด่วนหรือคิวด้านบนเพื่อเริ่มตรวจสอบ"); }
@@ -297,6 +298,32 @@ async function load(view = state.view) {
   else if (view === "media-reports") { payload = await api('/api/social/moderation/media-reports?'+caseQuery); renderMediaReports(payload.reports || []); }
   else if (view === "appeals") { payload = await api('/api/social/moderation/appeals?'+caseQuery); renderAppeals(payload.appeals || []); }
   else if (view === "audit") { payload = await api(`/api/social/moderation/audit?page=${state.page}`); renderAudit(payload.events || [],payload.accessEvents||[]); }
+  else if(view==='eligibility'){
+    payload=await api('/api/social/moderation/eligibility?'+caseQuery);
+    const results=$('#moderation-results');results.replaceChildren();
+    results.append(node('p','คิวนี้คงข้อจำกัดไว้เท่านั้น ไม่อนุญาตให้ปลดล็อกผู้เยาว์หรือรับเอกสารยืนยันตัวตน'));
+    for(const item of payload.items||[]){const card=node('article',undefined,'panel');card.dataset.eligibility=item.id;card.dataset.revision=item.revision;
+      card.append(node('h3','คำขอ '+item.id),node('p',item.reason),node('p','สถานะ: '+item.status));
+      if(item.decision_reason)card.append(node('p','เหตุผลการตัดสิน: '+item.decision_reason));
+      if(item.status==='pending')card.append(button('คงข้อจำกัด','eligibility','upheld'),button('รอแนวทางอนุมัติ','eligibility','deferred'));results.append(card);
+    }
+    if(!payload.items?.length)results.append(node('p','ไม่มีคำขอรอพิจารณา'));
+  }
+  else if(['members','deletions'].includes(view)){
+    payload=await api('/api/social/moderation/members?view='+view+'&page='+state.page+'&q='+encodeURIComponent($('#moderation-search').value.trim()));
+    const results=$('#moderation-results');results.replaceChildren(node('p','คิวอ่านอย่างเดียว ไม่มีปุ่มลบบัญชีหรือให้สิทธิ์โดยข้ามการยืนยันตัวตน'));
+    for(const item of payload.items||[]){const card=node('article',undefined,'panel');card.append(node('h3',item.id||item.request_id));
+      if(view==='members')card.append(node('p',`สถานะ: ${item.status} / ${item.account_state} · Beta: ${item.beta_status||'ไม่มี'} · จำกัดบัญชี: ${item.restricted?'ใช่':'ไม่'} · รอทบทวนอายุ: ${item.age_review_required?'ใช่':'ไม่'}`));
+      else card.append(node('p',`สถานะ: ${item.status} · หมดอายุ ${new Date(item.expires_at*1000).toLocaleString('th-TH')}`));results.append(card);
+    }
+    if(!payload.items?.length)results.append(node('p','ไม่มีรายการ'));
+  }
+  else if(view==='roles'){
+    payload=await api('/api/social/moderation/roles');const results=$('#moderation-results');results.replaceChildren(node('p','การให้หรือถอนสิทธิ์ต้องยืนยันบัญชีเป้าหมาย เหตุผล และการเข้าสู่ระบบล่าสุด บัญชี Cloudflare ไม่ได้สร้างสิทธิ์ให้อัตโนมัติ'));
+    results.append(button('ให้สิทธิ์ที่มีวันหมดอายุ','role-grant'));
+    for(const grant of payload.grants||[]){const card=node('article',undefined,'panel');card.append(node('h3',grant.user_id),node('p',`${grant.role} · หมดอายุ ${new Date(grant.expires_at*1000).toLocaleString('th-TH')}`));if(!grant.revoked_at)card.append(button('ถอนสิทธิ์','role-revoke',grant.id));results.append(card);}
+    for(const event of payload.events||[]){const card=node('article',undefined,'panel');card.append(node('h3',event.action+' · '+event.role),node('p',event.reason));results.append(card);}
+  }
   else if(view.startsWith('account-')){const kind={'account-restrictions':'restrictions','account-appeals':'appeals','account-history':'history'}[view];payload=await api('/api/social/moderation/accounts?view='+kind+'&page='+state.page);renderAccountOperations(payload.items||[],view);}
   state.hasMore = Boolean(payload?.hasMore);
   $("#moderation-page").textContent = `หน้า ${state.page.toLocaleString("th-TH")}`;
@@ -338,6 +365,23 @@ document.addEventListener("click", async (event) => {
   const action = event.target.closest("[data-action]");
   if (!action) return;
   try {
+    if(['role-grant','role-revoke'].includes(action.dataset.action)){
+      const reason=prompt('เหตุผลการเปลี่ยนสิทธิ์ (10–300 ตัวอักษร)');if(!reason||reason.trim().length<10)return;
+      let body={action:'revoke',grantId:action.dataset.value,reason};
+      if(action.dataset.action==='role-grant'){
+        const userId=prompt('รหัสบัญชีภายในที่ตรวจสอบและได้รับอนุมัติแล้ว');if(!userId)return;
+        const role=prompt('บทบาท: report_reviewer / safety_admin / moderation_admin / identity_reviewer');if(!role)return;
+        const hours=Number(prompt('ระยะเวลาสิทธิ์เป็นชั่วโมง (1–2160)', '168'));if(!Number.isInteger(hours)||hours<1||hours>2160)throw Error('ระยะเวลาไม่ถูกต้อง');
+        if(!confirm(`ยืนยันให้สิทธิ์ ${role} แก่บัญชี ${userId} เป็นเวลา ${hours} ชั่วโมง?`))return;
+        body={action:'grant',userId:userId.trim(),role:role.trim(),expiresAt:Math.floor(Date.now()/1000)+hours*3600,reason};
+      }else if(!confirm('ยืนยันถอนสิทธิ์รายการนี้หรือไม่?'))return;
+      await api('/api/social/moderation/roles',{method:'POST',body});await load();return;
+    }
+    if(action.dataset.action==='eligibility'){
+      const reason=prompt('บันทึกเหตุผล 10–300 ตัวอักษร (ไม่มีการปลดล็อกสิทธิ์อายุ)');if(!reason||reason.trim().length<10)return;
+      const card=action.closest('[data-eligibility]');
+      await api('/api/social/moderation/eligibility',{method:'POST',body:{id:card.dataset.eligibility,revision:Number(card.dataset.revision),action:action.dataset.value,reason}});await load();return;
+    }
     if(action.dataset.action==='open-queue'){state.page=1;await load(action.dataset.value);return;}
     if(action.dataset.action.startsWith('account-')){
       const reason=prompt('บันทึกเหตุผลสำหรับการตัดสินสิทธิ์ Beta (อย่างน้อย 10 ตัวอักษร)');if(!reason||reason.trim().length<10)return;
@@ -388,6 +432,9 @@ async function initializeAdmin() {
  state.accountOps=c.accountModerationEnabled===true;document.querySelectorAll('[data-account-ops]').forEach(el=>el.hidden=!state.accountOps);
  if(!c.moderationToolsEnabled)return;
  const grants=await api('/api/social/moderation/capabilities',{routine:true});
+ document.querySelector('[data-load="eligibility"]').hidden=!grants.canReviewEligibility;
+ document.querySelector('[data-load="roles"]').hidden=!grants.canManageRoles;
+ for(const view of ['members','deletions'])document.querySelector(`[data-load="${view}"]`).hidden=!grants.canInspectMembers;
  state.accountOps=grants.canModerateAccounts;
  document.querySelectorAll('[data-load]').forEach(el=>{const view=el.dataset.load;if(view.startsWith('account-'))el.hidden=!grants.canModerateAccounts;else if(['priority','pending','approved','sensitive','rejected','appeals','audit'].includes(view))el.hidden=!grants.canReviewMedia;else if(['user-reports','media-reports'].includes(view))el.hidden=!grants.canReviewReports;});
 }

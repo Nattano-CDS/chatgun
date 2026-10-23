@@ -16,7 +16,7 @@ async function contextFor(browser,actor,session=actor.session){
   {name:'__Host-cg_csrf',value:session.csrf,url:origin,secure:true,sameSite:'Lax'}]);return context;
 }
 test.beforeAll(async({request})=>{
- const r=await request.get('/release.json');expect(r.status()).toBe(200);const j=await r.json();expect(j.commit).toBe(manifest.applicationSha);expect(j.requiredD1MigrationNumber).toBe(20);
+ const r=await request.get('/release.json');expect(r.status()).toBe(200);const j=await r.json();expect(j.commit).toBe(manifest.applicationSha);expect(j.requiredD1MigrationNumber).toBe(21);
 });
 test('isolated Preview remains closed to real registration and anonymous member access',async({request})=>{
  const r=await request.get('/api/auth/config');expect(r.status()).toBe(200);const config=await r.json();expect(config.oauthLoginEnabled).toBe(false);expect(config.newAccountRegistrationEnabled).toBe(false);expect(config.emailOtpEnabled).toBe(false);expect(config.mobileOtpEnabled).toBe(false);
@@ -45,6 +45,15 @@ for(const actor of manifest.actors.filter(a=>a.band!=='control'))test(`Cloudflar
   await expect(page.locator('#age-safety-notice')).toBeVisible();await expect(page.locator('#open-social')).toBeHidden();await expect(page.locator('#linking')).toBeHidden();await expect(page.locator('.auth-navigation')).toBeHidden();
   await expect(page.locator('#session-management')).toBeVisible();await expect(page.locator('#logout')).toBeVisible();await expect(page.locator('#age-safety-notice')).toContainText('อย่าส่งวันเกิดเต็ม');
   await page.reload();await expect(page.locator('#age-safety-notice')).toBeVisible();
+  await expect(page.locator('#eligibility-review')).toBeVisible();
+  const correction={action:'request',reason:'คำขอทบทวนจากบัญชีจำลองในสภาพแวดล้อมแยก ไม่ใช่การรับผู้เยาว์จริง'};
+  const simultaneous=await Promise.all([0,1].map(()=>context.request.post('/api/auth/eligibility-review',{headers:headers(actor.session),data:correction})));
+  expect(simultaneous.map(r=>r.status()).sort()).toEqual([201,409]);
+  const own=await(await context.request.get('/api/auth/eligibility-review')).json();expect(own.requests.filter(r=>r.status==='pending')).toHaveLength(1);
+  const pending=own.requests.find(r=>r.status==='pending');
+  const withdrawals=await Promise.all([0,1].map(()=>context.request.post('/api/auth/eligibility-review',{headers:headers(actor.session),data:{action:'withdraw',id:pending.id,revision:pending.revision,reason:'ถอนคำขอจำลองโดยไม่ปลดข้อจำกัดบัญชี'}})));
+  expect(withdrawals.map(r=>r.status()).sort()).toEqual([200,409]);
+  await page.reload();await expect(page.locator('#eligibility-history')).toContainText('ถอนคำขอแล้ว');
   await page.locator('#age-safety-notice a[href="mailto:natttano@outlook.com"]').focus();await expect(page.locator('#age-safety-notice a[href="mailto:natttano@outlook.com"]')).toBeFocused();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:`${screenDir}/${actor.band}-${actor.width}.png`,fullPage:true});

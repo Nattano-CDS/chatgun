@@ -1,4 +1,5 @@
 import { safeUuid } from "../../_lib/crypto.js";
+import { eligibilityModeration } from '../../_lib/eligibility-review.js';
 import { onlineStatuses, writeOnlineHeartbeat } from '../../_lib/online-presence.js';
 import { getSession, hasRecentAuthentication, rateLimit, requireCsrf, unixTime } from "../../_lib/db.js";
 import { RequestError, failure, json, readJson, requireSameOrigin } from "../../_lib/http.js";
@@ -1086,6 +1087,11 @@ async function adminAccessLogin(request, env) {
   if (request.method === 'POST') { requireSameOrigin(request); body = await readJson(request); }
   // Ending one's own session stays possible even after the role expires.
   if (body?.action === 'logout') {
+    // An expired local session is not usable for work, but its owner can still
+    // revoke it before leaving Access. Keep subject/JWT/CSRF binding intact.
+    if (!session) session = await env.DB.prepare(`SELECT token_hash,csrf_hash,user_id
+      FROM cloudflare_admin_sessions WHERE token_hash=? AND user_id=? AND subject_hash=? AND revoked_at IS NULL`)
+      .bind(context.tokenHash,context.userId,context.subjectHash).first();
     if (!session || !await adminCsrfValid(request, session, context.actionCsrf)) throw new SocialError('invalid_csrf', 'คำขอไม่ถูกต้อง', 403);
     await env.DB.prepare('UPDATE cloudflare_admin_sessions SET revoked_at=? WHERE token_hash=? AND revoked_at IS NULL').bind(unixTime(), context.tokenHash).run();
     await auditMediaSafety(env.DB, context.userId, 'queue_view', 'admin_logout', 'cloudflare_admin_session_logout');
@@ -1160,7 +1166,29 @@ async function moderationCapabilities(request,env){
       SELECT 1 FROM moderation_access_grants recorded WHERE recorded.user_id=legacy.user_id AND recorded.role=legacy.role)
     `).bind(session.user_id,now,session.user_id).all();
   const roles=new Set((rows.results||[]).map(row=>row.role));
-  return json({canReviewReports:roles.has('report_reviewer')||roles.has('safety_admin'),canReviewMedia:roles.has('safety_admin'),canManageRoles:roles.has('moderation_admin'),canReviewIdentity:enabled(env.IDENTITY_VERIFICATION_ENABLED)&&roles.has('identity_reviewer'),canModerateAccounts:enabled(env.ACCOUNT_MODERATION_ENABLED)&&roles.has('safety_admin'),recentAuthentication:hasRecentAuthentication(session)});
+  return json({canReviewReports:roles.has('report_reviewer')||roles.has('safety_admin'),canReviewMedia:roles.has('safety_admin'),canReviewEligibility:enabled(env.ELIGIBILITY_REVIEW_ENABLED)&&roles.has('safety_admin'),canInspectMembers:roles.has('safety_admin'),canManageRoles:roles.has('moderation_admin'),canReviewIdentity:enabled(env.IDENTITY_VERIFICATION_ENABLED)&&roles.has('identity_reviewer'),canModerateAccounts:enabled(env.ACCOUNT_MODERATION_ENABLED)&&roles.has('safety_admin'),recentAuthentication:hasRecentAuthentication(session)});
+}
+
+async function moderationMemberQueues(request, env) {
+  const {session,purpose}=await moderationAccess(request,env,['safety_admin']);
+  const url=new URL(request.url),view=url.searchParams.get('view')||'members';
+  const page=Math.min(1000,Math.max(1,Math.floor(Number(url.searchParams.get('page'))||1))),limit=20,offset=(page-1)*limit;
+  let rows;
+  if(view==='members'){
+    const query=cleanText(url.searchParams.get('q')||'',80);
+    // Deliberately exclude email, provider subjects, age bands, coordinates and session identifiers.
+    rows=await env.DB.prepare(`SELECT u.id,u.status,u.account_state,u.created_at,
+      EXISTS(SELECT 1 FROM member_age_safety_holds h WHERE h.user_id=u.id AND (h.state='held' OR h.age_band<>'20_plus')) age_review_required,
+      EXISTS(SELECT 1 FROM beta_account_restrictions r WHERE r.user_id=u.id AND r.status='active') restricted,
+      (SELECT status FROM beta_enrollments b WHERE b.user_id=u.id) beta_status
+      FROM users u WHERE (?='' OR instr(u.id,?)>0) ORDER BY u.created_at DESC,u.id LIMIT 21 OFFSET ?`).bind(query,query,offset).all();
+  }else if(view==='deletions'){
+    rows=await env.DB.prepare(`SELECT request_id,user_id,status,requested_at,expires_at,updated_at
+      FROM account_deletion_requests ORDER BY requested_at,request_id LIMIT 21 OFFSET ?`).bind(offset).all();
+  }else throw new SocialError('invalid_view','ไม่พบคิวที่เรียก');
+  await env.DB.prepare('INSERT INTO administration_access_events(id,actor_id,scope,purpose,created_at)VALUES(?,?,?,?,?)')
+    .bind(safeUuid(),session.user_id,view==='members'?'member_queue':'deletion_queue',purpose,unixTime()).run();
+  return json({items:(rows.results||[]).slice(0,limit),page,hasMore:rows.results.length>limit,readOnly:true});
 }
 
 const MODERATION_ROLES = new Set(["moderation_admin", "report_reviewer", "identity_reviewer", "safety_admin"]);
@@ -1309,6 +1337,9 @@ async function moderationReports(request, env) {
         SELECT 1 FROM social_reports WHERE id = ? AND decision_nonce=?
       )
     `).bind(safeUuid(), session.user_id, id, decisionPurpose, timestamp, id,nonce),
+    env.DB.prepare(`INSERT INTO account_safety_notifications(id,user_id,message_code,created_at)
+      SELECT ?,reporter_user_id,?,? FROM social_reports WHERE id=? AND decision_nonce=? AND reporter_user_id IS NOT NULL`)
+      .bind(safeUuid(),'report_'+status,timestamp,id,nonce),
   ]);
   if (!Number(results[0]?.meta?.changes || 0)) throw new SocialError("decision_conflict", "รายงานถูกแก้ไขแล้ว กรุณาโหลดใหม่", 409);
   return json({ ok: true });
@@ -1844,6 +1875,8 @@ async function moderationAudit(request, env) {
   const access = await env.DB.prepare(`SELECT action,purpose,created_at FROM (
     SELECT action,purpose,created_at FROM media_safety_audit_events
     UNION ALL SELECT action,purpose,created_at FROM moderation_audit_events WHERE action NOT IN ('verification_view','verification_decision')
+    UNION ALL SELECT scope action,purpose,created_at FROM administration_access_events
+    UNION ALL SELECT action,purpose,created_at FROM eligibility_review_events WHERE purpose IS NOT NULL
   ) ORDER BY created_at DESC LIMIT ? OFFSET ?`).bind(limit+1,(page-1)*limit).all();
   return json({ events: events.slice(0, limit), accessEvents:(access.results||[]).slice(0,limit), page, hasMore: events.length > limit || (access.results||[]).length>limit });
 }
@@ -1852,15 +1885,19 @@ async function moderationNotifications(request, env) {
   const session = await authenticated(request, env, { csrf: request.method === "POST" });
   if (request.method === "GET") {
     const rows = await env.DB.prepare(`
-      SELECT id,kind,media_id,appeal_id,message_code,created_at,read_at
-      FROM moderation_notifications WHERE user_id=? ORDER BY created_at DESC LIMIT 100
-    `).bind(session.user_id).all();
+      SELECT id,kind,media_id,appeal_id,message_code,created_at,read_at FROM (
+        SELECT id,kind,media_id,appeal_id,message_code,created_at,read_at FROM moderation_notifications WHERE user_id=?
+        UNION ALL SELECT id,'account_safety' kind,NULL media_id,NULL appeal_id,message_code,created_at,read_at FROM account_safety_notifications WHERE user_id=?
+      ) ORDER BY created_at DESC LIMIT 100
+    `).bind(session.user_id,session.user_id).all();
     return json({ notifications: rows.results || [] });
   }
   const body = await readJson(request);
   const id = identifier(body.id, "ไม่พบการแจ้งเตือน");
-  await env.DB.prepare("UPDATE moderation_notifications SET read_at=? WHERE id=? AND user_id=? AND read_at IS NULL")
-    .bind(unixTime(), id, session.user_id).run();
+  await env.DB.batch([
+    env.DB.prepare("UPDATE moderation_notifications SET read_at=? WHERE id=? AND user_id=? AND read_at IS NULL").bind(unixTime(),id,session.user_id),
+    env.DB.prepare("UPDATE account_safety_notifications SET read_at=? WHERE id=? AND user_id=? AND read_at IS NULL").bind(unixTime(),id,session.user_id),
+  ]);
   return json({ ok: true });
 }
 
@@ -2310,6 +2347,10 @@ export async function onRequest({ request, env }) {
     if (path === "/api/social/moderation/notifications" && ["GET", "POST"].includes(request.method)) return await moderationNotifications(request, env);
     if (request.method === "GET" && path === "/api/social/moderation/overview") return await moderationOverview(request, env);
     if(request.method==='GET'&&path==='/api/social/moderation/capabilities')return await moderationCapabilities(request,env);
+    if(request.method==='GET'&&path==='/api/social/moderation/members')return await moderationMemberQueues(request,env);
+    if (path === '/api/social/moderation/eligibility' && ['GET','POST'].includes(request.method)) {
+      return await eligibilityModeration(request, env, await moderationAccess(request, env, ['safety_admin']));
+    }
     if (path === '/api/social/account-appeals' && ['GET','POST'].includes(request.method)) return await accountAppeals(request,env);
     if (path === '/api/social/moderation/accounts' && ['GET','POST'].includes(request.method)) return await moderationAccounts(request,env);
     if (path === "/api/social/moderation/roles" && ["GET", "POST"].includes(request.method)) return await moderationRoleManagement(request, env);

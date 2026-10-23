@@ -14,10 +14,12 @@ test("migration is idempotent and creates required tables and indexes", () => {
   database.exec(readFileSync("migrations/0018_cloudflare_admin_sessions.sql", "utf8"));
   database.exec(readFileSync("migrations/0019_member_age_safety_holds.sql", "utf8"));
   database.exec(readFileSync("migrations/0020_age_hold_write_guards.sql", "utf8"));
+  database.exec(readFileSync("migrations/0021_eligibility_review_requests.sql", "utf8"));
   const tables = database.database.prepare(
     "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name",
   ).all().map(({ name }) => name);
   assert.deepEqual(tables, [
+    "eligibility_review_requests", "eligibility_review_events", "administration_access_events", "account_safety_notifications",
     "cloudflare_admin_sessions", "member_age_safety_holds",
     "beta_account_restrictions", "beta_account_appeals", "beta_account_moderation_events", "album_access_grants", "album_access_requests", "chat_initiations", "chat_preferences", "chat_system_events", "account_acceptances", "account_deletion_requests", "age_assurance_events", "beta_enrollments", "beta_invitations", "deletion_receipts", "identities",
     "identity_verification_requests", "independent_age_assurances", "media_appeals", "media_deletion_queue", "media_moderation_decisions", "media_reports",

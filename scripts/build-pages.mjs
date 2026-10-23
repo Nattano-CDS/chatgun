@@ -57,5 +57,5 @@ function versionAssets(directory,prefix=''){
 }
 versionAssets(output);
 const manifest=JSON.stringify({commit,files},null,2)+'\n';writeFileSync(resolve(output,'release-assets.json'),manifest);
-writeFileSync(resolve(output,"release.json"),JSON.stringify({commit,requiredD1MigrationNumber:20,fictionalDemoEnabled:false,staticPrelaunch,releaseMode,...(policyRelease?{policyVersions:policyRelease.versions}:{}),assetsManifestSha256:createHash('sha256').update(manifest).digest('hex')})+"\n");
+writeFileSync(resolve(output,"release.json"),JSON.stringify({commit,requiredD1MigrationNumber:21,fictionalDemoEnabled:false,staticPrelaunch,releaseMode,...(policyRelease?{policyVersions:policyRelease.versions}:{}),assetsManifestSha256:createHash('sha256').update(manifest).digest('hex')})+"\n");
 console.log(`Public asset package: ${output}`);

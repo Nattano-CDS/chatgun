@@ -4,6 +4,13 @@ import {randomToken,sha256} from '../../functions/_lib/crypto.js';
 // A process failure between inserts must not leave a 30-day fixture session.
 export async function issueYouthFixtureSession(db,userId,{now,authenticatedAt=now,expired=false}){
  assert.ok(/^youth-e2e-[a-f0-9-]{36}-(?:under_13|13_17|18_19|control)-(?:390|768|1440)$/u.test(userId),'Not a scoped synthetic actor');
+ return issueBoundedFixtureSession(db,userId,{now,authenticatedAt,expired});
+}
+export async function issueDevelopmentFixtureSession(db,userId,{now}){
+ assert.ok(/^development-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}-(?:owner|viewer|moderator|other)(?:390|768|1440)$/u.test(userId),'Not a scoped development actor');
+ return issueBoundedFixtureSession(db,userId,{now,authenticatedAt:now,expired:false});
+}
+async function issueBoundedFixtureSession(db,userId,{now,authenticatedAt,expired}){
  assert.ok(Number.isSafeInteger(now)&&Number.isSafeInteger(authenticatedAt)&&authenticatedAt<=now,'Invalid fixture clock');
  const token=randomToken(),csrf=randomToken(),tokenHash=await sha256(token);
  const createdAt=expired?now-120:now,expiresAt=expired?now-1:now+1800;

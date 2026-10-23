@@ -5,6 +5,23 @@ export const BETA_INVITATION_AUDIT_SECONDS = 7 * 24 * 60 * 60;
 
 const CLEANUP_TARGETS = [
   {
+    name: 'closedEligibilityReviews',
+    sql: `DELETE FROM eligibility_review_requests WHERE id IN (
+      SELECT id FROM eligibility_review_requests WHERE status<>'pending' AND updated_at<=? LIMIT ?
+    )`,
+    values: (now, limit) => [now - 90*86400, limit],
+  },
+  {
+    name: 'administrationAccessEvents',
+    sql: 'DELETE FROM administration_access_events WHERE id IN (SELECT id FROM administration_access_events WHERE created_at<=? LIMIT ?)',
+    values: (now, limit) => [now - 90*86400, limit],
+  },
+  {
+    name: 'accountSafetyNotifications',
+    sql: 'DELETE FROM account_safety_notifications WHERE id IN (SELECT id FROM account_safety_notifications WHERE created_at<=? LIMIT ?)',
+    values: (now, limit) => [now - 90*86400, limit],
+  },
+  {
     name: "oauthFlows",
     sql: "DELETE FROM oauth_flows WHERE rowid IN (SELECT rowid FROM oauth_flows WHERE expires_at <= ? LIMIT ?)",
     values: (now, limit) => [now, limit],

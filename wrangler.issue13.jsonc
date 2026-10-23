@@ -6,6 +6,7 @@
   "d1_databases":[{"binding":"DB","database_name":"chatgun-issue13-staging","database_id":"275d9820-6aec-494a-8bb5-b7ed9b8b74cc","migrations_dir":"migrations"}],
   "r2_buckets":[{"binding":"MEDIA","bucket_name":"chatgun-issue13-media"}],
   "vars":{
+    "ELIGIBILITY_REVIEW_ENABLED":"true",
     "BETA_ENROLLMENT_REQUIRED":"true",
     "PRESENCE_ENABLED":"true",
     "SOCIAL_APP_ENABLED":"true","MESSAGING_ENABLED":"true","PUBLIC_DISCOVERY_ENABLED":"true",

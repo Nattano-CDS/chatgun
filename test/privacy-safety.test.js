@@ -79,6 +79,9 @@ test("retention cleanup removes only expired or aged security records", async ()
 
   const deleted = await runRetentionCleanup(database, now);
   assert.deepEqual(deleted, {
+    closedEligibilityReviews: 0,
+    administrationAccessEvents: 0,
+    accountSafetyNotifications: 0,
     oauthFlows: 1,
     betaInvitations: 1,
     sessions: 1,

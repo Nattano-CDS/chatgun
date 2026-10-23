@@ -154,6 +154,7 @@ test('standalone Access login needs no LINE/member cookie, retains RBAC/CSRF, an
     assert.equal(await cleanupAdminAccessSessions(db, now + 1000), 0, 'Do not delete revocation tombstones before assertion expiry');
     await db.prepare("UPDATE moderation_access_grants SET revoked_at=?,revocation_reason='Local revocation test only' WHERE id='standalone-role'").bind(now).run();
     assert.equal((await adminRequest({ env, request: freshReports })).status, 403);
+    await db.prepare('UPDATE cloudflare_admin_sessions SET authenticated_at=?,created_at=?,expires_at=? WHERE revoked_at IS NULL AND user_id=?').bind(now-3601,now-3600,now-1,config.userId).run();
     assert.equal((await adminRequest({env,request:req('session',{action:'logout'},fresh.csrfToken,undefined,freshJwt)})).status,200,'Own-session logout remains possible after role revocation');
     assert.equal((await call('notifications')).status, 404, 'Member notifications stay outside Access namespace');
     assert.equal((await db.prepare('SELECT COUNT(*) n FROM pragma_foreign_key_check').first()).n, 0);

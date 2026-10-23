@@ -44,6 +44,20 @@ test('frontend retry retains the same request ID after ambiguous network failure
  const payload={target:'owner',body:'ข้อความจริงใน fixture เท่านั้น'};await assert.rejects(()=>deliver(payload));await deliver(payload);
  assert.equal(bodies[0].clientRequestId,bodies[1].clientRequestId);await deliver({...payload,body:'ข้อความถัดไป'});assert.notEqual(bodies[1].clientRequestId,bodies[2].clientRequestId);
 });
+test('report resolution notifies only reporter once and hides reporter identity from the reported member',async t=>{
+ const {db,call}=await fixture(t);
+ assert.equal((await call('reports','viewer',{target:'owner',category:'privacy',details:'Synthetic privacy report for the local regression suite'})).status,201);
+ const row=await db.prepare('SELECT id,revision FROM social_reports').first();
+ const decision={id:row.id,revision:row.revision,status:'closed',note:'Evidence reviewed under the approved synthetic workflow'};
+ assert.equal((await call('moderation/reports','admin',decision)).status,200);
+ assert.equal((await call('moderation/reports','admin',decision)).status,404);
+ const own=await(await call('moderation/notifications','viewer')).json();assert.equal(own.notifications.length,1);assert.equal(own.notifications[0].message_code,'report_closed');
+ const subject=await(await call('moderation/notifications','owner')).json();assert.equal(subject.notifications.length,0);
+ assert.equal((await call('moderation/notifications','owner',{id:own.notifications[0].id})).status,200);
+ assert.equal((await db.prepare('SELECT read_at FROM account_safety_notifications').first()).read_at,null);
+ assert.equal((await call('moderation/notifications','viewer',{id:own.notifications[0].id})).status,200);
+ assert.ok((await db.prepare('SELECT read_at FROM account_safety_notifications').first()).read_at);
+});
 test('moderation report pagination, literal search, severity ordering and closed revision claims',async t=>{
  const{db,call,now}=await fixture(t);
  for(let i=0;i<121;i++)await db.prepare("INSERT INTO social_reports(id,reporter_user_id,subject_user_id,category,reason_code,details,created_at)VALUES(?,'viewer','owner','harassment',?,?,?)").bind('r'+String(i).padStart(3,'0'),i===120?'threat':'harassment',i===120?'urgent exact case':'Routine case '+i,now+i).run();

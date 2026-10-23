@@ -22,6 +22,13 @@
       <p>หากข้อมูลช่วงอายุไม่ถูกต้อง หรือต้องการความช่วยเหลือ ให้ติดต่อผู้ดูแล อย่าส่งวันเกิดเต็ม รูปบัตรประชาชน รหัสผ่าน หรือรหัสยืนยันทางอีเมล และอย่าสมัครบัญชีใหม่เพื่อข้ามข้อจำกัด</p>
       <p><a href="mailto:natttano@outlook.com">ติดต่อผู้ดูแล: natttano@outlook.com</a> · <a href="/data-deletion.html">วิธีขอลบข้อมูล</a></p>
       <p>คุณยังจัดการเซสชัน ออกจากระบบ และขอลบบัญชีได้ ไม่มีการรับรองเวลาตอบกลับทันที</p>
+      <section id="eligibility-review" hidden aria-labelledby="eligibility-heading">
+        <h3 id="eligibility-heading">ขอทบทวนข้อมูลสิทธิ์การใช้งาน</h3>
+        <p>คำขอไม่เปลี่ยนช่วงอายุหรือปลดข้อจำกัดอัตโนมัติ อย่าส่งวันเกิดเต็ม เอกสารยืนยันตัวตน หรือข้อมูลของผู้ปกครอง</p>
+        <form id="eligibility-form"><label for="eligibility-reason">เหตุผลที่ต้องการทบทวน (10–1000 ตัวอักษร)</label><textarea id="eligibility-reason" minlength="10" maxlength="1000" required rows="4"></textarea><button type="submit">ส่งคำขอทบทวน</button></form>
+        <p id="eligibility-message" role="status" aria-live="polite"></p>
+        <div id="eligibility-history"></div>
+      </section>
     </section>
     <a id="open-social" class="button" href="./app/" hidden>เปิด ChatGun Social</a>
     <a id="account-moderation-link" class="button" href="/app/moderation.html" hidden>ศูนย์ดูแลและรายงาน</a>

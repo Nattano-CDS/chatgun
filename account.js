@@ -7,6 +7,43 @@ let account = null;
 let pendingDeletion = null;
 let availableProviders = new Set();
 
+async function eligibilityApi(body) {
+  const response = await fetch('/api/auth/eligibility-review', { credentials: 'same-origin',
+    ...(body ? { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': readCookie('__Host-cg_csrf') }, body: JSON.stringify(body) } : {}),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || 'ไม่สามารถดำเนินการได้ กรุณาลองใหม่');
+  return result;
+}
+async function loadEligibility() {
+  const result = await eligibilityApi();
+  document.getElementById('eligibility-review').hidden = !result.enabled;
+  const history = document.getElementById('eligibility-history'); history.replaceChildren();
+  const pending = (result.requests || []).some(item => item.status === 'pending');
+  document.getElementById('eligibility-form').hidden = pending;
+  const labels = { pending: 'รอทบทวน', withdrawn: 'ถอนคำขอแล้ว', upheld: 'คงข้อจำกัด', deferred: 'รอแนวทางที่ได้รับอนุมัติ' };
+  for (const item of result.requests || []) {
+    const row = document.createElement('div'), status = document.createElement('p');
+    status.textContent = `${labels[item.status] || item.status}${item.decision_reason ? ' · ' + item.decision_reason : ''}`; row.append(status);
+    if (item.status === 'pending') {
+      const withdraw = document.createElement('button'); withdraw.type = 'button'; withdraw.textContent = 'ถอนคำขอทบทวน (ข้อจำกัดยังคงอยู่)';
+      withdraw.addEventListener('click', async () => {
+        if (!confirm('ถอนคำขอทบทวนนี้หรือไม่? การถอนคำขอไม่ปลดข้อจำกัดบัญชี')) return;
+        withdraw.disabled = true;
+        try { await eligibilityApi({ action: 'withdraw', id: item.id, revision: item.revision, reason: 'สมาชิกยืนยันถอนคำขอทบทวนผ่านหน้าบัญชี' }); await loadEligibility(); }
+        catch (error) { document.getElementById('eligibility-message').textContent = error.message; withdraw.disabled = false; }
+      }); row.append(withdraw);
+    }
+    history.append(row);
+  }
+}
+document.getElementById('eligibility-form').addEventListener('submit', async event => {
+  event.preventDefault(); const button = event.currentTarget.querySelector('button'); button.disabled = true;
+  try { await eligibilityApi({ action: 'request', reason: document.getElementById('eligibility-reason').value }); document.getElementById('eligibility-message').textContent = 'รับคำขอแล้ว ข้อจำกัดบัญชียังคงอยู่ระหว่างทบทวน ไม่มีการรับรองเวลาตอบกลับทันที'; await loadEligibility(); }
+  catch (error) { document.getElementById('eligibility-message').textContent = error.message; }
+  finally { button.disabled = false; }
+});
+
 function readCookie(name) {
   const prefix = `${name}=`;
   const value = document.cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith(prefix));
@@ -122,6 +159,7 @@ fetch("/api/auth/me", { credentials: "same-origin" })
     account = result;
     // Never trust an age-review query string as evidence of an account hold.
     document.getElementById('age-safety-notice').hidden = account.ageSafetyReviewRequired !== true;
+    if (account.ageSafetyReviewRequired === true) loadEligibility().catch(error => { document.getElementById('eligibility-message').textContent = error.message; });
     if (account.ageSafetyReviewRequired === true) {
       const socialNavigation = document.querySelector('.auth-navigation');
       if (socialNavigation) socialNavigation.hidden = true;
