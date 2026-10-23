@@ -15,7 +15,7 @@ Frozen application: `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Initial PR #17 e
 | Cleanup workers | PASS | New UAT-only privacy/media Workers, private endpoints, daily 03:17 / 03:37 UTC schedules; manual scoped R2 cleanup tested. First actual cron firing NOT RUN |
 | Frozen application CI | PASS | Run 40008332912, exact SHA 4a7dee3, completed success; source unchanged |
 | Reference evidence CI | PASS | Run 40009921495, exact SHA e7079c6, rechecked completed success |
-| New infrastructure regression | PASS | 3/3 direct Node tests; subsequent PR CI result recorded in closing comment |
+| New infrastructure regression | PASS | 4/4 Node tests including D1 cascade-inclusive cleanup counter; subsequent PR CI result recorded in closing comment |
 | New target synthetic browser journey | PASS | 10/10, 0 failed/skipped; actual Pages/D1/R2; NOT genuine OAuth or MFA |
 | Stable closed-host HTTP/UI | PASS | JSON configs/health, anonymous denials, 39 asset hashes, 390/768/1440 screenshots, no overflow/script error |
 | Real Turnstile configuration | PASS | Newly created UAT widget; stable hostname only; matching creation pair saved encrypted; actual invalid response rejected |
@@ -33,13 +33,15 @@ Frozen application: `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Initial PR #17 e
 
 ## Evidence distinctions
 
-Existing frozen engineering evidence is reused, not rerun needlessly: 238 unit/integration/security, 93 mocked UI, 10 local handler browser, 10 prior Cloudflare full-system and 11 prior Cloudflare youth-safety, all final runs 0 failure/skip. Those old Cloudflare runs target issue13, not this new UAT. New environment bindings/configuration justify the additional **10** remote synthetic cases and **3** infrastructure tests here. No synthetic session establishes genuine provider, MFA, consent or real-user readiness.
+Existing frozen engineering evidence is reused, not rerun needlessly: 238 unit/integration/security, 93 mocked UI, 10 local handler browser, 10 prior Cloudflare full-system and 11 prior Cloudflare youth-safety, all final runs 0 failure/skip. Those old Cloudflare runs target issue13, not this new UAT. New environment bindings/configuration justify the additional **10** remote synthetic cases and **4** infrastructure tests here. No synthetic session establishes genuine provider, MFA, consent or real-user readiness.
 
 Synthetic engineering Preview temporarily exercised application RBAC with short-lived synthetic member sessions, not Cloudflare Access. It was never an Admin-MFA test. Genuine UAT stays closed and Access-required. Retire intermediate engineering deployments after exact-batch cleanup; verify `deployment-retirement.json` before introducing real identities.
 
 ## Fixed readiness defect
 
 Initial direct-upload packaging omitted plain-text vars from `wrangler.jsonc`. Wrangler preserved encrypted secrets but removed the remotely configured flags/site key. No credentials or invitations existed; registration remained closed. Deployment tooling now serializes every flag/site key into the actual deployment config and asserts live auth config. New regression tests cover this. Corrected closed-host evidence supersedes initial deployment attempts; obsolete artifacts are retired. Runtime source remains frozen.
+
+Cleanup evidence correction: D1 `meta.changes` reported180 cascade-inclusive writes, not180 accounts. Protected before/after SQLite restores confirm9 accounts removed by cleanup and6 already deleted by browser tests, all15 manifest actors only. Corrected the JSON counter and added a regression; did not repeat deletion or change infrastructure/data to repair a report.
 
 ## Remaining owner actions — one consolidated checklist
 

@@ -23,7 +23,7 @@ Use PASS / FAIL / BLOCKED / NOT RUN per case. Record time, deployment ID, provid
 
 - Existing frozen baseline:238 unit/security +93 mocked UI +10 local-handler +10 prior Cloudflare full-system +11 prior Cloudflare youth, all final runs pass, no final skips. Reused because application unchanged.
 - New dedicated-target actual Cloudflare campaign: `full-system-cloud-browser.json`,10/10 pass. Synthetic sessions/grants30minutes; no OAuth identities.
-- New infrastructure tests: `test/final-uat-infrastructure.test.js`,3/3 pass (binding isolation, deploy vars/sitekey regression,21 checksums).
+- New infrastructure tests: `test/final-uat-infrastructure.test.js`,4/4 pass (binding isolation, deploy vars/sitekey regression,21 checksums, cascade-safe account cleanup counts).
 - Stable-host JSON/anonymous denial,39 asset hashes and three responsive closed-state captures: `http-browser-verification.json`.
 - One30-second synthetic foreground-inbox sample: `authenticated-request-observation.json`; not a billable-usage/capacity estimate. Actual hidden-tab campaign remains NOT RUN; prior deterministic tests verify app visibility guards.
 - Cleanup exact batch only, revoke sessions/grants, delete disposable synthetic accounts after protected backup, preserve minimized audit; `cloud-cleanup.json`, `disposable-account-cleanup.json`.

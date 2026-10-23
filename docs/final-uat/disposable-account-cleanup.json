@@ -1,8 +1,10 @@
 {
   "checkedAt": "2026-10-23T19:59:59.850Z",
   "exactManifestActors": 15,
-  "alreadyDeletedByAuthorizedBrowserTests": -165,
-  "remainingSyntheticAccountsDeleted": 180,
+  "alreadyDeletedByAuthorizedBrowserTests": 6,
+  "remainingSyntheticAccountsDeleted": 9,
+  "d1CascadeInclusiveWriteChanges": 180,
+  "accountCountsReconciledFromProtectedBeforeAndAfterSqliteRestores": true,
   "remainingUsers": 0,
   "remainingIdentities": 0,
   "remainingMedia": 0,

@@ -87,4 +87,3 @@ for(const width of[390,768,1440])test(`non-owner fixture account settings, sessi
  await page.locator('#delete-start').click();await expect(page.locator('#delete-confirm')).toBeVisible();await page.locator('#delete-phrase').fill('ลบบัญชีถาวร');await page.locator('#delete-confirm button').click();await expect(page.getByRole('heading',{name:cloud?.deletionMedia?.some(m=>m.width===width)?'ปิดบัญชีและเริ่มลบข้อมูลแล้ว':'ลบบัญชีแล้ว',exact:true})).toBeVisible();expect((await context.request.get('/api/auth/me')).status()).toBe(401);expect((await context.request.get('/api/social/profile')).status()).toBe(401);await page.screenshot({path:dir+'/non-owner-fixture-deletion-'+width+'.png'});
  }finally{await context.close();}
 });
-
