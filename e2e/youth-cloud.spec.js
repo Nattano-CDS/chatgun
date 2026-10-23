@@ -46,6 +46,8 @@ for(const actor of manifest.actors.filter(a=>a.band!=='control'))test(`Cloudflar
   await expect(page.locator('#session-management')).toBeVisible();await expect(page.locator('#logout')).toBeVisible();await expect(page.locator('#age-safety-notice')).toContainText('อย่าส่งวันเกิดเต็ม');
   await page.reload();await expect(page.locator('#age-safety-notice')).toBeVisible();
   await expect(page.locator('#eligibility-review')).toBeVisible();
+  const invalidUnicode=await context.request.post('/api/auth/eligibility-review',{headers:headers(actor.session),data:{action:'request',reason:'😀'.repeat(5)}});
+  expect(invalidUnicode.status()).toBe(400);expect((await invalidUnicode.json()).code).toBe('invalid_reason');
   const correction={action:'request',reason:'คำขอทบทวนจากบัญชีจำลองในสภาพแวดล้อมแยก ไม่ใช่การรับผู้เยาว์จริง'};
   const simultaneous=await Promise.all([0,1].map(()=>context.request.post('/api/auth/eligibility-review',{headers:headers(actor.session),data:correction})));
   expect(simultaneous.map(r=>r.status()).sort()).toEqual([201,409]);

@@ -76,7 +76,7 @@ for(const width of[390,768,1440])test(`held account real-handler privacy and del
   expect((await context.request.get('/api/social/profile')).status()).toBe(403);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:dir+'/held-account-'+width+'.png',fullPage:true});
-  await page.locator('#delete-start').click();await expect(page.locator('#delete-confirm')).toBeVisible();await page.locator('#delete-phrase').fill('ลบบัญชีถาวร');await page.locator('#delete-confirm button').click();await expect(page.getByRole('heading',{name:'ลบบัญชีแล้ว',exact:true})).toBeVisible();
+  await page.locator('#delete-start').click();await expect(page.locator('#delete-confirm')).toBeVisible();await expect(page.locator('#delete-confirm button')).toHaveCSS('background-color','rgb(163, 38, 69)');await page.locator('#delete-phrase').fill('ลบบัญชีถาวร');await page.locator('#delete-confirm button').click();await expect(page.getByRole('heading',{name:'ลบบัญชีแล้ว',exact:true})).toBeVisible();
   expect((await context.request.get('/api/auth/me')).status()).toBe(401);expect((await context.request.get('/api/social/profile')).status()).toBe(401);
  }finally{await context.close();}
 });
