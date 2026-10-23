@@ -1,0 +1,14 @@
+{
+  "accountId": "23017b53386fb67fc62a52cdd017454c",
+  "databaseId": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
+  "migration": "0021_eligibility_review_requests.sql",
+  "before": 20,
+  "after": 21,
+  "privateBackupPermissions": "directory0700/file0600",
+  "backupRestoredAndRehearsed": true,
+  "preExistingApplicationTablesUnchanged": 53,
+  "foreignKeyViolations": 0,
+  "productionWrites": 0,
+  "protectedStagingWrites": 0,
+  "rawBackupAndRowFingerprints": "Private local backup only; never published"
+}

@@ -1,4 +1,6 @@
 {
+  "historicalOnly": true,
+  "supersededBy": "test-summary.json",
   "checkedAt": "2026-10-20T05:20:26.955Z",
   "decision": "DEVELOPMENT COMPLETE — READY FOR CONSOLIDATED E2E/UAT",
   "applicationSha": "0a0eb19beb701371151ebd26c3415b8a3a33a76b",

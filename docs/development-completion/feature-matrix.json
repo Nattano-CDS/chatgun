@@ -1,4 +1,6 @@
 {
+  "historicalOnly": true,
+  "supersededBy": "feature-matrix.md",
   "scope": "PR17 development first; no human reauthentication until one consolidated UAT",
   "canonicalNear": "98bb83e44bf88eddb9822d7875f18cd4fe833ee2",
   "baselineHead": "244c5bc474978c3c5fd24eade0c4658a1e2fce50",

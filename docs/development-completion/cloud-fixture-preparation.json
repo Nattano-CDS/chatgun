@@ -1,9 +1,9 @@
 {
-  "checkedAt": "2026-10-20T08:51:28.294Z",
+  "checkedAt": "2026-10-23T19:07:25.183Z",
   "accountId": "23017b53386fb67fc62a52cdd017454c",
   "isolatedDatabase": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
-  "migrations": 17,
-  "newSyntheticUsers": 12,
+  "migrations": 21,
+  "newSyntheticUsers": 15,
   "noProviderIdentitiesCreated": true,
   "productionWrites": 0,
   "productionSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",

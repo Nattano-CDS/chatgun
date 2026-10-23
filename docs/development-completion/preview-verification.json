@@ -1,8 +1,8 @@
 {
-  "checkedAt": "2026-10-20T08:51:33.394Z",
+  "checkedAt": "2026-10-23T19:07:03.623Z",
   "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
-  "sha": "871fa9f7f8fe76c3d70787b6ff800505915ca5be",
-  "requiredSchema": 17,
+  "sha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+  "requiredSchema": 21,
   "assetHashesMatched": 39,
   "checks": [
     {
@@ -61,6 +61,16 @@
       "result": "PASS"
     },
     {
+      "path": "/api/social/moderation/members",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/moderation/eligibility",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
       "path": "/api/social/account-appeals",
       "status": 401,
       "result": "PASS"
@@ -71,7 +81,7 @@
       "result": "PASS"
     }
   ],
-  "passed": 13,
+  "passed": 15,
   "failed": 0,
   "noFictionalReleaseAssets": true,
   "realOAuthUat": "NOT RUN — isolated synthetic sessions only"

@@ -57,7 +57,8 @@
         "timeout": 180000,
         "use": {
           "baseURL": "https://issue13.chatgun-issue13-staging.pages.dev",
-          "trace": "retain-on-failure",
+          "trace": "off",
+          "video": "off",
           "screenshot": "only-on-failure"
         },
         "dependencies": [],
@@ -113,12 +114,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 54215,
+                  "duration": 50097,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T08:51:34.236Z",
+                  "startTime": "2026-10-23T19:07:26.069Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -128,7 +129,7 @@
           ],
           "id": "5547a721f4e2ba8d23f9-c81e11e8c3946dfd80b8",
           "file": "full-system-local.spec.js",
-          "line": 7,
+          "line": 8,
           "column": 34
         },
         {
@@ -147,12 +148,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 50070,
+                  "duration": 47838,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T08:52:28.735Z",
+                  "startTime": "2026-10-23T19:08:16.409Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -162,7 +163,7 @@
           ],
           "id": "5547a721f4e2ba8d23f9-f358f5ff5991863574ad",
           "file": "full-system-local.spec.js",
-          "line": 7,
+          "line": 8,
           "column": 34
         },
         {
@@ -181,12 +182,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 52570,
+                  "duration": 49796,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T08:53:18.812Z",
+                  "startTime": "2026-10-23T19:09:04.252Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -196,7 +197,7 @@
           ],
           "id": "5547a721f4e2ba8d23f9-94a316e82c5ea3b45e2c",
           "file": "full-system-local.spec.js",
-          "line": 7,
+          "line": 8,
           "column": 34
         },
         {
@@ -215,12 +216,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2163,
+                  "duration": 2432,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T08:54:11.387Z",
+                  "startTime": "2026-10-23T19:09:54.049Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -230,8 +231,110 @@
           ],
           "id": "5547a721f4e2ba8d23f9-6691e2e91e3bc5483ba3",
           "file": "full-system-local.spec.js",
-          "line": 40,
+          "line": 41,
           "column": 1
+        },
+        {
+          "title": "held account real-handler privacy and deletion journey 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11283,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:09:56.485Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5547a721f4e2ba8d23f9-a7081a9d637f09f4305d",
+          "file": "full-system-local.spec.js",
+          "line": 45,
+          "column": 34
+        },
+        {
+          "title": "held account real-handler privacy and deletion journey 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 9686,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:10:07.772Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5547a721f4e2ba8d23f9-acf0428356234b8a1aa3",
+          "file": "full-system-local.spec.js",
+          "line": 45,
+          "column": 34
+        },
+        {
+          "title": "held account real-handler privacy and deletion journey 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11210,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:10:17.462Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5547a721f4e2ba8d23f9-180fba64ae31fa56828f",
+          "file": "full-system-local.spec.js",
+          "line": 45,
+          "column": 34
         },
         {
           "title": "non-owner fixture account settings, session listing and deletion 390",
@@ -249,12 +352,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1472,
+                  "duration": 1248,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T08:54:13.555Z",
+                  "startTime": "2026-10-23T19:10:28.676Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -264,7 +367,7 @@
           ],
           "id": "5547a721f4e2ba8d23f9-5430c23d3b51220ef5a1",
           "file": "full-system-local.spec.js",
-          "line": 44,
+          "line": 84,
           "column": 34
         },
         {
@@ -283,12 +386,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2033,
+                  "duration": 1470,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T08:54:15.032Z",
+                  "startTime": "2026-10-23T19:10:29.929Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -298,7 +401,7 @@
           ],
           "id": "5547a721f4e2ba8d23f9-d02aba84036a96f1aafd",
           "file": "full-system-local.spec.js",
-          "line": 44,
+          "line": 84,
           "column": 34
         },
         {
@@ -317,12 +420,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1278,
+                  "duration": 1327,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-20T08:54:17.070Z",
+                  "startTime": "2026-10-23T19:10:31.404Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -332,7 +435,7 @@
           ],
           "id": "5547a721f4e2ba8d23f9-acd11704edfa9de498aa",
           "file": "full-system-local.spec.js",
-          "line": 44,
+          "line": 84,
           "column": 34
         }
       ]
@@ -340,9 +443,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-20T08:51:34.017Z",
-    "duration": 164454.35799999998,
-    "expected": 7,
+    "startTime": "2026-10-23T19:07:25.855Z",
+    "duration": 186914.37,
+    "expected": 10,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

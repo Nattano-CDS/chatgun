@@ -1,6 +1,14 @@
 import assert from'node:assert/strict';import{execFileSync}from'node:child_process';import{createHash}from'node:crypto';import{writeFileSync}from'node:fs';
 const origin='https://issue13.chatgun-issue13-staging.pages.dev',sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
-const release=await(await fetch(origin+'/release.json',{cache:'no-store'})).json();assert.equal(release.commit,sha);assert.equal(release.fictionalDemoEnabled,false);assert.equal(release.requiredD1MigrationNumber,21);
+// Pages can finish the immutable deployment before its branch alias propagates.
+// Wait boundedly, but never test/seed a different application revision.
+let release;
+for(let attempt=0;attempt<10;attempt++){
+ release=await(await fetch(origin+'/release.json?release_probe='+sha,{cache:'no-store'})).json();
+ if(release.commit===sha)break;
+ if(attempt<9)await new Promise(resolve=>setTimeout(resolve,2000));
+}
+assert.equal(release.commit,sha);assert.equal(release.fictionalDemoEnabled,false);assert.equal(release.requiredD1MigrationNumber,21);
 const manifestText=await(await fetch(origin+'/release-assets.json',{cache:'no-store'})).text();assert.equal(createHash('sha256').update(manifestText).digest('hex'),release.assetsManifestSha256);const manifest=JSON.parse(manifestText);assert.equal(manifest.commit,sha);
 for(let i=0;i<manifest.files.length;i+=6)await Promise.all(manifest.files.slice(i,i+6).map(async file=>{const r=await fetch(origin+'/'+file.path);assert.equal(r.status,200,file.path);assert.equal(createHash('sha256').update(new Uint8Array(await r.arrayBuffer())).digest('hex'),file.sha256,file.path);}));
 const checks=[];for(const path of['/api/health','/api/auth/config','/api/social/config']){const r=await fetch(origin+path);assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/application\/json/);checks.push({path,status:200,result:'PASS'});}

@@ -1,9 +1,9 @@
 {
-  "checkedAt": "2026-10-20T05:19:50.737Z",
+  "checkedAt": "2026-10-23T19:13:18.480Z",
   "account": "23017b53386fb67fc62a52cdd017454c",
-  "productionSha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
-  "productionDeployment": "118728d1-90ef-45c5-804c-2f270b4ba31b",
-  "isolatedSha": "0a0eb19beb701371151ebd26c3415b8a3a33a76b",
+  "productionSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "productionDeployment": "f705d7cd-974d-4e48-8b61-73ec1a760c42",
+  "isolatedSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
   "productionCounts": {
     "users": 1,
     "identities": 1,
@@ -43,8 +43,8 @@
     "DEMO_MODE_ENABLED": "false"
   },
   "migrations": {
-    "production": 15,
-    "isolated": 17,
+    "production": 17,
+    "isolated": 21,
     "protectedStaging": 12
   },
   "foreignKeyViolations": {

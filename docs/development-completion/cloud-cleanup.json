@@ -1,13 +1,13 @@
 {
-  "checkedAt": "2026-10-20T08:55:56.016Z",
+  "checkedAt": "2026-10-23T19:11:22.167Z",
   "database": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
   "bucket": "chatgun-issue13-media",
-  "fixtureBatches": 8,
-  "manifestFixtureUsers": 96,
+  "fixtureBatches": 1,
+  "manifestFixtureUsers": 15,
   "fixtureMediaQueued": 6,
-  "objectsCompleted": 21,
+  "objectsCompleted": 9,
   "sessionsRevokedInThisRun": 9,
-  "temporaryGrantsRevokedInThisRun": 12,
+  "temporaryGrantsRevokedInThisRun": 15,
   "activeFixtureSessionsRemaining": 0,
   "activeFixtureGrantsRemaining": 0,
   "unrelatedPendingQueueRowsUnchanged": 0,
@@ -28,6 +28,10 @@
     },
     {
       "name": "Foreign keys valid after fixture account deletion and R2 cleanup",
+      "status": "PASS"
+    },
+    {
+      "name": "Every pre-existing isolated row preserved by private backup hashes",
       "status": "PASS"
     }
   ],
