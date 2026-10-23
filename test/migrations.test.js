@@ -13,6 +13,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
   database.exec(readFileSync("migrations/0016_beta_account_moderation.sql", "utf8"));
   database.exec(readFileSync("migrations/0018_cloudflare_admin_sessions.sql", "utf8"));
   database.exec(readFileSync("migrations/0019_member_age_safety_holds.sql", "utf8"));
+  database.exec(readFileSync("migrations/0020_age_hold_write_guards.sql", "utf8"));
   const tables = database.database.prepare(
     "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name",
   ).all().map(({ name }) => name);

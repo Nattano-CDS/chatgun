@@ -67,6 +67,8 @@ async function startOauth(provider, payload) {
 }
 
 function showReauthentication() {
+  // Deletion verification must remain usable even when identity linking is denied.
+  document.getElementById('account-security').hidden = false;
   const container = document.getElementById("reauth-providers");
   container.replaceChildren();
   const providers=account.providers.filter(provider=>availableProviders.has(provider));
@@ -118,16 +120,25 @@ fetch("/api/auth/me", { credentials: "same-origin" })
   })
   .then((result) => {
     account = result;
+    // Never trust an age-review query string as evidence of an account hold.
+    document.getElementById('age-safety-notice').hidden = account.ageSafetyReviewRequired !== true;
+    if (account.ageSafetyReviewRequired === true) {
+      const socialNavigation = document.querySelector('.auth-navigation');
+      if (socialNavigation) socialNavigation.hidden = true;
+      const homeLink = document.querySelector('.auth-header-link');
+      if (homeLink) homeLink.textContent = 'กลับหน้าแรก';
+    }
     document.getElementById("status").textContent = `เข้าสู่ระบบแล้ว ${account.user.displayName || account.user.email || "สมาชิก ChatGun"}`;
     document.getElementById("logout").hidden = false;
-    document.getElementById("linking").hidden = !account.canLinkAccounts;
+    document.getElementById("linking").hidden = !account.canLinkAccounts || account.ageSafetyReviewRequired === true;
+    document.getElementById('account-security').hidden = document.getElementById('linking').hidden;
     document.getElementById("deletion").hidden = false;
     document.getElementById('session-management').hidden=false;loadSessions();
     fetch("/api/social/config", { credentials: "same-origin" })
       .then((response) => response.ok ? response.json() : null)
       .then((config) => {
-        if (config?.socialAppEnabled && account.nextPath === "/app/") document.getElementById("open-social").hidden = false;
-        document.getElementById('account-appeals-link').hidden = !config?.accountModerationEnabled;
+        if (config?.socialAppEnabled && account.nextPath === "/app/" && account.ageSafetyReviewRequired !== true) document.getElementById("open-social").hidden = false;
+        document.getElementById('account-appeals-link').hidden = !config?.accountModerationEnabled || account.ageSafetyReviewRequired === true;
         if(config?.moderationToolsEnabled)fetch('/api/social/moderation/capabilities',{credentials:'same-origin'}).then(r=>r.ok?r.json():null).then(c=>{document.getElementById('account-moderation-link').hidden=!(c?.canReviewReports||c?.canReviewMedia);}).catch(()=>{});
       })
       .catch(() => {});

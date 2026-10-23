@@ -19,10 +19,11 @@ async function cf(path,body){
 assert.equal((await cf('')).id,account);
 const query=async sql=>{const r=(await cf('/d1/database/'+database+'/query',{sql}))[0];assert.equal(r.meta.changed_db,false);return r.results;};
 const applied=(await query('SELECT name FROM d1_migrations ORDER BY id')).map(r=>r.name);
-const source=readdirSync('migrations').filter(n=>/^\d{4}.*\.sql$/u.test(n)).sort();assert.equal(source.length,19);
-assert.ok(applied.length===17||applied.length===19,'Unexpected isolated migration state');assert.deepEqual(applied,source.slice(0,applied.length));
-if(applied.length===19){assert.equal((await query('SELECT COUNT(*) n FROM pragma_foreign_key_check'))[0].n,0);console.log('Isolated schema19 already applied; FK0; no migration or data changes');process.exit(0);}
-assert.deepEqual(source.slice(17),['0018_cloudflare_admin_sessions.sql','0019_member_age_safety_holds.sql']);
+const source=readdirSync('migrations').filter(n=>/^\d{4}.*\.sql$/u.test(n)).sort();assert.equal(source.length,20);
+assert.ok([17,19,20].includes(applied.length),'Unexpected isolated migration state');assert.deepEqual(applied,source.slice(0,applied.length));
+if(applied.length===20){assert.equal((await query('SELECT COUNT(*) n FROM pragma_foreign_key_check'))[0].n,0);console.log('Isolated schema20 already applied; FK0; no migration or data changes');process.exit(0);}
+assert.deepEqual(source.slice(17),['0018_cloudflare_admin_sessions.sql','0019_member_age_safety_holds.sql','0020_age_hold_write_guards.sql']);
+const pending=source.slice(applied.length);
 const directory=mkdtempSync('/Users/nattano/.codex/private-backups/chatgun/age-admin-isolated-schema-');chmodSync(directory,0o700);
 function exported(name){
  const file=directory+'/'+name+'.sql';
@@ -36,14 +37,15 @@ function fingerprints(db){const result={};for(const{name}of db.prepare("SELECT n
 }return result;}
 const before=exported('before'),old=fingerprints(before.local);
 // Rehearse against the protected export before touching isolated D1.
-for(const name of source.slice(17))before.local.exec(readFileSync('migrations/'+name,'utf8'));
+for(const name of pending)before.local.exec(readFileSync('migrations/'+name,'utf8'));
 assert.equal(before.local.prepare('PRAGMA foreign_key_check').all().length,0);
 for(const[name,value]of Object.entries(old))assert.deepEqual(fingerprints(before.local)[name],value);
 execFileSync('npx',['wrangler@4.151.1','d1','migrations','apply','chatgun-issue13-staging','--remote','--config','wrangler.issue13.jsonc'],{env:{...process.env,CLOUDFLARE_ACCOUNT_ID:account},stdio:'pipe'});
 const after=exported('after'),current=fingerprints(after.local);
 for(const[name,value]of Object.entries(old))assert.deepEqual(current[name],value,'Existing isolated table changed: '+name);
-assert.equal(current.cloudflare_admin_sessions.count,0);assert.equal(current.member_age_safety_holds.count,0);
-assert.equal((await query('SELECT COUNT(*) n FROM d1_migrations'))[0].n,19);assert.equal((await query('SELECT COUNT(*) n FROM pragma_foreign_key_check'))[0].n,0);
-writeFileSync(directory+'/verification.json',JSON.stringify({account,database,migrations:source.slice(17),old,current,foreignKeyViolations:0,productionWrites:0,protectedStagingWrites:0},null,2),{mode:0o600});
-console.log(JSON.stringify({database,migrationsApplied:2,migrationCount:19,foreignKeyViolations:0,oldTablesPreserved:Object.keys(old).length,backupProtected:true,productionWrites:0,protectedStagingWrites:0}));
+if(!old.cloudflare_admin_sessions)assert.equal(current.cloudflare_admin_sessions.count,0);
+if(!old.member_age_safety_holds)assert.equal(current.member_age_safety_holds.count,0);
+assert.equal((await query('SELECT COUNT(*) n FROM d1_migrations'))[0].n,20);assert.equal((await query('SELECT COUNT(*) n FROM pragma_foreign_key_check'))[0].n,0);
+writeFileSync(directory+'/verification.json',JSON.stringify({account,database,migrations:pending,old,current,foreignKeyViolations:0,productionWrites:0,protectedStagingWrites:0},null,2),{mode:0o600});
+console.log(JSON.stringify({database,migrationsApplied:pending.length,migrationCount:20,foreignKeyViolations:0,oldTablesPreserved:Object.keys(old).length,backupProtected:true,productionWrites:0,protectedStagingWrites:0}));
 before.local.close();after.local.close();

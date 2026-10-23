@@ -170,6 +170,38 @@ test("account page redirects unauthenticated users to signup", async ({ page }) 
   await expect(page.getByRole("heading", { name: "เข้าสู่ระบบด้วยบัญชีเดิม" })).toBeVisible();
 });
 
+test('age-held account has understandable Thai rights controls and usable deletion reauthentication', async ({page}, testInfo) => {
+  await page.route('**/api/auth/me',r=>r.fulfill({json:{user:{displayName:'บัญชีทดสอบความปลอดภัย'},providers:['line'],ageSafetyReviewRequired:true,canLinkAccounts:false,nextPath:'/account.html?access=age-review'}}));
+  await page.route('**/api/auth/sessions',r=>r.fulfill({json:{sessions:[],hasMore:false}}));
+  await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:true}}));
+  await page.route('**/api/auth/config',r=>r.fulfill({json:{oauthProviders:['line'],turnstileSiteKey:'synthetic-ui-only'}}));
+  await page.route('https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',r=>r.fulfill({contentType:'application/javascript',body:`window.turnstile={render(target){document.querySelector(target).textContent='การยืนยันความปลอดภัยจำลองสำหรับ UI เท่านั้น';return 'fixture';},getResponse(){return '';}};`}));
+  await page.route('**/api/auth/account-deletion/request',r=>r.fulfill({status:428,json:{code:'recent_auth_required'}}));
+  await page.goto('/account.html?access=age-review');
+  await expect(page.locator('#age-safety-notice')).toBeVisible();
+  await expect(page.locator('#age-safety-notice')).toContainText('อย่าส่งวันเกิดเต็ม');
+  await expect(page.locator('#age-safety-notice a[href="mailto:natttano@outlook.com"]')).toBeVisible();
+  await expect(page.locator('#open-social')).toBeHidden(); await expect(page.locator('#linking')).toBeHidden();
+  await expect(page.locator('.auth-navigation')).toBeHidden();
+  await expect(page.locator('#session-management')).toBeVisible(); await expect(page.locator('#logout')).toBeVisible();
+  await page.locator('#delete-start').click();
+  await expect(page.locator('#delete-reauth')).toBeVisible();
+  await expect(page.locator('#account-security')).toBeVisible();
+  await expect(page.locator('#turnstile')).toContainText('UI เท่านั้น');
+  await expect(page.locator('.reauth-provider')).toHaveText('LINE');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:resolve(screenshotDirectory,'age-safety-rights-'+testInfo.project.name+'.png'),fullPage:true});
+});
+
+test('query string cannot label a non-held member as age-restricted',async({page})=>{
+  await page.route('**/api/auth/me',r=>r.fulfill({json:{user:{displayName:'บัญชีทดสอบ'},providers:[],ageSafetyReviewRequired:false,canLinkAccounts:false,nextPath:'/account.html'}}));
+  await page.route('**/api/auth/sessions',r=>r.fulfill({json:{sessions:[],hasMore:false}}));
+  await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false}}));
+  await page.route('**/api/auth/config',r=>r.fulfill({json:{oauthProviders:[],turnstileSiteKey:'synthetic-ui-only'}}));
+  await page.goto('/account.html?access=age-review');
+  await expect(page.locator('#logout')).toBeVisible(); await expect(page.locator('#age-safety-notice')).toBeHidden();
+});
+
 test("Pages Functions expose secure config and reject cross-origin mutations", async ({ request, baseURL }) => {
   const configResponse = await request.get("/api/auth/config");
   expect(configResponse.status()).toBe(200);

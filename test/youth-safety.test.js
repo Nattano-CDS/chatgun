@@ -66,6 +66,25 @@ for (const band of ['under_13','13_17','18_19']) test(`age hold ${band} blocks b
     assert.equal((await onRequest({ env, request: request('/api/social/gallery', adult, {action:'like',id:'held-photo'}) })).status, 404);
     assert.equal(objectReads,0,'Denied media never reaches R2');
     assert.equal((await authRequest({ env, request: request('/api/auth/me', youth) })).status, 200, 'Account/privacy controls stay reachable');
+    const withoutAcceptance = await (await authRequest({ env, request: request('/api/auth/me', youth) })).json();
+    assert.equal(withoutAcceptance.ageSafetyReviewRequired, true);
+    assert.equal(withoutAcceptance.nextPath, '/account.html?access=age-review', 'Turning acceptance off cannot hide a hold');
+    assert.equal(withoutAcceptance.canLinkAccounts, false);
+    assert.ok(!JSON.stringify(withoutAcceptance).includes(band), 'Only the account owner receives a safe hold boolean, not an age band');
+    // Simulate writes that passed an API check before the hold was installed.
+    for (const sql of [
+      "UPDATE member_profiles SET discovery_visible=1,latitude=13,longitude=100,accuracy=5,located_at=1 WHERE user_id='local-held'",
+      "UPDATE member_profiles SET direct_messages_enabled=1 WHERE user_id='local-held'",
+      "UPDATE member_profiles SET latitude=13 WHERE user_id='local-held'",
+      "UPDATE member_presence_preferences SET show_online=1 WHERE user_id='local-held'",
+      "INSERT INTO member_presence_preferences(user_id,show_online)VALUES('local-held',1) ON CONFLICT(user_id) DO UPDATE SET show_online=1",
+      "INSERT INTO member_presence_leases(user_id,session_token_hash,tab_id,touched_at)SELECT 'local-held',token_hash,'local-fixture-tab-0003',1 FROM sessions WHERE user_id='local-held'",
+      "UPDATE member_presence_leases SET user_id='local-held' WHERE user_id='local-adult'",
+      "INSERT INTO member_profiles(user_id,age_assurance_id,name,discovery_visible,direct_messages_enabled,created_at,updated_at)VALUES('local-held','local-held-age','Attempt',0,1,1,1) ON CONFLICT(user_id) DO UPDATE SET direct_messages_enabled=1",
+    ]) await assert.rejects(db.prepare(sql).run(), /age_safety_contact_denied/u, sql);
+    await db.prepare("UPDATE member_profiles SET bio='Private account correction pending' WHERE user_id='local-held'").run();
+    await db.prepare("UPDATE member_profiles SET direct_messages_enabled=1 WHERE user_id='local-adult'").run();
+    assert.equal((await db.prepare("SELECT COUNT(*) n FROM member_presence_leases WHERE user_id='local-adult'").first()).n, 1, 'Unrelated adult presence stays intact');
     const authEnv={...env,ACCEPTANCE_FLOW_ENABLED:'true',ADULT_NOTICE_VERSION:'age-notice-v1',TERMS_VERSION:'terms-v1',PRIVACY_VERSION:'privacy-v1'};
     const authStatus=await(await authRequest({env:authEnv,request:request('/api/auth/me',youth)})).json();
     assert.equal(authStatus.nextPath,'/account.html?access=age-review');assert.equal(authStatus.canLinkAccounts,false);
@@ -97,10 +116,24 @@ test('new migrations are additive/idempotent and leave schema17 member rows inta
     const now = unixTime();
     await db.prepare("INSERT INTO users(id,display_name,status,created_at,updated_at)VALUES('preserved','Preserve','active',?,?)").bind(now, now).run();
     const before = await db.prepare("SELECT * FROM users WHERE id='preserved'").first();
-    for (let i=0;i<2;i++) for (const file of ['0018_cloudflare_admin_sessions.sql','0019_member_age_safety_holds.sql']) db.exec(readFileSync('migrations/' + file, 'utf8'));
+    for (let i=0;i<2;i++) for (const file of ['0018_cloudflare_admin_sessions.sql','0019_member_age_safety_holds.sql','0020_age_hold_write_guards.sql']) db.exec(readFileSync('migrations/' + file, 'utf8'));
     assert.deepEqual(await db.prepare("SELECT * FROM users WHERE id='preserved'").first(), before);
     assert.equal((await db.prepare('SELECT COUNT(*) n FROM pragma_foreign_key_check').first()).n, 0);
     const cols = (await db.prepare('PRAGMA table_info(member_age_safety_holds)').all()).results.map(r=>r.name);
     assert.ok(!cols.some(c=>/birth|email|parent|location/u.test(c)));
+  } finally { db.close(); }
+});
+
+test('schema20 adds guards without changing existing schema19 accounts or holds', async () => {
+  const db = new TestD1({throughMigration:'0019_member_age_safety_holds.sql'});
+  try {
+    await member(db,'preserved-adult'); await member(db,'preserved-held');
+    await db.prepare("INSERT INTO member_age_safety_holds VALUES('preserved-held','13_17','held','fixture',1,1)").run();
+    const snapshot = () => db.database.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all()
+      .map(({name}) => [name, db.database.prepare(`SELECT * FROM ${name}`).all()]);
+    const before = snapshot();
+    for (let i=0;i<2;i++) db.exec(readFileSync('migrations/0020_age_hold_write_guards.sql','utf8'));
+    assert.deepEqual(snapshot(), before);
+    assert.equal((await db.prepare('SELECT COUNT(*) n FROM pragma_foreign_key_check').first()).n,0);
   } finally { db.close(); }
 });

@@ -13,7 +13,7 @@ const db=new TestD1(),now=unixTime(),sessions={},fullSystem=process.env.CHATGUN_
 const tls=mkdtempSync(resolve(tmpdir(),'chatgun-issue16-local-tls-'));
 execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',tls+'/key.pem','-out',tls+'/cert.pem','-subj','/CN=localhost','-days','1'],{stdio:'pipe'});
 const tlsOptions={key:readFileSync(tls+'/key.pem'),cert:readFileSync(tls+'/cert.pem')};
-for(const width of [390,768,1440])for(const [kind,name] of [['viewer','ผู้ทดสอบระบบผู้ชม'],['owner','ผู้ทดสอบชื่อภาษาไทยยาวสำหรับตรวจการตัดบรรทัด'],['other','ผู้ทดสอบบัญชีอื่น'],...(fullSystem?[['moderator','ผู้ตรวจระบบแยก']]:[])]){
+for(const width of [390,768,1440])for(const [kind,name] of [['viewer','ผู้ทดสอบระบบผู้ชม'],['owner','ผู้ทดสอบชื่อภาษาไทยยาวสำหรับตรวจการตัดบรรทัด'],['other','ผู้ทดสอบบัญชีอื่น'],...(fullSystem?[['moderator','ผู้ตรวจระบบแยก'],['held','บัญชีจำลองที่พักสิทธิ์ตามอายุ']]:[])]){
   const id=kind+width;
   db.exec(`INSERT INTO users(id,display_name,status,created_at,updated_at)VALUES('${id}','${name}','active',${now},${now});
     INSERT INTO age_assurance_events VALUES('${id}-adult','${id}','adult_18_plus','self_declaration','local-test',${now},NULL);
@@ -21,6 +21,8 @@ for(const width of [390,768,1440])for(const [kind,name] of [['viewer','ผู้
       VALUES('${id}','${id}-adult','${name}',1,0,0,10,${now},${now},${now});`);
   sessions[id]=await issueSession(db,id);
   if(fullSystem)await db.prepare("INSERT INTO beta_enrollments(user_id,status,created_at,activated_at)VALUES(?,'active',?,?)").bind(id,now,now).run();
+  // A local-only correction of a legacy adult declaration, not youth admission.
+  if(kind==='held')await db.prepare("INSERT INTO member_age_safety_holds(user_id,age_band,state,notice_version,declared_at,updated_at)VALUES(?,'13_17','held','local-only',?,?)").bind(id,now,now).run();
   if(kind==='owner'||kind==='moderator')for(const role of ['report_reviewer','safety_admin'])await db.prepare('INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at) VALUES(?,?,?,?,?,?)').bind(id+'-'+role,id,role,'Local-only browser authorization fixture',now,now+86400).run();
 }
 writeFileSync('/tmp/chatgun-issue16-local-sessions.json',JSON.stringify(sessions),{mode:0o600});

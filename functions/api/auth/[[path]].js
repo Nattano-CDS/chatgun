@@ -425,6 +425,7 @@ async function currentUser(request, env) {
     recentlyAuthenticated: hasRecentAuthentication(session),
     acceptanceRequired: journey.acceptanceRequired,
     nextPath: journey.nextPath,
+    ageSafetyReviewRequired: journey.ageSafetyReviewRequired === true,
     canLinkAccounts: journey.nextPath === "/app/",
   });
 }

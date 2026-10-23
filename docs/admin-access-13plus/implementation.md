@@ -1,5 +1,10 @@
 # Cloudflare-only Admin and 13+ safeguards — implementation, not public activation
 
+>24 October update: [youth safeguard follow-up](youth-followup-20261024.md) adds
+>schema20 write guards and account-rights UX. Admin/MFA setup is paused at owner
+>request. Zero Trust Free activation was verified22 October; the older onboarding
+>status below is historical. No Access app/policy or new Admin role has been saved.
+
 Owner approved remote Cloudflare setup, minimum age 13 and the exact Admin email
 `natttano@outlook.com`. No additional real member, invitation or permanent grant is
 created. No Production or original staging records are changed.

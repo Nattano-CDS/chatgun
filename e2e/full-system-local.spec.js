@@ -42,6 +42,24 @@ test('optional API failure leaves profile and navigation usable, with explicit r
  const s=(cloud?.sessions||JSON.parse(readFileSync('/tmp/chatgun-issue16-local-sessions.json'))).viewer390,context=await browser.newContext({baseURL:origin,ignoreHTTPSErrors:true});try{for(const[name,value]of[['__Host-cg_session',s.token],['__Host-cg_csrf',s.csrf]])await context.addCookies([{name,value,url:origin,secure:true,sameSite:'Lax'}]);const page=await context.newPage();let fail=true;await page.route('**/api/social/moderation/notifications',r=>fail?r.fulfill({status:503,json:{message:'Temporary isolated failure'}}):r.continue());await page.goto('/?tab=profile');await expect(page.locator('#profile-form')).toBeVisible();await expect(page.locator('#disabled-view')).toBeHidden();await expect(page.locator('#section-recovery')).toContainText('ผลการดูแลสื่อ');fail=false;await page.locator('#section-retry').click();await expect(page.locator('#section-recovery')).toBeHidden();}finally{await context.close();}
 });
 
+for(const width of[390,768,1440])test(`held account real-handler privacy and deletion journey ${width}`,async({browser})=>{
+ test.skip(Boolean(cloud),'Local-only held fixtures; never create or modify remote youth accounts');
+ const s=JSON.parse(readFileSync('/tmp/chatgun-issue16-local-sessions.json'))['held'+width];
+ const context=await browser.newContext({baseURL:origin,ignoreHTTPSErrors:true,viewport:{width,height:900}});
+ try{
+  for(const[name,value]of[['__Host-cg_session',s.token],['__Host-cg_csrf',s.csrf]])await context.addCookies([{name,value,url:origin,secure:true,sameSite:'Lax'}]);
+  const page=await context.newPage();
+  const me=await(await context.request.get('/api/auth/me')).json();expect(me.ageSafetyReviewRequired).toBe(true);expect(me.canLinkAccounts).toBe(false);
+  for(const path of['profile','discovery','conversations','gallery','online'])expect((await context.request.get('/api/social/'+path)).status()).toBe(403);
+  await page.goto('/account.html');await expect(page.locator('#age-safety-notice')).toBeVisible();await expect(page.locator('#linking')).toBeHidden();await expect(page.locator('#open-social')).toBeHidden();await expect(page.locator('#session-management')).toBeVisible();await expect(page.locator('.auth-navigation')).toBeHidden();await expect(page.locator('#account-appeals-link')).toBeHidden();
+  await page.locator('#age-safety-notice a[href="mailto:natttano@outlook.com"]').focus();await expect(page.locator('#age-safety-notice a[href="mailto:natttano@outlook.com"]')).toBeFocused();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:dir+'/held-account-'+width+'.png',fullPage:true});
+  await page.locator('#delete-start').click();await expect(page.locator('#delete-confirm')).toBeVisible();await page.locator('#delete-phrase').fill('ลบบัญชีถาวร');await page.locator('#delete-confirm button').click();await expect(page.getByRole('heading',{name:'ลบบัญชีแล้ว',exact:true})).toBeVisible();
+  expect((await context.request.get('/api/auth/me')).status()).toBe(401);expect((await context.request.get('/api/social/profile')).status()).toBe(401);
+ }finally{await context.close();}
+});
+
 for(const width of[390,768,1440])test(`non-owner fixture account settings, session listing and deletion ${width}`,async({browser})=>{
  const s=(cloud?.sessions||JSON.parse(readFileSync('/tmp/chatgun-issue16-local-sessions.json')))['other'+width],context=await browser.newContext({baseURL:origin,ignoreHTTPSErrors:true,viewport:{width,height:900}});
  try{for(const[name,value]of[['__Host-cg_session',s.token],['__Host-cg_csrf',s.csrf]])await context.addCookies([{name,value,url:origin,secure:true,sameSite:'Lax'}]);const page=await context.newPage();await page.goto('/account.html');await expect(page.locator('#session-management')).toBeVisible();await expect(page.locator('#session-list')).toContainText('เซสชันนี้');await expect(page.locator('#account-moderation-link')).toBeHidden();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
