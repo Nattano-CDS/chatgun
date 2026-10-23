@@ -1,0 +1,164 @@
+{
+  "checkedAt": "2026-10-23T20:28:22.852Z",
+  "origin": "https://uat.chatgun-final-uat.pages.dev",
+  "applicationSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+  "checks": [
+    {
+      "name": "google initiation closed",
+      "path": "/api/auth/oauth/google/start",
+      "method": "POST",
+      "http": 503,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "google foreign origin denied",
+      "path": "/api/auth/oauth/google/start",
+      "method": "POST",
+      "http": 403,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "google callback cannot authenticate while closed",
+      "path": "/api/auth/oauth/google/callback?code=invalid-uat-negative-only&state=invalid-uat-negative-only",
+      "method": "GET",
+      "http": 303,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "facebook initiation closed",
+      "path": "/api/auth/oauth/facebook/start",
+      "method": "POST",
+      "http": 503,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "facebook foreign origin denied",
+      "path": "/api/auth/oauth/facebook/start",
+      "method": "POST",
+      "http": 403,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "facebook callback cannot authenticate while closed",
+      "path": "/api/auth/oauth/facebook/callback?code=invalid-uat-negative-only&state=invalid-uat-negative-only",
+      "method": "GET",
+      "http": 303,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "line initiation closed",
+      "path": "/api/auth/oauth/line/start",
+      "method": "POST",
+      "http": 503,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "line foreign origin denied",
+      "path": "/api/auth/oauth/line/start",
+      "method": "POST",
+      "http": 403,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "line callback cannot authenticate while closed",
+      "path": "/api/auth/oauth/line/callback?code=invalid-uat-negative-only&state=invalid-uat-negative-only",
+      "method": "GET",
+      "http": 303,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "unknown provider rejected",
+      "path": "/api/auth/oauth/invalid/start",
+      "method": "POST",
+      "http": 404,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "missing member session denied",
+      "path": "/api/auth/me",
+      "method": "GET",
+      "http": 401,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "session management denied",
+      "path": "/api/auth/sessions",
+      "method": "GET",
+      "http": 401,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "session mutation foreign origin denied",
+      "path": "/api/auth/logout",
+      "method": "POST",
+      "http": 403,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "standalone Admin stays disabled",
+      "path": "/api/admin/session",
+      "method": "GET",
+      "http": 404,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "Email OTP remains disabled",
+      "path": "/api/auth/otp/start",
+      "method": "POST",
+      "http": 404,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    },
+    {
+      "name": "Mobile OTP remains disabled",
+      "path": "/api/auth/otp/start",
+      "method": "POST",
+      "http": 404,
+      "status": "PASS",
+      "noCrossDomainCookie": true
+    }
+  ],
+  "passed": 16,
+  "failed": 0,
+  "screens": [
+    {
+      "width": 390,
+      "status": "PASS",
+      "scriptErrors": 0,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 768,
+      "status": "PASS",
+      "scriptErrors": 0,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1440,
+      "status": "PASS",
+      "scriptErrors": 0,
+      "horizontalOverflow": false
+    }
+  ],
+  "genuineOAuth": "NOT RUN",
+  "genuineMfa": "NOT RUN",
+  "turnstileHuman": "NOT RUN",
+  "limitation": "Providers deliberately OFF. Invalid-state/token/PKCE cryptographic paths are covered by isolated implementation tests, not falsely claimed as exercised through an active live provider.",
+  "accountsCreated": 0,
+  "invitationsIssued": 0,
+  "roleGrants": 0
+}

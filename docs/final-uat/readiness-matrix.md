@@ -2,6 +2,8 @@
 
 Decision: **PARTIALLY READY — EXTERNAL APPROVALS REQUIRED**. Genuine human UAT has NOT started. No invitation, genuine account, owner role grant or Production activation was performed in this preparation.
 
+Latest OAuth/Access execution: [configuration status and consolidated handoff](oauth-access-setup/status.md). Google/Meta exact UAT forms are populated but not submitted pending action-time security confirmation; LINE console requires login. Wrangler lacks Access Write; independent MFA additionally requires an organization-level scope decision. New live negative checks16/16 and relevant implementation checks37/37 plus5 new boundary/import-error/role-plan regressions pass; these are not provider/MFA success.
+
 Frozen application: `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Initial PR #17 evidence HEAD: `e7079c692e3de3c8fb18856eb7da77916246c64e`. Closing PR comment records the eventual readiness-tooling HEAD and CI result; it is not a new application release.
 
 | Prerequisite | Status | Evidence / exact limitation |
