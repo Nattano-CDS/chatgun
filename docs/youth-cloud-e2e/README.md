@@ -37,8 +37,11 @@ server expiry. No general-purpose deletion/cleanup command is exposed publicly.
 
 The dedicated config must be invoked explicitly. Default Playwright excludes this
 remote suite and CI never receives Cloudflare credentials or writes remote fixtures.
-Seven local tests reject Production targets, unrelated/duplicate actors, incomplete
-manifests and credential-header injection.
+Seven scope tests cover valid fixtures and rejection of Production targets,
+unrelated/duplicate actors, incomplete manifests and credential-header injection.
+Four further tests verify fresh/stale/expired sessions and an interrupted setup.
+Fixture expiry is bounded in the very first INSERT, not a later UPDATE; a process
+failure cannot leave the library's ordinary30-day session or fresh-auth evidence.
 
 Two actual batches were run on24October2026. The first exposed only test-harness URL
 canonicalization/logout timing assumptions. After corrections, a new final batch

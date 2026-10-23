@@ -5,7 +5,7 @@
   "schema": 20,
   "productionShaUnchanged": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
   "automated": {
-    "unitIntegrationSecurity": {"passed": 227, "failed": 0, "skipped": 0},
+    "unitIntegrationSecurity": {"passed": 231, "failed": 0, "skipped": 0},
     "mockedPlatformUi": {"passed": 93, "failed": 0, "skipped": 0},
     "realHandlerLocalBrowser": {"passed": 10, "failed": 0, "skipped": 0},
     "realCloudflareBrowserFinalFullRun": {"passed": 11, "failed": 0, "skipped": 0}

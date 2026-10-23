@@ -5,9 +5,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,writeFileSync,mkdtempSync,chmodSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
 import {randomUUID,createHash} from 'node:crypto';
-import {issueSession} from '../functions/_lib/db.js';
-import {sha256} from '../functions/_lib/crypto.js';
-import {assertYouthFixtureScope} from './lib/youth-fixture-scope.mjs';
+import {assertYouthFixtureScope,issueYouthFixtureSession} from './lib/youth-fixture-scope.mjs';
 
 assert.equal(process.env.CHATGUN_ISOLATED_STAGING,'issue13');
 const mode=process.argv[2];assert.ok(['prepare','verify'].includes(mode));
@@ -58,13 +56,11 @@ if(mode==='prepare'){
   const id=run+'-'+band+'-'+width,actor={id,band,width};actors.push(actor);save();
   await query("INSERT INTO users(id,display_name,status,account_state,created_at,updated_at)VALUES(?,?,'active','pending_acceptance',?,?)",[id,'บัญชีสังเคราะห์สำหรับทดสอบความปลอดภัย',now,now]);
   await query("INSERT INTO member_age_safety_holds(user_id,age_band,state,notice_version,declared_at,updated_at)VALUES(?,?,'held','synthetic-cloud-e2e-v1',?,?)",[id,band==='control'?'13_17':band,now,now]);
-  actor.session=await issueSession(db,id);actor.other=await issueSession(db,id);
+  actor.session=await issueYouthFixtureSession(db,id,{now});actor.other=await issueYouthFixtureSession(db,id,{now});
   if(band==='control'){
-   actor.stale=await issueSession(db,id,now-660);actor.expired=await issueSession(db,id,now-120);
-   await query('UPDATE sessions SET expires_at=? WHERE token_hash=? AND user_id=?',[now-1,await sha256(actor.expired.token),id]);
+   actor.stale=await issueYouthFixtureSession(db,id,{now,authenticatedAt:now-660});actor.expired=await issueYouthFixtureSession(db,id,{now,expired:true});
   }
-  await query('UPDATE sessions SET expires_at=MIN(expires_at,?) WHERE user_id=?',[now+1800,id]);
-  await query('UPDATE session_auth_evidence SET expires_at=MIN(expires_at,?) WHERE user_id=?',[now+1800,id]);save();
+  save();
  }
  assertYouthFixtureScope(manifest);
  console.log('Prepared10 new isolated synthetic held accounts;30-minute sessions and manifest stored privately; no OAuth identities, profiles, R2 or Production writes.');

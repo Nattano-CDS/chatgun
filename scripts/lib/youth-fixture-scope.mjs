@@ -1,4 +1,18 @@
 import assert from 'node:assert/strict';
+import {randomToken,sha256} from '../../functions/_lib/crypto.js';
+// Bound the server expiry in the FIRST insert, not a later best-effort UPDATE.
+// A process failure between inserts must not leave a 30-day fixture session.
+export async function issueYouthFixtureSession(db,userId,{now,authenticatedAt=now,expired=false}){
+ assert.ok(/^youth-e2e-[a-f0-9-]{36}-(?:under_13|13_17|18_19|control)-(?:390|768|1440)$/u.test(userId),'Not a scoped synthetic actor');
+ assert.ok(Number.isSafeInteger(now)&&Number.isSafeInteger(authenticatedAt)&&authenticatedAt<=now,'Invalid fixture clock');
+ const token=randomToken(),csrf=randomToken(),tokenHash=await sha256(token);
+ const createdAt=expired?now-120:now,expiresAt=expired?now-1:now+1800;
+ await db.batch([
+  db.prepare('INSERT INTO sessions(token_hash,user_id,csrf_hash,created_at,expires_at,last_seen_at)VALUES(?,?,?,?,?,?)').bind(tokenHash,userId,await sha256(csrf),createdAt,expiresAt,createdAt),
+  db.prepare('INSERT INTO session_auth_evidence(token_hash,user_id,authenticated_at,expires_at)VALUES(?,?,?,?)').bind(tokenHash,userId,Math.min(authenticatedAt,createdAt),expiresAt),
+ ]);
+ return{token,csrf};
+}
 export function assertYouthFixtureScope(m){
  assert.equal(m?.syntheticOnly,true,'Not a synthetic manifest');
  assert.equal(m.database,'275d9820-6aec-494a-8bb5-b7ed9b8b74cc','Not isolated D1');
