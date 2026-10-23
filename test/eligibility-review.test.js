@@ -68,6 +68,7 @@ test('feature defaults closed; invalid requests, absent holds, origin and CSRF f
     assert.equal((await call('held',{action:'request',reason},false, {origin:'https://evil.example'})).status,403);
     assert.equal((await call('held',{action:'request',reason},false,{'x-csrf-token':''})).status,403);
     assert.equal((await call('held',{action:'request',reason:'short'})).status,400);
+    assert.equal((await call('held',{action:'request',reason:'😀'.repeat(5)})).status,400,'Unicode length must match the database rather than causing a constraint500');
     assert.equal((await call('other',{action:'request',reason})).status,409);
     assert.equal((await db.prepare('SELECT COUNT(*) n FROM eligibility_review_requests').first()).n,0);
   }finally{db.close();}

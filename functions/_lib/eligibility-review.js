@@ -3,7 +3,8 @@ import { getSession, requireCsrf, hasRecentAuthentication, rateLimit, unixTime }
 import { failure, json, readJson, requireSameOrigin } from './http.js';
 
 const enabled = env => env.ELIGIBILITY_REVIEW_ENABLED === 'true';
-const reasonText = (value, max) => typeof value === 'string' && value.trim().length >= 10 && value.trim().length <= max
+// Match SQLite length() code points, not UTF-16 units (five emoji are not ten characters).
+const reasonText = (value, max) => typeof value === 'string' && [...value.trim()].length >= 10 && [...value.trim()].length <= max
   && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/u.test(value) ? value.trim() : null;
 
 export async function eligibilityRequest(request, env) {
