@@ -1,0 +1,23 @@
+{
+  "checkedDateBangkok":"2026-10-24",
+  "account":"23017b53386fb67fc62a52cdd017454c",
+  "organizationMethods":{"totp":true,"biometrics":false,"security_key":false,"piv_key":false,"ssh_fido2_key":false},
+  "applyGlobalMfaByDefault":false,
+  "identityProviderMfaSkip":false,
+  "denyUnmatchedRequests":false,
+  "uatApplicationId":"c2c866d3-3d41-410b-909f-4beac2683a17",
+  "uatPolicyId":"8fbef132-a338-4ec4-8c7e-94b29749e0d6",
+  "uatApplicationSession":"10m",
+  "uatApplicationMfa":{"required":true,"methods":["totp"],"requireEveryLogin":true},
+  "uatOwnerPolicyMfa":{"required":true,"methods":["totp"],"requireEveryLogin":true,"exactOwnerEmailOnly":true,"idpOnlyAmrSelector":false},
+  "enrollmentPortal":{"host":"tiny-violet-2021.cloudflareaccess.com","ownerOnly":true,"policyId":"b3168995-89e2-4f88-ad2d-9ebf52ba7824","applicationSession":"15m","policySession":"10m","linkedOnlyTo":"App Launcher","adminRoleGrant":false,"enrollmentEntryReached":"Cloudflare primary sign-in"},
+  "verification":"Authenticated dashboard save and reload/read-back; Access API remains scope-limited",
+  "authenticatorEnrollment":"OWNER HANDOFF; not verified",
+  "genuineMfa":"NOT RUN",
+  "genuineChatgunCampaign":"NOT STARTED",
+  "ownerUuidMapped":false,
+  "chatgunRoleGrants":0,
+  "productionApplicationWrites":0,
+  "productionDatabaseWrites":0,
+  "organizationSecurityChange":"Only approved TOTP method enabled and owner-only enrollment portal configured; global enforcement remains OFF"
+}

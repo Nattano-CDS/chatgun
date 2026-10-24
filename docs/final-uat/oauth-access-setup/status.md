@@ -1,6 +1,6 @@
 # UAT OAuth / Access configuration execution
 
-Application remains frozen at `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Starting PR HEAD was `2b16100802b1fe8924ab493d64e6ffd7078033c8`; exact closing HEAD and CI are recorded in the PR closing comment. No Production deployment, migration, account change or role grant.
+Application remains frozen at `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Starting PR HEAD was `2b16100802b1fe8924ab493d64e6ffd7078033c8`; exact closing HEAD/CI are in the PR comment. No Production application deployment, migration, member-data change or role grant. The separately approved Cloudflare organization TOTP availability/enrollment-portal changes are documented below; global enforcement stays OFF.
 
 ## Actual status — not a completion claim
 
@@ -12,8 +12,8 @@ Application remains frozen at `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Starti
 | Meta | CONFIGURED / human OAuth NOT RUN | Separate **ChatGun UAT**, app1546406076913004, is a test version of parent1136950635489003, not Production1732162668911193. Exact UAT callback persisted alongside inherited callbacks; UAT domain/site URL saved. Client/Web OAuth, enforced HTTPS and Strict Mode ON; embedded/device/JS SDK login OFF. Actual Advanced settings show v26.0; Require app secret/proof enabled and saved. Following owner reauthentication, only the NEW child secret was read privately and stored0600/encrypted Preview. No publication or new roles/testers. Genuine callback/token exchange NOT RUN |
 | LINE | CONFIGURED / human OAuth NOT RUN | Owner completed separate channel2012186357 under ChatGun provider2005640887. ChatGun UAT, LINE Login, Thailand, Developing, Admin ownership, PROFILE/OPENID_CONNECT, email permission Unapplied. Exact UAT callback saved/read back; real UI Require two-factor switch ON. NEW channel ID/secret protected0600/encrypted Preview; old channel2012039306 untouched. No publication/tester invitations or genuine callback |
 | Access API403/code1010 | API still BLOCKED; dashboard saved | Wrangler OAuth scopes have no Access Write/Edit; direct resource GET also403. Authenticated dashboard successfully saved separate UAT policy/app without API token expansion or billing changes |
-| Access dashboard | CONFIGURED / genuine MFA NOT RUN | Created **ChatGun Final UAT Admin**, app c2c866d3-3d41-410b-909f-4beac2683a17; policy8fbef132-a338-4ec4-8c7e-94b29749e0d6. Exact two UAT destinations accepted and read back; session10m. Policy read-back confirms owner email AND Authentication Method `mfa` only (no PIN alternative). HttpOnly and binding-cookie hardening saved; launcher hidden because wildcard-only domains have no launch URL. Anonymous HTTP requests to both Admin paths302 to exact trusted Access team. Public auth/config remains JSON200 |
-| Independent MFA | BLOCKED | Dashboard explicitly says organization MFA not turned on; app-level custom MFA unavailable. Official docs require organization-level enablement first. This is an additional organization-scope decision, not covered by silently changing UAT-only settings |
+| Access dashboard | CONFIGURED / genuine MFA NOT RUN | **ChatGun Final UAT Admin**, app c2c866d3-3d41-410b-909f-4beac2683a17; policy8fbef132-a338-4ec4-8c7e-94b29749e0d6. Exact UAT destinations, session10m, HttpOnly/binding cookies retained. Both app and exact-owner policy now explicitly require independent TOTP every Access login. IdP-only AMR `mfa` selector replaced AFTER independent enforcement was saved/read back; no single-factor or Bypass alternative. Anonymous Admin paths302 to exact trusted team; public auth/config JSON200 |
+| Independent MFA | CONFIGURED / enrollment handoff | Owner instructed proceeding after the explicit organization-scope question. Enabled only TOTP; other methods, IdP-MFA skip, account-wide deny and **Apply global MFA settings by default** remain OFF. App/policy enforcement applies only to UAT. Disabled App Launcher initially blocked device enrollment; configured separate exact-owner enrollment policy b3168995-89e2-4f88-ad2d-9ebf52ba7824, attached ONLY to App Launcher,10m policy/15m app session. Real owner enrollment/pairing and MFA success NOT VERIFIED; no QR/setup key/OTP collected |
 | Admin mapping/roles | NOT RUN | Verified issuer/AUD/owner-email metadata encrypted in UAT Preview and redeployed, but no owner UUID mapped, standalone/moderation OFF and no grant. Genuine UAT UUID must be privately verified and grant scope independently approved; no Production UUID/role copy or extension. Prepared UAT-only role PLAN at most8hours; no executor run |
 | Turnstile | PASS configuration / NOT RUN human | Same dedicated real widget/site key/encrypted secret. Host/action checks unchanged; human challenge deferred to final campaign. No test-bypass keys |
 | Live negative security | PASS |17 checks after Access setup; disabled starts, foreign origins, callbacks, invalid provider/session, two Admin edge redirects and disabled OTP; no users/flows/invitations fabricated |
@@ -21,7 +21,7 @@ Application remains frozen at `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Starti
 | Responsive closed UAT | PASS |390/768/1440 actual-host screenshots; zero JS errors/overflow |
 | Genuine OAuth/MFA | NOT RUN | Final human campaign explicitly not started |
 
-Owner replied “ทำเลย” to the consolidated confirmation. Execution was limited to UAT-only credential/Access creation; organization-wide independent MFA was explicitly excluded in the execution commentary because the owner did not select that expanded scope. No Production role, UUID mapping, invitation or account was created. Do not mistake stored credentials, an MFA policy condition or an anonymous Access redirect for genuine provider/MFA success.
+Initial “ทำเลย” authorized UAT-only provisioning; organization settings were then left unchanged. Following the explicit organization-level TOTP scope question, owner said “ทำได้เลยตอนนี้ตามคำแนะนำ”; the execution commentary specified enabling TOTP while preserving Production and roles. TOTP method availability is now ON, but global default enforcement stays OFF. No Production role, ChatGun UUID mapping, invitation or account was created. Stored credentials/policy settings/anonymous redirects are not genuine OAuth/MFA success.
 
 ## Access diagnosis and route inventory
 
@@ -48,7 +48,15 @@ Google JS origin: `https://uat.chatgun-final-uat.pages.dev`. No new test user or
 
 ## Single minimal owner handoff
 
-Provider-console password/agreement steps are complete; no further provider login is requested during preparation. Remaining setup decision: independent organization MFA remains OFF. Explicitly approve enabling organization-level TOTP (potential inherited defaults for other Access apps), or approve an MFA-capable IdP design. The saved UAT owner+MFA policy stays strict, with no single-factor fallback. This decision is not silently included in the narrower UAT-only approval.
+Provider-console password/agreement steps and independent-MFA configuration are complete. One credential-enrollment handoff remains: open `https://tiny-violet-2021.cloudflareaccess.com/AddMfaDevice`, select Cloudflare, authenticate as the owner, then Account → MFA devices → Add an MFA device → Authenticator application. Owner must scan/pair and enter TOTP themselves. Do not send QR, setup key, OTP or recovery information through chat/GitHub. Enrollment does not grant ChatGun roles or start the consolidated member UAT.
+
+## Independent MFA implementation detail
+
+Cloudflare distinguishes **IdP-based MFA** (`Require Authentication Method=mfa`) from **independent MFA** (`mfa_config`). Keeping an IdP-only AMR selector can reject a primary login before an independent factor is evaluated. After saving/reloading mandatory independent TOTP at app AND policy levels, replaced that IdP-only rule; exact-owner Include remains and no MFA-disabled policy was added. Every-login MFA controls the next Access login; it does not replace the backend ten-minute recent-auth guard or prove a fresh signed authentication timestamp. That remains a genuine-event test.
+
+The App Launcher exception is Cloudflare's documented authenticator bootstrap path, not an Admin bypass: its separate policy is owner-only and attached only to App Launcher; it neither maps a ChatGun UUID nor grants a D1 role. The UAT application stays hidden in the launcher, service flags/standalone Admin remain OFF. Global defaults stay OFF, so unrelated apps do not inherit new MFA enforcement.
+
+Sources: [Independent MFA enrollment](https://developers.cloudflare.com/cloudflare-one/access-controls/access-settings/independent-mfa/#enroll-authenticators), [IdP versus independent MFA and every-login duration](https://developers.cloudflare.com/cloudflare-one/access-controls/policies/mfa-requirements/).
 
 ## Saved configuration evidence
 
@@ -56,6 +64,7 @@ Provider-console password/agreement steps are complete; no further provider logi
 - [Meta encrypted metadata](facebook-credential-metadata.json), [LINE encrypted metadata](line-credential-metadata.json), [Access verifier metadata](access-verifier-metadata.json).
 - [LINE Developing / required2FA](line-uat-developing-2fa.jpg), [exact callback](line-uat-callback.jpg).
 - [Meta exact callback and preserved inherited URLs](meta-uat-callback.jpg).
+- [Current independent MFA read-back](mfa-configuration.json), [organization TOTP with global defaults OFF](mfa-totp-global-default-off.jpg), [owner policy every-login enforcement](mfa-owner-policy-every-login.jpg). Initial access-verifier metadata is historical at credential-save time, not current MFA status.
 - [Created Access application](access-application-created.jpg).
 - [MFA-only owner policy](access-policy-mfa-only.jpg).
 - Access issuer: `https://tiny-violet-2021.cloudflareaccess.com`.

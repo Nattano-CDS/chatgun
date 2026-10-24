@@ -2,7 +2,7 @@
 
 Decision: **PARTIALLY READY — EXTERNAL APPROVALS REQUIRED**. Genuine human UAT has NOT started. No invitation, genuine account, owner role grant or Production activation was performed in this preparation.
 
-Latest OAuth/Access execution: [configuration status and consolidated handoff](oauth-access-setup/status.md). All THREE dedicated providers have exact callbacks and NEW encrypted Preview credentials, retained through frozen4a UAT redeployment. Owner-only Access saved with MFA-only requirement,10m session, encrypted issuer/AUD/email but NO owner UUID/roles. Independent organization MFA remains OFF pending explicit scope approval. Full Node248/248 and live negative17/17 PASS; no genuine OAuth/MFA campaign started.
+Latest OAuth/Access execution: [configuration status and consolidated handoff](oauth-access-setup/status.md). All THREE providers have exact callbacks and NEW encrypted Preview credentials, retained through frozen4a UAT deployment. TOTP availability enabled after owner confirmation; global default enforcement OFF. UAT app AND exact-owner policy explicitly require TOTP every login,10m Access session. Separate owner-only App Launcher permits device enrollment, not Admin access. No ChatGun owner UUID/roles. Prior full Node248/248 plus latest affected14/14 and live negative17/17 PASS; genuine OAuth/MFA campaign NOT STARTED.
 
 Frozen application: `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Initial PR #17 evidence HEAD: `e7079c692e3de3c8fb18856eb7da77916246c64e`. Closing PR comment records the eventual readiness-tooling HEAD and CI result; it is not a new application release.
 
@@ -25,7 +25,7 @@ Frozen application: `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Initial PR #17 e
 | Google UAT OAuth | CONFIGURED / actual OAuth NOT RUN | Separate web client created with exact UAT origin/callback, NEW ID/secret encrypted Preview-only. External/Testing and existing test users retained; admission/OAuth OFF |
 | Facebook UAT OAuth | CONFIGURED / genuine OAuth NOT RUN | Test app1546406076913004; exact callback/domain/site URL, HTTPS/Strict Mode, v26.0 and app-secret-proof requirement saved. NEW encrypted Preview credentials; no publication/testers added |
 | LINE UAT OAuth | CONFIGURED / genuine OAuth NOT RUN | New channel2012186357, ChatGun provider Admin, Thailand/Developing, exact callback and required2FA ON, email Unapplied. NEW encrypted Preview credentials; Production channel untouched |
-| Access application / MFA | APP CONFIGURED / genuine MFA BLOCKED | Dashboard creation succeeded despite scoped API403. Exact owner + MFA-only policy, two UAT Admin paths,10m session, HttpOnly+binding cookies saved. Anonymous302 verified. Independent organization MFA OFF; no MFA success claim |
+| Access application / MFA | CONFIGURED / enrollment handoff | Dashboard settings reloaded/read back: independent TOTP every login on app AND owner-only policy,10m session, HttpOnly+binding cookies. Global default OFF; no MFA skip/Bypass. Owner-only launcher enrollment prepared. Anonymous302 verified; no genuine MFA success claim |
 | Exact UAT owner subject / role mapping | BLOCKED | No genuine UAT account yet. Production UUID/roles NOT copied or extended. Exact UAT identity + bounded grant require separate confirmation |
 | Participant A | BLOCKED | Owner is designated; authorized UAT identity/provider eligibility and scope still need confirmation |
 | Participant B | BLOCKED | No separately consenting eligible distinct adult provided. Owner cannot act as both participants |
@@ -48,7 +48,7 @@ Cleanup evidence correction: D1 `meta.changes` reported180 cascade-inclusive wri
 ## Remaining owner actions — one consolidated checklist
 
 1. Provider configuration is complete; no more provider login is requested during preparation. All three NEW credentials are encrypted in dedicated UAT Preview, callback URLs preserved, apps unpublished. Genuine callbacks and participant tester eligibility remain for the coordinated campaign.
-2. Dedicated Access app is saved. Explicitly decide whether to enable independent organization-level TOTP (potential inherited effects on other Access apps) or approve a suitable MFA-capable IdP design. Keep owner+MFA requirement and10-minute privileged-auth guard; no single-factor fallback, Production change or role grant.
+2. Independent TOTP is configured, with global defaults OFF. Owner must complete private authenticator enrollment through the retained Cloudflare App Launcher tab; fresh MFA/auth-time verification is part of the coordinated campaign. No QR/setup-key/OTP sharing, no single-factor fallback, Production change or role grant.
 3. Privately identify and authorize A and a distinct adult B: consent, current eligible age/capacity, provider tester role, test-media consent, deletion/retention scope. Do not post identities publicly.
 4. Approve the specific Social/location/private-media UAT policy package, versions, notices, appeals/emergency procedures and retained test content. Existing owner-pilot approval does not satisfy this item.
 5. Confirm a testing window inside **19:00–22:00 Asia/Bangkok**, daily. No backup/independent appeals reviewer/scanner/24-hour coverage exists. Keep youth/Sensitive admission closed; no response-time guarantee.
