@@ -23,8 +23,8 @@ Frozen application: `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Initial PR #17 e
 | Real Turnstile configuration | PASS | Newly created UAT widget; stable hostname only; matching creation pair saved encrypted; actual invalid response rejected |
 | Real human Turnstile proof | NOT RUN | Wait for the one consolidated authorized campaign; hostname/action/expiry success not inferred from synthetic tests |
 | Google UAT OAuth | CONFIGURED / actual OAuth NOT RUN | Separate web client created with exact UAT origin/callback, NEW ID/secret encrypted Preview-only. External/Testing and existing test users retained; admission/OAuth OFF |
-| Facebook UAT OAuth | BLOCKED human reauthentication | Create test app submitted under ChatGun1136950635489003; password re-entry required before completion. No child app or secret claimed |
-| LINE UAT OAuth | BLOCKED | Developer console currently at Business ID login. Separate UAT channel/credentials/callback/tester authorization require interactive owner access |
+| Facebook UAT OAuth | APP/CALLBACK CONFIGURED; secret BLOCKED | Separate test app1546406076913004 confirmed. Exact UAT callback/domain/site URL saved, HTTPS/Strict Mode ON. Secret view requires separate owner password confirmation; no credential import or genuine OAuth yet |
+| LINE UAT OAuth | LOGGED IN; creation agreement BLOCKED | ChatGun provider Admin verified; Thailand Web-only UAT channel form prepared. Owner must review/accept provider agreements and Create. No new channel/credentials yet; old channels untouched |
 | Access application / MFA | APP CONFIGURED / genuine MFA BLOCKED | Dashboard creation succeeded despite scoped API403. Exact owner + MFA-only policy, two UAT Admin paths,10m session, HttpOnly+binding cookies saved. Anonymous302 verified. Independent organization MFA OFF; no MFA success claim |
 | Exact UAT owner subject / role mapping | BLOCKED | No genuine UAT account yet. Production UUID/roles NOT copied or extended. Exact UAT identity + bounded grant require separate confirmation |
 | Participant A | BLOCKED | Owner is designated; authorized UAT identity/provider eligibility and scope still need confirmation |
