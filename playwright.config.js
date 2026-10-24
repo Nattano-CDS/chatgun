@@ -2,6 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
+  // The local authenticated-presence harness has its own HTTPS test server/config.
+  testIgnore: ['**/issue16-*.spec.js', '**/youth-cloud.spec.js'],
   timeout: 30_000,
   expect: { timeout: 10_000 },
   fullyParallel: false,

@@ -1,0 +1,95 @@
+{
+  "checkedAt": "2026-10-20T10:30:01.615Z",
+  "status": "STAGING IMPLEMENTATION VALIDATED; GENUINE ACCESS AND PUBLIC YOUTH ACTIVATION BLOCKED",
+  "applicationSha": "40a56e9e182890e7d95119fadfb31f34be8ec214",
+  "preview": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "immutablePreview": "https://e80c84cb.chatgun-issue13-staging.pages.dev",
+  "productionSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "productionDeployments": 0,
+  "productionUserWrites": 0,
+  "protectedStagingWrites": 0,
+  "unitIntegrationSecurity": {
+    "passed": 219,
+    "failed": 0,
+    "skipped": 0
+  },
+  "mockedBrowser": {
+    "passed": 87,
+    "failed": 0,
+    "skipped": 0,
+    "widths": [
+      390,
+      768,
+      1440
+    ]
+  },
+  "fullSystemLocalRealHandlers": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "hashedPreviewAssets": 39,
+  "ci": {
+    "conclusion": "success",
+    "headSha": "40a56e9e182890e7d95119fadfb31f34be8ec214",
+    "status": "completed",
+    "url": "https://github.com/Nattano-CDS/chatgun/actions/runs/39407882882"
+  },
+  "isolatedMigrationEvidence": {
+    "account": "23017b53386fb67fc62a52cdd017454c",
+    "database": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
+    "migrationsApplied": [
+      "0018_cloudflare_admin_sessions.sql",
+      "0019_member_age_safety_holds.sql"
+    ],
+    "schema": 19,
+    "protectedExportAndRestoreVerified": true,
+    "oldTablesFingerprintMatched": 51,
+    "foreignKeyViolations": 0,
+    "newTablesEmpty": true
+  },
+  "productionAndProtectedStaging": {
+    "productionSchema": 17,
+    "productionForeignKeyViolations": 0,
+    "bindingsPreserved": true,
+    "originalStagingAggregateCountsUnchanged": true,
+    "ownerRoleExpiryUnchanged": true
+  },
+  "draftPoliciesPublished": false,
+  "draftExcludedFromBuild": true,
+  "accessSetup": {
+    "dashboardVerified": true,
+    "planSelection": "Pending action-time approval for Zero Trust Free $0/seat/month only",
+    "planSelected": false,
+    "accessAppCreated": false,
+    "accessPermissionsSaved": false,
+    "genuineAccessLogin": "BLOCKED",
+    "standaloneSessionCodeImplemented": true,
+    "standaloneEnabledInPreview": false
+  },
+  "youthReadiness": {
+    "minimumAgeApproved": 13,
+    "restrictiveSafetyHoldsTested": true,
+    "adultCheckboxBypassRejected": true,
+    "linkingDisabledForHeldAccounts": true,
+    "accountPrivacyAndDeletionTested": true,
+    "minorRegistrationEnabled": false,
+    "complete13PlusAdmissionImplemented": false,
+    "qualifiedReviewOfRevisedYouthPolicyConfirmed": false,
+    "parentalAuthorizationWorkflowImplemented": false
+  },
+  "notClaimed": [
+    "Genuine Cloudflare Access login/MFA/logout or current Production Admin SSO success",
+    "Public or minor registration activation",
+    "Genuine youth social E2E",
+    "Current-source authenticated Cloudflare full-system browser journeys",
+    "New permanent Admin privileges, independent reviewer, backup staffing, or legal compliance"
+  ],
+  "remaining": [
+    "Approve Free plan at the actual Cloudflare onboarding step; then configure exact-owner Access policy with action-time confirmation before saving persistent permissions",
+    "Genuine Access identity/session/revocation and fresh-authentication proof validation in isolated staging",
+    "Reviewed youth capacity/authorization/admission model, rights/reporting/correction workflow and appropriately staffed safeguarding operations",
+    "Qualified review of exact revised youth notices and consistent Terms/Privacy/Deletion/Beta pages before publication",
+    "Separate Production schema19 backup/rehearsal/rollout and operational cleanup readiness before any activation"
+  ]
+}

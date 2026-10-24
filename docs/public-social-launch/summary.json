@@ -1,0 +1,95 @@
+{
+  "checkedAt": "2026-10-20T08:59:00.629Z",
+  "status": "PUBLIC SOCIAL PREPARED — NOT ACTIVATED",
+  "ownerPublicScopeApproved": true,
+  "lineStatus": "Published",
+  "testedCandidateSha": "871fa9f7f8fe76c3d70787b6ff800505915ca5be",
+  "preview": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "productionSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "productionServiceFlagsChanged": false,
+  "productionDataMutated": false,
+  "legalDraftPublished": false,
+  "newRealUsersCreated": 0,
+  "unit": {
+    "passed": 206,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browser": {
+    "mockedUi": 84,
+    "realLocalFullSystem": 7,
+    "realCloudflareFullSystem": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "ci": {
+    "conclusion": "success",
+    "databaseId": 39396154026,
+    "headSha": "871fa9f7f8fe76c3d70787b6ff800505915ca5be",
+    "status": "completed",
+    "url": "https://github.com/Nattano-CDS/chatgun/actions/runs/39396154026"
+  },
+  "previewChecks": 13,
+  "assetHashes": 39,
+  "cleanup": {
+    "checkedAt": "2026-10-20T08:55:56.016Z",
+    "database": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
+    "bucket": "chatgun-issue13-media",
+    "fixtureBatches": 8,
+    "manifestFixtureUsers": 96,
+    "fixtureMediaQueued": 6,
+    "objectsCompleted": 21,
+    "sessionsRevokedInThisRun": 9,
+    "temporaryGrantsRevokedInThisRun": 12,
+    "activeFixtureSessionsRemaining": 0,
+    "activeFixtureGrantsRemaining": 0,
+    "unrelatedPendingQueueRowsUnchanged": 0,
+    "cleanup": {
+      "selected": 9,
+      "completed": 9,
+      "failed": 0,
+      "exhausted": 0
+    },
+    "checks": [
+      {
+        "name": "Only exact manifest-owned R2 objects deleted; unrelated queues unchanged",
+        "status": "PASS"
+      },
+      {
+        "name": "All fixture sessions and temporary grants revoked",
+        "status": "PASS"
+      },
+      {
+        "name": "Foreign keys valid after fixture account deletion and R2 cleanup",
+        "status": "PASS"
+      }
+    ],
+    "productionWrites": 0,
+    "existingFixtureUsersDeleted": 0,
+    "protectedStagingWrites": 0
+  },
+  "productionCleanupWorkerDryRuns": {
+    "passed": 2,
+    "actuallyDeployed": false
+  },
+  "fixed": [
+    "Public accounts without Beta enrollment can be restricted; re-login cannot bypass restrictions and self-appeal/privacy controls remain available.",
+    "Account+identity creation is atomic for public registration; failed or stale duplicate callback inserts cannot leave orphan pending accounts."
+  ],
+  "reproducedBeforeFix": [
+    "Public-member suspension returned409 instead of201.",
+    "Failed identity insertion left one orphan user; stale duplicate callback left two users for one identity."
+  ],
+  "notClaimed": [
+    "Genuine non-tester LINE registration/session E2E after publication.",
+    "Public Production Social activation.",
+    "Qualified legal approval of new public policies or approved age18–19 procedure.",
+    "Operational Production cleanup Cron deployment or independent moderator staffing."
+  ],
+  "remaining": [
+    "Review exact new public policy text and effective date; confirm qualified legal review for expanded scope and an enforceable age18–19/capacity model.",
+    "Confirm operational exception/appeal handling and continuity beyond existing role expiry; do not invent a backup or independent reviewer.",
+    "After policy/deletion scope approval, deploy and verify bounded Production cleanup Workers, fresh backup, exact release and selected flags.",
+    "Perform genuine Production UAT as explicitly requested; no synthetic provider identity or CAPTCHA bypass."
+  ]
+}

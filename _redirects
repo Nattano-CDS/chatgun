@@ -1,3 +1,7 @@
+/assets/demo/* /retired-demo-data 302
+/app/demo-network.js /retired-demo-data 302
+/app/demo-gallery.js /retired-demo-data 302
+/app/demo-bootstrap.js /retired-demo-data 302
 / /app/ 200
 /app/photos /app/ 200
 /app/me/gallery/upload /app/ 200

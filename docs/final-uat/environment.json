@@ -1,0 +1,104 @@
+{
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "project": "chatgun-final-uat",
+  "bucket": "chatgun-final-uat-media",
+  "candidate": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+  "createdAt": "2026-10-23T19:47:47.152Z",
+  "origin": "https://uat.chatgun-final-uat.pages.dev",
+  "projectSubdomain": "chatgun-final-uat.pages.dev",
+  "databaseId": "e3cb426c-b88a-4b93-90fd-39df524f68ae",
+  "turnstileSiteKey": "0x4AAAAAAFi6zY8ACyjaJZQd",
+  "turnstileHostname": "uat.chatgun-final-uat.pages.dev",
+  "flags": {
+    "OAUTH_LOGIN_ENABLED": "false",
+    "OAUTH_ENABLED_PROVIDERS": "",
+    "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
+    "BETA_INVITATION_REGISTRATION_ENABLED": "false",
+    "BETA_ENROLLMENT_REQUIRED": "true",
+    "ACCEPTANCE_FLOW_ENABLED": "false",
+    "ADULT_ONBOARDING_ENABLED": "true",
+    "SOCIAL_APP_ENABLED": "false",
+    "MESSAGING_ENABLED": "false",
+    "PUBLIC_DISCOVERY_ENABLED": "false",
+    "PRESENCE_ENABLED": "false",
+    "MEDIA_UPLOAD_ENABLED": "false",
+    "MEDIA_QUARANTINE_ENABLED": "true",
+    "RATINGS_ENABLED": "false",
+    "MODERATION_TOOLS_ENABLED": "false",
+    "ACCOUNT_MODERATION_ENABLED": "false",
+    "ELIGIBILITY_REVIEW_ENABLED": "true",
+    "IDENTITY_VERIFICATION_ENABLED": "false",
+    "SENSITIVE_CONTENT_ENABLED": "false",
+    "EMAIL_OTP_ENABLED": "false",
+    "MOBILE_OTP_ENABLED": "false",
+    "LINE_EMAIL_ENABLED": "false",
+    "FACEBOOK_EMAIL_ENABLED": "false",
+    "FRIEND_REQUESTS_ENABLED": "false",
+    "DEMO_MODE_ENABLED": "false",
+    "DEMO_AUTO_START_ENABLED": "false",
+    "PUBLIC_DEMO_CANARY_ENABLED": "false",
+    "ADMIN_ACCESS_STANDALONE_ENABLED": "false",
+    "ADMIN_CLOUDFLARE_ACCESS_REQUIRED": "true"
+  },
+  "secretsCreated": [
+    "RATE_LIMIT_PEPPER",
+    "OTP_PEPPER",
+    "TURNSTILE_SECRET_KEY"
+  ],
+  "publicAdmission": false,
+  "schema": 21,
+  "deploymentId": "e55630f4-415a-4401-9e7e-ae9f2d50de6c",
+  "immutableUrl": "https://e55630f4.chatgun-final-uat.pages.dev",
+  "deployedSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+  "deployedAt": "2026-10-24T07:12:52.917Z",
+  "verifiedAt": "2026-10-24T07:13:25.423Z",
+  "r2Private": true,
+  "turnstileConfigured": true,
+  "credentialMetadata": {
+    "TURNSTILE_SECRET_KEY": {
+      "present": true,
+      "encrypted": true
+    },
+    "RATE_LIMIT_PEPPER": {
+      "present": true,
+      "encrypted": true
+    },
+    "OTP_PEPPER": {
+      "present": true,
+      "encrypted": true
+    },
+    "LINE_CLIENT_ID": {
+      "present": true,
+      "encrypted": true
+    },
+    "LINE_CLIENT_SECRET": {
+      "present": true,
+      "encrypted": true
+    },
+    "GOOGLE_CLIENT_ID": {
+      "present": true,
+      "encrypted": true
+    },
+    "GOOGLE_CLIENT_SECRET": {
+      "present": true,
+      "encrypted": true
+    },
+    "FACEBOOK_CLIENT_ID": {
+      "present": true,
+      "encrypted": true
+    },
+    "FACEBOOK_CLIENT_SECRET": {
+      "present": true,
+      "encrypted": true
+    }
+  },
+  "syntheticEngineering": {
+    "deploymentId": "0759f84c-85d7-4c8e-8caf-09fbe7122bba",
+    "immutableUrl": "https://0759f84c.chatgun-final-uat.pages.dev",
+    "origin": "https://engineering.chatgun-final-uat.pages.dev",
+    "sha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+    "genuineAdmission": false,
+    "accessMfaEvidence": false,
+    "closed": true
+  }
+}

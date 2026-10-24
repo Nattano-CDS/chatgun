@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-10-20T08:56:15.306Z",
+  "checks": [
+    {
+      "width": 390,
+      "overflow": false,
+      "sections": 4
+    },
+    {
+      "width": 768,
+      "overflow": false,
+      "sections": 4
+    },
+    {
+      "width": 1440,
+      "overflow": false,
+      "sections": 4
+    }
+  ],
+  "passed": 3,
+  "draftExcludedFromReleaseAssets": true,
+  "productionApplied": false
+}

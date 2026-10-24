@@ -1,0 +1,193 @@
+{
+  "checkedAt": "2026-10-18T06:17:54.151Z",
+  "origin": "https://chatgun.social",
+  "sha": "6c824ab0ecf5e70f414e7d34d74b7abe7bae3a8c",
+  "passed": 45,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "preserved counts",
+      "status": "PASS"
+    },
+    {
+      "name": "preserved schemaSha256",
+      "status": "PASS"
+    },
+    {
+      "name": "preserved foreignKeyViolations",
+      "status": "PASS"
+    },
+    {
+      "name": "preserved productionD1",
+      "status": "PASS"
+    },
+    {
+      "name": "preserved productionR2",
+      "status": "PASS"
+    },
+    {
+      "name": "preserved previewD1",
+      "status": "PASS"
+    },
+    {
+      "name": "preserved previewR2",
+      "status": "PASS"
+    },
+    {
+      "name": "preserved secretNames",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate ACCEPTANCE_FLOW_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate ADULT_ONBOARDING_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate BETA_INVITATION_REGISTRATION_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate EMAIL_OTP_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate FRIEND_REQUESTS_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate IDENTITY_VERIFICATION_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate LINE_EMAIL_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate MEDIA_QUARANTINE_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate MEDIA_UPLOAD_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate MESSAGING_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate MOBILE_OTP_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate MODERATION_TOOLS_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate NEW_ACCOUNT_REGISTRATION_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate OAUTH_LOGIN_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate PUBLIC_DEMO_CANARY_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate PUBLIC_DISCOVERY_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate RATINGS_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate SENSITIVE_CONTENT_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged gate SOCIAL_APP_ENABLED",
+      "status": "PASS"
+    },
+    {
+      "name": "DEMO_MODE_ENABLED disabled",
+      "status": "PASS"
+    },
+    {
+      "name": "DEMO_AUTO_START_ENABLED disabled",
+      "status": "PASS"
+    },
+    {
+      "name": "PRESENCE_ENABLED disabled",
+      "status": "PASS"
+    },
+    {
+      "name": "actual deployed SHA matches canonical Cloudflare deployment",
+      "status": "PASS"
+    },
+    {
+      "name": "closed release mode",
+      "status": "PASS"
+    },
+    {
+      "name": "real social/presence/media disabled",
+      "status": "PASS"
+    },
+    {
+      "name": "fictional fallback disabled server-side",
+      "status": "PASS"
+    },
+    {
+      "name": "OAuth registration closed",
+      "status": "PASS"
+    },
+    {
+      "name": "google start denied without touching provider",
+      "status": "PASS"
+    },
+    {
+      "name": "google callback disabled",
+      "status": "PASS"
+    },
+    {
+      "name": "facebook start denied without touching provider",
+      "status": "PASS"
+    },
+    {
+      "name": "facebook callback disabled",
+      "status": "PASS"
+    },
+    {
+      "name": "line start denied without touching provider",
+      "status": "PASS"
+    },
+    {
+      "name": "line callback disabled",
+      "status": "PASS"
+    },
+    {
+      "name": "closed /api/social/profile",
+      "status": "PASS"
+    },
+    {
+      "name": "closed /api/social/online",
+      "status": "PASS"
+    },
+    {
+      "name": "closed /api/social/gallery",
+      "status": "PASS"
+    },
+    {
+      "name": "closed /api/social/conversations",
+      "status": "PASS"
+    }
+  ],
+  "productionD1Changes": false,
+  "productionR2Changes": false,
+  "secretValuesReadOrPrinted": false,
+  "realOAuth": "NOT RUN; disabled; checks above validate denial only"
+}

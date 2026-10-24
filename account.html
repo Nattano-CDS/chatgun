@@ -16,11 +16,29 @@
     <img src="./logo.svg" alt="ChatGun" width="90">
     <h1>ยินดีต้อนรับสู่ ChatGun</h1>
     <p id="status">กำลังตรวจสอบบัญชี...</p>
+    <section id="age-safety-notice" class="account-section" aria-labelledby="age-safety-heading" hidden>
+      <h2 id="age-safety-heading">บัญชีนี้ยังไม่เปิดใช้ฟีเจอร์สังคม</h2>
+      <p>บัญชีนี้อยู่ระหว่างตรวจสอบสิทธิ์ตามช่วงอายุ จึงยังใช้การค้นหาสมาชิก แชท รูปภาพ และสถานะออนไลน์ไม่ได้ การเข้าสู่ระบบไม่ได้หมายความว่าผ่านการตรวจสอบอายุแล้ว</p>
+      <p>หากข้อมูลช่วงอายุไม่ถูกต้อง หรือต้องการความช่วยเหลือ ให้ติดต่อผู้ดูแล อย่าส่งวันเกิดเต็ม รูปบัตรประชาชน รหัสผ่าน หรือรหัสยืนยันทางอีเมล และอย่าสมัครบัญชีใหม่เพื่อข้ามข้อจำกัด</p>
+      <p><a href="mailto:natttano@outlook.com">ติดต่อผู้ดูแล: natttano@outlook.com</a> · <a href="/data-deletion.html">วิธีขอลบข้อมูล</a></p>
+      <p>คุณยังจัดการเซสชัน ออกจากระบบ และขอลบบัญชีได้ ไม่มีการรับรองเวลาตอบกลับทันที</p>
+      <section id="eligibility-review" hidden aria-labelledby="eligibility-heading">
+        <h3 id="eligibility-heading">ขอทบทวนข้อมูลสิทธิ์การใช้งาน</h3>
+        <p>คำขอไม่เปลี่ยนช่วงอายุหรือปลดข้อจำกัดอัตโนมัติ อย่าส่งวันเกิดเต็ม เอกสารยืนยันตัวตน หรือข้อมูลของผู้ปกครอง</p>
+        <form id="eligibility-form"><label for="eligibility-reason">เหตุผลที่ต้องการทบทวน (10–1000 ตัวอักษร)</label><textarea id="eligibility-reason" minlength="10" maxlength="1000" required rows="4"></textarea><button type="submit">ส่งคำขอทบทวน</button></form>
+        <p id="eligibility-message" role="status" aria-live="polite"></p>
+        <div id="eligibility-history"></div>
+      </section>
+    </section>
     <a id="open-social" class="button" href="./app/" hidden>เปิด ChatGun Social</a>
+    <a id="account-moderation-link" class="button" href="/app/moderation.html" hidden>ศูนย์ดูแลและรายงาน</a>
     <section id="linking" class="account-section" hidden>
       <h2>เชื่อมบัญชีเข้าสู่ระบบ</h2>
       <p class="section-lead">เพิ่มวิธีเข้าสู่ระบบให้บัญชีนี้อย่างปลอดภัย</p>
       <div class="link-grid"><button class="link-provider" data-provider="google" type="button">Google</button><button class="link-provider" data-provider="facebook" type="button">Facebook</button><button class="link-provider" data-provider="line" type="button">LINE</button></div>
+    </section>
+    <section id="account-security" class="account-section" hidden>
+      <h2>ยืนยันความปลอดภัย</h2>
       <div id="turnstile" class="turnstile" aria-label="การตรวจสอบความปลอดภัย"></div>
       <p id="message" class="account-message" role="status" aria-live="polite"></p>
     </section>
@@ -36,7 +54,9 @@
       </form>
       <p id="delete-message" class="account-message" role="status" aria-live="polite"></p>
     </section>
+    <section id="session-management" class="account-section" hidden><h2>การเข้าสู่ระบบที่ยังใช้งาน</h2><div id="session-list"></div><button type="button" class="button" id="revoke-other-sessions">ออกจากระบบบนเซสชันอื่นทั้งหมด</button><p id="session-message" role="status"></p><a href="/signup">เข้าสู่ระบบใหม่เมื่อจำเป็นต้องยืนยันตัวตน</a></section>
     <button id="logout" class="button" hidden>ออกจากระบบ</button>
+    <a id="account-appeals-link" href="/app/appeals.html" hidden>ดูหรืออุทธรณ์การระงับสิทธิ์บัญชี</a>
   </main>
 </body>
 </html>

@@ -1,0 +1,96 @@
+{
+  "checkedAt": "2026-10-20T04:23:11.035Z",
+  "assessment": "PARTIAL GO — verified owner Admin only; broader Beta intentionally closed",
+  "production": {
+    "url": "https://chatgun.social",
+    "sha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+    "deployment": "118728d1-90ef-45c5-804c-2f270b4ba31b",
+    "migrations": 15,
+    "privateR2": "chatgun-media-production"
+  },
+  "admin": {
+    "roles": [
+      "report_reviewer",
+      "safety_admin"
+    ],
+    "expiresAt": 1793073705,
+    "privateOwnerUuidReconfirmed": true,
+    "grantAuditEvents": 2,
+    "routineAccessAuditEvents": 2,
+    "restrictedAccessAuditEvents": 0,
+    "ui": {
+      "productionSha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+      "browser": "Chrome with genuine owner session",
+      "overview": "PASS — actual owner, one real member, empty queues, no manual Purpose",
+      "restrictedQueues": "BLOCKED — recent authentication exceeded 10 minutes; genuine API denial observed; awaiting manual fresh LINE login",
+      "recentAuthenticationEnforcement": "PASS — restricted queue denied while routine overview remained available",
+      "desktop": {
+        "width": 1491,
+        "horizontalOverflow": false,
+        "screenshot": "screens/admin-production-desktop.png"
+      },
+      "responsiveLiveCapture": "BLOCKED — Chrome viewport override did not change the actual 1491px width; no mobile/tablet Production claim",
+      "responsiveLocalTests": "PASS — local authenticated handler and mocked UI suites cover 390, 768, 1440px; not a substitute for genuine mobile Production verification",
+      "productionMediaDecision": "NOT RUN — no media, uploads disabled",
+      "retainedTabs": "Original owner, Admin and fresh LINE login tabs retained; no automatic logout",
+      "personalIdentifiersPublished": false
+    }
+  },
+  "tests": {
+    "unitIntegrationSecurity": 180,
+    "localAuthenticatedBrowser": 16,
+    "localMockUi": 72,
+    "failed": 0,
+    "preview": 14,
+    "production": 22,
+    "assetsHashed": 38,
+    "ci": "https://github.com/Nattano-CDS/chatgun/actions/runs/39368680991"
+  },
+  "staging": {
+    "migration16AppliedOnlyToIsolatedDatabase": true,
+    "accountRestrictionAppeals": "Implemented and tested, Production capability OFF",
+    "originalFixturesPreserved": true
+  },
+  "limits": {
+    "secondPerson": "Not available; owner explicitly chose Admin-only",
+    "publicSignup": false,
+    "discovery": false,
+    "messaging": false,
+    "presence": false,
+    "uploads": false,
+    "accountModeration": false,
+    "sensitive": false,
+    "identityEvidence": false,
+    "roleAdministration": false,
+    "googleFacebook": false
+  },
+  "data": {
+    "counts": {
+      "users": 1,
+      "identities": 1,
+      "member_profiles": 1,
+      "beta_invitations": 1,
+      "moderation_access_grants": 2,
+      "moderation_role_events": 2,
+      "social_messages": 0,
+      "social_media": 0
+    },
+    "noNewInvitations": true,
+    "noSyntheticProductionUsers": true,
+    "noRealDataDeleted": true,
+    "backupProtected": true,
+    "backupRestoreLocalPassed": true
+  },
+  "remaining": {
+    "genuineMediaDecisions": "NOT RUN — no actual media, uploads closed",
+    "twoPersonE2E": "BLOCKED — no individually approved second person; owner deferred",
+    "realAndroidIphone": "NOT AVAILABLE — browser viewport tests are not physical devices",
+    "operatingDecisions": "Backup operator, alerts/support, emergency/legal route, independent appeal process and expanded policy scope unapproved"
+  },
+  "cost": {
+    "pagesAdaptiveEstimate": 286,
+    "usageWindow": "2026-10-20T00:00:00.000Z",
+    "exactBillingOrPlanAllowanceVerified": false,
+    "billingChanged": false
+  }
+}

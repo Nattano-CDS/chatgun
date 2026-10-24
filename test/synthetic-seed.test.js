@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import {execFileSync} from 'node:child_process';
 
 const manifest = JSON.parse(readFileSync("scripts/fixtures/social-owner-review-v1.json", "utf8"));
 const seed = readFileSync("scripts/seed-social-staging.mjs", "utf8");
@@ -37,4 +38,8 @@ test("cleanup defaults to dry-run and requires exact confirmation for deletion",
   assert.match(cleanup, /Dry run only\. No D1 rows or R2 objects were changed/u);
   assert.match(cleanup, /objectKey\.startsWith\(`synthetic\/\$\{batchId\}\/`\)/u);
   assert.match(cleanup, /email LIKE '%@synthetic\.chatgun\.invalid'/u);
+});
+test('destructive cleanup cannot run with confirmation alone or without backup evidence',()=>{
+  assert.throws(()=>execFileSync(process.execPath,['scripts/cleanup-social-staging.mjs','--batch','chatgun-owner-review-v1','--execute','--confirm','chatgun-owner-review-v1'],{stdio:'pipe'}),error=>error.stderr.toString().includes('Execution requires --audit and --backup-sql'));
+  assert.throws(()=>execFileSync(process.execPath,['scripts/seed-social-staging.mjs'],{stdio:'pipe'}),error=>error.stderr.toString().includes('demo seeding is retired'));
 });

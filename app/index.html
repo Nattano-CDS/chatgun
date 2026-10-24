@@ -11,10 +11,10 @@
   <link rel="stylesheet" href="/app/restoration.css">
   <link rel="stylesheet" href="/app/near-components.css">
   <link rel="stylesheet" href="/app/gallery-approved.css">
+  <link rel="stylesheet" href="/app/online-presence.css">
   <script defer src="/app/gallery-approved.js"></script>
   <script defer src="/app/near-icons.js"></script>
   <script defer src="/app/near-components.js"></script>
-  <script defer src="/app/demo-network.js"></script>
   <script type="module" src="/app/social.js"></script>
 </head>
 <body>
@@ -33,14 +33,16 @@
 
     <main>
       <div id="global-status" class="status" role="status" aria-live="polite">กำลังโหลด ChatGun…</div>
+      <section id="section-recovery" class="panel" hidden aria-label="ข้อมูลบางส่วนโหลดไม่สำเร็จ"><p id="section-recovery-message" role="status"></p><button type="button" class="secondary" id="section-retry">ลองโหลดข้อมูลที่ขาดอีกครั้ง</button></section>
 
       <section id="disabled-view" class="empty" hidden>
         <img src="/logo.svg" alt="" width="72">
-        <h1>ChatGun Social ยังไม่เปิดใช้งาน</h1>
-        <p>ระบบอยู่ระหว่างการทดสอบในสภาพแวดล้อม Preview ที่แยกจาก Production</p>
-        <button id="demo-start" class="secondary" type="button" hidden>ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์</button>
-        <a class="primary" href="/account.html">กลับไปบัญชี</a>
+        <h1>ChatGun กำลังเตรียมเปิดให้บริการ</h1>
+        <p id="service-status">ยังไม่เปิดรับสมาชิกหรือใช้งานบริการสังคมออนไลน์ ไม่มีการแสดงสมาชิกหรือบทสนทนาตัวอย่าง</p>
+        <a class="primary" href="/welcome">เกี่ยวกับ ChatGun</a>
+        <button id="service-retry" type="button" class="secondary" hidden>ลองเชื่อมต่ออีกครั้ง</button>
       </section>
+      <section id="retired-demo" class="panel retired-demo" hidden aria-label="สำรองและลบข้อมูลตัวอย่างเดิม"></section>
 
       <section id="onboarding-view" class="onboarding" hidden>
         <div class="onboarding-panel">
@@ -67,12 +69,11 @@
             <div class="filter-row" aria-label="ตัวกรองการค้นหา">
               <label><span>เพศ</span><select id="gender-filter" aria-label="เพศ"><option>ทั้งหมด</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option><option>ไม่ระบุ</option></select></label>
               <label><span>ความสนใจ</span><select id="interest-filter" aria-label="ความสนใจ"><option value="">ทั้งหมด</option></select></label>
-              <label><span>ระยะ</span><select id="radius-filter" aria-label="ระยะค้นหา"><option value="100">100 ม.</option><option value="1000">1 กม.</option><option value="5000" selected>5 กม.</option></select></label>
+              <label><span>ระยะโดยประมาณ</span><select id="radius-filter" aria-label="ระยะค้นหา"><option value="500">ภายในประมาณ 500 ม.</option><option value="1000">1 กม.</option><option value="5000" selected>5 กม.</option></select></label>
             </div>
           </div>
         </header>
         <div id="discovery-control-storage" hidden></div>
-        <div id="demo-banner" class="demo-banner" hidden><div><strong>โหมดตัวอย่าง</strong><span>บุคคลและบทสนทนาสมมติ · บันทึกเฉพาะในเบราว์เซอร์</span></div><a class="secondary" href="/signup">บัญชี</a><button class="demo-info" type="button" aria-label="ข้อมูลเกี่ยวกับโหมดตัวอย่าง">ข้อมูลสมมติ</button></div>
 
         <div id="near-tab" class="tab-view">
           <section id="location-banner" class="location-banner">
@@ -83,15 +84,16 @@
           <div class="section-heading"><h2>คนใกล้คุณ <span id="people-count">0</span></h2></div>
           <div id="people-grid" class="people-grid near-components"></div>
           <nav id="discovery-pagination" class="discovery-pagination" aria-label="หน้ารายชื่อเพื่อน"></nav>
+          <button id="discovery-more" class="secondary" type="button" hidden>โหลดรายชื่อเพิ่มเติม</button>
           <div class="rules"><div><svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg><strong>แชทได้ทันที</strong><p>เคารพความเป็นส่วนตัวและการบล็อก</p></div><div><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg><strong>คะแนนจากคนใกล้ตัว</strong><p>คนละ 1 ครั้งต่อวัน ในระยะ 100 ม.</p></div><div><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><strong>ความคิดเห็นส่วนตัว</strong><p>เจ้าของโปรไฟล์เท่านั้นที่อ่านได้</p></div></div>
         </div>
 
 
         <div id="chat-tab" class="tab-view" hidden>
-          <div id="demo-perspective" hidden></div><div class="chat-layout"><aside id="conversation-list" class="conversation-list"></aside><section id="thread" class="thread"><div class="empty"><h2>เลือกสมาชิกเพื่อเริ่มแชท</h2></div></section></div>
+          <div class="chat-layout"><aside id="conversation-list" class="conversation-list"></aside><section id="thread" class="thread"><div class="empty"><h2>เลือกสมาชิกเพื่อเริ่มแชท</h2></div></section></div>
         </div>
 
-        <div id="reviews-tab" class="tab-view" hidden><p class="subtitle">▣ มีเพียงคุณที่อ่านความคิดเห็นเหล่านี้ได้</p><div id="reviews-list"></div></div>
+        <div id="reviews-tab" class="tab-view" hidden><p class="subtitle">▣ มีเพียงคุณที่อ่านความคิดเห็นเหล่านี้ได้</p><div id="reviews-list"></div><button id="reviews-more" type="button" class="secondary" hidden>โหลดความคิดเห็นเพิ่มเติม</button></div>
 
         <div id="profile-tab" class="tab-view near-components" hidden>
           <p class="subtitle">แนะนำตัวในแบบที่เป็นคุณ</p>
@@ -105,14 +107,16 @@
             <button id="profile-verification" class="verify-cta" type="button" disabled title="การส่งหลักฐานยังไม่เปิดใช้งาน">ยืนยันตัวตน รับตรา Verify</button>
             <button id="hide-discovery" class="secondary" type="button">ปิดการหาเพื่อนและลบตำแหน่ง</button>
             <label class="wide"><input id="direct-contact-toggle" type="checkbox" checked> รับข้อความโดยตรงจากสมาชิกที่มีสิทธิ์ (ปิดได้ทุกเมื่อ)</label>
-            <button id="notification-toggle" class="secondary wide" type="button">เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้</button>
+            <label class="wide" id="online-preference" hidden><input id="online-status-toggle" type="checkbox"> แสดงสถานะออนไลน์ <small>ปิดไว้เป็นค่าเริ่มต้น แยกจากการแชร์ตำแหน่ง</small></label>
+            <button id="notification-toggle" class="secondary wide" type="button">เปิดการแจ้งเตือนขณะเปิดแอป</button>
+            <small class="wide">การแจ้งเตือนนี้ทำงานขณะเปิด ChatGun ไม่ใช่ Push เมื่อปิดแอป และไม่ดึงข้อความในแท็บเบื้องหลัง</small>
+            <a id="moderation-link" class="secondary wide" href="/app/moderation.html" hidden>ศูนย์ดูแลและรายงาน</a>
             <div id="blocked-list" class="blocked-users"></div>
           </form>
           <div class="toolbar-actions" aria-label="เครื่องมือบัญชี ChatGun"><button id="refresh" class="icon-button" aria-label="รีเฟรช">↻</button><a class="icon-button" href="/account.html" aria-label="บัญชี">⚙</a></div>
           <section class="gallery-panel upload-page">
             <header class="upload-header"><button id="gallery-settings-back" type="button" aria-label="กลับไปโปรไฟล์">←</button><a class="toolbar-brand" href="/"><img src="/logo.svg" alt="">ChatGun</a><h1>จัดการรูป</h1></header>
             <div class="upload-content">
-              <p class="upload-demo" id="manage-demo-notice" hidden>โหมดตัวอย่าง · รูปบันทึกเฉพาะในเบราว์เซอร์</p>
               <section class="upload-profile-panel"><div class="upload-cover" id="manage-cover"></div><div><h2 id="manage-owner"></h2><p>รูปโปรไฟล์ของคุณ</p><button class="secondary" data-choose-profile type="button">เปลี่ยนรูปโปรไฟล์</button></div></section>
               <section class="upload-editor">
                 <div class="upload-kind" role="group" aria-label="ประเภทของรูป"><button type="button" class="selected" data-upload-kind="profile" aria-pressed="true">รูปโปรไฟล์</button><button type="button" data-upload-kind="gallery" aria-pressed="false">Gallery</button></div>

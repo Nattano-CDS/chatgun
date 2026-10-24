@@ -1,0 +1,111 @@
+{
+  "checkedAt": "2026-10-24T07:35:43.611Z",
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "productionSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "productionDeployment": "f705d7cd-974d-4e48-8b61-73ec1a760c42",
+  "isolatedSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+  "productionCounts": {
+    "users": 1,
+    "identities": 1,
+    "member_profiles": 1,
+    "social_messages": 0,
+    "social_media": 0,
+    "moderation_access_grants": 2
+  },
+  "roles": [
+    {
+      "role": "report_reviewer",
+      "expires_at": 1793073705,
+      "revoked_at": null
+    },
+    {
+      "role": "safety_admin",
+      "expires_at": 1793073705,
+      "revoked_at": null
+    }
+  ],
+  "flags": {
+    "OAUTH_LOGIN_ENABLED": "true",
+    "OAUTH_ENABLED_PROVIDERS": "line",
+    "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
+    "BETA_INVITATION_REGISTRATION_ENABLED": "true",
+    "SOCIAL_APP_ENABLED": "true",
+    "MODERATION_TOOLS_ENABLED": "true",
+    "ACCOUNT_MODERATION_ENABLED": "false",
+    "PUBLIC_DISCOVERY_ENABLED": "false",
+    "MESSAGING_ENABLED": "false",
+    "PRESENCE_ENABLED": "false",
+    "MEDIA_UPLOAD_ENABLED": "false",
+    "IDENTITY_VERIFICATION_ENABLED": "false",
+    "SENSITIVE_CONTENT_ENABLED": "false",
+    "EMAIL_OTP_ENABLED": "false",
+    "MOBILE_OTP_ENABLED": "false",
+    "DEMO_MODE_ENABLED": "false"
+  },
+  "migrations": {
+    "production": 17,
+    "isolated": 21,
+    "protectedStaging": 12
+  },
+  "foreignKeyViolations": {
+    "production": 0,
+    "isolated": 0,
+    "protectedStaging": 0
+  },
+  "protectedStagingCounts": {
+    "users": 25,
+    "identities": 2,
+    "member_profiles": 25,
+    "social_messages": 122,
+    "social_relationships": 16,
+    "profile_photos": 37,
+    "social_media": 38,
+    "synthetic_seed_records": 369,
+    "synthetic_seed_objects": 33
+  },
+  "protectedAggregateFingerprint": "6768cc6b45b2adfd4c508068250013d5c2bd1dcb717c80ddaa5157618a8f080b",
+  "protectedDataCountsUnchanged": true,
+  "r2": {
+    "chatgun-media-production": {
+      "publicR2Dev": false,
+      "customDomains": 0
+    },
+    "chatgun-issue13-media": {
+      "publicR2Dev": false,
+      "customDomains": 0
+    }
+  },
+  "isolatedCredentialMetadata": {
+    "GOOGLE_CLIENT_ID": {
+      "configured": false
+    },
+    "GOOGLE_CLIENT_SECRET": {
+      "configured": false
+    },
+    "FACEBOOK_CLIENT_ID": {
+      "configured": false
+    },
+    "FACEBOOK_CLIENT_SECRET": {
+      "configured": false
+    },
+    "LINE_CLIENT_ID": {
+      "configured": false
+    },
+    "LINE_CLIENT_SECRET": {
+      "configured": false
+    },
+    "TURNSTILE_SITE_KEY": {
+      "configured": false
+    },
+    "TURNSTILE_SECRET_KEY": {
+      "configured": false
+    }
+  },
+  "productionApiStatuses": {
+    "/api/social/config": 200,
+    "/api/auth/config": 200,
+    "/api/health": 200
+  },
+  "productionWrites": 0,
+  "productionDeploymentByThisWorkstream": false
+}

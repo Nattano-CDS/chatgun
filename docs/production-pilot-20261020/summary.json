@@ -1,0 +1,122 @@
+{
+  "recordedAt": "2026-10-20T02:46:50.156Z",
+  "clientDate": "2026-10-20",
+  "timezone": "Asia/Bangkok",
+  "production": {
+    "url": "https://chatgun.social",
+    "sha": "c1116c25a77e0a96f1e53f9fe662b6a9c4aab671",
+    "deployment": "336fe5fa-c4ab-4bdd-a4da-6b91f0df1d88",
+    "releaseMode": "controlled-beta",
+    "scope": "LINE-only invitation owner pilot; later social/media waves disabled"
+  },
+  "staging": {
+    "url": "https://issue13.chatgun-issue13-staging.pages.dev",
+    "sha": "c1116c25a77e0a96f1e53f9fe662b6a9c4aab671",
+    "originalFixturesPreserved": true
+  },
+  "database": {
+    "migrations": 15,
+    "applied": [
+      "0013_direct_chat_private_albums.sql",
+      "0014_gallery_capacity.sql",
+      "0015_authenticated_online_presence.sql"
+    ],
+    "oldRecordProjectionsPreserved": true,
+    "foreignKeyViolations": 0
+  },
+  "media": {
+    "binding": "MEDIA",
+    "bucket": "chatgun-media-production",
+    "publicR2Dev": false,
+    "publicCustomDomains": 0,
+    "uploadsEnabled": false
+  },
+  "policies": {
+    "ownerApproval": true,
+    "qualifiedReview": "Completion confirmed by owner in chat; not independently certified by agent",
+    "effectiveDate": "2026-10-20",
+    "versions": {
+      "adultNotice": "adult-beta-2026-10-20-rc1",
+      "terms": "terms-beta-2026-10-20-rc1",
+      "privacy": "privacy-beta-2026-10-20-rc1",
+      "beta": "beta-2026-10-20-rc1"
+    },
+    "published": true,
+    "scope": "line-owner-pilot"
+  },
+  "flags": {
+    "OAUTH_LOGIN_ENABLED": "true",
+    "OAUTH_ENABLED_PROVIDERS": "line",
+    "LINE_EXPECTED_CLIENT_ID": "2012039306",
+    "LINE_EMAIL_ENABLED": "false",
+    "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
+    "BETA_INVITATION_REGISTRATION_ENABLED": "true",
+    "ACCEPTANCE_FLOW_ENABLED": "true",
+    "ADULT_ONBOARDING_ENABLED": "true",
+    "SOCIAL_APP_ENABLED": "true",
+    "ADULT_NOTICE_VERSION": "adult-beta-2026-10-20-rc1",
+    "TERMS_VERSION": "terms-beta-2026-10-20-rc1",
+    "PRIVACY_VERSION": "privacy-beta-2026-10-20-rc1",
+    "PUBLIC_DISCOVERY_ENABLED": "false",
+    "MESSAGING_ENABLED": "false",
+    "MEDIA_UPLOAD_ENABLED": "false",
+    "MEDIA_QUARANTINE_ENABLED": "true",
+    "MODERATION_TOOLS_ENABLED": "false",
+    "PRESENCE_ENABLED": "false",
+    "RATINGS_ENABLED": "false",
+    "SENSITIVE_CONTENT_ENABLED": "false",
+    "EMAIL_OTP_ENABLED": "false",
+    "MOBILE_OTP_ENABLED": "false",
+    "IDENTITY_VERIFICATION_ENABLED": "false",
+    "DEMO_MODE_ENABLED": "false",
+    "DEMO_AUTO_START_ENABLED": "false",
+    "PUBLIC_DEMO_CANARY_ENABLED": "false",
+    "FRIEND_REQUESTS_ENABLED": "false"
+  },
+  "tests": {
+    "unitIntegrationSecurity": {
+      "passed": 168,
+      "failed": 0,
+      "skipped": 0
+    },
+    "localBrowser": {
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    },
+    "isolatedPreviewChecks": {
+      "passed": 14,
+      "failed": 0
+    },
+    "productionChecks": {
+      "passed": 22,
+      "failed": 0,
+      "hashedAssets": 36
+    },
+    "ci": "https://github.com/Nattano-CDS/chatgun/actions/runs/39354111667",
+    "realLineOAuth": "BLOCKED: owner participant confirmation and human Turnstile/LINE interaction pending",
+    "ownerOnboarding": "NOT RUN",
+    "twoHumanSocial": "BLOCKED: two consenting identities and later-wave prerequisites unavailable",
+    "publicPrivateGallery": "BLOCKED: uploads/moderation disabled, no human media or roles",
+    "genuineAccountDeletion": "NOT RUN; separate consent required",
+    "actualAndroidIphone": "NOT AVAILABLE"
+  },
+  "counts": {
+    "users": 0,
+    "identities": 0,
+    "sessions": 0,
+    "account_acceptances": 0,
+    "member_profiles": 0,
+    "beta_invitations": 0,
+    "beta_enrollments": 0,
+    "moderation_roles": 0,
+    "social_messages": 0,
+    "social_media": 0
+  },
+  "rolesGranted": 0,
+  "invitationIssued": false,
+  "providerApplicationsPublished": false,
+  "publicRegistration": false,
+  "billingChanged": false,
+  "assessment": "Technical preparation and guarded owner pilot deployed; genuine-user Beta completion remains NO-GO pending human E2E and later-wave conditions"
+}

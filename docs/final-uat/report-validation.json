@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-10-24T07:38:18.237Z",
+  "localLinksValidated": 29,
+  "privateSessionAndNewSecretScan": "PASS",
+  "checks": [
+    {
+      "width": 390,
+      "status": "PASS",
+      "scriptErrors": 0,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 768,
+      "status": "PASS",
+      "scriptErrors": 0,
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1440,
+      "status": "PASS",
+      "scriptErrors": 0,
+      "horizontalOverflow": false
+    }
+  ]
+}

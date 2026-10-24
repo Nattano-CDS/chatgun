@@ -1,0 +1,415 @@
+{
+  "historicalOnly": true,
+  "supersededBy": "feature-matrix.md",
+  "scope": "PR17 development first; no human reauthentication until one consolidated UAT",
+  "canonicalNear": "98bb83e44bf88eddb9822d7875f18cd4fe833ee2",
+  "baselineHead": "244c5bc474978c3c5fd24eade0c4658a1e2fce50",
+  "productionUnchanged": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+  "phase": "DEVELOPMENT COMPLETE — READY FOR CONSOLIDATED E2E/UAT",
+  "features": [
+    {
+      "feature": "Navigation, responsive NEAR shell and recovery",
+      "status": "COMPLETE",
+      "source": [
+        "app/index.html",
+        "app/social.js",
+        "app/near-components.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "e2e/social.spec.js",
+        "full-system-local-browser.json",
+        "full-system-cloud-browser.json"
+      ]
+    },
+    {
+      "feature": "Google/Facebook/LINE authentication",
+      "status": "BLOCKED EXTERNALLY",
+      "source": [
+        "functions/_lib/oauth.js",
+        "functions/api/auth/[[path]].js",
+        "test/auth.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "functions/_lib/oauth.js",
+        "functions/api/auth/[[path]].js",
+        "test/auth.test.js"
+      ],
+      "externalGate": "Production publishing/allowlist approval; genuine provider UAT intentionally deferred; isolated Preview provider/Turnstile credentials are not configured. Historical genuine LINE owner pilot is preserved."
+    },
+    {
+      "feature": "Invitation, acceptance, adult onboarding",
+      "status": "COMPLETE",
+      "source": [
+        "test/acceptance.test.js",
+        "test/beta-admission.test.js",
+        "test/controlled-beta.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/acceptance.test.js",
+        "test/beta-admission.test.js",
+        "test/controlled-beta.test.js"
+      ]
+    },
+    {
+      "feature": "Sessions, CSRF, logout, linking, duplicate prevention",
+      "status": "COMPLETE",
+      "source": [
+        "functions/_lib/db.js",
+        "test/auth.test.js",
+        "test/privacy-safety.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "functions/_lib/db.js",
+        "test/auth.test.js",
+        "test/privacy-safety.test.js"
+      ]
+    },
+    {
+      "feature": "Profile edit and privacy settings",
+      "status": "COMPLETE",
+      "source": [
+        "app/social.js",
+        "functions/api/social/[[path]].js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/social.test.js",
+        "full-system-cloud-browser.json"
+      ]
+    },
+    {
+      "feature": "Discovery filters and pagination",
+      "status": "COMPLETE",
+      "source": [
+        "app/social.js",
+        "functions/api/social/[[path]].js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/development-completion.test.js",
+        "full-system-cloud-browser.json"
+      ]
+    },
+    {
+      "feature": "Location expiry and inference protection",
+      "status": "COMPLETE",
+      "source": [
+        "functions/api/social/[[path]].js",
+        "functions/_lib/retention.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/social.test.js",
+        "test/development-completion.test.js"
+      ]
+    },
+    {
+      "feature": "Direct chat and inbox",
+      "status": "COMPLETE",
+      "source": [
+        "app/social.js",
+        "functions/api/social/[[path]].js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/direct-chat-albums.test.js",
+        "test/development-completion.test.js",
+        "full-system-cloud-browser.json"
+      ]
+    },
+    {
+      "feature": "Chat media and recent five-image library",
+      "status": "COMPLETE",
+      "source": [
+        "test/social-media.test.js",
+        "test/media-moderation.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/social-media.test.js",
+        "test/development-completion.test.js",
+        "full-system-cloud-browser.json"
+      ]
+    },
+    {
+      "feature": "Private Album request/approve/reject/revoke",
+      "status": "COMPLETE",
+      "source": [
+        "test/direct-chat-albums.test.js",
+        "e2e/isolated-albums-live.spec.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/direct-chat-albums.test.js",
+        "full-system-cloud-browser.json"
+      ]
+    },
+    {
+      "feature": "Public/private Gallery, viewer, captions, likes/comments",
+      "status": "COMPLETE",
+      "source": [
+        "app/gallery-approved.js",
+        "app/social.js",
+        "test/gallery-approved.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/gallery-approved.test.js",
+        "e2e/social.spec.js",
+        "full-system-cloud-browser.json"
+      ]
+    },
+    {
+      "feature": "Capacity12, independent daily quotas, private R2",
+      "status": "COMPLETE",
+      "source": [
+        "migrations/0011_daily_media_upload_quotas.sql",
+        "migrations/0014_gallery_capacity.sql",
+        "test/social-media.test.js",
+        "test/media-cleanup.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "migrations/0011_daily_media_upload_quotas.sql",
+        "migrations/0014_gallery_capacity.sql",
+        "test/social-media.test.js",
+        "test/media-cleanup.test.js"
+      ]
+    },
+    {
+      "feature": "Online status",
+      "status": "COMPLETE",
+      "source": [
+        "app/online-presence.js",
+        "functions/_lib/online-presence.js",
+        "test/online-presence.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/online-presence.test.js",
+        "docs/issue-16/local-playwright.json"
+      ]
+    },
+    {
+      "feature": "Ratings and private reviews",
+      "status": "COMPLETE",
+      "source": [
+        "functions/api/social/[[path]].js",
+        "app/social.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/social.test.js",
+        "test/development-completion.test.js",
+        "full-system-cloud-browser.json"
+      ]
+    },
+    {
+      "feature": "Blocking and user reports",
+      "status": "COMPLETE",
+      "source": [
+        "functions/api/social/[[path]].js",
+        "test/social.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/direct-chat-albums.test.js",
+        "full-system-cloud-browser.json"
+      ]
+    },
+    {
+      "feature": "Moderation overview and workload",
+      "status": "COMPLETE",
+      "source": [
+        "test/account-moderation.test.js",
+        "e2e/issue16-admin.spec.js",
+        "docs/production-pilot-20261020/owner-admin-live.json"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/account-moderation.test.js",
+        "e2e/issue16-admin.spec.js",
+        "docs/production-pilot-20261020/owner-admin-live.json"
+      ]
+    },
+    {
+      "feature": "Moderation queues, search, pagination",
+      "status": "COMPLETE",
+      "source": [
+        "app/moderation.js",
+        "functions/api/social/[[path]].js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/development-completion.test.js",
+        "e2e/moderation.spec.js",
+        "full-system-cloud-browser.json"
+      ]
+    },
+    {
+      "feature": "Media decisions, appeals and audit",
+      "status": "COMPLETE",
+      "source": [
+        "functions/api/social/[[path]].js",
+        "test/media-moderation.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/media-moderation.test.js",
+        "test/development-completion.test.js",
+        "cloud-cleanup.json"
+      ]
+    },
+    {
+      "feature": "Account moderation/appeals",
+      "status": "COMPLETE",
+      "source": [
+        "migrations/0016_beta_account_moderation.sql",
+        "test/account-moderation.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/account-moderation.test.js",
+        "test/development-completion.test.js",
+        "e2e/issue16-admin.spec.js"
+      ]
+    },
+    {
+      "feature": "Role assignment/revocation and expiry",
+      "status": "COMPLETE",
+      "source": [
+        "test/moderation.test.js",
+        "test/owner-admin-bootstrap.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/moderation.test.js",
+        "test/owner-admin-bootstrap.test.js"
+      ]
+    },
+    {
+      "feature": "Notifications and cross-feature refresh",
+      "status": "COMPLETE",
+      "source": [
+        "app/social.js",
+        "functions/api/social/[[path]].js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "e2e/social.spec.js",
+        "test/development-completion.test.js",
+        "full-system-cloud-browser.json"
+      ]
+    },
+    {
+      "feature": "Account deletion and retention",
+      "status": "COMPLETE",
+      "source": [
+        "account.js",
+        "functions/_lib/retention.js",
+        "test/privacy-safety.test.js",
+        "test/media-cleanup.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/privacy-safety.test.js",
+        "test/development-completion.test.js",
+        "full-system-cloud-browser.json",
+        "cloud-cleanup.json"
+      ]
+    },
+    {
+      "feature": "Legal, staffing, scanner and public activation",
+      "status": "BLOCKED EXTERNALLY",
+      "source": [
+        "docs/production-pilot-20261020/policy-approval.html",
+        "docs/production-pilot-20261020/admin-operations-draft.html"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "docs/production-pilot-20261020/policy-approval.html",
+        "docs/production-pilot-20261020/admin-operations-draft.html"
+      ],
+      "externalGate": "Expanded Social/media/legal/operations scope, independent appeal reviewer, backup/emergency route and scanning-vendor decision not assumed. Owner-only policy approval is not unrestricted launch approval."
+    },
+    {
+      "feature": "Game, OTP and fictional Demo",
+      "status": "COMPLETE",
+      "source": [
+        "test/prelaunch-build.test.js",
+        "test/demo-compatibility.test.js"
+      ],
+      "technicalStatus": "COMPLETE",
+      "evidence": [
+        "test/prelaunch-build.test.js",
+        "test/demo-compatibility.test.js"
+      ]
+    },
+    {
+      "feature": "Member session list and revoke other sessions",
+      "status": "COMPLETE",
+      "technicalStatus": "COMPLETE",
+      "source": [
+        "account.html",
+        "account.js",
+        "functions/api/auth/[[path]].js"
+      ],
+      "evidence": [
+        "test/development-completion.test.js",
+        "full-system-cloud-browser.json"
+      ],
+      "note": "Sensitive revoke requires recent authentication + CSRF; owner Production sessions not mutated by this workstream."
+    },
+    {
+      "feature": "Forwarded image cleanup and uploader deletion",
+      "status": "COMPLETE",
+      "technicalStatus": "COMPLETE",
+      "source": [
+        "functions/_lib/db.js",
+        "workers/media-cleanup.js"
+      ],
+      "evidence": [
+        "test/development-completion.test.js",
+        "cloud-cleanup.json"
+      ],
+      "note": "Image-only messages tombstoned before SET NULL; R2 acknowledgement separated from D1 commit failure; exact manifest-only cleanup."
+    },
+    {
+      "feature": "Opt-in admitted-cohort isolation",
+      "status": "COMPLETE",
+      "technicalStatus": "COMPLETE",
+      "source": [
+        "functions/api/social/[[path]].js",
+        "wrangler.issue13.jsonc"
+      ],
+      "evidence": [
+        "test/acceptance.test.js",
+        "test/development-completion.test.js",
+        "full-system-cloud-browser.json"
+      ],
+      "note": "BETA_ENROLLMENT_REQUIRED is on only in isolated synthetic testing. Existing-member defaults and Production flags are unchanged; genuine UAT admission requires individual approval."
+    }
+  ],
+  "checkedAt": "2026-10-20T05:20:26.950Z",
+  "applicationSha": "0a0eb19beb701371151ebd26c3415b8a3a33a76b",
+  "productionSha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+  "engineeringDefects": [],
+  "exclusions": [
+    "Game",
+    "Removed Add Friend approval model",
+    "Email/Mobile OTP disabled",
+    "Public fictional Demo",
+    "Unapproved identity evidence / Sensitive activation",
+    "Automatic data-export product not present in NEAR; no new export promise"
+  ],
+  "residualRisks": [
+    "Self-declaration is not independent age verification.",
+    "Coarse distance and rate limits do not prove resistance to every repeated-query/location-spoofing inference; location scope needs risk approval.",
+    "Single operator is not an independent appeals panel or 24/7 response.",
+    "No scanning vendor or guaranteed backup-deletion period has been approved."
+  ]
+}

@@ -10,7 +10,7 @@ const person={name:'x" onerror="alert(1)',bio:'<script>bad</script>',gender:'ไ
 const context={person,id:'fixture',html,portrait:()=>'<img class="profile-photo" alt="fiction">',media:()=>'/assets/demo/01.png',distance:'ระยะสมมติ',photos:[{id:'photo',visibility:'public',caption:'สมมติ',like_count:0}],config:{friendRequestsEnabled:true,messagingEnabled:true},star:'<svg></svg>',images:'<svg></svg>',grid:'<svg></svg>',userPlus:'<svg></svg>',demo:true};
 test('self shortcut never fabricates proximity, ratings, verification or self-social actions',()=>{
  const out=ui.card({...context,person:{...person,identity_verified:1},own:true,canRate:true,incoming:true});
- assert.match(out,/self-card-badge">คุณ/);assert.match(out,/โปรไฟล์ของคุณ · ตัวอย่าง/);
+ assert.match(out,/self-card-badge">คุณ/);assert.match(out,/โปรไฟล์ของคุณ/);
  assert.match(out,/data-person-open="fixture"/);
  assert.doesNotMatch(out,/card-distance|verify-badge|incoming-bell|data-action=|4\.0/);
  assert.ok(out.includes('&lt;script&gt;'));

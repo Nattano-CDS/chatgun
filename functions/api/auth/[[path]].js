@@ -1,4 +1,6 @@
 import { constantTimeEqual, hmac, randomOtp, randomToken, safeUuid, sha256 } from "../../_lib/crypto.js";
+import { enabledOAuthProviders } from "../../_lib/oauth-provider-gates.js";
+import { eligibilityRequest } from '../../_lib/eligibility-review.js';
 import {
   CSRF_COOKIE,
   OAUTH_COOKIE,
@@ -204,7 +206,7 @@ async function verifyOtp(request, env) {
 
 async function startOauth(request, env, provider) {
   requireSameOrigin(request);
-  if (String(env.OAUTH_LOGIN_ENABLED).toLowerCase() === "false") return failure("การเข้าสู่บัญชีจริงยังไม่เปิดใช้งาน กรุณาใช้โหมดตัวอย่าง", 503, "oauth_unavailable");
+  if (!enabledOAuthProviders(env).includes(provider)) return failure("ChatGun กำลังเตรียมเปิดให้บริการ ยังไม่เปิดใช้งานการเข้าสู่บัญชี", 503, "oauth_unavailable");
   assertEnvironment(env, ["RATE_LIMIT_PEPPER"]);
   const body = await readJson(request);
   if (!await verifyTurnstile(request, env, body.turnstileToken, "auth_start")) {
@@ -328,7 +330,7 @@ async function startOauth(request, env, provider) {
 }
 
 async function oauthCallback(request, env, provider) {
-  if (String(env.OAUTH_LOGIN_ENABLED).toLowerCase() === "false") return authErrorRedirect(request, "oauth_unavailable");
+  if (!enabledOAuthProviders(env).includes(provider)) return authErrorRedirect(request, "oauth_unavailable");
   const url = new URL(request.url);
   const providerDenied = url.searchParams.has("error");
   const state = url.searchParams.get("state") || "";
@@ -395,7 +397,8 @@ async function oauthCallback(request, env, provider) {
     const journey = await accountJourney(env.DB, userId, env);
     return redirect(journey.nextPath, [cookie(OAUTH_COOKIE, "", 0), ...session.cookies]);
   } catch (error) {
-    console.error(JSON.stringify({ event: "oauth_callback_failed", provider, reason: error?.message || "unknown" }));
+    const safeReason=['identity_already_linked','registration_closed','invitation_unavailable','reauth_session_mismatch','reauth_identity_mismatch','reauth_session_expired'].includes(error?.message)?error.message:'provider_or_validation_failed';
+    console.error(JSON.stringify({ event: "oauth_callback_failed", provider, reason: safeReason }));
     const redirectCode = error?.message === "identity_already_linked"
       ? "identity_linked"
       : error?.message === "registration_closed" ? "registration_closed"
@@ -423,6 +426,7 @@ async function currentUser(request, env) {
     recentlyAuthenticated: hasRecentAuthentication(session),
     acceptanceRequired: journey.acceptanceRequired,
     nextPath: journey.nextPath,
+    ageSafetyReviewRequired: journey.ageSafetyReviewRequired === true,
     canLinkAccounts: journey.nextPath === "/app/",
   });
 }
@@ -452,6 +456,8 @@ async function acceptRequirements(request, env) {
   if (!await requireCsrf(request, session)) return failure("คำขอหมดอายุ กรุณาลองใหม่", 403, "invalid_csrf");
   const body = await readJson(request);
   const versions = requiredAcceptanceVersions(env);
+  const ageHold = await env.DB.prepare("SELECT 1 held FROM member_age_safety_holds WHERE user_id=? AND (state='held' OR age_band<>'20_plus')").bind(session.user_id).first();
+  if (ageHold) return failure('บัญชีนี้อยู่ระหว่างตรวจสอบสิทธิ์ตามช่วงอายุ ไม่สามารถใช้การยืนยัน 18+ เพื่อเปิดสิทธิ์แทนได้',403,'age_safety_review_required');
   if (body.confirmedAdult !== true) {
     return failure("ผู้ที่มีอายุต่ำกว่า 18 ปีไม่สามารถเข้าร่วม ChatGun Beta ได้", 403, "underage_not_eligible");
   }
@@ -599,6 +605,24 @@ async function logout(request, env) {
   ]);
 }
 
+async function accountSessions(request,env){
+  const session=await getSession(request,env.DB);
+  if(!session)return failure('กรุณาเข้าสู่ระบบ',401,'unauthorized');
+  const now=unixTime();
+  if(request.method==='POST'){
+    requireSameOrigin(request);
+    if(!await requireCsrf(request,session))return failure('คำขอหมดอายุ กรุณาลองใหม่',403,'invalid_csrf');
+    if(!hasRecentAuthentication(session))return failure('กรุณาเข้าสู่ระบบใหม่ก่อนเพิกถอนเซสชัน',428,'recent_auth_required');
+    if(!await rateLimit(env.DB,'session_management',session.user_id,20,3600,env.RATE_LIMIT_PEPPER))return failure('ดำเนินการบ่อยเกินไป กรุณารอ',429,'rate_limited');
+    const body=await readJson(request);
+    if(body.action!=='revoke_others')return failure('คำขอไม่ถูกต้อง',400,'invalid_action');
+    const result=await env.DB.prepare('UPDATE sessions SET revoked_at=? WHERE user_id=? AND token_hash<>? AND revoked_at IS NULL AND expires_at>?').bind(now,session.user_id,session.token_hash,now).run();
+    return json({ok:true,revoked:Number(result.meta?.changes||0)});
+  }
+  const rows=await env.DB.prepare('SELECT token_hash,created_at,expires_at FROM sessions WHERE user_id=? AND revoked_at IS NULL AND expires_at>? ORDER BY created_at DESC LIMIT 101').bind(session.user_id,now).all();
+  return json({sessions:await Promise.all((rows.results||[]).slice(0,100).map(async row=>({id:await sha256('session-display:'+session.user_id+':'+row.token_hash),createdAt:row.created_at,expiresAt:row.expires_at,current:row.token_hash===session.token_hash}))),hasMore:(rows.results||[]).length>100});
+}
+
 export async function onRequest({ request, env }) {
   const requestId = safeUuid();
   try {
@@ -609,7 +633,8 @@ export async function onRequest({ request, env }) {
       return json({
         turnstileSiteKey: env.TURNSTILE_SITE_KEY || null,
         oauthLoginEnabled: String(env.OAUTH_LOGIN_ENABLED).toLowerCase() !== "false",
-        oauthProviders: String(env.OAUTH_LOGIN_ENABLED).toLowerCase() === "false" ? [] : [...PROVIDERS],
+        oauthProviders: enabledOAuthProviders(env),
+        lineChannelMatchesExpected: env.LINE_EXPECTED_CLIENT_ID ? String(env.LINE_CLIENT_ID) === String(env.LINE_EXPECTED_CLIENT_ID) : null,
         emailOtpEnabled,
         mobileOtpEnabled,
         smsEnabled: mobileOtpEnabled,
@@ -633,10 +658,12 @@ export async function onRequest({ request, env }) {
       return failure("ไม่อนุญาตวิธีเรียกนี้", 405, "method_not_allowed");
     }
     if (request.method === "GET" && path === "/api/auth/me") return await currentUser(request, env);
+    if (path === '/api/auth/eligibility-review' && ['GET','POST'].includes(request.method)) return await eligibilityRequest(request, env);
     if (request.method === "GET" && path === "/api/auth/acceptance") return await acceptanceStatus(request, env);
     if (request.method === "POST" && path === "/api/auth/acceptance") return await acceptRequirements(request, env);
     if (request.method === "POST" && path === "/api/auth/acceptance/decline") return await declineAcceptance(request, env);
     if (request.method === "POST" && path === "/api/auth/logout") return await logout(request, env);
+    if(path==='/api/auth/sessions'&&['GET','POST'].includes(request.method))return await accountSessions(request,env);
     if (request.method === "POST" && path === "/api/auth/account-deletion/request") {
       return await requestAccountDeletion(request, env);
     }
@@ -654,7 +681,7 @@ export async function onRequest({ request, env }) {
       };
       return failure(messages[error.code] || "คำขอไม่ถูกต้อง", error.status, error.code, requestId);
     }
-    console.error(JSON.stringify({ event: "auth_request_failed", requestId, reason: error?.message || "unknown" }));
+    console.error(JSON.stringify({ event: "auth_request_failed", requestId, reason: "internal_error" }));
     return failure(GENERIC_ERROR, 500, "internal_error", requestId);
   }
 }

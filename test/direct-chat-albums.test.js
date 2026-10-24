@@ -148,14 +148,14 @@ test('Production closed gates deny new routes before touching migration-13 table
   assert.equal((await call('viewer','albums/access',{action:'request',owner:'owner'})).status,404);
 });
 
-test('unmigrated Production schema supports guarded fictional release without migration 0013',async t=>{
+test('unmigrated Production schema stays prelaunch without album or presence migrations',async t=>{
   const db=new TestD1({throughMigration:'0012_synthetic_seed_batches.sql'});t.after(()=>db.close());
   const env={...environment(db),SOCIAL_APP_ENABLED:'false',MESSAGING_ENABLED:'false',DEMO_MODE_ENABLED:'true',DEMO_AUTO_START_ENABLED:'true'};
   for(const path of ['conversations','albums/access','gallery','messages','media/unknown','chat-assets','relationships']){
     const response=await onRequest({env,request:new Request('https://chatgun.social/api/social/'+path)});assert.equal(response.status,404,path);
   }
   const config=await onRequest({env,request:new Request('https://chatgun.social/api/social/config')});assert.equal(config.status,200);
-  assert.equal((await config.json()).demoModeEnabled,true);
+  const flags=await config.json();assert.equal(flags.demoModeEnabled,false);assert.equal(flags.onlineStatusEnabled,false);
 });
 
 test('real deletion transaction cascades album evidence and sessions, queues media, preserves unrelated users',async t=>{

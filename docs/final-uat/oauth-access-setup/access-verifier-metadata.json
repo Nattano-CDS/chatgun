@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-24T07:12:00.768Z",
+  "project": "chatgun-final-uat",
+  "applicationId": "c2c866d3-3d41-410b-909f-4beac2683a17",
+  "policyId": "8fbef132-a338-4ec4-8c7e-94b29749e0d6",
+  "issuer": "https://tiny-violet-2021.cloudflareaccess.com",
+  "audience": "8088041f16940a90a6be75ce895613fff4fcdfaf4cb076d164138867e4709dbc",
+  "encryptedPreviewMetadata": true,
+  "ownerUuidMapped": false,
+  "adminEnabled": false,
+  "roleGrants": 0,
+  "productionConfigUnchanged": true,
+  "genuineMfa": "NOT RUN",
+  "independentOrganizationMfa": "OFF"
+}

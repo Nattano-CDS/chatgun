@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-20T01:38:01.987Z",
+  "origin": "https://chatgun.social",
+  "commit": "c1116c25a77e0a96f1e53f9fe662b6a9c4aab671",
+  "screens": [
+    {
+      "width": 390,
+      "lineVisible": true,
+      "otherProvidersHidden": true,
+      "overflow": false,
+      "pageErrors": 0,
+      "turnstile": "NOT SOLVED; no provider flow initiated"
+    },
+    {
+      "width": 768,
+      "lineVisible": true,
+      "otherProvidersHidden": true,
+      "overflow": false,
+      "pageErrors": 0,
+      "turnstile": "NOT SOLVED; no provider flow initiated"
+    },
+    {
+      "width": 1440,
+      "lineVisible": true,
+      "otherProvidersHidden": true,
+      "overflow": false,
+      "pageErrors": 0,
+      "turnstile": "NOT SOLVED; no provider flow initiated"
+    }
+  ],
+  "scope": "Fresh Chromium after config readiness; not actual phones or genuine OAuth",
+  "captureRace": "Initial immediate assertion preceded config rendering; rerun waits for disabled-provider DOM state"
+}

@@ -4,6 +4,7 @@
   "pages_build_output_dir": "dist",
   "compatibility_date": "2026-10-15",
   "vars": {
+    "PRESENCE_ENABLED": "false",
     "EMAIL_OTP_ENABLED": "false",
     "MOBILE_OTP_ENABLED": "false",
     "LINE_EMAIL_ENABLED": "false",
@@ -24,8 +25,8 @@
     "RATINGS_ENABLED": "true",
     "IDENTITY_VERIFICATION_ENABLED": "false",
     "MODERATION_TOOLS_ENABLED": "true",
-    "DEMO_MODE_ENABLED": "true",
-    "DEMO_AUTO_START_ENABLED": "true"
+    "DEMO_MODE_ENABLED": "false",
+    "DEMO_AUTO_START_ENABLED": "false"
   },
   "d1_databases": [
     {
@@ -44,6 +45,9 @@
   "env": {
     "production": {
       "vars": {
+        "OAUTH_ENABLED_PROVIDERS": "",
+        "FACEBOOK_EMAIL_ENABLED": "false",
+        "PRESENCE_ENABLED": "false",
         "EMAIL_OTP_ENABLED": "false",
         "MOBILE_OTP_ENABLED": "false",
         "LINE_EMAIL_ENABLED": "false",
@@ -64,8 +68,8 @@
         "RATINGS_ENABLED": "false",
         "IDENTITY_VERIFICATION_ENABLED": "false",
         "MODERATION_TOOLS_ENABLED": "false",
-        "DEMO_MODE_ENABLED": "true",
-        "DEMO_AUTO_START_ENABLED": "true",
+        "DEMO_MODE_ENABLED": "false",
+        "DEMO_AUTO_START_ENABLED": "false",
         "PUBLIC_DEMO_CANARY_ENABLED": "true",
         "OAUTH_LOGIN_ENABLED": "false"
       },
@@ -77,7 +81,7 @@
           "migrations_dir": "migrations"
         }
       ],
-      "r2_buckets": []
+      "r2_buckets": [{"binding":"MEDIA","bucket_name":"chatgun-media-production"}]
     }
   }
 }

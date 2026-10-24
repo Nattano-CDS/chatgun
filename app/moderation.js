@@ -8,6 +8,7 @@ const labels = {
   critical: "วิกฤต", high: "สูง", medium: "ปานกลาง", low: "ปกติ",
 };
 const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+function adminPath(path) { return state.standalone ? path.replace(/^\/api\/social\/moderation\//u, '/api/admin/') : path; }
 
 function cookie(name) {
   return document.cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${name}=`))?.slice(name.length + 1) || "";
@@ -30,9 +31,10 @@ async function api(path, options = {}) {
     body = JSON.stringify(options.body);
   }
   if (method !== "GET" && method !== "HEAD") headers["x-csrf-token"] = decodeURIComponent(cookie("__Host-cg_csrf"));
-  const response = await fetch(path, { credentials: "same-origin", ...options, method, headers, ...(body ? { body } : {}) });
+  if (state.standalone && method !== 'GET' && method !== 'HEAD') headers['x-cg-admin-csrf'] = state.adminCsrf || '';
+  const response = await fetch(adminPath(path), { credentials: "same-origin", ...options, method, headers, ...(body ? { body } : {}) });
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || "ไม่สามารถดำเนินการได้");
+  if (!response.ok) throw new Error(payload.message || payload.error || "ไม่สามารถดำเนินการได้");
   return payload;
 }
 
@@ -80,6 +82,7 @@ function setStatus(text, error = false) {
   const status = $("#moderation-status");
   status.textContent = text;
   status.classList.toggle("error", error);
+  $("#moderation-retry").hidden=!error;
 }
 
 function cardHeader(title, detail, status, category) {
@@ -140,7 +143,7 @@ function renderMedia(items) {
 function renderStats(counts = {}) {
   const stats = $("#moderation-stats");
   stats.replaceChildren();
-  for (const [key, text] of [["critical", "วิกฤต"], ["high", "สูง"], ["pending", "สื่อรอตรวจ"], ["userReports", "รายงานผู้ใช้"], ["mediaReports", "รายงานสื่อ"], ["appeals", "อุทธรณ์"]]) {
+  for (const [key, text] of [["members", "สมาชิกจริง"], ["activeMembers", "บัญชีที่เปิดใช้งาน"], ["critical", "วิกฤต"], ["high", "สูง"], ["pending", "สื่อรอตรวจ"], ["userReports", "รายงานผู้ใช้"], ["mediaReports", "รายงานสื่อ"], ["appeals", "อุทธรณ์"], ["deletionRequests", "คำขอลบบัญชี"], ["availableInvitations", "คำเชิญที่ยังใช้ได้"]]) {
     const card = node("article", null, "moderation-stat");
     card.append(node("strong", Number(counts[key] || 0).toLocaleString("th-TH")), node("span", text));
     stats.append(card);
@@ -178,7 +181,7 @@ function renderUserReports(reports) {
   const results = $("#moderation-results"); results.replaceChildren();
   if (!reports.length) return empty("ไม่มีรายงานผู้ใช้ที่รอดำเนินการ");
   for (const report of reports) {
-    const card = node("article", null, "moderation-card"); card.dataset.userReport = report.id;
+    const card = node("article", null, "moderation-card"); card.dataset.userReport = report.id;card.dataset.revision=String(report.revision||0);
     const severity = applySeverity(card, report.reason_code || report.category, report.status);
     card.append(
       cardHeader(`${report.reason_code || report.category} · ${report.subject_name || "ไม่แสดงชื่อ"}`, new Date(Number(report.created_at) * 1000).toLocaleString("th-TH"), report.status),
@@ -186,6 +189,7 @@ function renderUserReports(reports) {
     );
     const actions = node("div", null, "dialog-actions");
     actions.append(button("ตรวจแล้ว", "user-report", "reviewed"), button("ยกระดับ", "user-report", "escalated", "danger"), button("ปิดรายงาน", "user-report", "closed"));
+    if(state.accountOps)actions.append(button("ระงับสิทธิ์ Beta", "account-suspend", report.id, "danger"));
     card.append(actions); results.append(card);
   }
 }
@@ -194,7 +198,7 @@ function renderMediaReports(reports) {
   const results = $("#moderation-results"); results.replaceChildren();
   if (!reports.length) return empty("ไม่มีรายงานสื่อที่รอดำเนินการ");
   for (const report of reports) {
-    const card = node("article", null, "moderation-card"); card.dataset.mediaReport = report.id;
+    const card = node("article", null, "moderation-card"); card.dataset.mediaReport = report.id;card.dataset.revision=String(report.revision||0);
     const severity = applySeverity(card, report.reason_code, report.status);
     card.append(cardHeader(`${report.reason_code} · ${report.media_purpose}`, new Date(Number(report.created_at) * 1000).toLocaleString("th-TH"), report.status, report.category), badge(severity), node("p", report.details), node("small", ageText(report.created_at)));
     const actions = node("div", null, "dialog-actions");
@@ -214,14 +218,16 @@ function renderAppeals(appeals) {
     const category = node("select"); category.setAttribute("aria-label", `หมวดหมู่หลังอนุมัติอุทธรณ์ ${appeal.id}`);
     for (const [value, text] of [["general", "ทั่วไป"], ["sensitive", "ละเอียดอ่อน"]]) { const option = node("option", text); option.value = value; category.append(option); }
     const actions = node("div", null, "dialog-actions"); actions.append(button("อนุมัติอุทธรณ์", "appeal", "granted", "primary"), button("ยืนยันคำตัดสินเดิม", "appeal", "denied", "danger"));
+    if(itemConflict(appeal)){actions.querySelectorAll('button').forEach(b=>b.disabled=true);card.append(node('p','คุณเป็นผู้ตัดสินเดิม ต้องให้ผู้ตรวจคนอื่นพิจารณาอุทธรณ์นี้','error'));}
     card.append(category, actions); results.append(card);
   }
 }
+function itemConflict(item){return item.reviewer_conflict===1||item.reviewer_conflict===true;}
 
 function renderPriority({ userReports = [], mediaReports = [], appeals = [], media = [] }) {
   const results = $("#moderation-results"); results.replaceChildren();
   const items = [
-    ...userReports.map((item) => ({ kind: "รายงานผู้ใช้", reason: item.reason_code || item.category, status: item.status, created_at: item.created_at, title: item.subject_name || "ไม่แสดงชื่อ", detail: item.details })),
+    ...userReports.map((item) => ({ view:'user-reports',kind: "รายงานผู้ใช้", reason: item.reason_code || item.category, status: item.status, created_at: item.created_at, title: item.subject_name || "ไม่แสดงชื่อ", detail: item.details })),
     ...mediaReports.map((item) => ({ kind: "รายงานสื่อ", reason: item.reason_code, status: item.status, created_at: item.created_at, title: item.media_purpose, detail: item.details })),
     ...appeals.map((item) => ({ kind: "คำอุทธรณ์", reason: "appeal", status: item.status, created_at: item.created_at, title: item.media_id, detail: item.reason, fixedSeverity: "medium" })),
     ...media.map((item) => ({ kind: "สื่อรอตรวจ", reason: item.report_count > 0 ? "privacy" : "pending", status: item.status, created_at: item.created_at, title: item.media_purpose, detail: `รายงานที่เปิดอยู่ ${Number(item.report_count || 0)}`, fixedSeverity: item.report_count > 0 ? "high" : "low" })),
@@ -231,27 +237,49 @@ function renderPriority({ userReports = [], mediaReports = [], appeals = [], med
   for (const item of items) {
     const card = node("article", null, `moderation-card ${item.severity}`);
     card.append(cardHeader(`${item.kind} · ${item.title}`, new Date(Number(item.created_at) * 1000).toLocaleString("th-TH")), badge(item.severity), node("p", item.detail), node("small", ageText(item.created_at)));
-    results.append(card);
+    const open=button('เปิดคิวเพื่อดำเนินการ','open-queue',item.view||(item.kind==='รายงานสื่อ'?'media-reports':item.kind==='คำอุทธรณ์'?'appeals':'pending'));card.append(open);results.append(card);
   }
 }
 
-function renderAudit(events) {
+function renderAudit(events,accessEvents=[]) {
   const results = $("#moderation-results"); results.replaceChildren();
-  if (!events.length) return empty("ยังไม่มีประวัติการตัดสินใจ");
+  if (!events.length&&!accessEvents.length) return empty("ยังไม่มีประวัติการตัดสินใจหรือการเข้าถึง");
   for (const event of events) {
     const card = node("article", null, "moderation-card audit-card");
     card.append(cardHeader(`${labels[event.action] || event.action} · ${labels[event.category] || event.category}`, new Date(Number(event.created_at) * 1000).toLocaleString("th-TH"), event.action, event.category), node("p", event.reason), node("small", `สื่อ ${event.media_id} · รุ่น ${event.revision}`));
     results.append(card);
   }
+  for(const event of accessEvents){const card=node('article',null,'moderation-card audit-card');card.append(cardHeader('การเข้าถึง · '+event.action,new Date(Number(event.created_at)*1000).toLocaleString('th-TH')),node('p',event.purpose));results.append(card);}
+}
+
+function renderAccountOperations(items,view){
+  const results=$("#moderation-results");results.replaceChildren();
+  if(!items.length)return empty("ไม่มีรายการสิทธิ์ Beta ในคิวนี้");
+  for(const item of items){
+    const card=node('article',null,'moderation-card');card.dataset.accountItem=item.id;card.dataset.revision=String(item.revision||0);
+    card.append(cardHeader(item.subject_name||'สิทธิ์ Beta',new Date(item.created_at*1000).toLocaleString('th-TH'),item.status||item.action),node('p',item.reason));
+    if(item.reviewer_conflict){card.dataset.conflict='true';card.append(node('p','คุณเป็นผู้ตัดสินเดิม การทบทวนนี้ไม่ใช่การตรวจสอบอิสระ ต้องบันทึกข้อขัดแย้ง','error'));}
+    const actions=node('div',null,'dialog-actions');
+    if(view==='account-restrictions'&&item.status==='active')actions.append(button('คืนสิทธิ์ Beta','account-lift',item.id));
+    if(view==='account-appeals')actions.append(button('คืนสิทธิ์ตามอุทธรณ์','account-appeal','lifted'),button('ยืนยันการระงับ','account-appeal','upheld','danger'));
+    card.append(actions);results.append(card);
+  }
 }
 
 async function load(view = state.view) {
+  const previousView=state.view;
   state.view = view; setStatus("กำลังโหลด…");
   document.querySelectorAll("[data-load]").forEach((item) => item.classList.toggle("active", item.dataset.load === view));
   $("#moderation-stats").hidden = view !== "overview";
   $("#moderation-daily").hidden = view !== "overview";
-  $("#moderation-filters").hidden = !["pending", "approved", "sensitive", "rejected"].includes(view);
-  $("#moderation-pagination").hidden = !["pending", "approved", "sensitive", "rejected", "audit"].includes(view);
+  const mediaView=["pending", "approved", "sensitive", "rejected"].includes(view),caseView=['user-reports','media-reports','appeals','eligibility'].includes(view);
+  $("#moderation-filters").hidden = !mediaView&&!caseView&&view!=='members';
+  $('#moderation-search').closest('label').hidden=view==='eligibility';
+  $("#moderation-category").closest('label').hidden=!mediaView;
+  $("#moderation-case-status-label").hidden=!caseView;
+  if(caseView&&previousView!==view){const choices=view==='eligibility'?[['pending','รอทบทวน'],['withdrawn','ถอนคำขอ'],['upheld','คงข้อจำกัด'],['deferred','รอแนวทางอนุมัติ']]:view==='appeals'?[['pending','รอดำเนินการ'],['granted','อนุมัติ'],['denied','ยืนยันคำตัดสินเดิม'],['withdrawn','ถอนคำอุทธรณ์']]:[['pending','รอดำเนินการ'],['escalated','ยกระดับ'],['reviewed','ตรวจแล้ว'],['closed','ปิดรายการ']];$('#moderation-case-status').replaceChildren(...choices.map(([value,label])=>{const el=node('option',label);el.value=value;return el;}));}
+  $("#moderation-pagination").hidden = !mediaView&&!caseView&&!['audit','eligibility','members','deletions'].includes(view)&&!view.startsWith('account-');
+  const caseQuery=new URLSearchParams({page:String(state.page),status:$('#moderation-case-status').value||'pending',q:$('#moderation-search').value.trim()});
   let payload;
   if (view === "overview") { payload = await api("/api/social/moderation/overview", { routine: true }); renderStats(payload.counts); renderDaily(payload.daily, payload.cleanup); renderCoverage(payload.coverage); empty("เลือกงานด่วนหรือคิวด้านบนเพื่อเริ่มตรวจสอบ"); }
   else if (view === "priority") {
@@ -266,10 +294,37 @@ async function load(view = state.view) {
     const category = view === "sensitive" ? "sensitive" : $("#moderation-category").value;
     const query = new URLSearchParams({ status, category, q: $("#moderation-search").value.trim(), page: String(state.page) });
     payload = await api(`/api/social/moderation/media?${query}`); renderMedia(payload.media || []);
-  } else if (view === "user-reports") { payload = await api("/api/social/moderation/reports?status=pending"); renderUserReports(payload.reports || []); }
-  else if (view === "media-reports") { payload = await api("/api/social/moderation/media-reports?status=pending"); renderMediaReports(payload.reports || []); }
-  else if (view === "appeals") { payload = await api("/api/social/moderation/appeals?status=pending"); renderAppeals(payload.appeals || []); }
-  else if (view === "audit") { payload = await api(`/api/social/moderation/audit?page=${state.page}`); renderAudit(payload.events || []); }
+  } else if (view === "user-reports") { payload = await api('/api/social/moderation/reports?'+caseQuery); renderUserReports(payload.reports || []); }
+  else if (view === "media-reports") { payload = await api('/api/social/moderation/media-reports?'+caseQuery); renderMediaReports(payload.reports || []); }
+  else if (view === "appeals") { payload = await api('/api/social/moderation/appeals?'+caseQuery); renderAppeals(payload.appeals || []); }
+  else if (view === "audit") { payload = await api(`/api/social/moderation/audit?page=${state.page}`); renderAudit(payload.events || [],payload.accessEvents||[]); }
+  else if(view==='eligibility'){
+    payload=await api('/api/social/moderation/eligibility?'+caseQuery);
+    const results=$('#moderation-results');results.replaceChildren();
+    results.append(node('p','คิวนี้คงข้อจำกัดไว้เท่านั้น ไม่อนุญาตให้ปลดล็อกผู้เยาว์หรือรับเอกสารยืนยันตัวตน'));
+    for(const item of payload.items||[]){const card=node('article',undefined,'panel');card.dataset.eligibility=item.id;card.dataset.revision=item.revision;
+      card.append(node('h3','คำขอ '+item.id),node('p',item.reason),node('p','สถานะ: '+item.status));
+      if(item.decision_reason)card.append(node('p','เหตุผลการตัดสิน: '+item.decision_reason));
+      if(item.status==='pending')card.append(button('คงข้อจำกัด','eligibility','upheld'),button('รอแนวทางอนุมัติ','eligibility','deferred'));results.append(card);
+    }
+    if(!payload.items?.length)results.append(node('p','ไม่มีคำขอรอพิจารณา'));
+  }
+  else if(['members','deletions'].includes(view)){
+    payload=await api('/api/social/moderation/members?view='+view+'&page='+state.page+'&q='+encodeURIComponent($('#moderation-search').value.trim()));
+    const results=$('#moderation-results');results.replaceChildren(node('p','คิวอ่านอย่างเดียว ไม่มีปุ่มลบบัญชีหรือให้สิทธิ์โดยข้ามการยืนยันตัวตน'));
+    for(const item of payload.items||[]){const card=node('article',undefined,'panel');card.append(node('h3',item.id||item.request_id));
+      if(view==='members')card.append(node('p',`สถานะ: ${item.status} / ${item.account_state} · Beta: ${item.beta_status||'ไม่มี'} · จำกัดบัญชี: ${item.restricted?'ใช่':'ไม่'} · รอทบทวนอายุ: ${item.age_review_required?'ใช่':'ไม่'}`));
+      else card.append(node('p',`สถานะ: ${item.status} · หมดอายุ ${new Date(item.expires_at*1000).toLocaleString('th-TH')}`));results.append(card);
+    }
+    if(!payload.items?.length)results.append(node('p','ไม่มีรายการ'));
+  }
+  else if(view==='roles'){
+    payload=await api('/api/social/moderation/roles');const results=$('#moderation-results');results.replaceChildren(node('p','การให้หรือถอนสิทธิ์ต้องยืนยันบัญชีเป้าหมาย เหตุผล และการเข้าสู่ระบบล่าสุด บัญชี Cloudflare ไม่ได้สร้างสิทธิ์ให้อัตโนมัติ'));
+    results.append(button('ให้สิทธิ์ที่มีวันหมดอายุ','role-grant'));
+    for(const grant of payload.grants||[]){const card=node('article',undefined,'panel');card.append(node('h3',grant.user_id),node('p',`${grant.role} · หมดอายุ ${new Date(grant.expires_at*1000).toLocaleString('th-TH')}`));if(!grant.revoked_at)card.append(button('ถอนสิทธิ์','role-revoke',grant.id));results.append(card);}
+    for(const event of payload.events||[]){const card=node('article',undefined,'panel');card.append(node('h3',event.action+' · '+event.role),node('p',event.reason));results.append(card);}
+  }
+  else if(view.startsWith('account-')){const kind={'account-restrictions':'restrictions','account-appeals':'appeals','account-history':'history'}[view];payload=await api('/api/social/moderation/accounts?view='+kind+'&page='+state.page);renderAccountOperations(payload.items||[],view);}
   state.hasMore = Boolean(payload?.hasMore);
   $("#moderation-page").textContent = `หน้า ${state.page.toLocaleString("th-TH")}`;
   $("[data-page='previous']").disabled = state.page <= 1;
@@ -278,8 +333,8 @@ async function load(view = state.view) {
 }
 
 async function authenticatedImage(path) {
-  const response = await fetch(path, { credentials: "same-origin", headers: { "x-moderation-purpose": encodeURIComponent(purpose()) } });
-  if (!response.ok) { const payload = await response.json().catch(() => ({})); throw new Error(payload.error || "ไม่สามารถเปิดรูปภาพได้"); }
+  const response = await fetch(adminPath(path), { credentials: "same-origin", headers: { "x-moderation-purpose": encodeURIComponent(purpose()) } });
+  if (!response.ok) { const payload = await response.json().catch(() => ({})); throw new Error(payload.message || payload.error || "ไม่สามารถเปิดรูปภาพได้"); }
   return URL.createObjectURL(await response.blob());
 }
 
@@ -294,6 +349,12 @@ async function showMedia(id) {
 }
 
 document.addEventListener("click", async (event) => {
+  if (event.target.closest('#admin-access-logout')) {
+    try { await api('/api/admin/session', { method: 'POST', routine: true, body: { action: 'logout' } }); state.adminCsrf = ''; location.assign('/cdn-cgi/access/logout'); }
+    catch (error) { setStatus(error.message, true); }
+    return;
+  }
+  if(event.target.closest('#moderation-retry')){try{await load();}catch(error){setStatus(error.message,true);}return;}
   const close = event.target.closest(".dialog-close");
   if (close) return close.closest("dialog").close();
   const loader = event.target.closest("[data-load]");
@@ -304,6 +365,35 @@ document.addEventListener("click", async (event) => {
   const action = event.target.closest("[data-action]");
   if (!action) return;
   try {
+    if(['role-grant','role-revoke'].includes(action.dataset.action)){
+      const reason=prompt('เหตุผลการเปลี่ยนสิทธิ์ (10–300 ตัวอักษร)');if(!reason||reason.trim().length<10)return;
+      let body={action:'revoke',grantId:action.dataset.value,reason};
+      if(action.dataset.action==='role-grant'){
+        const userId=prompt('รหัสบัญชีภายในที่ตรวจสอบและได้รับอนุมัติแล้ว');if(!userId)return;
+        const role=prompt('บทบาท: report_reviewer / safety_admin / moderation_admin / identity_reviewer');if(!role)return;
+        const hours=Number(prompt('ระยะเวลาสิทธิ์เป็นชั่วโมง (1–2160)', '168'));if(!Number.isInteger(hours)||hours<1||hours>2160)throw Error('ระยะเวลาไม่ถูกต้อง');
+        if(!confirm(`ยืนยันให้สิทธิ์ ${role} แก่บัญชี ${userId} เป็นเวลา ${hours} ชั่วโมง?`))return;
+        body={action:'grant',userId:userId.trim(),role:role.trim(),expiresAt:Math.floor(Date.now()/1000)+hours*3600,reason};
+      }else if(!confirm('ยืนยันถอนสิทธิ์รายการนี้หรือไม่?'))return;
+      await api('/api/social/moderation/roles',{method:'POST',body});await load();return;
+    }
+    if(action.dataset.action==='eligibility'){
+      const reason=prompt('บันทึกเหตุผล 10–300 ตัวอักษร (ไม่มีการปลดล็อกสิทธิ์อายุ)');if(!reason||reason.trim().length<10)return;
+      const card=action.closest('[data-eligibility]');
+      await api('/api/social/moderation/eligibility',{method:'POST',body:{id:card.dataset.eligibility,revision:Number(card.dataset.revision),action:action.dataset.value,reason}});await load();return;
+    }
+    if(action.dataset.action==='open-queue'){state.page=1;await load(action.dataset.value);return;}
+    if(action.dataset.action.startsWith('account-')){
+      const reason=prompt('บันทึกเหตุผลสำหรับการตัดสินสิทธิ์ Beta (อย่างน้อย 10 ตัวอักษร)');if(!reason||reason.trim().length<10)return;
+      const card=action.closest('[data-account-item]');let body;
+      if(action.dataset.action==='account-suspend')body={action:'suspend',reportId:action.dataset.value,reason};
+      if(action.dataset.action==='account-lift')body={action:'lift',id:action.dataset.value,revision:Number(card.dataset.revision),reason};
+      if(action.dataset.action==='account-appeal'){
+        const conflict=card.dataset.conflict==='true';if(conflict&&!confirm('คุณเป็นผู้ตัดสินเดิม ไม่มีผู้ทบทวนอิสระ ยืนยันว่าบันทึกข้อขัดแย้งและดำเนินการตามขั้นตอนที่เจ้าของอนุมัติแล้วหรือไม่?'))return;
+        body={action:'resolve_appeal',id:card.dataset.accountItem,revision:Number(card.dataset.revision),decision:action.dataset.value,reason,conflictAcknowledged:conflict};
+      }
+      await api('/api/social/moderation/accounts',{method:'POST',body});await load();return;
+    }
     if (action.dataset.action === "media-view") await showMedia(action.dataset.value);
     if (action.dataset.action === "media") {
       const card = action.closest("[data-media]");
@@ -317,11 +407,11 @@ document.addEventListener("click", async (event) => {
     }
     if (action.dataset.action === "media-report") {
       const note = prompt("บันทึกเหตุผลการดำเนินการกับรายงาน (จำเป็น)"); if (!note?.trim()) return;
-      await api("/api/social/moderation/media-reports", { method: "POST", body: { id: action.closest("[data-media-report]").dataset.mediaReport, status: action.dataset.value, note } }); await load();
+      const card=action.closest('[data-media-report]');await api("/api/social/moderation/media-reports", { method: "POST", body: { id: card.dataset.mediaReport,revision:Number(card.dataset.revision), status: action.dataset.value, note } }); await load();
     }
     if (action.dataset.action === "user-report") {
       const note = prompt("บันทึกเหตุผลการดำเนินการกับรายงานผู้ใช้ (จำเป็น)"); if (!note?.trim()) return;
-      await api("/api/social/moderation/reports", { method: "POST", body: { id: action.closest("[data-user-report]").dataset.userReport, status: action.dataset.value, note } }); await load();
+      const card=action.closest('[data-user-report]');await api("/api/social/moderation/reports", { method: "POST", body: { id: card.dataset.userReport,revision:Number(card.dataset.revision), status: action.dataset.value, note } }); await load();
     }
     if (action.dataset.action === "appeal") {
       const card = action.closest("[data-appeal]"); const reason = prompt("บันทึกเหตุผลผลอุทธรณ์ (จำเป็น)"); if (!reason?.trim()) return;
@@ -330,4 +420,22 @@ document.addEventListener("click", async (event) => {
   } catch (error) { setStatus(error.message, true); }
 });
 
-load("overview").catch((error) => setStatus(error.message, true));
+async function initializeAdmin() {
+ const c=await api('/api/social/config',{routine:true});
+ state.standalone=c.adminAccessStandaloneEnabled===true;
+ if(state.standalone){
+   let session=await api('/api/admin/session',{routine:true});state.adminCsrf=session.csrfToken;
+   if(!session.authenticated)session=await api('/api/admin/session',{method:'POST',routine:true,body:{action:'start'}});
+   state.adminCsrf=session.csrfToken;$('#admin-access-logout').hidden=false;
+ }
+ await load("overview");
+ state.accountOps=c.accountModerationEnabled===true;document.querySelectorAll('[data-account-ops]').forEach(el=>el.hidden=!state.accountOps);
+ if(!c.moderationToolsEnabled)return;
+ const grants=await api('/api/social/moderation/capabilities',{routine:true});
+ document.querySelector('[data-load="eligibility"]').hidden=!grants.canReviewEligibility;
+ document.querySelector('[data-load="roles"]').hidden=!grants.canManageRoles;
+ for(const view of ['members','deletions'])document.querySelector(`[data-load="${view}"]`).hidden=!grants.canInspectMembers;
+ state.accountOps=grants.canModerateAccounts;
+ document.querySelectorAll('[data-load]').forEach(el=>{const view=el.dataset.load;if(view.startsWith('account-'))el.hidden=!grants.canModerateAccounts;else if(['priority','pending','approved','sensitive','rejected','appeals','audit'].includes(view))el.hidden=!grants.canReviewMedia;else if(['user-reports','media-reports'].includes(view))el.hidden=!grants.canReviewReports;});
+}
+initializeAdmin().catch(error=>setStatus(error.message,true));

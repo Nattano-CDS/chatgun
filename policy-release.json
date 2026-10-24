@@ -1,0 +1,18 @@
+{
+  "scope": "line-owner-pilot",
+  "ownerApproved": true,
+  "qualifiedReviewConfirmedByOwner": true,
+  "confirmationSource": "Owner chat confirmations on 20 October 2026; agent does not independently certify legal compliance",
+  "effectiveDate": "2026-10-20",
+  "timezone": "Asia/Bangkok",
+  "effectiveCondition": "Upon publication on approved date",
+  "versions": {"adultNotice":"adult-beta-2026-10-20-rc1","terms":"terms-beta-2026-10-20-rc1","privacy":"privacy-beta-2026-10-20-rc1","beta":"beta-2026-10-20-rc1"},
+  "files": {
+    "privacy.html":"be5d8578da6a3e3fd0d6180a37fdde7667565d719b35ec880ffe6105d703f48b",
+    "terms.html":"7b381aaed9ab52f0033a7aec0d2ec4c3951317ad52ed23acc981ff0bc7717dc3",
+    "data-deletion.html":"b55216f2b9853d70476484042644896431e9abdbe9daecd9d641bd7e2105d4e4",
+    "beta-notice.html":"e01da689a1d91bbcc994f47eb734a191852fb2f162db0d19025bdab4fb4bb394"
+  },
+  "restrictedAdmission": "Single confirmed consenting owner; defer ages 18–19 pending explicit procedure; no unrestricted registration",
+  "laterWavesApproved": false
+}

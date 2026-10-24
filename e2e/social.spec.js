@@ -51,6 +51,15 @@ test.beforeEach(async ({ page }) => {
   await mockSocialApi(page);
 });
 
+test('restricted public account reaches account privacy/deletion and appeal controls instead of a retry dead end',async({page})=>{
+ await page.route('**/api/social/profile',r=>r.fulfill({status:403,json:{code:'account_access_restricted',message:'บัญชีถูกระงับสิทธิ์'}}));
+ await page.route('**/api/social/config',r=>r.fulfill({json:{...config,accountModerationEnabled:true}}));
+ await page.goto('/app/');await expect(page).toHaveURL(/\/account\.html\?access=restricted$/);
+ await expect(page.locator('#account-appeals-link')).toBeVisible();
+ await expect(page.locator('#account-appeals-link')).toHaveAttribute('href','/app/appeals.html');
+ await expect(page.locator('#deletion')).toBeVisible();await expect(page.locator('#logout')).toBeVisible();
+});
+
 test('authenticated chat deep link opens the actual inbox immediately',async({page})=>{
   await page.goto('/?tab=chat');await expect(page.locator('#chat-tab')).toBeVisible();
   await expect(page.locator('#near-tab')).not.toBeVisible();await expect(page.locator('[data-chat="friend-1"]')).toBeVisible();
@@ -67,7 +76,7 @@ test("root is the authenticated discovery entry while welcome retains marketing"
 
 test('authenticated shortcut is session-owned, deduplicated and independent of discovery visibility',async({page})=>{
  await page.route('**/api/social/profile',r=>r.fulfill({json:{profile:{user_id:'me',name:'นัท',bio:'โปรไฟล์ส่วนตัว',discovery_visible:0}}}));
- await page.route('**/api/social/discovery',r=>r.fulfill({json:{locationFresh:true,people:[{user_id:'me',name:'stale API copy',distance:1},{user_id:'other',name:'สมาชิกอื่น',distance:250}]}}));
+ await page.route('**/api/social/discovery?*',r=>r.fulfill({json:{locationFresh:true,people:[{user_id:'me',name:'stale API copy',distance:1},{user_id:'other',name:'สมาชิกอื่น',distance:250}]}}));
  await page.goto('/');
  const first=page.locator('#people-grid .person-card').first();
  await expect(first).toHaveAttribute('data-person','me');await expect(first.locator('.person-name')).toHaveText('นัท');
@@ -103,6 +112,22 @@ test('gallery failed comment keeps its draft and inline reason; likes are disabl
   await page.keyboard.press('Escape');await expect(page.locator('#profile-dialog')).toBeHidden();
 });
 
+test('public photo stays open without a private grant and foreground updates preserve comment draft',async({page})=>{
+ await page.clock.install();let updated=false;
+ await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',album:{granted:false,request:null},photos:[{id:'public-refresh',visibility:'public',caption:'รูปสาธารณะ',like_count:updated?2:0}],comments:updated?[{id:'new',sender_name:'ผู้แสดงความคิดเห็นทดสอบ',body:'ความคิดเห็นใหม่'}]:[]}}));
+ await page.goto('/app/people/near-1/gallery/public-refresh');await expect(page.locator('.lightbox-shell')).toBeVisible();await page.locator('#gallery-comment input[name=comment]').fill('ร่างที่ต้องรักษาไว้');updated=true;await page.clock.fastForward(11000);
+ await expect(page.locator('.lightbox-shell')).toBeVisible();await expect(page.locator('.post-comments')).toContainText('ความคิดเห็นใหม่');await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ร่างที่ต้องรักษาไว้');
+});
+test('core configuration outage exposes a working recovery action without fake members',async({page})=>{
+ let failed=true;await page.route('**/api/social/config',r=>failed?r.fulfill({status:503,json:{message:'Temporary failure'}}):r.fulfill({json:config}));await page.goto('/');await expect(page.locator('#disabled-view')).toBeVisible();await expect(page.locator('#people-grid .person-card')).toHaveCount(0);failed=false;await page.locator('#service-retry').click();await expect(page.locator('#social-view')).toBeVisible();await expect(page.locator('#disabled-view')).toBeHidden();
+});
+test('unread badges refresh across screens and opt-in foreground notifications do not require hidden polling',async({page})=>{
+ await page.clock.install();await page.addInitScript(()=>{window.notificationSamples=[];window.Notification=class{static permission='granted';constructor(title,options){window.notificationSamples.push({title,body:options.body});}};});let unread=0;
+ await page.route('**/api/social/conversations',r=>r.fulfill({json:{conversations:[{other_user_id:'friend-1',name:'ผู้ทดสอบ',unread_count:unread,last_message_at:1}]}}));
+ await page.goto('/');await expect(page.locator('#social-view')).toBeVisible();unread=1;await page.clock.fastForward(31000);await expect(page.locator('#message-badge')).toHaveText('1');expect(await page.evaluate(()=>window.notificationSamples.length)).toBe(0);
+ await page.evaluate(()=>localStorage.setItem('chatgun-notifications','enabled'));unread=2;await page.clock.fastForward(31000);await expect.poll(()=>page.evaluate(()=>window.notificationSamples.length)).toBe(1);expect(await page.evaluate(()=>window.notificationSamples[0].body)).toBe('มีข้อความหรือคำขอใหม่');
+});
+
 test('moderation withdrawal clears an already-open photo on permission refresh',async({page})=>{
   let released=true;
   await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',album:{granted:false,request:null},photos:released?[{id:'withdrawn',visibility:'public',review_status:'released',caption:'รูปสมมติ'}]:[],comments:[]}}));
@@ -115,7 +140,7 @@ test("desktop social shell preserves discovery, direct chat, reviews, and profil
   await page.goto("/app/");
   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();
   await expect(page.getByText("มิน")).toBeVisible();
-  await expect(page.getByText("ต้น")).toBeVisible();
+  await expect(page.getByText("ต้น", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "เกม" })).toHaveCount(0);
   await page.locator('#primary-nav button[data-tab="reviews"]').click();
   await expect(page.locator("#reviews-list").getByText("สุภาพและเป็นมิตร")).toBeVisible();
@@ -128,7 +153,6 @@ test("desktop social shell preserves discovery, direct chat, reviews, and profil
 });
 
 test("mobile social shell uses bottom navigation and remains usable", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "mobile-chromium", "mobile-only layout check");
   await page.goto("/app/");
   await expect(page.locator(".sidebar")).toBeVisible();
   await expect(page.locator("#people-grid .person-card")).toHaveCount(3);
@@ -141,7 +165,7 @@ test("disabled social environment reveals no member features", async ({ page }) 
   await page.unroute("**/api/**");
   await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false }) }));
   await page.goto("/app/");
-  await expect(page.getByRole("heading", { name: "ChatGun Social ยังไม่เปิดใช้งาน" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "ChatGun กำลังเตรียมเปิดให้บริการ" })).toBeVisible();
   await expect(page.locator("#social-view")).toBeHidden();
 });
 
@@ -185,67 +209,32 @@ test('source header switches out discovery controls; gallery distinguishes loadi
   await expect(page.locator('.gallery-experience .viewer-hint')).toContainText('ยังไม่มีรูป');
 });
 
-test("optional demo remains browser-only and contains no game", async ({ page }) => {
+test("retired demo cannot be re-enabled by a stale configuration flag", async ({ page }) => {
   await page.unroute("**/api/**");
   await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false, demoModeEnabled: true }) }));
   await page.goto("/app/");
-  await page.getByRole("button", { name: "ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์" }).click();
-  await expect(page.locator("#demo-banner")).toBeVisible();
-  await expect(page.locator("#people-grid").getByText("มะปราง")).toBeVisible();
+  await expect(page.getByRole('heading',{name:'ChatGun กำลังเตรียมเปิดให้บริการ'})).toBeVisible();
+  await expect(page.getByRole("button", { name: "ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์" })).toHaveCount(0);
+  await expect(page.locator("#demo-banner")).toHaveCount(0);
+  await expect(page.locator("#people-grid .person-card")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "เกม" })).toHaveCount(0);
 });
 
 test("profile names cannot break out of text or media attributes", async ({ page }) => {
-  await page.unroute("**/api/**");
-  await page.route("**/api/social/config",route=>route.fulfill({json:{...config,socialAppEnabled:false,demoModeEnabled:true}}));
-  await page.goto("/app/");
-  await page.getByRole("button",{name:"ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์"}).click();
-  await page.locator('#primary-nav [data-tab="profile"]').click();
-  await page.locator('#manage-gallery').click();
-  await page.locator('#my-gallery button[data-gallery-action="select"]').first().click();
-  await expect(page.locator('#my-gallery .cover-label')).toHaveCount(1);
-  await page.locator('#gallery-settings-back').click();
   const payload='x" onerror="alert(1)';
-  await page.locator('#profile-form input[name="name"]').fill(payload);
-  await page.getByRole("button",{name:"บันทึกโปรไฟล์",exact:true}).click();
-  await expect(page.locator("#toast")).toContainText("บันทึกโปรไฟล์แล้ว");
-  await page.getByRole("button",{name:"ดูโปรไฟล์และแกลเลอรี"}).click();
+  await page.route('**/api/social/profile**',route=>route.fulfill({json:{profile:{user_id:new URL(route.request().url()).searchParams.get('user')||'me',name:payload,gender:'ไม่ระบุ',bio:'Local-only escaping test',interests:''}}}));
+  await page.goto('/app/people/injection-fixture');
   await expect(page.locator(".full-name-row h1")).toHaveText(payload);
-  await expect(page.locator(".full-profile-image img")).toHaveAttribute("alt",`รูปของ ${payload}`);
   await expect(page.locator("#profile-dialog img[onerror]")).toHaveCount(0);
   await expect(page.locator("#profile-dialog [onmouseover],#profile-dialog [onfocus]")).toHaveCount(0);
 });
 
-test("browser-only demo supports local gallery and chat image workflows", async ({ page }) => {
-  await page.unroute("**/api/**");
-  await page.route("**/api/social/config", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...config, socialAppEnabled: false, demoModeEnabled: true }) }));
+test("real-data shell never substitutes demo photos when uploads are disabled", async ({ page }) => {
   await page.goto("/app/");
-  await page.getByRole("button", { name: "ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์" }).click();
-  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Z0ioAAAAASUVORK5CYII=", "base64");
-
   await page.locator('#primary-nav button[data-tab="profile"]').click();
-  await page.locator('#manage-gallery').click();
-  await page.locator('#gallery-upload input[type="file"]').setInputFiles({ name: "demo.png", mimeType: "image/png", buffer: png });
-  await page.locator('#gallery-upload input[name="caption"]').fill("รูปตัวอย่างในเครื่อง");
-  await page.getByRole("button", { name: "บันทึกรูป" }).click();
-  await expect(page.locator("#gallery-count")).toHaveText("11 / 12");
-  await expect(page.locator("#my-gallery .pending-media-placeholder").first()).toContainText("รอผู้ดูแลตรวจสอบ");
-
-  await page.locator('#primary-nav button[data-tab="chat"]').click();
-  await page.getByRole("button", { name: /ต้นน้ำ/u }).click();
-  await page.locator('#thread input[type="file"]').setInputFiles({ name: "chat.png", mimeType: "image/png", buffer: png });
-  await expect(page.locator("#thread .chat-image")).toHaveAttribute("src", /^data:image\//u);
-  await page.getByRole("button", { name: "รูปที่ส่งล่าสุด" }).click();
-  await expect(page.locator("#asset-grid img")).toHaveAttribute("src", /^data:image\//u);
-  await page.locator('#asset-grid [data-asset]').first().click();
-  await page.locator('[data-forward-user="demo-03"]').click();
-  await expect(page.locator('#thread .chat-image')).toHaveAttribute('src',/^data:image\//u);
-  await expect(page.locator('#chat-upload-quota')).toContainText('9/10');
-  await page.getByRole('button',{name:'เลือกรูปแชท',exact:true}).click();
-  await page.locator('[data-picker-asset]').first().click();
-  await page.locator('#thread .composer').getByRole('button',{name:'ส่ง',exact:true}).click();
-  await expect(page.locator('#thread .chat-image')).toHaveCount(2);
-  await expect(page.locator('#chat-upload-quota')).toContainText('9/10');
+  await expect(page.locator('#gallery-upload')).toBeHidden();
+  await expect(page.locator('#my-gallery img')).toHaveCount(0);
+  await expect(page.locator('script[src*="demo-"]')).toHaveCount(0);
 });
 
 test("social shell reports offline state and recovers when connectivity returns", async ({ page, context }) => {
