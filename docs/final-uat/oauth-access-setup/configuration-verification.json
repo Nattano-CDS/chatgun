@@ -1,0 +1,20 @@
+{
+  "checkedDateBangkok": "2026-10-24",
+  "scope": "Dedicated UAT configuration only; genuine human campaign NOT STARTED",
+  "applicationSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+  "nodeSuite": {"passed":248,"failed":0,"skipped":0},
+  "liveClosedHostChecks": {"passed":17,"failed":0,"skipped":0},
+  "responsiveWidths": [390,768,1440],
+  "newProviderEncryptedImports": {"google":"PASS","facebook":"PASS","line":"PASS"},
+  "accessMetadataImport":"PASS",
+  "genuineOAuth":{"google":"NOT RUN","facebook":"NOT RUN","line":"NOT RUN"},
+  "genuineTurnstile":"NOT RUN",
+  "genuineAdminMfa":"BLOCKED: independent organization MFA OFF; explicit scope decision required",
+  "ownerUuidMapped":false,
+  "accountsCreated":0,
+  "invitationsIssued":0,
+  "roleGrants":0,
+  "productionWrites":0,
+  "protectedStagingWrites":0,
+  "decision":"NO-GO for genuine human campaign until remaining MFA, participant and policy gates pass"
+}

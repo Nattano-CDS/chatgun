@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-23T20:22:30.902Z",
+  "checkedAt": "2026-10-24T07:13:04.392Z",
   "counts": {
     "users": 0,
     "identities": 0,
@@ -57,10 +57,16 @@
   "emptyDatabaseReadProbe": {
     "rowsRead": 0,
     "rowsWritten": 0,
-    "durationMs": 0.1568
+    "durationMs": 0.2466
   },
   "readProbeLimit": "Empty UAT sentinel query; not real-member traffic/capacity evidence",
   "remainingDeployments": [
+    {
+      "id": "e55630f4-415a-4401-9e7e-ae9f2d50de6c",
+      "environment": "preview",
+      "branch": "uat",
+      "sha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a"
+    },
     {
       "id": "0759f84c-85d7-4c8e-8caf-09fbe7122bba",
       "environment": "preview",

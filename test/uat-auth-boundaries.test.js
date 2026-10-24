@@ -18,6 +18,11 @@ test('private credential importer fails closed with sanitized errors before cred
  assert.equal(r.status,1);assert.equal(r.stdout,'');assert.ok(r.stderr.includes('stopped safely'));assert.ok(!r.stderr.includes('must-not-read-private-credential-input'));assert.ok(!r.stderr.includes('AssertionError'));
 });
 
+test('UAT Access metadata writer requires explicit scoped approval before any account lookup',()=>{
+ const r=spawnSync(process.execPath,['scripts/store-final-uat-access-metadata.mjs'],{encoding:'utf8',env:{...process.env,CHATGUN_FINAL_UAT:'not-approved'}});
+ assert.equal(r.status,1);assert.equal(r.stdout,'');assert.ok(r.stderr.includes('stopped safely'));assert.ok(!r.stderr.includes('AssertionError'));assert.ok(!r.stderr.includes('natttano@outlook.com'));
+});
+
 test('provisioned UAT credentials cannot override the closed OAuth/admission flags',async()=>{
  const db=new TestD1();try{const env={...environment(db),OAUTH_LOGIN_ENABLED:'false',OAUTH_ENABLED_PROVIDERS:'google,facebook,line',NEW_ACCOUNT_REGISTRATION_ENABLED:'false',BETA_INVITATION_REGISTRATION_ENABLED:'false'};
  assert.deepEqual(enabledOAuthProviders(env),[]);
