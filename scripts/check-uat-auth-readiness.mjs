@@ -26,7 +26,16 @@ await check('unknown provider rejected','/api/auth/oauth/invalid/start',{method:
 await check('missing member session denied','/api/auth/me',{status:401,code:'unauthorized'});
 await check('session management denied','/api/auth/sessions',{status:401,code:'unauthorized'});
 await check('session mutation foreign origin denied','/api/auth/logout',{method:'POST',origin:'https://invalid.example',body:{},status:403,code:'invalid_origin'});
-await check('standalone Admin stays disabled','/api/admin/session',{status:404,code:'feature_disabled'});
+// Edge Access now intercepts these two paths before the disabled origin handler.
+// Do not follow the redirect or publish its signed query parameters.
+for(const path of ['/api/admin/session','/app/moderation.html']){
+ const r=await fetch(s.origin+path,{redirect:'manual'});
+ assert.equal(r.status,302,'UAT Admin edge authentication required');
+ const location=new URL(r.headers.get('location'));
+ assert.equal(location.origin,'https://tiny-violet-2021.cloudflareaccess.com');
+ assert.ok(location.pathname.startsWith('/cdn-cgi/access/login/'));
+ checks.push({name:'Anonymous UAT Admin requires Access',path,method:'GET',http:r.status,status:'PASS',redirectHost:location.host});
+}
 await check('Email OTP remains disabled','/api/auth/otp/start',{method:'POST',origin:s.origin,body:{channel:'email'},status:404,code:'otp_disabled'});
 await check('Mobile OTP remains disabled','/api/auth/otp/start',{method:'POST',origin:s.origin,body:{channel:'mobile'},status:404,code:'otp_disabled'});
 const browser=await chromium.launch(),screens=[];

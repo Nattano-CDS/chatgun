@@ -51,7 +51,7 @@
   "immutableUrl": "https://d4aab7fb.chatgun-final-uat.pages.dev",
   "deployedSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
   "deployedAt": "2026-10-23T19:54:51.932Z",
-  "verifiedAt": "2026-10-23T20:22:38.584Z",
+  "verifiedAt": "2026-10-24T06:34:40.110Z",
   "r2Private": true,
   "turnstileConfigured": true,
   "credentialMetadata": {
@@ -76,12 +76,12 @@
       "encrypted": false
     },
     "GOOGLE_CLIENT_ID": {
-      "present": false,
-      "encrypted": false
+      "present": true,
+      "encrypted": true
     },
     "GOOGLE_CLIENT_SECRET": {
-      "present": false,
-      "encrypted": false
+      "present": true,
+      "encrypted": true
     },
     "FACEBOOK_CLIENT_ID": {
       "present": false,

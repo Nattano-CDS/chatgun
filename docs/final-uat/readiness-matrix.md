@@ -2,7 +2,7 @@
 
 Decision: **PARTIALLY READY — EXTERNAL APPROVALS REQUIRED**. Genuine human UAT has NOT started. No invitation, genuine account, owner role grant or Production activation was performed in this preparation.
 
-Latest OAuth/Access execution: [configuration status and consolidated handoff](oauth-access-setup/status.md). Google/Meta exact UAT forms are populated but not submitted pending action-time security confirmation; LINE console requires login. Wrangler lacks Access Write; independent MFA additionally requires an organization-level scope decision. New live negative checks16/16 and relevant implementation checks37/37 plus5 new boundary/import-error/role-plan regressions pass; these are not provider/MFA success.
+Latest OAuth/Access execution: [configuration status and consolidated handoff](oauth-access-setup/status.md). Separate Google UAT client created and NEW ID/secret stored encrypted in Preview only. Owner-only UAT Access app saved with MFA-only requirement and10m session; anonymous Admin paths redirect to trusted Access team. Meta creation requires password reauthentication; LINE console requires login. Independent organization MFA remains OFF pending explicit scope approval. Live negative checks17/17 and this turn's affected Access/boundary tests13/13 pass; previous37+5 implementation results remain evidence, not genuine OAuth/MFA success.
 
 Frozen application: `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Initial PR #17 evidence HEAD: `e7079c692e3de3c8fb18856eb7da77916246c64e`. Closing PR comment records the eventual readiness-tooling HEAD and CI result; it is not a new application release.
 
@@ -22,10 +22,10 @@ Frozen application: `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Initial PR #17 e
 | Stable closed-host HTTP/UI | PASS | JSON configs/health, anonymous denials, 39 asset hashes, 390/768/1440 screenshots, no overflow/script error |
 | Real Turnstile configuration | PASS | Newly created UAT widget; stable hostname only; matching creation pair saved encrypted; actual invalid response rejected |
 | Real human Turnstile proof | NOT RUN | Wait for the one consolidated authorized campaign; hostname/action/expiry success not inferred from synthetic tests |
-| Google UAT OAuth | BLOCKED | ChatGun project accessible, External / Testing, one existing test user. Separate UAT client/secret and exact callback not yet created; creation/private credential handoff requires controlled owner action |
-| Facebook UAT OAuth | BLOCKED | ChatGun app 1136950635489003 accessible, unpublished/development. Separate UAT test app/secret and participant app-role eligibility unconfirmed |
+| Google UAT OAuth | CONFIGURED / actual OAuth NOT RUN | Separate web client created with exact UAT origin/callback, NEW ID/secret encrypted Preview-only. External/Testing and existing test users retained; admission/OAuth OFF |
+| Facebook UAT OAuth | BLOCKED human reauthentication | Create test app submitted under ChatGun1136950635489003; password re-entry required before completion. No child app or secret claimed |
 | LINE UAT OAuth | BLOCKED | Developer console currently at Business ID login. Separate UAT channel/credentials/callback/tester authorization require interactive owner access |
-| Access application / MFA | BLOCKED | New app creation API returned HTTP403/code1010. Existing browser console accessible, team verified; no global MFA method enabled. Configure UAT-only app and MFA before genuine campaign |
+| Access application / MFA | APP CONFIGURED / genuine MFA BLOCKED | Dashboard creation succeeded despite scoped API403. Exact owner + MFA-only policy, two UAT Admin paths,10m session, HttpOnly+binding cookies saved. Anonymous302 verified. Independent organization MFA OFF; no MFA success claim |
 | Exact UAT owner subject / role mapping | BLOCKED | No genuine UAT account yet. Production UUID/roles NOT copied or extended. Exact UAT identity + bounded grant require separate confirmation |
 | Participant A | BLOCKED | Owner is designated; authorized UAT identity/provider eligibility and scope still need confirmation |
 | Participant B | BLOCKED | No separately consenting eligible distinct adult provided. Owner cannot act as both participants |

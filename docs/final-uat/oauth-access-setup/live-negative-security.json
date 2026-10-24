@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-23T20:28:22.852Z",
+  "checkedAt": "2026-10-24T06:36:26.071Z",
   "origin": "https://uat.chatgun-final-uat.pages.dev",
   "applicationSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
   "checks": [
@@ -108,12 +108,20 @@
       "noCrossDomainCookie": true
     },
     {
-      "name": "standalone Admin stays disabled",
+      "name": "Anonymous UAT Admin requires Access",
       "path": "/api/admin/session",
       "method": "GET",
-      "http": 404,
+      "http": 302,
       "status": "PASS",
-      "noCrossDomainCookie": true
+      "redirectHost": "tiny-violet-2021.cloudflareaccess.com"
+    },
+    {
+      "name": "Anonymous UAT Admin requires Access",
+      "path": "/app/moderation.html",
+      "method": "GET",
+      "http": 302,
+      "status": "PASS",
+      "redirectHost": "tiny-violet-2021.cloudflareaccess.com"
     },
     {
       "name": "Email OTP remains disabled",
@@ -132,7 +140,7 @@
       "noCrossDomainCookie": true
     }
   ],
-  "passed": 16,
+  "passed": 17,
   "failed": 0,
   "screens": [
     {
