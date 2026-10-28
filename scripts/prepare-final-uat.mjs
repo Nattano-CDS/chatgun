@@ -63,7 +63,7 @@ if(mode==='create'){
 }
 if(mode==='migrate'){
  const c=JSON.parse(readFileSync('wrangler.final-uat.jsonc'));assert.equal(c.d1_databases[0].database_id,state.databaseId);assert.equal(c.r2_buckets[0].bucket_name,bucket);
- const files=readdirSync('migrations').filter(n=>/^\d{4}.*\.sql$/.test(n)).sort();assert.equal(files.length,21);
+	 const files=readdirSync('migrations').filter(n=>/^\d{4}.*\.sql$/.test(n)).sort();assert.equal(files.length,22);
  const rehearsal=new DatabaseSync(':memory:');for(const f of files)rehearsal.exec(readFileSync('migrations/'+f,'utf8'));
  assert.equal(rehearsal.prepare('PRAGMA foreign_key_check').all().length,0);rehearsal.close();
  execFileSync('npx',['wrangler@4.151.1','d1','migrations','apply',name,'--remote','--config=wrangler.final-uat.jsonc'],{env,stdio:'pipe'});
@@ -73,15 +73,15 @@ if(mode==='migrate'){
  for(const c of checksums)await query('INSERT OR IGNORE INTO uat_migration_checksums VALUES(?,?)',[c.name,c.sha256]);
  assert.deepEqual((await query('SELECT * FROM uat_migration_checksums ORDER BY name')).results,checksums);
  const dir=mkdtempSync('/Users/nattano/.codex/private-backups/chatgun/final-uat-schema-');chmodSync(dir,0o700);
- const file=dir+'/schema21.sql';execFileSync('npx',['wrangler@4.151.1','d1','export',name,'--remote','--config=wrangler.final-uat.jsonc','--output='+file],{env,stdio:'pipe'});chmodSync(file,0o600);
+	 const file=dir+'/schema22.sql';execFileSync('npx',['wrangler@4.151.1','d1','export',name,'--remote','--config=wrangler.final-uat.jsonc','--output='+file],{env,stdio:'pipe'});chmodSync(file,0o600);
  const restored=new DatabaseSync(':memory:');restored.exec('PRAGMA foreign_keys=OFF');restored.exec(readFileSync(file,'utf8'));assert.equal(restored.prepare('PRAGMA foreign_key_check').all().length,0);
  const objects=(await query("SELECT type,name FROM sqlite_master WHERE type IN ('table','index','trigger') AND name NOT LIKE 'sqlite_%' ORDER BY type,name")).results;
  assert.equal((await query('SELECT COUNT(*) n FROM users')).results[0].n,0);
  const proof={checkedAt:new Date().toISOString(),databaseId:state.databaseId,migrationCount:history.length,checksums,objects,foreignKeyViolations:0,protectedBackup:true,sqliteRestoreRehearsal:'PASS',productionWrites:0,protectedStagingWrites:0};
- writeFileSync(report+'/schema-verification.json',JSON.stringify(proof,null,2)+'\n');restored.close();state.schema=21;save();console.log('New UAT schema21, checksums, FK0 and protected SQLite restore rehearsal PASS.');
+	 writeFileSync(report+'/schema-verification.json',JSON.stringify(proof,null,2)+'\n');restored.close();state.schema=22;save();console.log('New UAT schema22, checksums, FK0 and protected SQLite restore rehearsal PASS.');
 }
 if(mode==='deploy'||mode==='deploy-engineering'||mode==='retire-engineering'){
- assert.equal(state.schema,21);
+	 assert.equal(state.schema,22);
  if(mode==='deploy-engineering'){
   const p=await cf('/pages/projects/'+project);
   assert.ok(!['LINE_CLIENT_SECRET','GOOGLE_CLIENT_SECRET','FACEBOOK_CLIENT_SECRET'].some(k=>p.deployment_configs.preview.env_vars?.[k]),'Synthetic engineering is forbidden after genuine credentials are provisioned');

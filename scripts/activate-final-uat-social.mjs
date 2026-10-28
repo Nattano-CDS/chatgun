@@ -4,30 +4,30 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { chmodSync, copyFileSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import {
-  FINAL_UAT_ACCOUNT, FINAL_UAT_APPLICATION_SHA, FINAL_UAT_BUCKET, FINAL_UAT_DATABASE, FINAL_UAT_ORIGIN, FINAL_UAT_PROJECT,
+  FINAL_UAT_ACCOUNT, FINAL_UAT_BUCKET, FINAL_UAT_DATABASE, FINAL_UAT_ORIGIN, FINAL_UAT_PROJECT,
   PROPOSED_POLICY, finalUatSocialVars, sanitizedCampaignSummary, validateFinalUatSocialApproval,
 } from './lib/final-uat-social-campaign.mjs';
 import { UAT_CAMPAIGN_AUDIT_TABLE_SQL } from '../functions/_lib/retention.js';
 
-assert.equal(process.env.CHATGUN_FINAL_UAT_SOCIAL, 'activate-approved-window');
+assert.equal(process.env.CHATGUN_FINAL_UAT_SOCIAL, 'activate-approved-always-on');
 const approvalFile = resolve(process.env.CHATGUN_UAT_PRIVATE_APPROVAL_FILE || '');
 assert.ok(approvalFile.startsWith('/Users/nattano/.codex/private-backups/chatgun/'));
 const receipt = validateFinalUatSocialApproval(JSON.parse(readFileSync(approvalFile, 'utf8')));
+const applicationSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+assert.equal(receipt.applicationSha, applicationSha, 'Private approval must pin the exact implementation HEAD');
 for (const [file, digest] of Object.entries(PROPOSED_POLICY.files)) assert.equal(createHash('sha256').update(readFileSync(file)).digest('hex'), digest, `Policy artifact changed: ${file}`);
-const policyTarget = file => file.replace(/^policies\/final-uat\//u, '');
+const policyTarget = file => basename(file);
 const policyVersionByTarget = {
   'beta-notice.html': PROPOSED_POLICY.versions.adultNotice,
   'terms.html': PROPOSED_POLICY.versions.terms,
   'privacy.html': PROPOSED_POLICY.versions.privacy,
   'data-deletion.html': PROPOSED_POLICY.versions.deletion,
 };
-const now = Date.now(), start = Date.parse(receipt.window.start), end = Date.parse(receipt.window.end);
-assert.ok(now >= start - 20 * 60_000 && now < end, 'Activation is restricted to twenty minutes before or during the approved window');
 const vars = finalUatSocialVars(receipt);
 const state = JSON.parse(readFileSync('docs/final-uat/environment.json'));
-assert.equal(state.databaseId, FINAL_UAT_DATABASE); assert.equal(state.bucket, FINAL_UAT_BUCKET); assert.equal(state.candidate, FINAL_UAT_APPLICATION_SHA); assert.equal(state.origin, FINAL_UAT_ORIGIN);
+assert.equal(state.databaseId, FINAL_UAT_DATABASE); assert.equal(state.bucket, FINAL_UAT_BUCKET); assert.equal(state.origin, FINAL_UAT_ORIGIN);
 
 const { token } = JSON.parse(execFileSync('npx', ['wrangler@4.151.1', 'auth', 'token', '--json'], { encoding: 'utf8' }));
 async function cf(path, body, method = body ? 'POST' : 'GET') {
@@ -42,20 +42,25 @@ assert.equal((await cf(`/r2/buckets/${FINAL_UAT_BUCKET}/domains/managed`)).enabl
 assert.equal((await cf(`/r2/buckets/${FINAL_UAT_BUCKET}/domains/custom`)).domains.length, 0);
 const query = async (sql, params = []) => (await cf(`/d1/database/${FINAL_UAT_DATABASE}/query`, { sql, params }))[0];
 await query(UAT_CAMPAIGN_AUDIT_TABLE_SQL);
-for (const table of ['users', 'identities', 'sessions', 'beta_invitations', 'social_media', 'moderation_access_grants']) assert.equal((await query(`SELECT COUNT(*) n FROM ${table}`)).results[0].n, 0, `${table} must be empty before activation`);
+for (const table of ['users', 'identities', 'sessions', 'beta_invitations', 'social_media', 'moderation_access_grants', 'uat_authorized_identities']) assert.equal((await query(`SELECT COUNT(*) n FROM ${table}`)).results[0].n, 0, `${table} must be empty before activation`);
 assert.equal((await query('SELECT COUNT(*) n FROM uat_campaign_audit_evidence')).results[0].n, 0, 'A prior campaign audit record blocks activation');
 assert.equal((await query('SELECT COUNT(*) n FROM pragma_foreign_key_check')).results[0].n, 0);
-assert.equal((await query('SELECT COUNT(*) n FROM d1_migrations')).results[0].n, 21);
-const liveRelease = await (await fetch(`${FINAL_UAT_ORIGIN}/release.json`, { cache: 'no-store' })).json(); assert.equal(liveRelease.commit, FINAL_UAT_APPLICATION_SHA);
+assert.equal((await query('SELECT COUNT(*) n FROM d1_migrations')).results[0].n, 22);
+const consentedAt = Math.floor(Date.now() / 1000);
+for (const participant of receipt.participants) {
+  const inserted = await query('INSERT INTO uat_authorized_identities(participant_ref,provider,account_reference_sha256,consented_at) VALUES(?,?,?,?)', [participant.reference, participant.provider, participant.providerAccountReferenceSha256, consentedAt]);
+  assert.equal(inserted.meta.changes, 1);
+}
+const liveRelease = await (await fetch(`${FINAL_UAT_ORIGIN}/release.json`, { cache: 'no-store' })).json(); assert.equal(liveRelease.commit, state.deployedSha);
 
 const backup = mkdtempSync('/Users/nattano/.codex/private-backups/chatgun/final-uat-social-preactivation-'); chmodSync(backup, 0o700);
 writeFileSync(join(backup, 'environment-metadata.json'), JSON.stringify({ checkedAt: new Date().toISOString(), project: FINAL_UAT_PROJECT, database: FINAL_UAT_DATABASE, bucket: FINAL_UAT_BUCKET, priorDeployment: state.deploymentId, priorSha: liveRelease.commit, rollback: 'CHATGUN_FINAL_UAT=approved node scripts/prepare-final-uat.mjs deploy', privateR2: true, preactivationCountsZero: true }, null, 2), { mode: 0o600 });
 
 const directory = mkdtempSync(join(tmpdir(), 'chatgun-final-uat-social-')); chmodSync(directory, 0o700);
 execFileSync('git', ['clone', '--shared', '--no-checkout', process.cwd(), directory], { stdio: 'pipe' });
-execFileSync('git', ['checkout', '--detach', FINAL_UAT_APPLICATION_SHA], { cwd: directory, stdio: 'pipe' });
+execFileSync('git', ['checkout', '--detach', applicationSha], { cwd: directory, stdio: 'pipe' });
 execFileSync('node', ['scripts/build-pages.mjs'], { cwd: directory, env: { ...process.env, CHATGUN_RELEASE_MODE: 'default', CHATGUN_CANARY_BUILD: 'false', CF_PAGES_BRANCH: 'uat' }, stdio: 'pipe' });
-const release = JSON.parse(readFileSync(join(directory, 'dist/release.json'))); assert.equal(release.commit, FINAL_UAT_APPLICATION_SHA); assert.equal(release.fictionalDemoEnabled, false);
+const release = JSON.parse(readFileSync(join(directory, 'dist/release.json'))); assert.equal(release.commit, applicationSha); assert.equal(release.fictionalDemoEnabled, false);
 for (const file of Object.keys(PROPOSED_POLICY.files)) copyFileSync(resolve(file), join(directory, 'dist', policyTarget(file)));
 for (const [file, digest] of Object.entries(PROPOSED_POLICY.files)) {
   const target = policyTarget(file), built = readFileSync(join(directory, 'dist', target));
@@ -77,7 +82,7 @@ const base = JSON.parse(readFileSync('wrangler.final-uat-social.proposed.jsonc')
 const config = { ...base, vars: { ...vars, TURNSTILE_SITE_KEY: state.turnstileSiteKey } };
 writeFileSync(join(directory, 'wrangler.jsonc'), JSON.stringify(config, null, 2), { mode: 0o600 });
 execFileSync('npx', ['wrangler@4.151.1', 'deploy', '--config=wrangler.final-uat-privacy-cleanup.jsonc'], { env: { ...process.env, CLOUDFLARE_ACCOUNT_ID: FINAL_UAT_ACCOUNT }, stdio: 'inherit' });
-execFileSync('npx', ['wrangler@4.151.1', 'pages', 'deploy', 'dist', `--project-name=${FINAL_UAT_PROJECT}`, '--branch=uat', `--commit-hash=${FINAL_UAT_APPLICATION_SHA}`, '--commit-dirty=true'], { cwd: directory, env: { ...process.env, CLOUDFLARE_ACCOUNT_ID: FINAL_UAT_ACCOUNT }, stdio: 'inherit' });
+execFileSync('npx', ['wrangler@4.151.1', 'pages', 'deploy', 'dist', `--project-name=${FINAL_UAT_PROJECT}`, '--branch=uat', `--commit-hash=${applicationSha}`, '--commit-dirty=true'], { cwd: directory, env: { ...process.env, CLOUDFLARE_ACCOUNT_ID: FINAL_UAT_ACCOUNT }, stdio: 'inherit' });
 
 const after = await cf(`/pages/projects/${FINAL_UAT_PROJECT}`), afterVars = after.deployment_configs.preview.env_vars;
 for (const [key, value] of Object.entries(vars)) assert.equal(afterVars[key]?.value, value, `Flag read-back failed: ${key}`);
@@ -87,7 +92,7 @@ assert.equal(auth.oauthLoginEnabled, true); assert.deepEqual([...auth.oauthProvi
 const social = await (await fetch(`${FINAL_UAT_ORIGIN}/api/social/config`, { cache: 'no-store' })).json();
 assert.equal(social.socialAppEnabled, true); assert.equal(social.publicDiscoveryEnabled, true); assert.equal(social.messagingEnabled, true); assert.equal(social.mediaUploadEnabled, false); assert.equal(social.onlineStatusEnabled, true);
 const deployedRelease = await (await fetch(`${FINAL_UAT_ORIGIN}/release.json?uat-policy=${Date.now()}`, { cache: 'no-store' })).json();
-assert.equal(deployedRelease.commit, FINAL_UAT_APPLICATION_SHA); assert.deepEqual(deployedRelease.uatPolicyVersions, PROPOSED_POLICY.versions); assert.deepEqual(deployedRelease.uatPolicyFiles, release.uatPolicyFiles);
+assert.equal(deployedRelease.commit, applicationSha); assert.deepEqual(deployedRelease.uatPolicyVersions, PROPOSED_POLICY.versions); assert.deepEqual(deployedRelease.uatPolicyFiles, release.uatPolicyFiles);
 for (const [file, digest] of Object.entries(PROPOSED_POLICY.files)) {
   const target = policyTarget(file), response = await fetch(`${FINAL_UAT_ORIGIN}/${target}?uat-policy=${Date.now()}`, { cache: 'no-store' });
   assert.ok(response.ok, `Displayed policy unavailable: ${target}`);
@@ -95,5 +100,5 @@ for (const [file, digest] of Object.entries(PROPOSED_POLICY.files)) {
   assert.equal(createHash('sha256').update(displayed).digest('hex'), digest, `Displayed policy changed: ${target}`);
   assert.match(displayed.toString('utf8'), new RegExp(`data-policy-version=["']${policyVersionByTarget[target]}["']`, 'u'), `Displayed policy version changed: ${target}`);
 }
-writeFileSync('docs/final-uat/social-campaign-activation.json', JSON.stringify({ checkedAt: new Date().toISOString(), applicationSha: FINAL_UAT_APPLICATION_SHA, summary: sanitizedCampaignSummary(receipt), flags: vars, d1Schema: 21, foreignKeyViolations: 0, preactivationCountsZero: true, privateR2: true, invitationCount: 0, roleGrants: 0, productionWrites: 0, rollbackPrepared: true }, null, 2) + '\n');
-console.log(JSON.stringify({ status: 'ACTIVATED_FOR_APPROVED_WINDOW', applicationSha: FINAL_UAT_APPLICATION_SHA, invitationsIssued: 0, roleGrants: 0, mediaEnabled: false, productionWrites: 0 }));
+writeFileSync('docs/final-uat/social-campaign-activation.json', JSON.stringify({ checkedAt: new Date().toISOString(), applicationSha, summary: sanitizedCampaignSummary(receipt), flags: vars, d1Schema: 22, foreignKeyViolations: 0, preactivationCountsZero: true, authorizedCohortCount: 2, privateR2: true, invitationCount: 0, roleGrants: 0, productionWrites: 0, rollbackPrepared: true }, null, 2) + '\n');
+console.log(JSON.stringify({ status: 'ACTIVATED_ALWAYS_ON_PRIVATE_UNTIL_EXPLICIT_CLOSE', applicationSha, invitationsIssued: 0, roleGrants: 0, mediaEnabled: false, productionWrites: 0 }));

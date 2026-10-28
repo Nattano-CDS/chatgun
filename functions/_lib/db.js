@@ -198,7 +198,7 @@ export async function findOrCreateIdentity(
   profile,
   linkUserId,
   timestamp = unixTime(),
-  { allowRegistration = true, allowInvitationRegistration = false, invitationId = null } = {},
+  { allowRegistration = true, allowInvitationRegistration = false, invitationId = null, authorizedCohort = false } = {},
 ) {
   const existing = await db.prepare(
     `SELECT i.user_id, u.status FROM identities i JOIN users u ON u.id = i.user_id
@@ -241,7 +241,14 @@ export async function findOrCreateIdentity(
               last_claim_nonce = ?
           WHERE id = ? AND status = 'active' AND max_uses = 1
             AND expires_at > ? AND use_count < max_uses
-        `).bind(timestamp, claimNonce, invitationId, timestamp),
+            AND (? = 0 OR EXISTS (
+              SELECT 1 FROM uat_authorized_identities authorized
+              WHERE authorized.participant_ref = beta_invitations.uat_participant_ref
+                AND authorized.provider = ?
+                AND authorized.account_reference_sha256 = beta_invitations.uat_account_reference_sha256
+                AND authorized.user_id IS NULL AND authorized.revoked_at IS NULL
+            ))
+        `).bind(timestamp, claimNonce, invitationId, timestamp, authorizedCohort ? 1 : 0, profile.provider),
         db.prepare(`
           INSERT INTO users(id, email, email_verified_at, display_name, avatar_url, status, account_state, created_at, updated_at)
           SELECT ?, ?, ?, ?, ?, 'active', 'pending_acceptance', ?, ?
@@ -276,6 +283,14 @@ export async function findOrCreateIdentity(
           INSERT INTO beta_enrollments(user_id, invitation_id, status, created_at)
           SELECT ?, ?, 'pending_age', ? WHERE EXISTS (SELECT 1 FROM users WHERE id = ?)
         `).bind(userId, invitationId, timestamp, userId),
+        db.prepare(`
+          UPDATE uat_authorized_identities
+          SET invitation_id = ?, user_id = ?, provider_subject_sha256 = ?, enrolled_at = COALESCE(enrolled_at, ?)
+          WHERE ? = 1 AND participant_ref = (SELECT uat_participant_ref FROM beta_invitations WHERE id = ?)
+            AND provider = ?
+            AND account_reference_sha256 = (SELECT uat_account_reference_sha256 FROM beta_invitations WHERE id = ?)
+            AND user_id IS NULL AND revoked_at IS NULL
+        `).bind(invitationId, userId, await sha256(profile.subject), timestamp, authorizedCohort ? 1 : 0, invitationId, profile.provider, invitationId),
         ]);
       } catch (error) {
         // A concurrent callback for the same provider subject rolls this batch back.
@@ -288,6 +303,7 @@ export async function findOrCreateIdentity(
         return winner.user_id;
       }
       if (Number(results[0]?.meta?.changes || 0) !== 1) throw new Error("invitation_unavailable");
+      if (authorizedCohort && Number(results[4]?.meta?.changes || 0) !== 1) throw new Error("uat_cohort_denied");
       return userId;
     }
     // Public registration has no invitation claim, but account + identity must

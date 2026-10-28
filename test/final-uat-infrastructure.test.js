@@ -19,8 +19,9 @@ test('UAT deployment explicitly serializes closed flags and real site key into W
  const deployer=readFileSync('scripts/prepare-final-uat.mjs','utf8');assert.match(deployer,/wrangler\.jsonc',JSON\.stringify\(config\(\)\)/);assert.match(deployer,/assert\.equal\(auth\.oauthLoginEnabled,false\)/);
  assert.ok(!Object.keys(c.vars).some(k=>/SECRET|PEPPER|CLIENT_ID/.test(k)),'Secrets must not be version controlled');
 });
-test('all 21 UAT migration history checksums match the frozen source files',()=>{
+test('existing schema21 proof stays exact and the always-on cohort migration advances schema locally',()=>{
  const proof=JSON.parse(readFileSync('docs/final-uat/schema-verification.json'));
- const files=readdirSync('migrations').filter(n=>/^\d{4}.*\.sql$/.test(n)).sort();assert.equal(files.length,21);assert.equal(proof.migrationCount,21);assert.equal(proof.foreignKeyViolations,0);
- assert.deepEqual(proof.checksums,files.map(name=>({name,sha256:createHash('sha256').update(readFileSync('migrations/'+name)).digest('hex')})));
+ const files=readdirSync('migrations').filter(n=>/^\d{4}.*\.sql$/.test(n)).sort(),applied=files.slice(0,21);assert.equal(files.length,22);assert.equal(proof.migrationCount,21);assert.equal(proof.foreignKeyViolations,0);
+ assert.deepEqual(proof.checksums,applied.map(name=>({name,sha256:createHash('sha256').update(readFileSync('migrations/'+name)).digest('hex')})));
+ assert.equal(files[21],'0022_always_on_private_uat_cohort.sql');
 });

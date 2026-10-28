@@ -745,7 +745,7 @@ async function initialize() {
       }
       throw error;
     }
-    $("#global-status").textContent = "", delete document.body.dataset.flow, $("#social-view").hidden = !1, localStorage.getItem("chatgun-notifications") === "enabled" && ($("#notification-toggle").textContent = "ปิดการแจ้งเตือนขณะเปิดแอป"), fillProfile(), await refreshSections(), await monitorLocationPermission(), switchTab(state.activeTab), location.pathname === "/app/photos" && openOwnGallery(!1);
+    $("#global-status").textContent = "", delete document.body.dataset.flow, $("#social-view").hidden = !1, $("#always-on-uat-notice").hidden = !state.config.alwaysOnPrivateUat, localStorage.getItem("chatgun-notifications") === "enabled" && ($("#notification-toggle").textContent = "ปิดการแจ้งเตือนขณะเปิดแอป"), fillProfile(), await refreshSections(), await monitorLocationPermission(), switchTab(state.activeTab), location.pathname === "/app/photos" && openOwnGallery(!1);
     const route = routedProfile();
     if(route)await showPerson(route.user,{historyMode:'none',photo:route.photo}).catch(error=>toast(error.message,true));
     if(state.config.onlineStatusEnabled)await startOnlinePresence().catch(()=>toast('สถานะออนไลน์ยังไม่พร้อม ส่วนอื่นยังใช้งานได้',true));

@@ -264,11 +264,14 @@ async function startOauth(request, env, provider) {
       return failure("รหัสเชิญไม่ถูกต้องหรือหมดอายุ", 403, "invitation_invalid");
     }
     const invitation = await env.DB.prepare(`
-      SELECT id FROM beta_invitations
+      SELECT id, uat_required_provider FROM beta_invitations
       WHERE token_hash = ? AND status = 'active' AND max_uses = 1
         AND expires_at > ? AND use_count < max_uses
     `).bind(await sha256(invitationCode), unixTime()).first();
     if (!invitation) return failure("รหัสเชิญไม่ถูกต้องหรือหมดอายุ", 403, "invitation_invalid");
+    if (featureEnabled(env.UAT_PRIVATE_COHORT_REQUIRED) && invitation.uat_required_provider !== provider) {
+      return failure("รหัสเชิญไม่ตรงกับบัญชีผู้ให้บริการที่ได้รับอนุญาต", 403, "invitation_invalid");
+    }
     invitationId = invitation.id;
   }
 
@@ -388,8 +391,27 @@ async function oauthCallback(request, env, provider) {
         allowRegistration: featureEnabled(env.NEW_ACCOUNT_REGISTRATION_ENABLED),
         allowInvitationRegistration: featureEnabled(env.BETA_INVITATION_REGISTRATION_ENABLED),
         invitationId: flow.invitation_id,
+        authorizedCohort: featureEnabled(env.UAT_PRIVATE_COHORT_REQUIRED),
       },
     );
+    if (featureEnabled(env.UAT_PRIVATE_COHORT_REQUIRED)) {
+      const subjectHash = await sha256(profile.subject);
+      if (flow.invitation_id) {
+        const invitation = await env.DB.prepare(`SELECT uat_participant_ref,uat_required_provider,uat_account_reference_sha256
+          FROM beta_invitations WHERE id=?`).bind(flow.invitation_id).first();
+        if (!invitation || invitation.uat_required_provider !== provider) throw new Error('uat_cohort_denied');
+        const bound = await env.DB.prepare(`SELECT 1 ok FROM uat_authorized_identities
+          WHERE invitation_id=? AND participant_ref=? AND provider=? AND account_reference_sha256=?
+            AND user_id=? AND provider_subject_sha256=? AND revoked_at IS NULL`)
+          .bind(flow.invitation_id,invitation.uat_participant_ref,provider,invitation.uat_account_reference_sha256,userId,subjectHash).first();
+        if (!bound) throw new Error('uat_cohort_denied');
+      } else {
+        const authorized = await env.DB.prepare(`SELECT 1 ok FROM uat_authorized_identities
+          WHERE provider=? AND provider_subject_sha256=? AND user_id=? AND revoked_at IS NULL`)
+          .bind(provider,subjectHash,userId).first();
+        if (!authorized) throw new Error('uat_cohort_denied');
+      }
+    }
     const session = await issueSession(env.DB, userId, timestamp);
     if (flow.link_user_id) {
       return redirect("/account.html", [cookie(OAUTH_COOKIE, "", 0), ...session.cookies]);
@@ -397,7 +419,7 @@ async function oauthCallback(request, env, provider) {
     const journey = await accountJourney(env.DB, userId, env);
     return redirect(journey.nextPath, [cookie(OAUTH_COOKIE, "", 0), ...session.cookies]);
   } catch (error) {
-    const safeReason=['identity_already_linked','registration_closed','invitation_unavailable','reauth_session_mismatch','reauth_identity_mismatch','reauth_session_expired'].includes(error?.message)?error.message:'provider_or_validation_failed';
+    const safeReason=['identity_already_linked','registration_closed','invitation_unavailable','uat_cohort_denied','reauth_session_mismatch','reauth_identity_mismatch','reauth_session_expired'].includes(error?.message)?error.message:'provider_or_validation_failed';
     console.error(JSON.stringify({ event: "oauth_callback_failed", provider, reason: safeReason }));
     const redirectCode = error?.message === "identity_already_linked"
       ? "identity_linked"

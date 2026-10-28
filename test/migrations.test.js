@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { TestD1 } from "./helpers/d1.js";
 
 test("migration is idempotent and creates required tables and indexes", () => {
-  const database = new TestD1();
+  const database = new TestD1({ throughMigration: "0021_eligibility_review_requests.sql" });
   database.exec(readFileSync("migrations/0001_auth.sql", "utf8"));
   database.exec(readFileSync("migrations/0002_privacy_safety.sql", "utf8"));
   database.exec(readFileSync("migrations/0003_social.sql", "utf8"));
@@ -15,6 +15,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
   database.exec(readFileSync("migrations/0019_member_age_safety_holds.sql", "utf8"));
   database.exec(readFileSync("migrations/0020_age_hold_write_guards.sql", "utf8"));
   database.exec(readFileSync("migrations/0021_eligibility_review_requests.sql", "utf8"));
+  database.exec(readFileSync("migrations/0022_always_on_private_uat_cohort.sql", "utf8"));
   const tables = database.database.prepare(
     "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name",
   ).all().map(({ name }) => name);
@@ -27,7 +28,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
     "member_presence_preferences", "member_presence_leases", "oauth_flows", "oauth_reauth_contexts", "otp_challenges",
     "photo_comments", "photo_likes", "profile_photos", "proximity_ratings", "rate_limits",
     "session_auth_evidence", "sessions", "social_blocks", "social_media", "social_messages",
-    "social_relationships", "social_reports", "synthetic_seed_batches", "synthetic_seed_objects", "synthetic_seed_records", "users",
+    "social_relationships", "social_reports", "synthetic_seed_batches", "synthetic_seed_objects", "synthetic_seed_records", "uat_authorized_identities", "users",
   ].sort());
   const indexes = database.database.prepare(
     "SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE 'idx_%' ORDER BY name",
@@ -45,7 +46,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
     "idx_otp_ip_created", "idx_photo_comments_created", "idx_profile_photos_owner",
     "idx_presence_user_fresh", "idx_presence_expiry", "idx_profiles_discovery", "idx_rate_limits_expiry", "idx_ratings_receiver",
     "idx_relationships_high_status", "idx_relationships_low_status", "idx_reports_reason_status", "idx_reports_status",
-    "idx_session_auth_evidence_expiry", "idx_sessions_expiry", "idx_sessions_user", "idx_synthetic_seed_objects_media", "idx_synthetic_seed_records_type",
+    "idx_session_auth_evidence_expiry", "idx_sessions_expiry", "idx_sessions_user", "idx_synthetic_seed_objects_media", "idx_synthetic_seed_records_type", "idx_uat_authorized_active_provider",
   ].sort());
   assert.throws(() => database.database.prepare(
     "INSERT INTO identities(provider, subject, user_id, created_at, last_login_at) VALUES ('evil', 'x', 'x', 1, 1)",

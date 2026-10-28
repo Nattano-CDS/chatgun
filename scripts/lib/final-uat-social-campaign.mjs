@@ -7,27 +7,27 @@ export const FINAL_UAT_ORIGIN = 'https://uat.chatgun-final-uat.pages.dev';
 export const FINAL_UAT_DATABASE = 'e3cb426c-b88a-4b93-90fd-39df524f68ae';
 export const FINAL_UAT_BUCKET = 'chatgun-final-uat-media';
 export const FINAL_UAT_APPLICATION_SHA = '4a7dee32c52bc474ee3cc50d13e293e66e771c1a';
-export const OWNER_AUTHORIZATION_COMMENT = 6470727761;
+export const OWNER_AUTHORIZATION_COMMENT = 6473130647;
 
 export const PROPOSED_POLICY = Object.freeze({
   versions: {
-    adultNotice: 'adult-social-uat-2026-10-28-rc3',
-    terms: 'terms-social-uat-2026-10-28-rc3',
-    privacy: 'privacy-social-uat-2026-10-28-rc3',
-    deletion: 'deletion-social-uat-2026-10-28-rc3',
+    adultNotice: 'adult-social-always-on-uat-2026-10-28-rc4',
+    terms: 'terms-social-always-on-uat-2026-10-28-rc4',
+    privacy: 'privacy-social-always-on-uat-2026-10-28-rc4',
+    deletion: 'deletion-social-always-on-uat-2026-10-28-rc4',
   },
   files: {
-    'policies/final-uat/beta-notice.html': 'bed1712129fa59f26683bfa5f00b4c5de6ca3a88de103c8c48b6ca55d7d703a0',
-    'policies/final-uat/terms.html': 'ca712150dcf45a93854325215e4eaf4b5a7eaa25f9817f809ff30daf16af4240',
-    'policies/final-uat/privacy.html': '38a01bd8731481aafab92b480a002bc411c37b0f9e48281cc4aad8890d52d0ed',
-    'policies/final-uat/data-deletion.html': '8112d26ec9a0ad5bbef74d737e38662a1c0050f3fe0910ac4d190dbbe5bb3c9a',
+    'policies/final-uat/always-on-rc4/beta-notice.html': '40fc351a36f4152b1be777e36d80f2ce3ed758dcf3e8787ff498bba7d7d0f33a',
+    'policies/final-uat/always-on-rc4/terms.html': '05e29c0bf3add6c9c265f4c0f88ef8a233d6671d615c74a3abef89f450236cc3',
+    'policies/final-uat/always-on-rc4/privacy.html': 'e21371102282875933be8cf9349880c82dc9cd9a9762e6e34248907c6a0e79b1',
+    'policies/final-uat/always-on-rc4/data-deletion.html': '7d880152078a479a42574bb846609911b67b857205c6c200dee98bff525915cd',
   },
 });
 
 const providers = new Set(['google', 'facebook', 'line']);
 const referencePattern = /^[a-f0-9]{64}$/u;
 
-function exactBangkokWindow(window) {
+function assistedKickoffWindow(window) {
   assert.equal(window.timezone, 'Asia/Bangkok');
   assert.match(window.start, /^\d{4}-\d{2}-\d{2}T(?:19|20|21):[0-5]\d:[0-5]\d\+07:00$/u);
   assert.match(window.end, /^\d{4}-\d{2}-\d{2}T(?:19|20|21|22):[0-5]\d:[0-5]\d\+07:00$/u);
@@ -40,13 +40,17 @@ function exactBangkokWindow(window) {
 }
 
 export function validateFinalUatSocialApproval(receipt) {
-  assert.equal(receipt.scope, 'final-uat-social-location-chat-privacy');
+  assert.equal(receipt.scope, 'final-uat-always-on-private-social-location-chat-privacy');
   assert.equal(receipt.ownerAuthorizationComment, OWNER_AUTHORIZATION_COMMENT);
   assert.equal(receipt.policyApproved, true);
+  assert.match(receipt.applicationSha, /^[a-f0-9]{40}$/u);
   assert.deepEqual(receipt.policyVersions, PROPOSED_POLICY.versions);
   assert.deepEqual(receipt.policyFiles, PROPOSED_POLICY.files);
   assert.equal(receipt.operations?.moderationCoverage, '19:00-22:00 Asia/Bangkok daily');
   assert.equal(receipt.operations?.no24x7OrBackupModeratorClaim, true);
+  assert.equal(receipt.operations?.participantAccess, '24x7-until-explicit-owner-close-or-safety-kill-switch');
+  assert.equal(receipt.operations?.accessRestrictedToModerationHours, false);
+  assert.equal(receipt.operations?.automatic2200Shutdown, false);
   assert.equal(receipt.operations?.mediaEnabled, false);
   assert.equal(receipt.operations?.publicRegistrationEnabled, false);
   assert.equal(receipt.operations?.youthAdmissionEnabled, false);
@@ -60,14 +64,14 @@ export function validateFinalUatSocialApproval(receipt) {
   assert.equal(receipt.operations?.actualCampaignClosedAt, null);
   assert.equal(receipt.operations?.auditEvidenceExpiresAt, null);
   assert.equal(receipt.operations?.ownerAccountDeletionAuthorized, false);
-  exactBangkokWindow(receipt.window);
+  assistedKickoffWindow(receipt.window);
   assert.equal(receipt.participants?.length, 2);
   assert.deepEqual(receipt.participants.map(p => p.reference), ['A', 'B']);
   assert.equal(new Set(receipt.participants.map(p => p.providerAccountReferenceSha256)).size, 2);
   for (const participant of receipt.participants) {
     assert.ok(providers.has(participant.provider));
     assert.match(participant.providerAccountReferenceSha256, referencePattern);
-    for (const field of ['genuineDistinctAdultConfirmed', 'age20PlusConfirmed', 'individualConsentConfirmed', 'providerTesterEligible', 'socialScopeConsent', 'locationScopeConsent', 'chatScopeConsent', 'presenceScopeConsent', 'privacyScopeConsent', 'disposableTestDataConsent']) assert.equal(participant[field], true, `${participant.reference}.${field}`);
+    for (const field of ['genuineDistinctAdultConfirmed', 'age20PlusConfirmed', 'individualConsentConfirmed', 'providerTesterEligible', 'socialScopeConsent', 'locationScopeConsent', 'chatScopeConsent', 'presenceScopeConsent', 'privacyScopeConsent', 'disposableTestDataConsent', 'alwaysOnAccessConsent', 'outOfHoursModerationAcknowledged']) assert.equal(participant[field], true, `${participant.reference}.${field}`);
     assert.equal(participant.mediaConsentUsed, false);
   }
   assert.equal(typeof receipt.participants[1].accountDeletionConsent, 'boolean');
@@ -88,6 +92,7 @@ export function finalUatSocialVars(receipt) {
     EMAIL_OTP_ENABLED: 'false', MOBILE_OTP_ENABLED: 'false', LINE_EMAIL_ENABLED: 'false', FACEBOOK_EMAIL_ENABLED: 'false',
     FRIEND_REQUESTS_ENABLED: 'false', DEMO_MODE_ENABLED: 'false', DEMO_AUTO_START_ENABLED: 'false', PUBLIC_DEMO_CANARY_ENABLED: 'false',
     ADMIN_ACCESS_STANDALONE_ENABLED: 'false', ADMIN_CLOUDFLARE_ACCESS_REQUIRED: 'true',
+    UAT_PRIVATE_COHORT_REQUIRED: 'true', UAT_ACCESS_MODE: 'always-on-until-explicit-close',
     UAT_AUDIT_RETENTION_DAYS: '90', UAT_AUDIT_RETENTION_START_MODE: 'actual-campaign-close',
   };
 }

@@ -187,6 +187,7 @@ function capability(env, name) {
 async function authenticated(request, env, { csrf = false, onboarding = false, allowRevokedEnrollment = false } = {}) {
   const session = await getSession(request, env.DB);
   if (!session) throw new SocialError("unauthorized", "กรุณาเข้าสู่ระบบ", 401);
+  if(enabled(env.UAT_PRIVATE_COHORT_REQUIRED)&&!await env.DB.prepare("SELECT 1 ok FROM uat_authorized_identities WHERE user_id=? AND revoked_at IS NULL").bind(session.user_id).first())throw new SocialError('uat_cohort_required','บัญชีนี้ไม่อยู่ในกลุ่ม UAT ส่วนตัวที่ได้รับอนุญาต',403);
   const ageHold = await env.DB.prepare("SELECT 1 held FROM member_age_safety_holds WHERE user_id=? AND (state='held' OR age_band<>'20_plus')").bind(session.user_id).first();
   if (ageHold) throw new SocialError('age_safety_review_required', 'บัญชีนี้ยังไม่เปิดใช้ฟีเจอร์สังคมระหว่างตรวจสอบสิทธิ์ตามช่วงอายุ คุณยังเข้าหน้าบัญชีเพื่อออกจากระบบ ติดต่อผู้ดูแล หรือขอลบข้อมูลได้', 403);
   const betaEnrollment = await env.DB.prepare(
@@ -357,6 +358,9 @@ async function config(env) {
     demoAutoStartEnabled: false,
     onlineStatusEnabled: socialAppEnabled && enabled(env.PRESENCE_ENABLED),
     moderationToolsEnabled: socialAppEnabled && enabled(env.MODERATION_TOOLS_ENABLED),
+    alwaysOnPrivateUat: socialAppEnabled && env.UAT_ACCESS_MODE === "always-on-until-explicit-close",
+    participantAccess: socialAppEnabled && env.UAT_ACCESS_MODE === "always-on-until-explicit-close" ? "24x7-until-explicit-close" : null,
+    moderationCoverage: socialAppEnabled && env.UAT_ACCESS_MODE === "always-on-until-explicit-close" ? moderationCoverage() : null,
     adminAccessStandaloneEnabled: standaloneAdminEnabled(env),
     accountModerationEnabled: socialAppEnabled && enabled(env.ACCOUNT_MODERATION_ENABLED),
     gameEnabled: false,
