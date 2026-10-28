@@ -10,16 +10,16 @@ export const OWNER_AUTHORIZATION_COMMENT = 6470727761;
 
 export const PROPOSED_POLICY = Object.freeze({
   versions: {
-    adultNotice: 'adult-social-uat-2026-10-28-rc1',
-    terms: 'terms-social-uat-2026-10-28-rc1',
-    privacy: 'privacy-social-uat-2026-10-28-rc1',
-    deletion: 'deletion-social-uat-2026-10-28-rc1',
+    adultNotice: 'adult-social-uat-2026-10-28-rc2',
+    terms: 'terms-social-uat-2026-10-28-rc2',
+    privacy: 'privacy-social-uat-2026-10-28-rc2',
+    deletion: 'deletion-social-uat-2026-10-28-rc2',
   },
   files: {
-    'beta-notice.html': 'e01da689a1d91bbcc994f47eb734a191852fb2f162db0d19025bdab4fb4bb394',
-    'terms.html': '7b381aaed9ab52f0033a7aec0d2ec4c3951317ad52ed23acc981ff0bc7717dc3',
-    'privacy.html': 'be5d8578da6a3e3fd0d6180a37fdde7667565d719b35ec880ffe6105d703f48b',
-    'data-deletion.html': 'b55216f2b9853d70476484042644896431e9abdbe9daecd9d641bd7e2105d4e4',
+    'policies/final-uat/beta-notice.html': '99cfb4e96b9b43ab24fae190369e387c8c70743d9238d02c4abddb6aa4e82244',
+    'policies/final-uat/terms.html': '382679f326d165bf66d1263328ee76ebcc42ac5be07ee8782b57766686233aa5',
+    'policies/final-uat/privacy.html': '12ab34bac6b2a9a5699741b68f80bacaa2929e0ae5e5b1559ccf7344043cd534',
+    'policies/final-uat/data-deletion.html': 'bf532150640e2f0ceaeb6833b50221e0c72b2ae95843756d42a319c30c9d7f36',
   },
 });
 

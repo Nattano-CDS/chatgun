@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { chmodSync, cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { chmodSync, copyFileSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import {
@@ -15,6 +15,13 @@ const approvalFile = resolve(process.env.CHATGUN_UAT_PRIVATE_APPROVAL_FILE || ''
 assert.ok(approvalFile.startsWith('/Users/nattano/.codex/private-backups/chatgun/'));
 const receipt = validateFinalUatSocialApproval(JSON.parse(readFileSync(approvalFile, 'utf8')));
 for (const [file, digest] of Object.entries(PROPOSED_POLICY.files)) assert.equal(createHash('sha256').update(readFileSync(file)).digest('hex'), digest, `Policy artifact changed: ${file}`);
+const policyTarget = file => file.replace(/^policies\/final-uat\//u, '');
+const policyVersionByTarget = {
+  'beta-notice.html': PROPOSED_POLICY.versions.adultNotice,
+  'terms.html': PROPOSED_POLICY.versions.terms,
+  'privacy.html': PROPOSED_POLICY.versions.privacy,
+  'data-deletion.html': PROPOSED_POLICY.versions.deletion,
+};
 const now = Date.now(), start = Date.parse(receipt.window.start), end = Date.parse(receipt.window.end);
 assert.ok(now >= start - 20 * 60_000 && now < end, 'Activation is restricted to twenty minutes before or during the approved window');
 const vars = finalUatSocialVars(receipt);
@@ -46,7 +53,23 @@ execFileSync('git', ['clone', '--shared', '--no-checkout', process.cwd(), direct
 execFileSync('git', ['checkout', '--detach', FINAL_UAT_APPLICATION_SHA], { cwd: directory, stdio: 'pipe' });
 execFileSync('node', ['scripts/build-pages.mjs'], { cwd: directory, env: { ...process.env, CHATGUN_RELEASE_MODE: 'default', CHATGUN_CANARY_BUILD: 'false', CF_PAGES_BRANCH: 'uat' }, stdio: 'pipe' });
 const release = JSON.parse(readFileSync(join(directory, 'dist/release.json'))); assert.equal(release.commit, FINAL_UAT_APPLICATION_SHA); assert.equal(release.fictionalDemoEnabled, false);
-for (const [file, digest] of Object.entries(PROPOSED_POLICY.files)) assert.equal(createHash('sha256').update(readFileSync(join(directory, 'dist', file))).digest('hex'), digest, `Built policy changed: ${file}`);
+for (const file of Object.keys(PROPOSED_POLICY.files)) copyFileSync(resolve(file), join(directory, 'dist', policyTarget(file)));
+for (const [file, digest] of Object.entries(PROPOSED_POLICY.files)) {
+  const target = policyTarget(file), built = readFileSync(join(directory, 'dist', target));
+  assert.equal(createHash('sha256').update(built).digest('hex'), digest, `Built policy changed: ${target}`);
+  assert.match(built.toString('utf8'), new RegExp(`data-policy-version=["']${policyVersionByTarget[target]}["']`, 'u'), `Built policy version changed: ${target}`);
+}
+release.uatPolicyStatus = 'owner-approved-private-receipt';
+release.uatPolicyVersions = PROPOSED_POLICY.versions;
+release.uatPolicyFiles = Object.fromEntries(Object.entries(PROPOSED_POLICY.files).map(([file, digest]) => [policyTarget(file), digest]));
+const assetsPath = join(directory, 'dist/release-assets.json');
+const assets = JSON.parse(readFileSync(assetsPath));
+for (const [target, digest] of Object.entries(release.uatPolicyFiles)) {
+  const entry = assets.files.find(asset => asset.path === target); assert.ok(entry, `Policy missing from asset manifest: ${target}`); entry.sha256 = digest;
+}
+const assetsManifest = JSON.stringify(assets, null, 2) + '\n'; writeFileSync(assetsPath, assetsManifest);
+release.assetsManifestSha256 = createHash('sha256').update(assetsManifest).digest('hex');
+writeFileSync(join(directory, 'dist/release.json'), JSON.stringify(release, null, 2) + '\n');
 const base = JSON.parse(readFileSync('wrangler.final-uat-social.proposed.jsonc'));
 const config = { ...base, vars: { ...vars, TURNSTILE_SITE_KEY: state.turnstileSiteKey } };
 writeFileSync(join(directory, 'wrangler.jsonc'), JSON.stringify(config, null, 2), { mode: 0o600 });
@@ -59,5 +82,14 @@ const auth = await (await fetch(`${FINAL_UAT_ORIGIN}/api/auth/config`, { cache: 
 assert.equal(auth.oauthLoginEnabled, true); assert.deepEqual([...auth.oauthProviders].sort(), vars.OAUTH_ENABLED_PROVIDERS.split(',')); assert.equal(auth.newAccountRegistrationEnabled, false); assert.equal(auth.invitationOnlyRegistrationEnabled, true);
 const social = await (await fetch(`${FINAL_UAT_ORIGIN}/api/social/config`, { cache: 'no-store' })).json();
 assert.equal(social.socialAppEnabled, true); assert.equal(social.publicDiscoveryEnabled, true); assert.equal(social.messagingEnabled, true); assert.equal(social.mediaUploadEnabled, false); assert.equal(social.onlineStatusEnabled, true);
+const deployedRelease = await (await fetch(`${FINAL_UAT_ORIGIN}/release.json?uat-policy=${Date.now()}`, { cache: 'no-store' })).json();
+assert.equal(deployedRelease.commit, FINAL_UAT_APPLICATION_SHA); assert.deepEqual(deployedRelease.uatPolicyVersions, PROPOSED_POLICY.versions); assert.deepEqual(deployedRelease.uatPolicyFiles, release.uatPolicyFiles);
+for (const [file, digest] of Object.entries(PROPOSED_POLICY.files)) {
+  const target = policyTarget(file), response = await fetch(`${FINAL_UAT_ORIGIN}/${target}?uat-policy=${Date.now()}`, { cache: 'no-store' });
+  assert.ok(response.ok, `Displayed policy unavailable: ${target}`);
+  const displayed = Buffer.from(await response.arrayBuffer());
+  assert.equal(createHash('sha256').update(displayed).digest('hex'), digest, `Displayed policy changed: ${target}`);
+  assert.match(displayed.toString('utf8'), new RegExp(`data-policy-version=["']${policyVersionByTarget[target]}["']`, 'u'), `Displayed policy version changed: ${target}`);
+}
 writeFileSync('docs/final-uat/social-campaign-activation.json', JSON.stringify({ checkedAt: new Date().toISOString(), applicationSha: FINAL_UAT_APPLICATION_SHA, summary: sanitizedCampaignSummary(receipt), flags: vars, d1Schema: 21, foreignKeyViolations: 0, preactivationCountsZero: true, privateR2: true, invitationCount: 0, roleGrants: 0, productionWrites: 0, rollbackPrepared: true }, null, 2) + '\n');
 console.log(JSON.stringify({ status: 'ACTIVATED_FOR_APPROVED_WINDOW', applicationSha: FINAL_UAT_APPLICATION_SHA, invitationsIssued: 0, roleGrants: 0, mediaEnabled: false, productionWrites: 0 }));
