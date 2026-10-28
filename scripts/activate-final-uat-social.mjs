@@ -1,0 +1,63 @@
+// Scheduled, isolated UAT activation only. No invitations, roles, Media or Production writes.
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { chmodSync, cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import {
+  FINAL_UAT_ACCOUNT, FINAL_UAT_APPLICATION_SHA, FINAL_UAT_BUCKET, FINAL_UAT_DATABASE, FINAL_UAT_ORIGIN, FINAL_UAT_PROJECT,
+  PROPOSED_POLICY, finalUatSocialVars, sanitizedCampaignSummary, validateFinalUatSocialApproval,
+} from './lib/final-uat-social-campaign.mjs';
+
+assert.equal(process.env.CHATGUN_FINAL_UAT_SOCIAL, 'activate-approved-window');
+const approvalFile = resolve(process.env.CHATGUN_UAT_PRIVATE_APPROVAL_FILE || '');
+assert.ok(approvalFile.startsWith('/Users/nattano/.codex/private-backups/chatgun/'));
+const receipt = validateFinalUatSocialApproval(JSON.parse(readFileSync(approvalFile, 'utf8')));
+for (const [file, digest] of Object.entries(PROPOSED_POLICY.files)) assert.equal(createHash('sha256').update(readFileSync(file)).digest('hex'), digest, `Policy artifact changed: ${file}`);
+const now = Date.now(), start = Date.parse(receipt.window.start), end = Date.parse(receipt.window.end);
+assert.ok(now >= start - 20 * 60_000 && now < end, 'Activation is restricted to twenty minutes before or during the approved window');
+const vars = finalUatSocialVars(receipt);
+const state = JSON.parse(readFileSync('docs/final-uat/environment.json'));
+assert.equal(state.databaseId, FINAL_UAT_DATABASE); assert.equal(state.bucket, FINAL_UAT_BUCKET); assert.equal(state.candidate, FINAL_UAT_APPLICATION_SHA); assert.equal(state.origin, FINAL_UAT_ORIGIN);
+
+const { token } = JSON.parse(execFileSync('npx', ['wrangler@4.151.1', 'auth', 'token', '--json'], { encoding: 'utf8' }));
+async function cf(path, body, method = body ? 'POST' : 'GET') {
+  const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${FINAL_UAT_ACCOUNT}${path}`, { method, headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}) });
+  const json = await response.json(); assert.ok(response.ok && json.success, `Cloudflare ${method} ${path} failed`); return json.result;
+}
+assert.equal((await cf('')).id, FINAL_UAT_ACCOUNT);
+const project = await cf(`/pages/projects/${FINAL_UAT_PROJECT}`), preview = project.deployment_configs.preview;
+assert.equal(preview.d1_databases.DB.id, FINAL_UAT_DATABASE); assert.equal(preview.r2_buckets.MEDIA.name, FINAL_UAT_BUCKET);
+for (const key of ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'FACEBOOK_CLIENT_ID', 'FACEBOOK_CLIENT_SECRET', 'LINE_CLIENT_ID', 'LINE_CLIENT_SECRET', 'TURNSTILE_SECRET_KEY', 'ADMIN_ACCESS_ISSUER', 'ADMIN_ACCESS_AUDIENCE']) assert.equal(preview.env_vars[key]?.type, 'secret_text', `Missing encrypted UAT value: ${key}`);
+assert.equal((await cf(`/r2/buckets/${FINAL_UAT_BUCKET}/domains/managed`)).enabled, false);
+assert.equal((await cf(`/r2/buckets/${FINAL_UAT_BUCKET}/domains/custom`)).domains.length, 0);
+const query = async (sql, params = []) => (await cf(`/d1/database/${FINAL_UAT_DATABASE}/query`, { sql, params }))[0];
+for (const table of ['users', 'identities', 'sessions', 'beta_invitations', 'social_media', 'moderation_access_grants']) assert.equal((await query(`SELECT COUNT(*) n FROM ${table}`)).results[0].n, 0, `${table} must be empty before activation`);
+assert.equal((await query('SELECT COUNT(*) n FROM pragma_foreign_key_check')).results[0].n, 0);
+assert.equal((await query('SELECT COUNT(*) n FROM d1_migrations')).results[0].n, 21);
+const liveRelease = await (await fetch(`${FINAL_UAT_ORIGIN}/release.json`, { cache: 'no-store' })).json(); assert.equal(liveRelease.commit, FINAL_UAT_APPLICATION_SHA);
+
+const backup = mkdtempSync('/Users/nattano/.codex/private-backups/chatgun/final-uat-social-preactivation-'); chmodSync(backup, 0o700);
+writeFileSync(join(backup, 'environment-metadata.json'), JSON.stringify({ checkedAt: new Date().toISOString(), project: FINAL_UAT_PROJECT, database: FINAL_UAT_DATABASE, bucket: FINAL_UAT_BUCKET, priorDeployment: state.deploymentId, priorSha: liveRelease.commit, rollback: 'CHATGUN_FINAL_UAT=approved node scripts/prepare-final-uat.mjs deploy', privateR2: true, preactivationCountsZero: true }, null, 2), { mode: 0o600 });
+
+const directory = mkdtempSync(join(tmpdir(), 'chatgun-final-uat-social-')); chmodSync(directory, 0o700);
+execFileSync('git', ['clone', '--shared', '--no-checkout', process.cwd(), directory], { stdio: 'pipe' });
+execFileSync('git', ['checkout', '--detach', FINAL_UAT_APPLICATION_SHA], { cwd: directory, stdio: 'pipe' });
+execFileSync('node', ['scripts/build-pages.mjs'], { cwd: directory, env: { ...process.env, CHATGUN_RELEASE_MODE: 'default', CHATGUN_CANARY_BUILD: 'false', CF_PAGES_BRANCH: 'uat' }, stdio: 'pipe' });
+const release = JSON.parse(readFileSync(join(directory, 'dist/release.json'))); assert.equal(release.commit, FINAL_UAT_APPLICATION_SHA); assert.equal(release.fictionalDemoEnabled, false);
+for (const [file, digest] of Object.entries(PROPOSED_POLICY.files)) assert.equal(createHash('sha256').update(readFileSync(join(directory, 'dist', file))).digest('hex'), digest, `Built policy changed: ${file}`);
+const base = JSON.parse(readFileSync('wrangler.final-uat-social.proposed.jsonc'));
+const config = { ...base, vars: { ...vars, TURNSTILE_SITE_KEY: state.turnstileSiteKey } };
+writeFileSync(join(directory, 'wrangler.jsonc'), JSON.stringify(config, null, 2), { mode: 0o600 });
+execFileSync('npx', ['wrangler@4.151.1', 'pages', 'deploy', 'dist', `--project-name=${FINAL_UAT_PROJECT}`, '--branch=uat', `--commit-hash=${FINAL_UAT_APPLICATION_SHA}`, '--commit-dirty=true'], { cwd: directory, env: { ...process.env, CLOUDFLARE_ACCOUNT_ID: FINAL_UAT_ACCOUNT }, stdio: 'inherit' });
+
+const after = await cf(`/pages/projects/${FINAL_UAT_PROJECT}`), afterVars = after.deployment_configs.preview.env_vars;
+for (const [key, value] of Object.entries(vars)) assert.equal(afterVars[key]?.value, value, `Flag read-back failed: ${key}`);
+for (const key of ['GOOGLE_CLIENT_SECRET', 'FACEBOOK_CLIENT_SECRET', 'LINE_CLIENT_SECRET', 'TURNSTILE_SECRET_KEY']) assert.equal(afterVars[key]?.type, 'secret_text', `Encrypted value lost: ${key}`);
+const auth = await (await fetch(`${FINAL_UAT_ORIGIN}/api/auth/config`, { cache: 'no-store' })).json();
+assert.equal(auth.oauthLoginEnabled, true); assert.deepEqual([...auth.oauthProviders].sort(), vars.OAUTH_ENABLED_PROVIDERS.split(',')); assert.equal(auth.newAccountRegistrationEnabled, false); assert.equal(auth.invitationOnlyRegistrationEnabled, true);
+const social = await (await fetch(`${FINAL_UAT_ORIGIN}/api/social/config`, { cache: 'no-store' })).json();
+assert.equal(social.socialAppEnabled, true); assert.equal(social.publicDiscoveryEnabled, true); assert.equal(social.messagingEnabled, true); assert.equal(social.mediaUploadEnabled, false); assert.equal(social.onlineStatusEnabled, true);
+writeFileSync('docs/final-uat/social-campaign-activation.json', JSON.stringify({ checkedAt: new Date().toISOString(), applicationSha: FINAL_UAT_APPLICATION_SHA, summary: sanitizedCampaignSummary(receipt), flags: vars, d1Schema: 21, foreignKeyViolations: 0, preactivationCountsZero: true, privateR2: true, invitationCount: 0, roleGrants: 0, productionWrites: 0, rollbackPrepared: true }, null, 2) + '\n');
+console.log(JSON.stringify({ status: 'ACTIVATED_FOR_APPROVED_WINDOW', applicationSha: FINAL_UAT_APPLICATION_SHA, invitationsIssued: 0, roleGrants: 0, mediaEnabled: false, productionWrites: 0 }));

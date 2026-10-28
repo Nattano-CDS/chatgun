@@ -11,7 +11,7 @@
     "uatOrigin": "https://uat.chatgun-final-uat.pages.dev"
   },
   "counts": {
-    "automatedAssertions": { "total": 268, "pass": 268, "fail": 0, "blocked": 0, "notRun": 0 },
+    "automatedAssertions": { "total": 270, "pass": 270, "fail": 0, "blocked": 0, "notRun": 0 },
     "genuineHumanScenarios": { "total": 50, "pass": 0, "fail": 0, "blocked": 50, "notRun": 0 },
     "physicalDeviceChecks": { "total": 2, "pass": 0, "fail": 0, "blocked": 0, "notRun": 2 }
   },
@@ -19,7 +19,7 @@
     {
       "id": "LOCAL-REGRESSION",
       "status": "PASS",
-      "passed": 248,
+      "passed": 250,
       "failed": 0,
       "skipped": 0,
       "command": "npm test",

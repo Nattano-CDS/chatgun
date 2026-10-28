@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-28T13:33:08.783Z",
+  "checkedAt": "2026-10-28T13:51:27.124Z",
   "counts": {
     "users": 0,
     "identities": 0,
@@ -57,7 +57,7 @@
   "emptyDatabaseReadProbe": {
     "rowsRead": 0,
     "rowsWritten": 0,
-    "durationMs": 0.1647
+    "durationMs": 0.2228
   },
   "readProbeLimit": "Empty UAT sentinel query; not real-member traffic/capacity evidence",
   "remainingDeployments": [

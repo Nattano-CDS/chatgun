@@ -12,7 +12,7 @@ Production deployment is **not authorized**. Draft PR #17 must not be merged aut
 | Latest GitHub CI at execution start | SUCCESS, run `40110238957`, exact engineering HEAD |
 | Frozen/tested UAT application | `4a7dee32c52bc474ee3cc50d13e293e66e771c1a` |
 | Current Production | `a73ff21c615dabb6a0c19c0a22685c2370958ca1` |
-| Local regression | 248 pass, 0 fail, 0 skip |
+| Local regression | 250 pass, 0 fail, 0 skip |
 | Live closed-UAT security | 17 pass, 0 fail |
 | Genuine human UAT | 0 pass; 50 blocked/not executed |
 | Open P0/P1 engineering defects | 0 / 0 |
