@@ -1,23 +1,25 @@
-# One coordinated genuine-UAT campaign
+# Single-operator dual-device/two-account private UAT
 
-Status: **NOT RUN — prerequisite gates BLOCKED**. Do not fabricate results from synthetic sessions. Freeze exact SHA, provider IDs, acceptance versions and flags before scheduling. Participants A and B must be distinct and specifically approved. Privileged fresh authentication remains valid at most ten minutes; coordinate necessary MFA rather than bypassing it.
+Status: **NOT RUN — rc5 approval and truthful owner attestations BLOCKED**. Do not fabricate results from synthetic sessions or describe the two accounts as two humans. Freeze exact SHA, provider IDs, acceptance versions and flags before scheduling. The campaign requires one verified adult owner operating A=LINE and B=Google on two devices; both provider identities must be distinct, personally controlled, provider-test eligible and specifically authorized.
 
-Use PASS / FAIL / BLOCKED / NOT RUN per case. Record time, deployment ID, provider, internal participant reference, width and minimized evidence; never passwords, tokens, cookies, invitation fragments, precise locations or private member information.
+Use PASS / FAIL / BLOCKED / NOT RUN per case. Record time, deployment ID, provider, internal identity reference, width and minimized evidence; never passwords, tokens, cookies, invitation fragments, precise locations or private member information.
 
 | Cases | Action / evidence | Current genuine result |
 |---|---|---|
-| AUTH01–06 | LINE, Google, Facebook where individually authorized: invitation bind/consume, callback/state/nonce, session, cancellation, replay, failure message | BLOCKED: UAT credentials/tester eligibility |
-| AUTH07–10 | Acceptance initially unchecked; age+Terms evidence once; interrupted recovery; onboarding activates; repeat login no duplicate; authorized distinct identity linking and cross-user rejection | NOT RUN |
-| ADMIN01–07 | Genuine Access MFA; routine overview no Purpose prompt; restricted purpose; reports/members/deletions/media; least privilege/expiry/revocation; stale auth denied | BLOCKED: Access config + exact UAT role authorization |
+| AUTH01–06 | Owner completes genuine LINE A and Google B OAuth on separate devices: identity-specific invitation bind/consume, callback/state/nonce, Turnstile/applicable MFA, session, cancellation, replay and provider mismatch | BLOCKED: rc5 approval/owner identity attestations |
+| AUTH07–10 | Acceptance initially unchecked; one operator age/Terms evidence; interrupted recovery; onboarding; repeat login no duplicate; exact LINE/Google subjects differ; third identity rejected | NOT RUN |
+| ADMIN01–07 | Admin role flows | BLOCKED / OUT OF SCOPE: no Admin grants authorized |
 | PROF01–05 | Name/bio/interests/profile photo, visibility/privacy, persistence/reload, own Discovery card first | NOT RUN |
 | DISC01–05 | Only admitted eligible users; explicit location permission; coarse distance/no exact coordinates; filters/pagination; block/hide/revoke exclusion | NOT RUN |
-| CHAT01–08 | A↔B direct chat, persistent text/read/unread/inbox; retry/unsend; notifications; block; private-media reuse denial | NOT RUN |
+| CHAT01–08 | Owner-operated A↔B functional chat across two devices: persistent text/read/unread/inbox, retry/unsend, privacy isolation, block and report | NOT RUN — never label as independent two-human experience evidence |
 | PRES01–06 | Opt-in heartbeat, actual visible/hidden browser activity, multiple devices,90-second expiry, opt-out, logout/session expiry/block | NOT RUN |
-| MED01–10 | Disposable public/private image upload; file validation/metadata; quarantine; manual approve/reject; quota10+10/Bangkok day; pending/rejected not visible; authorized likes/comments; private request→Chat approve/reject/revoke; raw-byte denial; deletion/retry | NOT RUN |
+| MED01–10 | Media/Gallery upload, sharing and moderation | BLOCKED / OUT OF SCOPE; flags remain OFF |
 | SAFE01–08 | Real report/block and private review; proximity rating; appeals/notifications; reporter/evidence privacy; safety hold/correction/withdrawal remains fail-closed; CSRF/replay/cross-user denial | NOT RUN |
-| DEL01–04 | Explicitly disposable B only: recent-auth+CSRF request; revoke sessions; remove identities/media; queue retries; receipt; no owner deletion | NOT RUN |
+| DEL01–04 | After separate owner YES: de-enroll B, revoke sessions, delete only ChatGun UAT Google-linked identity/account, verify retries/receipt; never delete external Google, LINE or Production identity | NOT RUN |
 | UX01–10 |390/768/1440, keyboard/focus/back/loading/error/offline/empty/permission states, no overflow; approved NEAR styling/no Game | NOT RUN genuine; independent synthetic/closed evidence exists |
-| OPS01–05 | Foreground/background request measurements, APIerrors, rate limits, D1/R2 integrity, final exact-batch backup and approved cleanup, no Production changes | NOT RUN genuine |
+| OPS01–05 | Foreground/background requests, midnight session continuity, rate limits, D1 integrity, explicit close, 7-day logical cleanup, 90-day minimized evidence, no Production/R2 changes | NOT RUN genuine |
+
+Any scenario that genuinely requires two independent human decision-makers, consent judgments, reporting perspectives or appeal independence is **BLOCKED / NOT RUN** until separately consented humans exist. Passing A↔B actions proves only dual-account functionality under one operator.
 
 ## Independent preparation evidence (not genuine-user substitutes)
 

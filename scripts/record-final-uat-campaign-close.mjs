@@ -1,4 +1,4 @@
-// Records the actual close only after live UAT flags are closed; stores no raw participant identifier or content.
+// Records the actual close only after live UAT flags are closed; stores no raw identity identifier or content.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -25,15 +25,16 @@ async function cf(path, body) {
 }
 const query = async (sql, params = []) => (await cf(`/d1/database/${FINAL_UAT_DATABASE}/query`, { sql, params }))[0];
 await query(UAT_CAMPAIGN_AUDIT_TABLE_SQL);
-const cohort = (await query('SELECT participant_ref,user_id FROM uat_authorized_identities ORDER BY participant_ref')).results;
-assert.deepEqual(cohort.map(row => row.participant_ref), ['A', 'B'], 'Explicit close requires the exact two-person cohort');
-assert.ok(cohort.every(row => row.user_id), 'Both authorized participants must be enrolled before campaign close');
+const cohort = (await query('SELECT identity_ref,user_id,provider,provider_subject_sha256 FROM uat_authorized_identities ORDER BY identity_ref')).results;
+assert.deepEqual(cohort.map(row => [row.identity_ref,row.provider]), [['A','line'], ['B','google']], 'Explicit close requires the exact owner-controlled LINE/Google cohort');
+assert.ok(cohort.every(row => row.user_id && row.provider_subject_sha256), 'Both authorized identities must be enrolled before campaign close');
+assert.equal(new Set(cohort.map(row => row.provider_subject_sha256)).size, 2, 'LINE and Google provider subjects must differ');
 assert.equal((await query('SELECT COUNT(*) n FROM users')).results[0].n, 2, 'Refusing broad cleanup outside the isolated two-user UAT');
 const expiresAt = now + UAT_AUDIT_RETENTION_SECONDS;
-const minimized = { scope: receipt.scope, policyVersions: PROPOSED_POLICY.versions, policyFiles: PROPOSED_POLICY.files, window: receipt.window, closedAt: now, participantCount: 2, participants: receipt.participants.map(p => ({ reference: p.reference, provider: p.provider, eligibleAndConsented: true, accountDeletionConsent: p.reference === 'B' ? p.accountDeletionConsent : false })), mediaEnabled: false, productionWrites: 0 };
+const minimized = { scope: receipt.scope, policyVersions: PROPOSED_POLICY.versions, policyFiles: PROPOSED_POLICY.files, window: receipt.window, closedAt: now, operatorCount: 1, identityCount: 2, identities: receipt.identities.map(identity => ({ reference: identity.reference, provider: identity.provider, ownerAuthorized: true, chatgunUatIdentityDeletionAuthorized: identity.reference === 'B' ? identity.chatgunUatIdentityDeletionAuthorized : false })), humanEvidenceClassification: 'single-operator-dual-account-functional-e2e', mediaEnabled: false, productionWrites: 0 };
 const evidenceSha256 = createHash('sha256').update(JSON.stringify(minimized)).digest('hex');
 const campaignId = createHash('sha256').update(`always-on-private-uat\0${now}\0${evidenceSha256}`).digest('hex');
-const inserted = await query('INSERT INTO uat_campaign_audit_evidence(campaign_id,closed_at,expires_at,evidence_sha256,policy_versions_json,policy_files_json,participant_count,participant_b_deletion_consent,created_at) VALUES(?,?,?,?,?,?,?,?,?)', [campaignId, now, expiresAt, evidenceSha256, JSON.stringify(PROPOSED_POLICY.versions), JSON.stringify(PROPOSED_POLICY.files), 2, receipt.participants[1].accountDeletionConsent ? 1 : 0, now]);
+const inserted = await query('INSERT INTO uat_campaign_audit_evidence(campaign_id,closed_at,expires_at,evidence_sha256,policy_versions_json,policy_files_json,operator_count,identity_count,google_chatgun_identity_deletion_authorized,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)', [campaignId, now, expiresAt, evidenceSha256, JSON.stringify(PROPOSED_POLICY.versions), JSON.stringify(PROPOSED_POLICY.files), 1, 2, receipt.identities[1].chatgunUatIdentityDeletionAuthorized ? 1 : 0, now]);
 assert.equal(inserted.meta.changes, 1);
 // Access is revoked immediately at explicit close. The isolated UAT contains only
 // these two users, so disposable Social data can be removed immediately (within
@@ -64,4 +65,4 @@ assert.equal((await query('SELECT COUNT(*) n FROM uat_authorized_identities')).r
 receipt.operations.actualCampaignClosedAt = new Date(now * 1000).toISOString();
 receipt.operations.auditEvidenceExpiresAt = new Date(expiresAt * 1000).toISOString();
 writeFileSync(file, JSON.stringify(receipt, null, 2) + '\n', { mode: 0o600 }); chmodSync(file, 0o600);
-console.log(JSON.stringify({ status: 'ACTUAL_CLOSE_RECORDED_AND_LOGICALLY_CLEANED', closedAt: receipt.operations.actualCampaignClosedAt, auditEvidenceExpiresAt: receipt.operations.auditEvidenceExpiresAt, accessRevoked: true, socialDataRemoved: true, participantAAccountDeleted: false, participantBDeletionRequiresSeparateConfirmedAccountDeletionFlow: true, retainedEvidence: 'minimized-digest-and-policy-proof', rawAccountReferencesStored: false, chatOrLocationStored: false, productionWrites: 0 }));
+console.log(JSON.stringify({ status: 'ACTUAL_CLOSE_RECORDED_AND_LOGICALLY_CLEANED', closedAt: receipt.operations.actualCampaignClosedAt, auditEvidenceExpiresAt: receipt.operations.auditEvidenceExpiresAt, accessRevoked: true, socialDataRemoved: true, identityAChatgunAccountDeleted: false, identityBDeletionRequiresSeparateOwnerAuthorizedAccountDeletionFlow: true, externalProviderAccountsDeleted: false, retainedEvidence: 'minimized-digest-and-policy-proof', rawAccountReferencesStored: false, chatOrLocationStored: false, productionWrites: 0 }));

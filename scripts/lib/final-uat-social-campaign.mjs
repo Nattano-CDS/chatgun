@@ -6,25 +6,23 @@ export const FINAL_UAT_PROJECT = 'chatgun-final-uat';
 export const FINAL_UAT_ORIGIN = 'https://uat.chatgun-final-uat.pages.dev';
 export const FINAL_UAT_DATABASE = 'e3cb426c-b88a-4b93-90fd-39df524f68ae';
 export const FINAL_UAT_BUCKET = 'chatgun-final-uat-media';
-export const FINAL_UAT_APPLICATION_SHA = '4a7dee32c52bc474ee3cc50d13e293e66e771c1a';
-export const OWNER_AUTHORIZATION_COMMENT = 6473130647;
+export const OWNER_AUTHORIZATION_COMMENT = 6473803567;
 
 export const PROPOSED_POLICY = Object.freeze({
   versions: {
-    adultNotice: 'adult-social-always-on-uat-2026-10-28-rc4',
-    terms: 'terms-social-always-on-uat-2026-10-28-rc4',
-    privacy: 'privacy-social-always-on-uat-2026-10-28-rc4',
-    deletion: 'deletion-social-always-on-uat-2026-10-28-rc4',
+    adultNotice: 'adult-social-single-operator-dual-account-uat-2026-10-28-rc5',
+    terms: 'terms-social-single-operator-dual-account-uat-2026-10-28-rc5',
+    privacy: 'privacy-social-single-operator-dual-account-uat-2026-10-28-rc5',
+    deletion: 'deletion-social-single-operator-dual-account-uat-2026-10-28-rc5',
   },
   files: {
-    'policies/final-uat/always-on-rc4/beta-notice.html': '40fc351a36f4152b1be777e36d80f2ce3ed758dcf3e8787ff498bba7d7d0f33a',
-    'policies/final-uat/always-on-rc4/terms.html': '05e29c0bf3add6c9c265f4c0f88ef8a233d6671d615c74a3abef89f450236cc3',
-    'policies/final-uat/always-on-rc4/privacy.html': 'e21371102282875933be8cf9349880c82dc9cd9a9762e6e34248907c6a0e79b1',
-    'policies/final-uat/always-on-rc4/data-deletion.html': '7d880152078a479a42574bb846609911b67b857205c6c200dee98bff525915cd',
+    'policies/final-uat/single-operator-rc5/beta-notice.html': 'e4a8f77b607586b8c0ebd185d72857e0e0661e526cb6cfd0770247a7513c7de9',
+    'policies/final-uat/single-operator-rc5/terms.html': 'd6d4035d772c9104bbbaaf96384a4768d6406ade93637e1fbed78f913a0f9f90',
+    'policies/final-uat/single-operator-rc5/privacy.html': '73176011f94bfe987ae8e0c4ed3f09f862f43c38d5ee86d201afabfe9909201a',
+    'policies/final-uat/single-operator-rc5/data-deletion.html': 'aaca1f6637f293f52bb2e2c7aa332bdba2a1ee052e8beccc39c8849408985d58',
   },
 });
 
-const providers = new Set(['google', 'facebook', 'line']);
 const referencePattern = /^[a-f0-9]{64}$/u;
 
 function assistedKickoffWindow(window) {
@@ -40,7 +38,7 @@ function assistedKickoffWindow(window) {
 }
 
 export function validateFinalUatSocialApproval(receipt) {
-  assert.equal(receipt.scope, 'final-uat-always-on-private-social-location-chat-privacy');
+  assert.equal(receipt.scope, 'final-uat-single-operator-dual-account-always-on-private');
   assert.equal(receipt.ownerAuthorizationComment, OWNER_AUTHORIZATION_COMMENT);
   assert.equal(receipt.policyApproved, true);
   assert.match(receipt.applicationSha, /^[a-f0-9]{40}$/u);
@@ -63,24 +61,32 @@ export function validateFinalUatSocialApproval(receipt) {
   assert.equal(receipt.operations?.auditEvidencePhysicalBackupLimitClaimed, false);
   assert.equal(receipt.operations?.actualCampaignClosedAt, null);
   assert.equal(receipt.operations?.auditEvidenceExpiresAt, null);
-  assert.equal(receipt.operations?.ownerAccountDeletionAuthorized, false);
+  assert.equal(receipt.operations?.humanOperatorCount, 1);
+  assert.equal(receipt.operations?.authorizedIdentityCount, 2);
+  assert.equal(receipt.operations?.functionalE2EClassification, 'single-operator-dual-account-not-independent-two-human-uat');
+  assert.equal(receipt.operations?.externalProviderAccountDeletionAuthorized, false);
+  assert.equal(receipt.operations?.productionLineIdentityDeletionAuthorized, false);
   assistedKickoffWindow(receipt.window);
-  assert.equal(receipt.participants?.length, 2);
-  assert.deepEqual(receipt.participants.map(p => p.reference), ['A', 'B']);
-  assert.equal(new Set(receipt.participants.map(p => p.providerAccountReferenceSha256)).size, 2);
-  for (const participant of receipt.participants) {
-    assert.ok(providers.has(participant.provider));
-    assert.match(participant.providerAccountReferenceSha256, referencePattern);
-    for (const field of ['genuineDistinctAdultConfirmed', 'age20PlusConfirmed', 'individualConsentConfirmed', 'providerTesterEligible', 'socialScopeConsent', 'locationScopeConsent', 'chatScopeConsent', 'presenceScopeConsent', 'privacyScopeConsent', 'disposableTestDataConsent', 'alwaysOnAccessConsent', 'outOfHoursModerationAcknowledged']) assert.equal(participant[field], true, `${participant.reference}.${field}`);
-    assert.equal(participant.mediaConsentUsed, false);
+  assert.equal(receipt.participants, undefined, 'Legacy two-human participant attestations are forbidden');
+  assert.equal(receipt.operator?.reference, 'owner');
+  for (const field of ['singleHumanOperatorConfirmed', 'age20PlusConfirmed', 'dualDeviceControlConfirmed', 'controlsAllAuthorizedIdentitiesConfirmed', 'socialScopeConsent', 'locationScopeConsent', 'chatScopeConsent', 'presenceScopeConsent', 'privacyScopeConsent', 'disposableTestDataConsent', 'alwaysOnAccessConsent', 'outOfHoursModerationAcknowledged']) assert.equal(receipt.operator[field], true, `operator.${field}`);
+  assert.equal(receipt.identities?.length, 2);
+  assert.deepEqual(receipt.identities.map(identity => [identity.reference, identity.provider]), [['A', 'line'], ['B', 'google']]);
+  assert.equal(new Set(receipt.identities.map(identity => identity.providerAccountReferenceSha256)).size, 2);
+  for (const identity of receipt.identities) {
+    for (const legacy of ['genuineDistinctAdultConfirmed', 'individualConsentConfirmed', 'accountDeletionConsent']) assert.equal(identity[legacy], undefined, `${identity.reference}.${legacy} is a forbidden legacy human-consent field`);
+    assert.match(identity.providerAccountReferenceSha256, referencePattern);
+    for (const field of ['operatorControlConfirmed', 'providerTesterEligible', 'uatUseAuthorized']) assert.equal(identity[field], true, `${identity.reference}.${field}`);
+    assert.equal(identity.mediaConsentUsed, false);
   }
-  assert.equal(typeof receipt.participants[1].accountDeletionConsent, 'boolean');
+  assert.equal(receipt.identities[0].chatgunUatIdentityDeletionAuthorized, false);
+  assert.equal(typeof receipt.identities[1].chatgunUatIdentityDeletionAuthorized, 'boolean');
   return receipt;
 }
 
 export function finalUatSocialVars(receipt) {
   validateFinalUatSocialApproval(receipt);
-  const enabledProviders = [...new Set(receipt.participants.map(p => p.provider))].sort().join(',');
+  const enabledProviders = [...new Set(receipt.identities.map(identity => identity.provider))].sort().join(',');
   return {
     OAUTH_LOGIN_ENABLED: 'true', OAUTH_ENABLED_PROVIDERS: enabledProviders,
     NEW_ACCOUNT_REGISTRATION_ENABLED: 'false', BETA_INVITATION_REGISTRATION_ENABLED: 'true', BETA_ENROLLMENT_REQUIRED: 'true',
@@ -104,7 +110,9 @@ export function sanitizedCampaignSummary(receipt) {
     authorizationComment: receipt.ownerAuthorizationComment,
     policyVersions: receipt.policyVersions,
     window: receipt.window,
-    participants: receipt.participants.map(p => ({ reference: p.reference, provider: p.provider, accountDeletionConsent: p.reference === 'B' ? p.accountDeletionConsent : false })),
+    operatorCount: 1,
+    identities: receipt.identities.map(identity => ({ reference: identity.reference, provider: identity.provider, chatgunUatIdentityDeletionAuthorized: identity.reference === 'B' ? identity.chatgunUatIdentityDeletionAuthorized : false })),
+    humanEvidenceClassification: 'single-operator-dual-account-functional-e2e',
     enabledProviders: vars.OAUTH_ENABLED_PROVIDERS.split(','),
     mediaEnabled: false,
     publicRegistrationEnabled: false,
@@ -113,15 +121,15 @@ export function sanitizedCampaignSummary(receipt) {
   };
 }
 
-export function hashAndRemovePrivateParticipantReferences(receipt) {
+export function hashAndRemovePrivateIdentityReferences(receipt) {
   const sanitized = structuredClone(receipt);
-  for (const participant of sanitized.participants || []) {
-    assert.equal(participant.providerAccountReferenceSha256, null, `${participant.reference}.providerAccountReferenceSha256 must be empty before finalization`);
-    assert.equal(typeof participant.providerAccountReferencePrivate, 'string');
-    const privateReference = participant.providerAccountReferencePrivate.trim();
-    assert.ok(privateReference.length >= 3, `${participant.reference}.providerAccountReferencePrivate is required`);
-    participant.providerAccountReferenceSha256 = createHash('sha256').update(`${participant.provider}\0${privateReference}`).digest('hex');
-    participant.providerAccountReferencePrivate = '';
+  for (const identity of sanitized.identities || []) {
+    assert.equal(identity.providerAccountReferenceSha256, null, `${identity.reference}.providerAccountReferenceSha256 must be empty before finalization`);
+    assert.equal(typeof identity.providerAccountReferencePrivate, 'string');
+    const privateReference = identity.providerAccountReferencePrivate.trim();
+    assert.ok(privateReference.length >= 3, `${identity.reference}.providerAccountReferencePrivate is required`);
+    identity.providerAccountReferenceSha256 = createHash('sha256').update(`${identity.provider}\0${privateReference}`).digest('hex');
+    identity.providerAccountReferencePrivate = '';
   }
   validateFinalUatSocialApproval(sanitized);
   return sanitized;

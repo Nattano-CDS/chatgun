@@ -47,8 +47,8 @@ assert.equal((await query('SELECT COUNT(*) n FROM uat_campaign_audit_evidence'))
 assert.equal((await query('SELECT COUNT(*) n FROM pragma_foreign_key_check')).results[0].n, 0);
 assert.equal((await query('SELECT COUNT(*) n FROM d1_migrations')).results[0].n, 22);
 const consentedAt = Math.floor(Date.now() / 1000);
-for (const participant of receipt.participants) {
-  const inserted = await query('INSERT INTO uat_authorized_identities(participant_ref,provider,account_reference_sha256,consented_at) VALUES(?,?,?,?)', [participant.reference, participant.provider, participant.providerAccountReferenceSha256, consentedAt]);
+for (const identity of receipt.identities) {
+  const inserted = await query('INSERT INTO uat_authorized_identities(identity_ref,provider,account_reference_sha256,consented_at) VALUES(?,?,?,?)', [identity.reference, identity.provider, identity.providerAccountReferenceSha256, consentedAt]);
   assert.equal(inserted.meta.changes, 1);
 }
 const liveRelease = await (await fetch(`${FINAL_UAT_ORIGIN}/release.json`, { cache: 'no-store' })).json(); assert.equal(liveRelease.commit, state.deployedSha);

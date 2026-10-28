@@ -243,7 +243,7 @@ export async function findOrCreateIdentity(
             AND expires_at > ? AND use_count < max_uses
             AND (? = 0 OR EXISTS (
               SELECT 1 FROM uat_authorized_identities authorized
-              WHERE authorized.participant_ref = beta_invitations.uat_participant_ref
+              WHERE authorized.identity_ref = beta_invitations.uat_identity_ref
                 AND authorized.provider = ?
                 AND authorized.account_reference_sha256 = beta_invitations.uat_account_reference_sha256
                 AND authorized.user_id IS NULL AND authorized.revoked_at IS NULL
@@ -286,7 +286,7 @@ export async function findOrCreateIdentity(
         db.prepare(`
           UPDATE uat_authorized_identities
           SET invitation_id = ?, user_id = ?, provider_subject_sha256 = ?, enrolled_at = COALESCE(enrolled_at, ?)
-          WHERE ? = 1 AND participant_ref = (SELECT uat_participant_ref FROM beta_invitations WHERE id = ?)
+          WHERE ? = 1 AND identity_ref = (SELECT uat_identity_ref FROM beta_invitations WHERE id = ?)
             AND provider = ?
             AND account_reference_sha256 = (SELECT uat_account_reference_sha256 FROM beta_invitations WHERE id = ?)
             AND user_id IS NULL AND revoked_at IS NULL

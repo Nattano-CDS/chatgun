@@ -31,18 +31,18 @@ const query = async (sql, params = []) => (await cf(`/d1/database/${FINAL_UAT_DA
 assert.equal((await query('SELECT COUNT(*) n FROM users')).results[0].n, 0, 'Invitations require the empty pre-campaign cohort');
 assert.equal((await query('SELECT COUNT(*) n FROM beta_invitations')).results[0].n, 0, 'Refusing duplicate invitation issuance');
 const issuedAt = Math.floor(nowMs / 1000), expiresAt = issuedAt + 1800;
-const invitations = receipt.participants.map(participant => {
+const invitations = receipt.identities.map(identity => {
   const code = randomBytes(32).toString('base64url');
-  return { reference: participant.reference, id: randomUUID(), code, tokenHash: createHash('sha256').update(code).digest('base64url'), expiresAt };
+  return { reference: identity.reference, id: randomUUID(), code, tokenHash: createHash('sha256').update(code).digest('base64url'), expiresAt };
 });
 mkdirSync(dirname(output), { recursive: true });
 assert.equal(existsSync(output), false, 'Refusing to overwrite an invitation handoff');
-const sql = "INSERT INTO beta_invitations(id,token_hash,label,max_uses,use_count,expires_at,created_at,uat_participant_ref,uat_required_provider,uat_account_reference_sha256) VALUES(?,?,'participant-a',1,0,?,?, 'A',?,?),(?,?,'participant-b',1,0,?,?, 'B',?,?)";
-const params = [invitations[0].id, invitations[0].tokenHash, expiresAt, issuedAt, receipt.participants[0].provider, receipt.participants[0].providerAccountReferenceSha256, invitations[1].id, invitations[1].tokenHash, expiresAt, issuedAt, receipt.participants[1].provider, receipt.participants[1].providerAccountReferenceSha256];
+const sql = "INSERT INTO beta_invitations(id,token_hash,label,max_uses,use_count,expires_at,created_at,uat_identity_ref,uat_required_provider,uat_account_reference_sha256) VALUES(?,?,'identity-a-line',1,0,?,?, 'A',?,?),(?,?,'identity-b-google',1,0,?,?, 'B',?,?)";
+const params = [invitations[0].id, invitations[0].tokenHash, expiresAt, issuedAt, receipt.identities[0].provider, receipt.identities[0].providerAccountReferenceSha256, invitations[1].id, invitations[1].tokenHash, expiresAt, issuedAt, receipt.identities[1].provider, receipt.identities[1].providerAccountReferenceSha256];
 const result = await query(sql, params);
 assert.equal(result.meta.changes, 2);
 for (let index = 0; index < invitations.length; index += 1) {
-  const linked = await query('UPDATE uat_authorized_identities SET invitation_id=? WHERE participant_ref=? AND provider=? AND account_reference_sha256=? AND user_id IS NULL AND revoked_at IS NULL', [invitations[index].id, receipt.participants[index].reference, receipt.participants[index].provider, receipt.participants[index].providerAccountReferenceSha256]);
+  const linked = await query('UPDATE uat_authorized_identities SET invitation_id=? WHERE identity_ref=? AND provider=? AND account_reference_sha256=? AND user_id IS NULL AND revoked_at IS NULL', [invitations[index].id, receipt.identities[index].reference, receipt.identities[index].provider, receipt.identities[index].providerAccountReferenceSha256]);
   assert.equal(linked.meta.changes, 1);
 }
 try {

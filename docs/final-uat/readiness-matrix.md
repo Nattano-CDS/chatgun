@@ -27,8 +27,9 @@ Frozen application: `4a7dee32c52bc474ee3cc50d13e293e66e771c1a`. Initial PR #17 e
 | LINE UAT OAuth | CONFIGURED / genuine OAuth NOT RUN | New channel2012186357, ChatGun provider Admin, Thailand/Developing, exact callback and required2FA ON, email Unapplied. NEW encrypted Preview credentials; Production channel untouched |
 | Access application / MFA | Enrollment PASS / protected-app MFA NOT RUN | Owner Account UI matches approved email and lists one registered Authenticator/TOTP device. Independent TOTP every login on app AND owner-only policy,10m session, HttpOnly+binding cookies. Global default OFF; no skip/Bypass. Anonymous302 verified; no UAT protected-app MFA/fresh-auth success claim or role grant |
 | Exact UAT owner subject / role mapping | BLOCKED | No genuine UAT account yet. Production UUID/roles NOT copied or extended. Exact UAT identity + bounded grant require separate confirmation |
-| Participant A | BLOCKED | Owner is designated; authorized UAT identity/provider eligibility and scope still need confirmation |
-| Participant B | BLOCKED | No separately consenting eligible distinct adult provided. Owner cannot act as both participants |
+| Human operator | BLOCKED | Owner is designated as the sole operator; exact rc5 age, dual-device, scope and limited-moderation attestations remain pending |
+| Identity A / LINE | BLOCKED | Preserved private hash; owner control, provider-test eligibility and UAT-use authorization must be reconfirmed under rc5 |
+| Identity B / Google | BLOCKED | Preserved private hash; owner control, provider-test eligibility, UAT-use authorization and separate ChatGun-identity deletion YES/NO remain pending |
 | Expanded policy/operating approval | BLOCKED | Existing approval is LINE owner pilot only, not wider Social/location/media UAT; acceptance disabled, unapproved legal text replaced by notice |
 | Genuine human E2E | NOT RUN | Mandatory gates above blocked; no repeated owner login prompts issued |
 | Production / original Staging / issue13 preservation | PASS | Read-only `isolation-audit.json`; Production SHA a73ff21, schema17, users1/identities1, original fixture counts preserved |
@@ -47,11 +48,11 @@ Cleanup evidence correction: D1 `meta.changes` reported180 cascade-inclusive wri
 
 ## Remaining owner actions — one consolidated checklist
 
-1. Provider configuration is complete; no more provider login is requested during preparation. All three NEW credentials are encrypted in dedicated UAT Preview, callback URLs preserved, apps unpublished. Genuine callbacks and participant tester eligibility remain for the coordinated campaign.
+1. Provider configuration is complete; no provider login is requested during preparation. Dedicated UAT Preview credentials and callbacks remain preserved and unpublished. The rc5 campaign uses only A=LINE and B=Google; genuine callbacks and owner tester eligibility remain for the coordinated campaign. Facebook stays disabled for this campaign.
 2. Independent TOTP enrollment is verified PASS: approved owner Account UI lists one registered device. Global defaults remain OFF. Protected-app MFA/auth-time verification is still part of the coordinated campaign. No QR/setup-key/OTP sharing, single-factor fallback, Production change or role grant.
-3. Privately identify and authorize A and a distinct adult B: consent, current eligible age/capacity, provider tester role, test-media consent, deletion/retention scope. Do not post identities publicly.
-4. Approve the specific Social/location/private-media UAT policy package, versions, notices, appeals/emergency procedures and retained test content. Existing owner-pilot approval does not satisfy this item.
-5. Confirm a testing window inside **19:00–22:00 Asia/Bangkok**, daily. No backup/independent appeals reviewer/scanner/24-hour coverage exists. Keep youth/Sensitive admission closed; no response-time guarantee.
-6. After prerequisites pass, confirm exact authenticated UAT owner UUID and short-lived least-privilege roles privately. Then issue one 30-minute single-use invitation per specifically approved participant and schedule ONE coordinated human campaign. Do not issue any now.
+3. Privately confirm one adult owner controls both A=LINE and B=Google on two devices, is eligible to test both providers, and authorizes the exact non-Media rc5 scope. Record a separate YES/NO for deletion of only the disposable ChatGun UAT Google identity B; never post identifiers publicly.
+4. Approve the exact rc5 Social/approximate-location/text-Chat/Presence/privacy policy bytes and hashes, retention/recovery limitations and truthful single-operator evidence classification. Earlier rc4 approval does not satisfy this item; Media remains out of scope and OFF.
+5. Acknowledge that participant access is 24/7 until explicit close or withdrawal, while human moderation is only **19:00–22:00 Asia/Bangkok**. No backup moderator, independent appeals reviewer, scanner, emergency service or response-time guarantee exists. Keep youth/Sensitive admission closed.
+6. After prerequisites pass, issue one 30-minute single-use invitation per approved identity and run ONE single-operator dual-account functional campaign. No roles are authorized. Do not issue any invitation now.
 
 Production expansion remains a separate decision after genuine UAT, Production-specific backups, migrations18–21 rehearsal and explicit activation approval.

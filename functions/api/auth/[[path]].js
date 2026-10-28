@@ -397,13 +397,13 @@ async function oauthCallback(request, env, provider) {
     if (featureEnabled(env.UAT_PRIVATE_COHORT_REQUIRED)) {
       const subjectHash = await sha256(profile.subject);
       if (flow.invitation_id) {
-        const invitation = await env.DB.prepare(`SELECT uat_participant_ref,uat_required_provider,uat_account_reference_sha256
+        const invitation = await env.DB.prepare(`SELECT uat_identity_ref,uat_required_provider,uat_account_reference_sha256
           FROM beta_invitations WHERE id=?`).bind(flow.invitation_id).first();
         if (!invitation || invitation.uat_required_provider !== provider) throw new Error('uat_cohort_denied');
         const bound = await env.DB.prepare(`SELECT 1 ok FROM uat_authorized_identities
-          WHERE invitation_id=? AND participant_ref=? AND provider=? AND account_reference_sha256=?
+          WHERE invitation_id=? AND identity_ref=? AND provider=? AND account_reference_sha256=?
             AND user_id=? AND provider_subject_sha256=? AND revoked_at IS NULL`)
-          .bind(flow.invitation_id,invitation.uat_participant_ref,provider,invitation.uat_account_reference_sha256,userId,subjectHash).first();
+          .bind(flow.invitation_id,invitation.uat_identity_ref,provider,invitation.uat_account_reference_sha256,userId,subjectHash).first();
         if (!bound) throw new Error('uat_cohort_denied');
       } else {
         const authorized = await env.DB.prepare(`SELECT 1 ok FROM uat_authorized_identities

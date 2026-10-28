@@ -12,8 +12,9 @@ export const UAT_CAMPAIGN_AUDIT_TABLE_SQL = `CREATE TABLE IF NOT EXISTS uat_camp
   evidence_sha256 TEXT NOT NULL CHECK(length(evidence_sha256)=64),
   policy_versions_json TEXT NOT NULL,
   policy_files_json TEXT NOT NULL,
-  participant_count INTEGER NOT NULL CHECK(participant_count=2),
-  participant_b_deletion_consent INTEGER NOT NULL CHECK(participant_b_deletion_consent IN(0,1)),
+  operator_count INTEGER NOT NULL CHECK(operator_count=1),
+  identity_count INTEGER NOT NULL CHECK(identity_count=2),
+  google_chatgun_identity_deletion_authorized INTEGER NOT NULL CHECK(google_chatgun_identity_deletion_authorized IN(0,1)),
   created_at INTEGER NOT NULL,
   CHECK(expires_at=closed_at+${UAT_AUDIT_RETENTION_SECONDS})
 )`;
