@@ -67,7 +67,7 @@ export function validateFinalUatSocialApproval(receipt) {
   for (const participant of receipt.participants) {
     assert.ok(providers.has(participant.provider));
     assert.match(participant.providerAccountReferenceSha256, referencePattern);
-    for (const field of ['genuineDistinctAdultConfirmed', 'age20PlusConfirmed', 'individualConsentConfirmed', 'providerTesterEligible', 'socialScopeConsent', 'locationScopeConsent', 'chatScopeConsent', 'privacyScopeConsent', 'disposableTestDataConsent']) assert.equal(participant[field], true, `${participant.reference}.${field}`);
+    for (const field of ['genuineDistinctAdultConfirmed', 'age20PlusConfirmed', 'individualConsentConfirmed', 'providerTesterEligible', 'socialScopeConsent', 'locationScopeConsent', 'chatScopeConsent', 'presenceScopeConsent', 'privacyScopeConsent', 'disposableTestDataConsent']) assert.equal(participant[field], true, `${participant.reference}.${field}`);
     assert.equal(participant.mediaConsentUsed, false);
   }
   assert.equal(typeof receipt.participants[1].accountDeletionConsent, 'boolean');

@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { finalUatSocialVars, hashAndRemovePrivateParticipantReferences, PROPOSED_POLICY, sanitizedCampaignSummary, validateFinalUatSocialApproval } from '../scripts/lib/final-uat-social-campaign.mjs';
 
 function receipt() {
-  const participant = (reference, provider, hash) => ({ reference, provider, providerAccountReferencePrivate: '', providerAccountReferenceSha256: hash, genuineDistinctAdultConfirmed: true, age20PlusConfirmed: true, individualConsentConfirmed: true, providerTesterEligible: true, socialScopeConsent: true, locationScopeConsent: true, chatScopeConsent: true, privacyScopeConsent: true, disposableTestDataConsent: true, mediaConsentUsed: false, accountDeletionConsent: reference === 'B' });
+  const participant = (reference, provider, hash) => ({ reference, provider, providerAccountReferencePrivate: '', providerAccountReferenceSha256: hash, genuineDistinctAdultConfirmed: true, age20PlusConfirmed: true, individualConsentConfirmed: true, providerTesterEligible: true, socialScopeConsent: true, locationScopeConsent: true, chatScopeConsent: true, presenceScopeConsent: true, privacyScopeConsent: true, disposableTestDataConsent: true, mediaConsentUsed: false, accountDeletionConsent: reference === 'B' });
   return {
     scope: 'final-uat-social-location-chat-privacy', ownerAuthorizationComment: 6470727761, policyApproved: true,
     policyVersions: PROPOSED_POLICY.versions, policyFiles: PROPOSED_POLICY.files,
@@ -37,6 +37,7 @@ test('UAT gate rejects missing policy approval, duplicate people, media, public/
     { ...base, operations: { ...base.operations, auditEvidenceRetentionDays: 91 } },
     { ...base, operations: { ...base.operations, auditEvidenceRetentionStartsAt: base.window.end } },
     { ...base, operations: { ...base.operations, actualCampaignClosedAt: base.window.end } },
+    { ...base, participants: [{ ...base.participants[0], presenceScopeConsent: null }, base.participants[1]] },
     { ...base, window: { timezone: 'Asia/Bangkok', start: '2026-10-29T18:00:00+07:00', end: '2026-10-29T20:00:00+07:00' } },
   ]) assert.throws(() => validateFinalUatSocialApproval(changed));
 });
