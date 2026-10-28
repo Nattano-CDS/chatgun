@@ -8,8 +8,8 @@ Production deployment is **not authorized**. Draft PR #17 must not be merged aut
 
 | Item | Result |
 |---|---|
-| PR #17 HEAD | `9c8689566b78f87952e38d7be3504b5a9e419451` (Draft, mergeable) |
-| Latest GitHub CI at baseline | SUCCESS, run `40110238957`, exact PR HEAD |
+| PR #17 engineering HEAD at execution start | `9c8689566b78f87952e38d7be3504b5a9e419451` (Draft, mergeable) |
+| Latest GitHub CI at execution start | SUCCESS, run `40110238957`, exact engineering HEAD |
 | Frozen/tested UAT application | `4a7dee32c52bc474ee3cc50d13e293e66e771c1a` |
 | Current Production | `a73ff21c615dabb6a0c19c0a22685c2370958ca1` |
 | Local regression | 248 pass, 0 fail, 0 skip |

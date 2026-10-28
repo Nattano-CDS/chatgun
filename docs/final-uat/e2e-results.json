@@ -5,7 +5,7 @@
   "classification": "PARTIAL UAT — SPECIFIC EXTERNAL GATES REMAIN",
   "baseline": {
     "pullRequest": 17,
-    "pullRequestHead": "9c8689566b78f87952e38d7be3504b5a9e419451",
+    "pullRequestHeadAtExecutionStart": "9c8689566b78f87952e38d7be3504b5a9e419451",
     "testedUatApplicationSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
     "productionSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
     "uatOrigin": "https://uat.chatgun-final-uat.pages.dev"
