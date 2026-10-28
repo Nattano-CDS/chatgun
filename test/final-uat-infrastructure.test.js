@@ -11,6 +11,7 @@ test('cleanup counts accounts rather than D1 cascade-inclusive write changes',()
 test('dedicated UAT cannot select Production, original staging or issue13 bindings',()=>{
  assert.equal(c.name,'chatgun-final-uat');assert.equal(c.d1_databases[0].database_id,'e3cb426c-b88a-4b93-90fd-39df524f68ae');assert.equal(c.r2_buckets[0].bucket_name,'chatgun-final-uat-media');
  for(const file of ['wrangler.final-uat-privacy-cleanup.jsonc','wrangler.final-uat-media-cleanup.jsonc']){const worker=JSON.parse(readFileSync(file));assert.equal(worker.d1_databases[0].database_id,c.d1_databases[0].database_id);assert.equal(worker.workers_dev,false);assert.equal(worker.preview_urls,false);}
+ const privacy=JSON.parse(readFileSync('wrangler.final-uat-privacy-cleanup.jsonc'));assert.equal(privacy.vars.UAT_AUDIT_RETENTION_DAYS,'90');assert.equal(privacy.vars.UAT_AUDIT_RETENTION_START_MODE,'actual-campaign-close');
 });
 test('UAT deployment explicitly serializes closed flags and real site key into Wrangler config',()=>{
  for(const k of ['OAUTH_LOGIN_ENABLED','NEW_ACCOUNT_REGISTRATION_ENABLED','BETA_INVITATION_REGISTRATION_ENABLED','SENSITIVE_CONTENT_ENABLED','IDENTITY_VERIFICATION_ENABLED','EMAIL_OTP_ENABLED','MOBILE_OTP_ENABLED','DEMO_MODE_ENABLED','MESSAGING_ENABLED','PRESENCE_ENABLED','MEDIA_UPLOAD_ENABLED'])assert.equal(c.vars[k],'false',k);

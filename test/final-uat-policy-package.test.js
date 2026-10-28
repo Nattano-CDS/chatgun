@@ -30,13 +30,15 @@ test('UAT manifest, proposed validator and exact document bytes agree', () => {
     assert.match(readFileSync(document.path, 'utf8'), new RegExp(`data-policy-version=["']${document.version}["']`, 'u'));
   }
   assert.equal(manifest.activation.requiresPrivateOwnerApproval, true);
-  assert.equal(manifest.retention.ownerDecisionPending, true);
+  assert.equal(manifest.retention.ownerDecisionPending, false);
+  assert.equal(manifest.retention.minimumAuditEvidenceRetentionDays, 90);
+  assert.equal(manifest.retention.minimumAuditEvidenceRetentionStartsAt, 'actual-campaign-close');
 });
 
-test('all corrected documents state the controlled two-adult scope, draft status and exclusions', () => {
+test('all corrected documents state the controlled two-adult scope, conditional effect and exclusions', () => {
   for (const file of Object.keys(PROPOSED_POLICY.files)) {
     const html = readFileSync(file, 'utf8');
-    assert.match(html, /ยังไม่ได้รับอนุมัติ/u, file);
+    assert.match(html, /มีผลเฉพาะเมื่อเจ้าของอนุมัติ bytes\/SHA-256 นี้/u, file);
     assert.match(html, /Participant A|ผู้เข้าร่วมสองคน/u, file);
     assert.match(html, /Participant B|สองบัญชี/u, file);
     assert.match(html, /20 ปี/u, file);
@@ -60,6 +62,9 @@ test('documents cover Social risks, lifecycle and the genuine cleanup limitation
   assert.match(all, /ไม่มีการตรวจอายุโดยอิสระ/u);
   assert.match(all, /ไม่มีการสแกน.*อัตโนมัติ/u);
   assert.match(all, /ไม่มีการรับรองทางกฎหมาย/u);
+  assert.match(all, /90 วัน/u);
+  assert.match(all, /เวลาปิดแคมเปญจริง/u);
+  assert.match(all, /บัญชีอ้างอิงดิบ/u);
 });
 
 test('frontend links, backend acceptance versions and guarded UAT publication all point to matching policies', () => {
@@ -76,7 +81,7 @@ test('frontend links, backend acceptance versions and guarded UAT publication al
 
 test('owner review package leaves all human decisions pending and activation remains fail-closed', () => {
   const review = readFileSync('docs/final-uat/policy-review/README.md', 'utf8');
-  assert.match(review, /DRAFT — NOT APPROVED/u);
+  assert.match(review, /RC3 DRAFT — EXACT OWNER REAPPROVAL REQUIRED/u);
   assert.match(review, /No answer is preselected/u);
   assert.match(review, /do not publish.*issue invitations.*enable Social/u);
   const validator = readFileSync('scripts/lib/final-uat-social-campaign.mjs', 'utf8');

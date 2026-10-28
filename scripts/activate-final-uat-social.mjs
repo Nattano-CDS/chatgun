@@ -9,6 +9,7 @@ import {
   FINAL_UAT_ACCOUNT, FINAL_UAT_APPLICATION_SHA, FINAL_UAT_BUCKET, FINAL_UAT_DATABASE, FINAL_UAT_ORIGIN, FINAL_UAT_PROJECT,
   PROPOSED_POLICY, finalUatSocialVars, sanitizedCampaignSummary, validateFinalUatSocialApproval,
 } from './lib/final-uat-social-campaign.mjs';
+import { UAT_CAMPAIGN_AUDIT_TABLE_SQL } from '../functions/_lib/retention.js';
 
 assert.equal(process.env.CHATGUN_FINAL_UAT_SOCIAL, 'activate-approved-window');
 const approvalFile = resolve(process.env.CHATGUN_UAT_PRIVATE_APPROVAL_FILE || '');
@@ -40,7 +41,9 @@ for (const key of ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'FACEBOOK_CLIENT_
 assert.equal((await cf(`/r2/buckets/${FINAL_UAT_BUCKET}/domains/managed`)).enabled, false);
 assert.equal((await cf(`/r2/buckets/${FINAL_UAT_BUCKET}/domains/custom`)).domains.length, 0);
 const query = async (sql, params = []) => (await cf(`/d1/database/${FINAL_UAT_DATABASE}/query`, { sql, params }))[0];
+await query(UAT_CAMPAIGN_AUDIT_TABLE_SQL);
 for (const table of ['users', 'identities', 'sessions', 'beta_invitations', 'social_media', 'moderation_access_grants']) assert.equal((await query(`SELECT COUNT(*) n FROM ${table}`)).results[0].n, 0, `${table} must be empty before activation`);
+assert.equal((await query('SELECT COUNT(*) n FROM uat_campaign_audit_evidence')).results[0].n, 0, 'A prior campaign audit record blocks activation');
 assert.equal((await query('SELECT COUNT(*) n FROM pragma_foreign_key_check')).results[0].n, 0);
 assert.equal((await query('SELECT COUNT(*) n FROM d1_migrations')).results[0].n, 21);
 const liveRelease = await (await fetch(`${FINAL_UAT_ORIGIN}/release.json`, { cache: 'no-store' })).json(); assert.equal(liveRelease.commit, FINAL_UAT_APPLICATION_SHA);
@@ -73,6 +76,7 @@ writeFileSync(join(directory, 'dist/release.json'), JSON.stringify(release, null
 const base = JSON.parse(readFileSync('wrangler.final-uat-social.proposed.jsonc'));
 const config = { ...base, vars: { ...vars, TURNSTILE_SITE_KEY: state.turnstileSiteKey } };
 writeFileSync(join(directory, 'wrangler.jsonc'), JSON.stringify(config, null, 2), { mode: 0o600 });
+execFileSync('npx', ['wrangler@4.151.1', 'deploy', '--config=wrangler.final-uat-privacy-cleanup.jsonc'], { env: { ...process.env, CLOUDFLARE_ACCOUNT_ID: FINAL_UAT_ACCOUNT }, stdio: 'inherit' });
 execFileSync('npx', ['wrangler@4.151.1', 'pages', 'deploy', 'dist', `--project-name=${FINAL_UAT_PROJECT}`, '--branch=uat', `--commit-hash=${FINAL_UAT_APPLICATION_SHA}`, '--commit-dirty=true'], { cwd: directory, env: { ...process.env, CLOUDFLARE_ACCOUNT_ID: FINAL_UAT_ACCOUNT }, stdio: 'inherit' });
 
 const after = await cf(`/pages/projects/${FINAL_UAT_PROJECT}`), afterVars = after.deployment_configs.preview.env_vars;

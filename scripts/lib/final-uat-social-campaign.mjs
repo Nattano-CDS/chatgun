@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 
 export const FINAL_UAT_ACCOUNT = '23017b53386fb67fc62a52cdd017454c';
 export const FINAL_UAT_PROJECT = 'chatgun-final-uat';
@@ -10,16 +11,16 @@ export const OWNER_AUTHORIZATION_COMMENT = 6470727761;
 
 export const PROPOSED_POLICY = Object.freeze({
   versions: {
-    adultNotice: 'adult-social-uat-2026-10-28-rc2',
-    terms: 'terms-social-uat-2026-10-28-rc2',
-    privacy: 'privacy-social-uat-2026-10-28-rc2',
-    deletion: 'deletion-social-uat-2026-10-28-rc2',
+    adultNotice: 'adult-social-uat-2026-10-28-rc3',
+    terms: 'terms-social-uat-2026-10-28-rc3',
+    privacy: 'privacy-social-uat-2026-10-28-rc3',
+    deletion: 'deletion-social-uat-2026-10-28-rc3',
   },
   files: {
-    'policies/final-uat/beta-notice.html': '99cfb4e96b9b43ab24fae190369e387c8c70743d9238d02c4abddb6aa4e82244',
-    'policies/final-uat/terms.html': '382679f326d165bf66d1263328ee76ebcc42ac5be07ee8782b57766686233aa5',
-    'policies/final-uat/privacy.html': '12ab34bac6b2a9a5699741b68f80bacaa2929e0ae5e5b1559ccf7344043cd534',
-    'policies/final-uat/data-deletion.html': 'bf532150640e2f0ceaeb6833b50221e0c72b2ae95843756d42a319c30c9d7f36',
+    'policies/final-uat/beta-notice.html': 'bed1712129fa59f26683bfa5f00b4c5de6ca3a88de103c8c48b6ca55d7d703a0',
+    'policies/final-uat/terms.html': 'ca712150dcf45a93854325215e4eaf4b5a7eaa25f9817f809ff30daf16af4240',
+    'policies/final-uat/privacy.html': '38a01bd8731481aafab92b480a002bc411c37b0f9e48281cc4aad8890d52d0ed',
+    'policies/final-uat/data-deletion.html': '8112d26ec9a0ad5bbef74d737e38662a1c0050f3fe0910ac4d190dbbe5bb3c9a',
   },
 });
 
@@ -52,6 +53,12 @@ export function validateFinalUatSocialApproval(receipt) {
   assert.equal(receipt.operations?.productionChangesAuthorized, false);
   assert.equal(receipt.operations?.retentionDecision, 'campaign-plus-7-days-logical-cleanup-with-recovery-caveat');
   assert.equal(receipt.operations?.recoveryCaveatAcknowledged, true);
+  assert.equal(receipt.operations?.auditEvidenceRetentionDays, 90);
+  assert.equal(receipt.operations?.auditEvidenceRetentionStartsAt, 'actual-campaign-close');
+  assert.equal(receipt.operations?.auditEvidenceScope, 'strictly-necessary-minimized-security-audit-only');
+  assert.equal(receipt.operations?.auditEvidencePhysicalBackupLimitClaimed, false);
+  assert.equal(receipt.operations?.actualCampaignClosedAt, null);
+  assert.equal(receipt.operations?.auditEvidenceExpiresAt, null);
   assert.equal(receipt.operations?.ownerAccountDeletionAuthorized, false);
   exactBangkokWindow(receipt.window);
   assert.equal(receipt.participants?.length, 2);
@@ -81,6 +88,7 @@ export function finalUatSocialVars(receipt) {
     EMAIL_OTP_ENABLED: 'false', MOBILE_OTP_ENABLED: 'false', LINE_EMAIL_ENABLED: 'false', FACEBOOK_EMAIL_ENABLED: 'false',
     FRIEND_REQUESTS_ENABLED: 'false', DEMO_MODE_ENABLED: 'false', DEMO_AUTO_START_ENABLED: 'false', PUBLIC_DEMO_CANARY_ENABLED: 'false',
     ADMIN_ACCESS_STANDALONE_ENABLED: 'false', ADMIN_CLOUDFLARE_ACCESS_REQUIRED: 'true',
+    UAT_AUDIT_RETENTION_DAYS: '90', UAT_AUDIT_RETENTION_START_MODE: 'actual-campaign-close',
   };
 }
 
@@ -98,4 +106,18 @@ export function sanitizedCampaignSummary(receipt) {
     youthAdmissionEnabled: false,
     productionChangesAuthorized: false,
   };
+}
+
+export function hashAndRemovePrivateParticipantReferences(receipt) {
+  const sanitized = structuredClone(receipt);
+  for (const participant of sanitized.participants || []) {
+    assert.equal(participant.providerAccountReferenceSha256, null, `${participant.reference}.providerAccountReferenceSha256 must be empty before finalization`);
+    assert.equal(typeof participant.providerAccountReferencePrivate, 'string');
+    const privateReference = participant.providerAccountReferencePrivate.trim();
+    assert.ok(privateReference.length >= 3, `${participant.reference}.providerAccountReferencePrivate is required`);
+    participant.providerAccountReferenceSha256 = createHash('sha256').update(`${participant.provider}\0${privateReference}`).digest('hex');
+    participant.providerAccountReferencePrivate = '';
+  }
+  validateFinalUatSocialApproval(sanitized);
+  return sanitized;
 }

@@ -4,7 +4,7 @@ The “before” documents are the preserved Production owner-pilot files at rep
 
 | Area | Before: October 20 Production owner pilot | After: proposed October 28 isolated Social UAT |
 |---|---|---|
-| Legal status | Effective Production owner-pilot wording | Explicit draft banner: not approved and no effect until exact versions/hashes and retention are approved |
+| Legal status | Effective Production owner-pilot wording | Conditional UAT effect statement that remains accurate before and after exact-byte approval; activation still requires every private gate |
 | Audience | Owner-only pilot | Exactly two distinct, consenting adults aged 20+ |
 | Provider | LINE-only | Authorized Google, Facebook or LINE account selected privately per participant |
 | Admission | Single owner invitation | Two private, one-time, non-transferable invitations; public registration remains OFF |
@@ -25,13 +25,13 @@ The “before” documents are the preserved Production owner-pilot files at rep
 | Terms | Owner-only LINE access and future Social terms | Two-person eligibility/admission, gated feature terms, acceptable use, Social risks, account lifecycle and UAT limitations |
 | Privacy | Owner-only processing and future-stage data concepts | Actual proposed OAuth/profile/location/message/presence/block/report data, purposes, processors, sharing, security limits and participant rights |
 | Deletion | Production deletion remained closed pending scope approval | Proposed campaign-close procedure with A/B distinctions, D1 transaction/check/retry evidence, R2 unexpected-object handling and recovery caveat |
-| Cleanup clock | No approved seven-day Social-UAT cleanup | Proposed live-data logical cleanup within seven days after campaign close, pending explicit owner acceptance |
+| Cleanup clock | No approved seven-day Social-UAT cleanup | Owner-approved live-data logical cleanup within seven days after actual campaign close |
 | Participant A | Owner account within pilot | Genuine account must not be deleted automatically; campaign data/session cleanup must not cascade-delete A |
 | Participant B | Did not exist in owner pilot | Account deletion requires B's separate explicit consent; Social consent or OAuth revocation is insufficient |
 | D1 | General live-data deletion caveat | Specifies approved campaign record classes, provider-linked sessions/identities, counts, transactions, foreign-key checks and bounded retries without claiming unverified automation |
 | R2 | Described future media deletion queue/retry | Media remains OFF; no authorized new objects. Unexpected objects require ownership/scope verification and auditable cleanup/retry |
-| Minimal evidence | Unspecified security-log duration | Only necessary consent/control, security, defect/abuse, anti-reuse and deletion evidence may remain; final unenforced duration is explicitly an owner decision |
+| Minimal evidence | Unspecified security-log duration | Strictly necessary minimized evidence only, 90 days from actual close; excludes full Chat, location, raw references, credentials, media and profiles; dedicated UAT worker removes expired live evidence |
 | Backup/Time Travel | Warned that row deletion may not be immediate | Clarifies logical-versus-physical deletion, provider recovery lifecycle, no seven-day physical-erasure promise, and re-cleanup of restored snapshots |
-| Version binding | Production `*-2026-10-20-rc1` files | New UAT-specific `*-social-uat-2026-10-28-rc2` identifiers and SHA-256 values |
+| Version binding | Production `*-2026-10-20-rc1` files | New UAT-specific `*-social-uat-2026-10-28-rc3` identifiers and SHA-256 values; approved rc2 remains preserved at commit `1468943` |
 | Publication | Root files used by Production builds | Canonical UAT drafts live separately; only the guarded UAT activation build overlays exact reviewed bytes into the isolated UAT artifact |
 | Mismatch handling | Production release validation | Source, built artifact, release manifest and displayed UAT document versions/hashes must all match or activation aborts |
