@@ -143,6 +143,46 @@ test('moderation withdrawal clears an already-open photo on permission refresh',
   await expect(page.locator('.lightbox-shell')).toHaveCount(0);await expect(page).toHaveURL(/near-1\/gallery$/);await expect(page.locator('.gallery-grid .tile')).toHaveCount(0);
 });
 
+test("chat messages flow oldest-to-newest with latest at bottom and older-page scroll preserved", async ({ page }) => {
+  const makeMessage = (n) => ({
+    id: `chat-order-${n}`,
+    sender_user_id: n % 2 ? "friend-1" : "me",
+    receiver_user_id: n % 2 ? "me" : "friend-1",
+    body: `chronology-${String(n).padStart(2, "0")}`,
+    media_id: null, unsent_at: null, read_at: null, created_at: 1_790_002_000 + n,
+  });
+  const latest = Array.from({ length: 32 }, (_, i) => makeMessage(i + 12));
+  const older = Array.from({ length: 12 }, (_, i) => makeMessage(i));
+  await page.route("**/api/social/messages?*", (route) => {
+    const olderRequest = new URL(route.request().url()).searchParams.has("before");
+    return route.fulfill({ json: { messages: (olderRequest ? older : latest).slice().reverse(), hasMore: !olderRequest } });
+  });
+  await page.goto("/app/");
+  // Make the thread independently scrollable on desktop and mobile.
+  await page.addStyleTag({ content: ".chat-layout{height:460px!important;min-height:460px!important}.thread,.messages{min-height:0}" });
+  await page.locator('#primary-nav button[data-tab="chat"]').click();
+  await page.locator('#conversation-list [data-chat="friend-1"]').click();
+
+  const history = page.locator("#thread .messages");
+  const bubbles = history.locator(".message");
+  await expect(bubbles).toHaveCount(32);
+  await expect(bubbles.first()).toContainText("chronology-12");
+  await expect(bubbles.last()).toContainText("chronology-43");
+  const positions = await bubbles.evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().top));
+  expect(positions[0]).toBeLessThan(positions.at(-1));
+  await expect.poll(() => history.evaluate((el) => el.scrollHeight - el.clientHeight)).toBeGreaterThan(100);
+  await expect.poll(() => history.evaluate((el) => el.scrollHeight - el.clientHeight - el.scrollTop)).toBeLessThan(4);
+
+  await history.evaluate((el) => { el.scrollTop = 0; });
+  const anchor = bubbles.filter({ hasText: "chronology-12" });
+  const before = await anchor.evaluate((el) => el.getBoundingClientRect().top);
+  await history.locator(".load-older").click();
+  await expect(bubbles).toHaveCount(44);
+  await expect(bubbles.first()).toContainText("chronology-00");
+  const after = await anchor.evaluate((el) => el.getBoundingClientRect().top);
+  expect(Math.abs(after - before)).toBeLessThan(8);
+});
+
 test("desktop social shell preserves discovery, direct chat, reviews, and profile without game", async ({ page }, testInfo) => {
   await page.goto("/app/");
   await expect(page.getByRole("heading", { name: "คนใกล้คุณ" })).toBeVisible();

@@ -670,7 +670,7 @@ function renderThreadMessages() {
 }
 async function loadMessagePage(id, before = null) {
   const host = $("#thread .messages"), oldHeight = host?.scrollHeight || 0, oldTop = host?.scrollTop || 0, atEnd = !host || host.scrollHeight - host.scrollTop - host.clientHeight < 80, query = before ? `&before=${encodeURIComponent(before.created_at)}&beforeId=${encodeURIComponent(before.id)}` : "", result = await api(`/api/social/messages?target=${encodeURIComponent(id)}${query}`);
-  state.threadMessages = before ? [...state.threadMessages, ...result.messages] : result.messages, state.threadHasMore = result.hasMore, renderThreadMessages(), host && (before ? host.scrollTop = oldTop + host.scrollHeight - oldHeight : atEnd && (host.scrollTop = host.scrollHeight));
+  state.threadMessages = before ? [...state.threadMessages, ...result.messages] : result.messages, state.threadHasMore = result.hasMore, renderThreadMessages(), host && (host.scrollTop = before ? oldTop + host.scrollHeight - oldHeight : atEnd ? host.scrollHeight : oldTop);
 }
 async function openChat(id) {
   const person = (id === state.profile?.user_id ? state.profile : null) || state.people.find((p) => p.user_id === id) || state.conversations.find((p) => p.other_user_id === id) || (state.selectedPerson && (state.selectedPerson.user_id || state.selectedPerson.other_user_id) === id ? state.selectedPerson : null);

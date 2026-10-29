@@ -95,7 +95,8 @@ button:disabled{opacity: 0.5; cursor: not-allowed;}
 .chat-safety{padding: 9px 18px; border-bottom: 1px solid rgb(234, 223, 179); color: rgb(95, 74, 0); background: rgb(255, 249, 223); font-size: 12px;}
 .chat-safety summary{cursor: pointer; font-weight: 800;}
 .chat-safety p{margin: 7px 0px 0px; line-height: 1.5;}
-.messages{flex: 1 1 0%; display: flex; flex-direction: column-reverse; gap: 8px; padding: 18px; overflow-y: auto;}
+.messages{flex: 1 1 0%; display: flex; flex-direction: column; gap: 8px; padding: 18px; overflow-y: auto; min-height: 0;}
+.messages > :first-child:not(.empty){margin-top: auto;}
 .message{max-width: 75%; align-self: flex-start; padding: 10px 13px; border-radius: 15px 15px 15px 4px; background: rgb(240, 239, 243);}
 .message.mine{align-self: flex-end; color: rgb(255, 255, 255); background: var(--primary); border-radius: 15px 15px 4px;}
 .message.unsent{color: var(--muted); font-style: italic; background: transparent; border: 1px dashed var(--line);}
