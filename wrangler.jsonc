@@ -53,6 +53,7 @@
         "LINE_EMAIL_ENABLED": "false",
         "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
         "BETA_INVITATION_REGISTRATION_ENABLED": "false",
+        "BETA_ENROLLMENT_REQUIRED": "true",
         "ACCEPTANCE_FLOW_ENABLED": "false",
         "SOCIAL_APP_ENABLED": "false",
         "ADULT_ONBOARDING_ENABLED": "false",
@@ -68,9 +69,13 @@
         "RATINGS_ENABLED": "false",
         "IDENTITY_VERIFICATION_ENABLED": "false",
         "MODERATION_TOOLS_ENABLED": "false",
+        "ACCOUNT_MODERATION_ENABLED": "false",
+        "ELIGIBILITY_REVIEW_ENABLED": "false",
+        "ADMIN_ACCESS_STANDALONE_ENABLED": "false",
+        "ADMIN_CLOUDFLARE_ACCESS_REQUIRED": "true",
         "DEMO_MODE_ENABLED": "false",
         "DEMO_AUTO_START_ENABLED": "false",
-        "PUBLIC_DEMO_CANARY_ENABLED": "true",
+        "PUBLIC_DEMO_CANARY_ENABLED": "false",
         "OAUTH_LOGIN_ENABLED": "false"
       },
       "d1_databases": [
@@ -78,7 +83,7 @@
           "binding": "DB",
           "database_name": "chatgun-auth",
           "database_id": "9738a051-d914-42d0-8e7b-8098ef2b959d",
-          "migrations_dir": "migrations"
+          "migrations_dir": "migrations/production"
         }
       ],
       "r2_buckets": [{"binding":"MEDIA","bucket_name":"chatgun-media-production"}]

@@ -1,0 +1,35 @@
+{
+  "checkedAt": "2026-10-29T16:36:26Z",
+  "baselineSha": "fb0210090745cdbfaaf0eb0ca68bfcb24fd6e576",
+  "baselineGithubCi": {
+    "runId": 40910120435,
+    "conclusion": "success",
+    "workflow": "Local security and browser regression (no deployment)"
+  },
+  "local": {
+    "baselineNode": { "passed": 272, "failed": 0, "skipped": 0 },
+    "issue16Browser": { "passed": 16, "failed": 0 },
+    "platformBrowser": { "passed": 102, "failed": 0, "viewports": [390, 768, 1440] },
+    "fullSystemBrowser": { "passed": 10, "failed": 0, "viewports": [390, 768, 1440] },
+    "closedRelease": { "passed": 35, "failed": 0, "hashedAssets": 27 },
+    "remediationNode": { "passed": 275, "failed": 0, "skipped": 0 },
+    "npmAuditVulnerabilities": 0,
+    "releaseBuild": { "requiredD1MigrationNumber": 21, "fictionalDemoEnabled": false }
+  },
+  "isolatedUat": {
+    "sha": "fb0210090745cdbfaaf0eb0ca68bfcb24fd6e576",
+    "classification": "single-operator dual-account functional E2E",
+    "chatChronology": "PASS",
+    "outgoingAutoScroll": "PASS",
+    "incomingNearBottomAutoScroll": "PASS",
+    "incomingHistoryPositionAndIndicator": "PASS",
+    "refreshOrder": "PASS",
+    "productionWrites": 0
+  },
+  "notExecuted": [
+    "Production deployment smoke tests",
+    "Production Google/Facebook/LINE genuine OAuth callbacks",
+    "Production migrations",
+    "Public registration, Media or Messaging activation"
+  ]
+}
