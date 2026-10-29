@@ -8,6 +8,10 @@
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "test:coverage": "node --experimental-test-coverage --test --test-concurrency=1 test/*.test.js",
     "test:e2e": "playwright test",
+    "test:e2e:phase6-cross-device": "playwright test --config=playwright.phase6-cross-device.config.js",
+    "test:performance:phase6": "node scripts/measure-phase6-performance.mjs",
+    "audit:production-preservation": "node scripts/verify-production-preservation.mjs",
+    "verify:production-preservation": "node scripts/verify-production-preservation.mjs --enforce",
     "verify:production-remediation": "node scripts/verify-production-remediation.mjs",
     "verify:production-activation": "node scripts/verify-production-activation-package.mjs"
   },

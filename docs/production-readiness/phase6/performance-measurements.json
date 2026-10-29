@@ -1,0 +1,73 @@
+{
+  "measuredAt": "2026-10-29T17:43:22.626Z",
+  "environment": "isolated local real-handler harness with synthetic identities, in-memory D1 and R2",
+  "iterations": 20,
+  "browser": "Playwright Chromium",
+  "metrics": [
+    {
+      "name": "discovery API",
+      "iterations": 20,
+      "p50Ms": 1.6,
+      "p95Ms": 2.58,
+      "maxMs": 13.42
+    },
+    {
+      "name": "authenticated initial application load",
+      "iterations": 20,
+      "p50Ms": 553.42,
+      "p95Ms": 574.27,
+      "maxMs": 587.78
+    },
+    {
+      "name": "profile API",
+      "iterations": 20,
+      "p50Ms": 1.49,
+      "p95Ms": 2.91,
+      "maxMs": 11.92
+    },
+    {
+      "name": "conversation list API",
+      "iterations": 20,
+      "p50Ms": 0.84,
+      "p95Ms": 1.54,
+      "maxMs": 3.08
+    },
+    {
+      "name": "message send API",
+      "iterations": 20,
+      "p50Ms": 0.86,
+      "p95Ms": 1.45,
+      "maxMs": 2.15
+    },
+    {
+      "name": "moderation dashboard load",
+      "iterations": 20,
+      "p50Ms": 529.36,
+      "p95Ms": 537.35,
+      "maxMs": 538.79
+    },
+    {
+      "name": "concurrent profile reads (5)",
+      "iterations": 20,
+      "p50Ms": 2.16,
+      "p95Ms": 12.33,
+      "maxMs": 27.73
+    }
+  ],
+  "discoveryRateLimit": {
+    "requestsBeforeProbe": 30,
+    "permittedStatuses": [
+      200
+    ],
+    "probeStatus": 429,
+    "result": "PASS"
+  },
+  "excluded": [
+    "Production load testing",
+    "external OAuth provider latency",
+    "Cloudflare edge and remote D1/R2 network latency",
+    "physical-device rendering and radio latency"
+  ],
+  "productionWrites": 0,
+  "result": "PASS"
+}
