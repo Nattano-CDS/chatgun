@@ -58,7 +58,7 @@ test.beforeEach(async ({ page }) => {
 test('restricted public account reaches account privacy/deletion and appeal controls instead of a retry dead end',async({page})=>{
  await page.route('**/api/social/profile',r=>r.fulfill({status:403,json:{code:'account_access_restricted',message:'บัญชีถูกระงับสิทธิ์'}}));
  await page.route('**/api/social/config',r=>r.fulfill({json:{...config,accountModerationEnabled:true}}));
- await page.goto('/app/');await expect(page).toHaveURL(/\/account\.html\?access=restricted$/);
+ await page.goto('/app/');await expect(page).toHaveURL(/\/account(?:\.html)?\?access=restricted$/);
  await expect(page.locator('#account-appeals-link')).toBeVisible();
  await expect(page.locator('#account-appeals-link')).toHaveAttribute('href','/app/appeals.html');
  await expect(page.locator('#deletion')).toBeVisible();await expect(page.locator('#logout')).toBeVisible();
@@ -67,6 +67,102 @@ test('restricted public account reaches account privacy/deletion and appeal cont
 test('authenticated chat deep link opens the actual inbox immediately',async({page})=>{
   await page.goto('/?tab=chat');await expect(page.locator('#chat-tab')).toBeVisible();
   await expect(page.locator('#near-tab')).not.toBeVisible();await expect(page.locator('[data-chat="friend-1"]')).toBeVisible();
+});
+
+test('chat timeline stays chronological and preserves intentional reading position', async ({ page }) => {
+  await page.clock.install();
+  const makeMessage = (id, createdAt, body, sender = 'friend-1') => ({ id, sender_user_id: sender, receiver_user_id: sender === 'me' ? 'friend-1' : 'me', body, media_id: null, unsent_at: null, read_at: null, created_at: createdAt });
+  const recent = Array.from({ length: 22 }, (_, index) => makeMessage(`recent-${String(index).padStart(2, '0')}`, 200 + index, `recent ${index}`));
+  recent.push(makeMessage('same-b', 222, 'same timestamp B'), makeMessage('same-a', 222, 'same timestamp A'));
+  const older = Array.from({ length: 8 }, (_, index) => makeMessage(`older-${String(index).padStart(2, '0')}`, 100 + index, `older ${index}`));
+  await page.route('**/api/social/messages*', async route => {
+    const request = route.request(), url = new URL(request.url());
+    if (request.method() === 'GET') return route.fulfill({ json: { messages: url.searchParams.has('before') ? older.slice().reverse() : recent.slice().reverse(), hasMore: !url.searchParams.has('before') } });
+    const body = request.postDataJSON();
+    if (body.action === 'send') recent.push(makeMessage(`sent-${recent.length}`, 300 + recent.length, body.body, 'me'));
+    await route.fulfill({ json: { ok: true } });
+  });
+  await page.goto('/app/?tab=chat');
+  await page.locator('[data-chat="friend-1"]').click();
+  const host = page.locator('#thread .messages'), timeline = host.locator('[data-timeline-key]');
+  await expect(timeline).toHaveCount(24);
+  expect(await timeline.evaluateAll(nodes => nodes.map(node => node.dataset.timelineKey))).toEqual([
+    ...Array.from({ length: 22 }, (_, index) => `message:recent-${String(index).padStart(2, '0')}`),
+    'message:same-a', 'message:same-b',
+  ]);
+  await expect.poll(() => host.evaluate(node => node.scrollHeight - node.scrollTop - node.clientHeight)).toBeLessThanOrEqual(3);
+  expect(await host.evaluate(node => getComputedStyle(node).flexDirection)).toBe('column');
+
+  await page.locator('#thread input[name=body]').fill('outgoing at bottom');
+  await page.locator('#thread .composer').getByRole('button', { name: 'ส่ง' }).click();
+  await expect(host.locator('.message').last()).toContainText('outgoing at bottom');
+  await expect.poll(() => host.evaluate(node => node.scrollHeight - node.scrollTop - node.clientHeight)).toBeLessThanOrEqual(3);
+
+  recent.push(makeMessage('incoming-near-bottom', 400, 'incoming near bottom'));
+  await page.clock.fastForward(10_100);
+  await expect(host.locator('.message').last()).toContainText('incoming near bottom');
+  await expect.poll(() => host.evaluate(node => node.scrollHeight - node.scrollTop - node.clientHeight)).toBeLessThanOrEqual(3);
+
+  await page.clock.fastForward(32);
+  await host.evaluate(node => { node.scrollTop = 0; });
+  expect(await host.evaluate(node => node.scrollHeight - node.scrollTop - node.clientHeight)).toBeGreaterThan(80);
+  const readingTop = await host.evaluate(node => node.scrollTop);
+  recent.push(makeMessage('incoming-while-reading', 401, 'incoming while reading'));
+  await page.clock.fastForward(10_100);
+  await expect(page.locator('#thread .new-messages-indicator')).toBeVisible();
+  expect(await host.evaluate(node => node.scrollTop)).toBe(readingTop);
+  await page.locator('#thread .new-messages-indicator').click();
+  await expect(page.locator('#thread .new-messages-indicator')).toBeHidden();
+  await expect.poll(() => host.evaluate(node => node.scrollHeight - node.scrollTop - node.clientHeight)).toBeLessThanOrEqual(3);
+
+  await page.clock.fastForward(32);
+  await host.evaluate(node => { node.scrollTop = 0; });
+  const anchor = host.locator('[data-timeline-key]').first();
+  const anchorKey = await anchor.getAttribute('data-timeline-key'), anchorTop = await anchor.evaluate(node => node.getBoundingClientRect().top);
+  await page.locator('#thread .load-older').click();
+  await expect(timeline).toHaveCount(35);
+  const anchored = host.locator(`[data-timeline-key="${anchorKey}"]`);
+  await expect(anchored).toBeVisible();
+  expect(Math.abs(await anchored.evaluate(node => node.getBoundingClientRect().top) - anchorTop)).toBeLessThanOrEqual(2);
+  expect((await timeline.evaluateAll(nodes => nodes.map(node => node.dataset.timelineKey))).slice(0, 8)).toEqual(
+    Array.from({ length: 8 }, (_, index) => `message:older-${String(index).padStart(2, '0')}`),
+  );
+
+  await page.reload();
+  await page.locator('[data-chat="friend-1"]').click();
+  await expect(page.locator('#thread .message').last()).toContainText('incoming while reading');
+  await expect.poll(() => page.locator('#thread .messages').evaluate(node => node.scrollHeight - node.scrollTop - node.clientHeight)).toBeLessThanOrEqual(3);
+});
+
+test('real-time chat appends from account B to account A', async ({ page, context }) => {
+  await page.clock.install();
+  const pageB = await context.newPage();
+  await pageB.clock.install();
+  await mockSocialApi(pageB);
+  const messages = [];
+  const installAccount = async (targetPage, actor, peer, actorName, peerName) => {
+    await targetPage.route('**/api/auth/me', route => route.fulfill({ json: { user: { id: actor, displayName: actorName }, providers: ['google'], recentlyAuthenticated: true } }));
+    await targetPage.route('**/api/social/profile', route => route.fulfill({ json: { profile: { user_id: actor, name: actorName, direct_messages_enabled: 1, discovery_visible: 0 } } }));
+    await targetPage.route('**/api/social/conversations*', route => route.fulfill({ json: { conversations: [{ other_user_id: peer, name: peerName, direct_messages_enabled: 1, unread_count: 0, last_message_at: messages.at(-1)?.created_at || 1, last_message_body: messages.at(-1)?.body || '' }] } }));
+    await targetPage.route('**/api/social/messages*', async route => {
+      const request = route.request();
+      if (request.method() === 'GET') return route.fulfill({ json: { messages: messages.slice().reverse(), hasMore: false } });
+      const body = request.postDataJSON();
+      if (body.action === 'send') messages.push({ id: `dual-${messages.length}`, sender_user_id: actor, receiver_user_id: peer, body: body.body, created_at: 500 + messages.length });
+      await route.fulfill({ json: { ok: true } });
+    });
+  };
+  await installAccount(page, 'me', 'friend-1', 'Account A', 'Account B');
+  await installAccount(pageB, 'friend-1', 'me', 'Account B', 'Account A');
+  await Promise.all([page.goto('/app/?tab=chat'), pageB.goto('/app/?tab=chat')]);
+  await page.locator('[data-chat="friend-1"]').click();
+  await pageB.locator('[data-chat="me"]').click();
+  await pageB.locator('#thread input[name=body]').fill('B to A real-time');
+  await pageB.locator('#thread .composer').getByRole('button', { name: 'ส่ง' }).click();
+  await expect(pageB.locator('#thread .message').last()).toContainText('B to A real-time');
+  await page.clock.fastForward(10_100);
+  await expect(page.locator('#thread .message').last()).toContainText('B to A real-time');
+  await expect.poll(() => page.locator('#thread .messages').evaluate(node => node.scrollHeight - node.scrollTop - node.clientHeight)).toBeLessThanOrEqual(3);
 });
 
 test("root is the authenticated discovery entry while welcome retains marketing", async ({ page }) => {

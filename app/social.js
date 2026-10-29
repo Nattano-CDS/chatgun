@@ -1,6 +1,7 @@
 import { offerDemoRetirement } from "./retire-demo.js";
 import { createOnlinePresence } from "./online-presence.js";
 import { createMessageDelivery } from "./message-delivery.js";
+import { isNearTimelineBottom, mergeTimelineMessages, timelineMessageKey } from "./chat-timeline.js";
 const deliverMessage=createMessageDelivery((path,options)=>api(path,options));
 let onlinePresence;
 const onlineSlot=(person,id)=>window.ChatgunNearComponents.online(person,id,escapeHtml);
@@ -48,6 +49,7 @@ const state = {
   lastUnread: 0,
   threadMessages: [],
   threadHasMore: !1,
+  threadNewMessages: 0,
   galleryView: null,
   chosenAsset: null,
   threadPolling: !1,
@@ -661,23 +663,52 @@ async function albumAction(button) {
 function renderThreadMessages() {
   const messages = $("#thread .messages");
   if (!messages) return;
-  const loadMore = state.threadHasMore ? '<button class="secondary load-older" type="button">โหลดข้อความก่อนหน้า</button>' : "", ordered = state.threadMessages.slice().sort((a, b) => Number(a.created_at) - Number(b.created_at) || (a.system && b.system && a.request_id === b.request_id ? a.revision - b.revision : +!!a.system - +!!b.system || a.id.localeCompare(b.id)));
-  messages.innerHTML = ordered.length ? `${loadMore}${ordered.map((message) => {
-    if (message.system) return albumSystemCard(message);
+  const loadMore = state.threadHasMore ? '<button class="secondary load-older" type="button">โหลดข้อความก่อนหน้า</button>' : "";
+  messages.innerHTML = state.threadMessages.length ? `${loadMore}${state.threadMessages.map((message) => {
+    const key = escapeHtml(timelineMessageKey(message));
+    if (message.system) return `<div data-timeline-key="${key}">${albumSystemCard(message)}</div>`;
     const media = message.media_id && !message.unsent_at ? chatMediaUrl(message.media_id) : "", attachment = message.media_id && !message.unsent_at ? media ? `<img class="chat-image" src="${escapeHtml(media)}" alt="รูปในแชท" loading="lazy">` : "<em>รูปนี้ไม่อยู่ในคลังแล้ว</em>" : "";
-    return `<div class="message ${message.sender_user_id === currentActor() ? "mine" : ""} ${message.unsent_at ? "unsent" : ""}">${attachment}${escapeHtml(message.unsent_at ? "ยกเลิกข้อความแล้ว" : message.body)}<time>${new Date(Number(message.created_at) * 1e3).toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" })}</time>${message.sender_user_id === currentActor() && !message.unsent_at ? `<span class="message-tools"><button type="button" data-message-action="unsend" data-message="${escapeHtml(message.id)}">ยกเลิกข้อความ</button></span>` : ""}</div>`;
+    return `<div class="message ${message.sender_user_id === currentActor() ? "mine" : ""} ${message.unsent_at ? "unsent" : ""}" data-timeline-key="${key}">${attachment}${escapeHtml(message.unsent_at ? "ยกเลิกข้อความแล้ว" : message.body)}<time>${new Date(Number(message.created_at) * 1e3).toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" })}</time>${message.sender_user_id === currentActor() && !message.unsent_at ? `<span class="message-tools"><button type="button" data-message-action="unsend" data-message="${escapeHtml(message.id)}">ยกเลิกข้อความ</button></span>` : ""}</div>`;
   }).join("")}` : '<div class="empty"><p>เริ่มบทสนทนาด้วยความสุภาพ</p></div>';
 }
-async function loadMessagePage(id, before = null) {
-  const host = $("#thread .messages"), oldHeight = host?.scrollHeight || 0, oldTop = host?.scrollTop || 0, atEnd = !host || host.scrollHeight - host.scrollTop - host.clientHeight < 80, query = before ? `&before=${encodeURIComponent(before.created_at)}&beforeId=${encodeURIComponent(before.id)}` : "", result = await api(`/api/social/messages?target=${encodeURIComponent(id)}${query}`);
-  state.threadMessages = before ? [...state.threadMessages, ...result.messages] : result.messages, state.threadHasMore = result.hasMore, renderThreadMessages(), host && (host.scrollTop = before ? oldTop + host.scrollHeight - oldHeight : atEnd ? host.scrollHeight : oldTop);
+function updateNewMessagesIndicator() {
+  const indicator = $("#thread .new-messages-indicator");
+  if (!indicator) return;
+  indicator.hidden = state.threadNewMessages < 1;
+  indicator.textContent = state.threadNewMessages > 1 ? `ข้อความใหม่ ${state.threadNewMessages} ข้อความ` : "ข้อความใหม่";
+}
+function scrollThreadToBottom() {
+  const host = $("#thread .messages");
+  if (!host) return;
+  host.scrollTop = host.scrollHeight, state.threadNewMessages = 0, updateNewMessagesIndicator();
+}
+function visibleTimelineAnchor(host) {
+  const top = host.getBoundingClientRect().top;
+  const element = [...host.querySelectorAll("[data-timeline-key]")].find((item) => item.getBoundingClientRect().bottom > top);
+  return element ? { key: element.dataset.timelineKey, offset: element.getBoundingClientRect().top - top } : null;
+}
+async function loadMessagePage(id, before = null, { initial = !1 } = {}) {
+  const host = $("#thread .messages"), nearBottom = !host || isNearTimelineBottom(host), previousKeys = new Set(state.threadMessages.map(timelineMessageKey)), anchor = before && host ? visibleTimelineAnchor(host) : null, oldTop = host?.scrollTop || 0, query = before ? `&before=${encodeURIComponent(before.created_at)}&beforeId=${encodeURIComponent(before.id)}` : "", result = await api(`/api/social/messages?target=${encodeURIComponent(id)}${query}`);
+  const incoming = result.messages.filter((message) => !previousKeys.has(timelineMessageKey(message)));
+  state.threadMessages = initial ? mergeTimelineMessages([], result.messages) : mergeTimelineMessages(state.threadMessages, result.messages), state.threadHasMore = before || initial ? result.hasMore : state.threadHasMore || result.hasMore, renderThreadMessages();
+  if (!host) return;
+  if (before) {
+    const anchored = anchor && host.querySelector(`[data-timeline-key="${CSS.escape(anchor.key)}"]`);
+    host.scrollTop = anchored ? oldTop + anchored.getBoundingClientRect().top - host.getBoundingClientRect().top - anchor.offset : oldTop;
+  } else if (initial || nearBottom) {
+    scrollThreadToBottom(), requestAnimationFrame(scrollThreadToBottom);
+  } else {
+    host.scrollTop = oldTop;
+    state.threadNewMessages += incoming.filter((message) => !message.system && message.sender_user_id !== currentActor()).length;
+    updateNewMessagesIndicator();
+  }
 }
 async function openChat(id) {
   const person = (id === state.profile?.user_id ? state.profile : null) || state.people.find((p) => p.user_id === id) || state.conversations.find((p) => p.other_user_id === id) || (state.selectedPerson && (state.selectedPerson.user_id || state.selectedPerson.other_user_id) === id ? state.selectedPerson : null);
   if (!person || id === currentActor()) return;
-  state.selectedChat = id, switchTab("chat"), $(".chat-layout").classList.add("open"), renderConversations();
+  state.selectedChat = id, state.threadMessages = [], state.threadHasMore = !1, state.threadNewMessages = 0, switchTab("chat"), $(".chat-layout").classList.add("open"), renderConversations();
   const thread = $("#thread");
-  thread.innerHTML = `<header class="thread-head"><button class="icon-button chat-back" aria-label="กลับ">←</button><span class="avatar">${escapeHtml(initials(person.name))}</span><span class="member-name-status"><strong>${escapeHtml(person.name)}</strong>${onlineSlot(person,id)}</span></header><details class="chat-safety"><summary>⚠ ระวังการหลอกโอนเงินและขอข้อมูลส่วนตัว</summary><p>อย่าโอนเงินหรือส่งรหัส OTP รหัสผ่าน ข้อมูลบัญชีธนาคาร หรือรูปเอกสารยืนยันตัวตนให้คู่สนทนา</p><p>${person.identity_verified ? "บัญชีนี้ยืนยันตัวตนแล้ว แต่ตรายืนยันไม่รับรองพฤติกรรมหรือความปลอดภัยในการทำธุรกรรม" : "บัญชีนี้ยังไม่ยืนยันตัวตน โปรดระมัดระวังเป็นพิเศษ"}</p></details><div class="messages"><p>กำลังโหลด…</p></div>${state.config.mediaUploadEnabled ? '<p id="chat-upload-quota" class="upload-quota" aria-live="polite"></p>' : ""}<form class="composer">${state.config.mediaUploadEnabled ? '<label class="icon-button" title="ส่งรูป">▧<input type="file" name="file" accept="image/jpeg,image/png,image/webp" aria-label="ส่งรูป" hidden></label><button class="icon-button asset-library" type="button" title="รูปที่ส่งล่าสุด" aria-label="รูปที่ส่งล่าสุด">▦</button>' : ""}<input name="body" maxlength="2000" placeholder="พิมพ์ข้อความ…"><button class="primary">ส่ง</button></form>`, renderUploadQuotas(), populateAvatar($("#thread .avatar"), person);
+  thread.innerHTML = `<header class="thread-head"><button class="icon-button chat-back" aria-label="กลับ">←</button><span class="avatar">${escapeHtml(initials(person.name))}</span><span class="member-name-status"><strong>${escapeHtml(person.name)}</strong>${onlineSlot(person,id)}</span></header><details class="chat-safety"><summary>⚠ ระวังการหลอกโอนเงินและขอข้อมูลส่วนตัว</summary><p>อย่าโอนเงินหรือส่งรหัส OTP รหัสผ่าน ข้อมูลบัญชีธนาคาร หรือรูปเอกสารยืนยันตัวตนให้คู่สนทนา</p><p>${person.identity_verified ? "บัญชีนี้ยืนยันตัวตนแล้ว แต่ตรายืนยันไม่รับรองพฤติกรรมหรือความปลอดภัยในการทำธุรกรรม" : "บัญชีนี้ยังไม่ยืนยันตัวตน โปรดระมัดระวังเป็นพิเศษ"}</p></details><div class="messages"><p>กำลังโหลด…</p></div><button class="new-messages-indicator" type="button" hidden>ข้อความใหม่</button>${state.config.mediaUploadEnabled ? '<p id="chat-upload-quota" class="upload-quota" aria-live="polite"></p>' : ""}<form class="composer">${state.config.mediaUploadEnabled ? '<label class="icon-button" title="ส่งรูป">▧<input type="file" name="file" accept="image/jpeg,image/png,image/webp" aria-label="ส่งรูป" hidden></label><button class="icon-button asset-library" type="button" title="รูปที่ส่งล่าสุด" aria-label="รูปที่ส่งล่าสุด">▦</button>' : ""}<input name="body" maxlength="2000" placeholder="พิมพ์ข้อความ…"><button class="primary">ส่ง</button></form>`, renderUploadQuotas(), populateAvatar($("#thread .avatar"), person);
   const brand = document.createElement("div");
   brand.className = "thread-brand-row", brand.innerHTML = '<a class="toolbar-brand" href="/"><img src="/logo.svg" alt=""><b>ChatGun</b></a><span>แชท</span>', thread.prepend(brand);
   const safety = document.createElement("div");
@@ -692,7 +723,7 @@ async function openChat(id) {
   const send = $(".composer>.primary", thread);
   send.setAttribute("aria-label", "ส่ง"), send.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z M22 2 11 13"/></svg>', person.direct_messages_enabled === 0 && ($(".composer input[name=body]", thread).disabled = !0, send.disabled = !0, $(".composer", thread).insertAdjacentHTML("beforebegin", '<p role="status">สมาชิกนี้ปิดรับข้อความใหม่ · คุณยังอ่านประวัติได้</p>')), requestAnimationFrame(sizeConversation);
   try {
-    await loadMessagePage(id), await api("/api/social/messages", { method: "POST", body: { action: "read", target: id } }), await loadRelationships();
+    await loadMessagePage(id, null, { initial: !0 }), await api("/api/social/messages", { method: "POST", body: { action: "read", target: id } }), await loadRelationships();
   } catch (error) {
     toast(error.message, !0);
   }
@@ -1063,12 +1094,16 @@ document.addEventListener("click", async (event) => {
     return;
   }
   if (event.target.closest(".load-older")) {
-    const oldest = state.threadMessages.at(-1);
+    const oldest = state.threadMessages[0];
     if (oldest) try {
       await loadMessagePage(state.selectedChat, oldest);
     } catch (error) {
       toast(error.message, !0);
     }
+    return;
+  }
+  if (event.target.closest(".new-messages-indicator")) {
+    scrollThreadToBottom();
     return;
   }
   const messageAction = event.target.closest("[data-message-action]");
@@ -1231,6 +1266,9 @@ $("#profile-dialog").addEventListener("input", (event) => {
 $("#thread").addEventListener("change", (event) => {
   event.target.matches("input[name=file]") && event.target.files?.length && event.target.closest("form").requestSubmit();
 });
+$("#thread").addEventListener("scroll", (event) => {
+  event.target.matches(".messages") && isNearTimelineBottom(event.target) && state.threadNewMessages && (state.threadNewMessages = 0, updateNewMessagesIndicator());
+}, !0);
 $("#thread").addEventListener("submit", async (event) => {
   if (!event.target.matches(".composer")) return;
   event.preventDefault();

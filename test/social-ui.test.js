@@ -74,6 +74,16 @@ test("social client uses same-origin APIs, CSRF, escaped rendering, and fail-clo
   assert.doesNotMatch(script, /innerHTML\s*=\s*(?:location|document\.cookie)/u);
 });
 
+test("chat renders chronological DOM without reverse flex and preserves timeline scrolling", () => {
+  assert.doesNotMatch(styles, /\.messages[^}]*column-reverse/u);
+  assert.match(styles, /\.messages[^}]*flex-direction: column/u);
+  assert.match(script, /mergeTimelineMessages/u);
+  assert.match(script, /visibleTimelineAnchor/u);
+  assert.match(script, /new-messages-indicator/u);
+  assert.match(script, /isNearTimelineBottom/u);
+  assert.match(script, /state\.threadMessages\[0\]/u);
+});
+
 test("responsive social route receives only the required geolocation permission", () => {
   assert.match(styles, /@media \(max-width: 760px\)/u);
   assert.match(headers, /Permissions-Policy: camera=\(\), microphone=\(\), geolocation=\(self\), payment=\(\)/u);
