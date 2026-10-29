@@ -6,7 +6,9 @@ test('prepared Production cleanup is inert until explicit enablement and schedul
   }
   const DB={prepare(){throw Error('disabled worker must not touch data');}};
   await privacy.scheduled({scheduledTime:1},{DB,RETENTION_CLEANUP_ENABLED:'false'},{waitUntil(){throw Error('must not schedule deletes');}});
+  await privacy.scheduled({scheduledTime:1},{DB},{waitUntil(){throw Error('missing flag must not schedule deletes');}});
   assert.equal((await drainMediaDeletionQueue({DB,MEDIA_CLEANUP_ENABLED:'false'})).disabled,true);
+  assert.equal((await drainMediaDeletionQueue({DB})).disabled,true);
 });
 test('limited owner-pilot policies match confirmed operator and disclosed 18+ scope',()=>{
   for(const file of ['privacy.html','terms.html','data-deletion.html']){

@@ -6,9 +6,19 @@ const ISSUER = /^https:\/\/[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.cloudflareacces
 let cachedKeys;
 let cachedAuthenticationTime;
 
-function configuration(env) {
+export function cloudflareAdminAccessConfiguration(env) {
   const flag = env.ADMIN_CLOUDFLARE_ACCESS_REQUIRED;
-  if (flag === undefined || flag === '' || flag === 'false') return null;
+  const production = env.DEPLOYMENT_ENVIRONMENT === 'production';
+  const standalone = env.ADMIN_ACCESS_STANDALONE_ENABLED === 'true';
+  if (env.DEPLOYMENT_ENVIRONMENT && !['production', 'preview', 'uat', 'test'].includes(env.DEPLOYMENT_ENVIRONMENT)) {
+    throw new Error('invalid_deployment_environment');
+  }
+  // Production administration and the standalone admin namespace must never
+  // silently fall back to a member session when Access is absent or disabled.
+  if (flag === undefined || flag === '' || flag === 'false') {
+    if (production || standalone) throw new Error('access_configuration_required');
+    return null;
+  }
   if (flag !== 'true') throw new Error('invalid_access_configuration');
   const issuer = String(env.ADMIN_ACCESS_ISSUER || '');
   const audience = String(env.ADMIN_ACCESS_AUDIENCE || '');
@@ -77,7 +87,7 @@ async function trustedKeys(issuer) {
 }
 
 export async function requireCloudflareAdminAccess(request, env, session) {
-  const config = configuration(env);
+  const config = cloudflareAdminAccessConfiguration(env);
   if (!config) return;
   // Binding both identities prevents a valid owner Access token being combined
   // with somebody else's ChatGun session. No grant is derived from an email.
@@ -89,7 +99,7 @@ export async function requireCloudflareAdminAccess(request, env, session) {
 }
 
 export async function cloudflareAdminPrincipal(request, env) {
-  const config = configuration(env);
+  const config = cloudflareAdminAccessConfiguration(env);
   if (!config) throw new Error('access_not_configured');
   const token = request.headers.get('cf-access-jwt-assertion');
   const parsed = parseToken(token);

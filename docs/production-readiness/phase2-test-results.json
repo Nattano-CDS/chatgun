@@ -1,0 +1,23 @@
+{
+  "executedAt": "2026-10-29T16:45:55Z",
+  "baseline": "f1759505fe3b6d99fdfe524ed81091d734b859d3",
+  "results": {
+    "offlineProductionPackageVerifier": {"passed": 1, "failed": 0},
+    "npmAuditHigh": {"vulnerabilities": 0},
+    "nodeUnitIntegrationSecurity": {"passed": 277, "failed": 0},
+    "issue16BrowserRegression": {"passed": 16, "failed": 0},
+    "responsivePlatformBrowser": {"passed": 102, "failed": 0, "viewports": [390, 768, 1440]},
+    "fullSystemBrowser": {"passed": 10, "failed": 0, "viewports": [390, 768, 1440]},
+    "closedReleaseAssertions": {"passed": 35, "failed": 0},
+    "schema17To21Rehearsal": {"passed": true, "foreignKeyViolations": 0, "productionWrites": 0},
+    "rollbackRestoreRehearsal": {"passed": true, "restoredSchema": 17}
+  },
+  "notExecuted": [
+    "Production deployment",
+    "Production migration",
+    "Production OAuth login",
+    "Production Cloudflare Access login or MFA",
+    "Production cleanup Worker deployment or schedule",
+    "Production media or moderation activation"
+  ]
+}

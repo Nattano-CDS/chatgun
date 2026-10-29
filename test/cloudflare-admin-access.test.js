@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { base64Url } from '../functions/_lib/crypto.js';
-import { requireCloudflareAdminAccess, verifyCloudflareAccessJwt, cloudflareAdminPrincipal } from '../functions/_lib/cloudflare-admin-access.js';
+import { requireCloudflareAdminAccess, verifyCloudflareAccessJwt, cloudflareAdminPrincipal, cloudflareAdminAccessConfiguration } from '../functions/_lib/cloudflare-admin-access.js';
 import { issueSession, unixTime } from '../functions/_lib/db.js';
 import { onRequest } from '../functions/api/social/[[path]].js';
 import { onRequest as adminRequest } from '../functions/api/admin/[[path]].js';
@@ -62,6 +62,18 @@ test('Access opt-in rejects partial/invalid configuration and plain spoofed emai
   await assert.rejects(requireCloudflareAdminAccess(r, envConfig, { user_id: 'different-user' }));
 });
 
+test('Production and standalone administration require complete Access configuration and never fall back to member auth', async () => {
+  for (const env of [
+    { DEPLOYMENT_ENVIRONMENT: 'production' },
+    { DEPLOYMENT_ENVIRONMENT: 'production', ADMIN_CLOUDFLARE_ACCESS_REQUIRED: 'false' },
+    { ADMIN_ACCESS_STANDALONE_ENABLED: 'true' },
+    { ADMIN_ACCESS_STANDALONE_ENABLED: 'true', ADMIN_CLOUDFLARE_ACCESS_REQUIRED: 'false' },
+  ]) assert.throws(() => cloudflareAdminAccessConfiguration(env));
+  assert.throws(() => cloudflareAdminAccessConfiguration({ DEPLOYMENT_ENVIRONMENT: 'prod' }));
+  assert.equal(cloudflareAdminAccessConfiguration({ DEPLOYMENT_ENVIRONMENT: 'preview' }), null);
+  assert.deepEqual(cloudflareAdminAccessConfiguration({ ...envConfig, DEPLOYMENT_ENVIRONMENT: 'production' }), config);
+});
+
 test('Access validates real handler RBAC, audit, CSRF and revocation without granting roles from an email', async () => {
   const db = new TestD1();
   const originalFetch = globalThis.fetch;
@@ -85,6 +97,8 @@ test('Access validates real handler RBAC, audit, CSRF and revocation without gra
     });
     assert.equal((await onRequest({ env, request: request('overview') })).status, 403, 'Access never grants a D1 role');
     await db.prepare("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES('local-access-grant',?,'safety_admin','Local test only',?,?)").bind(config.userId, now, now + 3600).run();
+    assert.equal((await onRequest({ env: { ...env, DEPLOYMENT_ENVIRONMENT: 'production', ADMIN_CLOUDFLARE_ACCESS_REQUIRED: 'false' }, request: request('overview') })).status, 403,
+      'Production must not fall back to a member session when Access is disabled');
     assert.equal((await onRequest({ env, request: request('overview', null) })).status, 403);
     assert.equal((await onRequest({ env, request: request('capabilities', null) })).status, 403);
     assert.equal((await onRequest({ env, request: request('overview') })).status, 200);

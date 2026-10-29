@@ -34,11 +34,12 @@ test('Production Wrangler configuration is fail-closed and uses the isolated mig
   assert.equal(production.vars.BETA_ENROLLMENT_REQUIRED, 'true');
   assert.equal(production.vars.MEDIA_QUARANTINE_ENABLED, 'true');
   assert.equal(production.vars.ADMIN_CLOUDFLARE_ACCESS_REQUIRED, 'true');
+  assert.equal(production.vars.DEPLOYMENT_ENVIRONMENT, 'production');
   assert.equal(production.vars.OAUTH_ENABLED_PROVIDERS, '');
 });
 
 test('Readiness utilities are verification-only and cannot deploy or apply remote migrations', () => {
-  for (const name of ['audit-production-readiness.mjs', 'rehearse-production-migrations.mjs', 'prepare-production-rollback.mjs']) {
+  for (const name of ['audit-production-readiness.mjs', 'rehearse-production-migrations.mjs', 'prepare-production-rollback.mjs', 'verify-production-remediation.mjs']) {
     const source = readFileSync(`scripts/${name}`, 'utf8');
     assert.doesNotMatch(source, /pages['"]?\s*,\s*['"]deploy|d1['"]?\s*,\s*['"]migrations['"]?\s*,\s*['"]apply/u, name);
   }
@@ -46,4 +47,20 @@ test('Readiness utilities are verification-only and cannot deploy or apply remot
   assert.match(audit, /Only read-only D1 statements are allowed/u);
   const rehearsal = readFileSync('scripts/rehearse-production-migrations.mjs', 'utf8');
   assert.match(rehearsal, /excludedFromProduction: \['0022_always_on_private_uat_cohort\.sql'\]/u);
+});
+
+test('Prepared Production cleanup Workers are inert and cannot run on a missing enable flag', () => {
+  const privacy = JSON.parse(readFileSync('wrangler.cleanup-production-prepared.jsonc', 'utf8'));
+  const media = JSON.parse(readFileSync('wrangler.media-cleanup-production-prepared.jsonc', 'utf8'));
+  for (const config of [privacy, media]) {
+    assert.deepEqual(config.triggers.crons, []);
+    assert.equal(config.workers_dev, false);
+    assert.equal(config.preview_urls, false);
+    assert.equal(config.d1_databases[0].database_id, '9738a051-d914-42d0-8e7b-8098ef2b959d');
+  }
+  assert.equal(privacy.vars.RETENTION_CLEANUP_ENABLED, 'false');
+  assert.equal(media.vars.MEDIA_CLEANUP_ENABLED, 'false');
+  assert.equal(media.r2_buckets[0].bucket_name, 'chatgun-media-production');
+  assert.match(readFileSync('workers/privacy-cleanup.js', 'utf8'), /RETENTION_CLEANUP_ENABLED !== 'true'/u);
+  assert.match(readFileSync('workers/media-cleanup.js', 'utf8'), /MEDIA_CLEANUP_ENABLED !== 'true'/u);
 });
