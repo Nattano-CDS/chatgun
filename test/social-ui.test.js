@@ -56,6 +56,8 @@ test("social client uses same-origin APIs, CSRF, escaped rendering, and fail-clo
   assert.match(script, /navigator\.permissions\.query\(\{ name: "geolocation" \}\)/u);
   assert.match(script, /revokeLocationPublication/u);
   assert.match(script, /refreshOpenThread/u);
+  assert.match(script, /hadUnread && await loadRelationships\(\)/u);
+  assert.match(script, /if \(!state\.config\.mediaUploadEnabled\) return state\.myGallery = \[\], renderOwnGallery\(\)/u);
   assert.match(script, /10_000|1e4/u);
   assert.match(script, /\/app\/people\//u);
   assert.match(script, /popstate/u);

@@ -29,8 +29,25 @@ const current = Object.fromEntries(Object.entries(project.deployment_configs.pre
 for (const [key, value] of Object.entries(vars)) assert.equal(current[key], value, `UAT flag not active: ${key}`);
 const query = async (sql, params = []) => (await cf(`/d1/database/${FINAL_UAT_DATABASE}/query`, { sql, params }))[0];
 assert.equal((await query('SELECT COUNT(*) n FROM users')).results[0].n, 0, 'Invitations require the empty pre-campaign cohort');
-assert.equal((await query('SELECT COUNT(*) n FROM beta_invitations')).results[0].n, 0, 'Refusing duplicate invitation issuance');
 const issuedAt = Math.floor(nowMs / 1000), expiresAt = issuedAt + 1800;
+const priorInvitations = (await query(`SELECT uat_identity_ref,uat_required_provider,uat_account_reference_sha256,status,max_uses,use_count,expires_at,consumed_at
+  FROM beta_invitations ORDER BY created_at`)).results;
+for (const prior of priorInvitations) {
+  const approved = receipt.identities.find(identity => identity.reference === prior.uat_identity_ref);
+  assert.ok(
+    approved
+      && prior.uat_required_provider === approved.provider
+      && prior.uat_account_reference_sha256 === approved.providerAccountReferenceSha256
+      && ['active', 'revoked'].includes(prior.status)
+      && prior.max_uses === 1
+      && prior.use_count === 0
+      && prior.consumed_at === null
+      && prior.expires_at <= issuedAt,
+    'Refusing duplicate invitation issuance: a prior invitation is not expired, unredeemed and bound to the approved cohort',
+  );
+}
+const revoked = await query("UPDATE beta_invitations SET status='revoked',revoked_at=COALESCE(revoked_at,?) WHERE status='active' AND use_count=0 AND consumed_at IS NULL AND expires_at<=? AND uat_identity_ref IN ('A','B')", [issuedAt, issuedAt]);
+assert.equal(revoked.meta.changes, priorInvitations.filter(invitation => invitation.status === 'active').length);
 const invitations = receipt.identities.map(identity => {
   const code = randomBytes(32).toString('base64url');
   return { reference: identity.reference, id: randomUUID(), code, tokenHash: createHash('sha256').update(code).digest('base64url'), expiresAt };

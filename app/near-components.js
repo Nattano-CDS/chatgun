@@ -57,7 +57,7 @@ window.ChatgunNearComponents = (() => {
         <p class="full-bio">${h(p.bio||'ยังไม่ได้เขียน Bio')}</p>
         <div class="profile-facts"><span>${h(p.gender||'ไม่ระบุเพศ')}</span>${p.distance!=null?`<span>${icon('pin',15)}${h(c.distance)}</span>`:''}<span>${c.star}${score(c)}</span></div>
         <div class="profile-interests">${chips(c)}</div>
-        <div class="full-profile-actions">${primary(c)}<button class="profile-gallery-button" data-profile-gallery>${c.grid}Gallery <span>${c.photos.filter(p=>p.visibility==='public').length}</span></button>${albumIconButton(c)}${c.canRate ? action('rate',h(c.id),c.star,'profile-rate',`aria-label="ให้คะแนน" ${c.rateDisabled?'disabled':''}`):''}</div>
+        <div class="full-profile-actions">${primary(c)}${c.config.mediaUploadEnabled?`<button class="profile-gallery-button" data-profile-gallery>${c.grid}Gallery <span>${c.photos.filter(p=>p.visibility==='public').length}</span></button>${albumIconButton(c)}`:''}${c.canRate ? action('rate',h(c.id),c.star,'profile-rate',`aria-label="ให้คะแนน" ${c.rateDisabled?'disabled':''}`):''}</div>
         ${peopleActions(c,true)}
       </div></main>`;
   }

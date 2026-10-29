@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 const window={};for(const file of ['app/near-icons.js','app/near-components.js'])vm.runInNewContext(readFileSync(file,'utf8'),{window});
-const c={person:{name:'สมมติ',identity_verified:1},id:'sample',html:String,portrait:()=>'',photos:[],config:{messagingEnabled:true},album:{granted:false},media:()=>'',images:'',grid:'',star:'<svg></svg>'};
+const c={person:{name:'สมมติ',identity_verified:1},id:'sample',html:String,portrait:()=>'',photos:[],config:{messagingEnabled:true,mediaUploadEnabled:true},album:{granted:false},media:()=>'',images:'',grid:'',star:'<svg></svg>'};
 test('every member and own card has one semantic profile link and no action buttons',()=>{
   for(const own of [false,true]){
     const out=window.ChatgunNearComponents.card({...c,own,canRate:true,messagingEnabled:true});

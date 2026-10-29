@@ -256,6 +256,7 @@ function galleryCapacity() {
   return state.uploadQuotas.galleryCapacity || { used: 0, limit: 12, remaining: 0 };
 }
 async function loadOwnGallery() {
+  if (!state.config.mediaUploadEnabled) return state.myGallery = [], renderOwnGallery();
   const galleries = await Promise.all(["public", "private"].map((album) => api(`/api/social/gallery?user=${encodeURIComponent(state.account.user.id)}&album=${album}`)));
   state.myGallery = galleries.flatMap((g) => g.photos), renderOwnGallery();
 }
@@ -369,7 +370,8 @@ async function refreshOpenThread() {
       !state.selectedChat || state.threadPolling || !state.config?.messagingEnabled) return;
   state.threadPolling = !0;
   try {
-    await loadMessagePage(state.selectedChat), await api("/api/social/messages", { method: "POST", body: { action: "read", target: state.selectedChat } });
+    const hadUnread = Number(state.conversations.find((person) => person.other_user_id === state.selectedChat)?.unread_count || 0) > 0;
+    await loadMessagePage(state.selectedChat), await api("/api/social/messages", { method: "POST", body: { action: "read", target: state.selectedChat } }), hadUnread && await loadRelationships();
   } finally {
     state.threadPolling = !1;
   }
@@ -541,9 +543,16 @@ async function showPerson(id, { historyMode = "push", photo = null } = {}) {
     $("#profile-dialog-content").innerHTML = '<main class="full-profile gallery-page"><div class="empty"><h2>ไม่พบโปรไฟล์นี้</h2><p>คุณอาจไม่มีสิทธิ์ดูบัญชีนี้</p><button data-close-profile>กลับ</button></div></main>', openProfileSurface();
     return;
   }
+  if (!state.config.mediaUploadEnabled && photo) {
+    photo = null, state.privateAlbumOpen = !1, updateProfileRoute(id, null, "replace");
+  }
   photo || (state.privateAlbumOpen = !1), state.selectedPerson = person, state.personPhotos = [], state.album = null, state.albumRequests = [], state.galleryLoadError = !1, state.albumLoading = !0, state.profileRequest = (state.profileRequest || 0) + 1;
   const generation = state.profileRequest;
   photo === "upload" ? (state.personRouteView = "upload", document.body.dataset.personRoute = "upload", $("#profile-dialog-content").innerHTML = '<main class="gallery-experience"><p role="status">กำลังตรวจสอบโควตาและพื้นที่อัลบั้ม…</p></main>', openProfileSurface()) : renderPersonRoute(photo === "gallery" ? "gallery" : "profile");
+  if (!state.config.mediaUploadEnabled) {
+    state.albumLoading = !1, renderPersonRoute("profile");
+    return;
+  }
   try {
     const result = await api("/api/social/gallery?user=" + encodeURIComponent(id) + "&album=" + (state.privateAlbumOpen ? "private" : "public")), photos = result.photos;
     if (generation !== state.profileRequest) return;
