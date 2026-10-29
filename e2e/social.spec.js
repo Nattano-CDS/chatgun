@@ -240,6 +240,8 @@ test("profile names cannot break out of text or media attributes", async ({ page
 test("real-data shell never substitutes demo photos when uploads are disabled", async ({ page }) => {
   await page.goto("/app/");
   await page.locator('#primary-nav button[data-tab="profile"]').click();
+  await expect(page.locator('#manage-gallery')).toBeHidden();
+  await expect(page.locator('#view-own-profile')).toBeHidden();
   await expect(page.locator('#gallery-upload')).toBeHidden();
   await expect(page.locator('#my-gallery img')).toHaveCount(0);
   await expect(page.locator('script[src*="demo-"]')).toHaveCount(0);
