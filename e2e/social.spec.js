@@ -47,6 +47,10 @@ async function mockSocialApi(page) {
   });
 }
 
+async function enableMedia(page) {
+  await page.route("**/api/social/config", (route) => route.fulfill({ json: { ...config, mediaUploadEnabled: true } }));
+}
+
 test.beforeEach(async ({ page }) => {
   await mockSocialApi(page);
 });
@@ -88,6 +92,7 @@ test('authenticated shortcut is session-owned, deduplicated and independent of d
 });
 
 test('gallery failed comment keeps its draft and inline reason; likes are disabled while pending',async({page})=>{
+ await enableMedia(page);
  let likes=0;
  await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',photos:[{id:'fixture-photo',visibility:'public',owner:'near-1',caption:'ภาพสมมติ',like_count:0}],comments:[]}}));
  await page.route('**/api/social/gallery',async r=>{
@@ -113,6 +118,7 @@ test('gallery failed comment keeps its draft and inline reason; likes are disabl
 });
 
 test('public photo stays open without a private grant and foreground updates preserve comment draft',async({page})=>{
+ await enableMedia(page);
  await page.clock.install();let updated=false;
  await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',album:{granted:false,request:null},photos:[{id:'public-refresh',visibility:'public',caption:'รูปสาธารณะ',like_count:updated?2:0}],comments:updated?[{id:'new',sender_name:'ผู้แสดงความคิดเห็นทดสอบ',body:'ความคิดเห็นใหม่'}]:[]}}));
  await page.goto('/app/people/near-1/gallery/public-refresh');await expect(page.locator('.lightbox-shell')).toBeVisible();await page.locator('#gallery-comment input[name=comment]').fill('ร่างที่ต้องรักษาไว้');updated=true;await page.clock.fastForward(11000);
@@ -129,6 +135,7 @@ test('unread badges refresh across screens and opt-in foreground notifications d
 });
 
 test('moderation withdrawal clears an already-open photo on permission refresh',async({page})=>{
+  await enableMedia(page);
   let released=true;
   await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',album:{granted:false,request:null},photos:released?[{id:'withdrawn',visibility:'public',review_status:'released',caption:'รูปสมมติ'}]:[],comments:[]}}));
   await page.goto('/app/people/near-1/gallery/withdrawn');await expect(page.locator('.lightbox-shell')).toBeVisible();
@@ -191,6 +198,7 @@ test('coarse live distance does not silently remove the server-authorized rating
 });
 
 test('source header switches out discovery controls; gallery distinguishes loading failure from empty and retries',async({page})=>{
+  await enableMedia(page);
   await page.goto('/app/');await page.locator('#primary-nav [data-tab=chat]').click();
   await expect(page.locator('.toolbar .discovery-controls')).toHaveCount(0);
   await expect(page.locator('.toolbar>.toolbar-page')).toHaveText('แชท');
