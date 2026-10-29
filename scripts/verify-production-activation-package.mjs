@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { verifyProductionPreservation } from './verify-production-preservation.mjs';
 
 const sha256 = path => createHash('sha256').update(readFileSync(path)).digest('hex');
 const manifest = JSON.parse(readFileSync('docs/production-readiness/phase3-release-manifest.json', 'utf8'));
@@ -31,21 +32,19 @@ for (const [name, expected] of Object.entries(manifest.migrationHashes)) {
   assert.equal(sha256(`migrations/${name}`), expected, name);
   assert.equal(sha256(`migrations/production/${name}`), expected, `production/${name}`);
 }
-for (const flag of [
-  'OAUTH_LOGIN_ENABLED', 'NEW_ACCOUNT_REGISTRATION_ENABLED', 'BETA_INVITATION_REGISTRATION_ENABLED',
-  'ACCEPTANCE_FLOW_ENABLED', 'SOCIAL_APP_ENABLED', 'PUBLIC_DISCOVERY_ENABLED', 'MESSAGING_ENABLED',
-  'PRESENCE_ENABLED', 'MEDIA_UPLOAD_ENABLED', 'SENSITIVE_CONTENT_ENABLED', 'MODERATION_TOOLS_ENABLED',
-  'ACCOUNT_MODERATION_ENABLED', 'IDENTITY_VERIFICATION_ENABLED', 'ELIGIBILITY_REVIEW_ENABLED',
-  'EMAIL_OTP_ENABLED', 'MOBILE_OTP_ENABLED', 'DEMO_MODE_ENABLED', 'DEMO_AUTO_START_ENABLED',
-  'PUBLIC_DEMO_CANARY_ENABLED', 'ADMIN_ACCESS_STANDALONE_ENABLED'
-]) assert.equal(config.vars[flag], 'false', flag);
+const fingerprint = JSON.parse(readFileSync('docs/production-readiness/phase6/production-owner-pilot-fingerprint.json', 'utf8'));
+const preservation = verifyProductionPreservation(config.vars, fingerprint);
+assert.equal(preservation.result, 'PASS');
+assert.equal(preservation.totalChecks, 25);
+assert.equal(config.vars.ADMIN_ACCESS_STANDALONE_ENABLED, 'false');
+assert.equal(config.vars.ELIGIBILITY_REVIEW_ENABLED, 'false');
 assert.equal(config.vars.ADMIN_CLOUDFLARE_ACCESS_REQUIRED, 'true');
-assert.equal(config.vars.OAUTH_ENABLED_PROVIDERS, '');
+assert.equal(config.vars.OAUTH_ENABLED_PROVIDERS, 'line');
 assert.equal(config.d1_databases[0].migrations_dir, 'migrations/production');
 assert.equal(config.r2_buckets[0].bucket_name, 'chatgun-media-production');
 
 console.log(JSON.stringify({
   result: 'PASS', candidateApplicationSha: manifest.candidateApplicationSha,
-  migrationHashesVerified: 4, productionClosedFlagsVerified: 20,
+  migrationHashesVerified: 4, productionPreservationChecksVerified: 25,
   verdict: manifest.verdict, productionMutations: 0,
 }, null, 2));
