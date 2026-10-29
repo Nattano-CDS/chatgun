@@ -1,0 +1,18 @@
+{
+  "status": "DRAFT_NOT_APPROVED",
+  "ownerDirectiveComment": 6473803567,
+  "scope": "single-operator-dual-device-two-account-private-uat",
+  "humanOperatorCount": 1,
+  "authorizedIdentityCount": 2,
+  "humanEvidenceClassification": "single-operator-dual-account-functional-e2e",
+  "productionDocumentsChanged": false,
+  "rc4DocumentsChanged": false,
+  "documents": {
+    "adultNotice": {"version":"adult-social-single-operator-dual-account-uat-2026-10-28-rc5","path":"policies/final-uat/single-operator-rc5/beta-notice.html","sha256":"e4a8f77b607586b8c0ebd185d72857e0e0661e526cb6cfd0770247a7513c7de9"},
+    "terms": {"version":"terms-social-single-operator-dual-account-uat-2026-10-28-rc5","path":"policies/final-uat/single-operator-rc5/terms.html","sha256":"d6d4035d772c9104bbbaaf96384a4768d6406ade93637e1fbed78f913a0f9f90"},
+    "privacy": {"version":"privacy-social-single-operator-dual-account-uat-2026-10-28-rc5","path":"policies/final-uat/single-operator-rc5/privacy.html","sha256":"73176011f94bfe987ae8e0c4ed3f09f862f43c38d5ee86d201afabfe9909201a"},
+    "deletion": {"version":"deletion-social-single-operator-dual-account-uat-2026-10-28-rc5","path":"policies/final-uat/single-operator-rc5/data-deletion.html","sha256":"aaca1f6637f293f52bb2e2c7aa332bdba2a1ee052e8beccc39c8849408985d58"}
+  },
+  "retention": {"logicalCleanupWithinDaysAfterActualClose":7,"minimumAuditEvidenceRetentionDays":90,"minimumAuditEvidenceRetentionStartsAt":"actual-explicit-close","physicalBackupErasurePromised":false},
+  "activation": {"requiresPrivateOwnerApproval":true,"requiresExactImplementationSha":true,"requiresOwnerControlAttestationForBothIdentities":true,"requiresSeparateGoogleChatgunIdentityDeletionDecision":true,"schema22ApplicationAllowed":false,"invitationsAllowed":false}
+}

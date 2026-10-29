@@ -3,6 +3,16 @@ import test from "node:test";
 import { drainMediaDeletionQueue } from "../workers/media-cleanup.js";
 import { TestD1 } from "./helpers/d1.js";
 
+test('two cleanup workers atomically claim an object once and never delete active media',async()=>{
+ const db=new TestD1();try{
+ db.exec("INSERT INTO users(id,status,created_at,updated_at)VALUES('u','active',1,1);INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,state,created_at)VALUES('active','u','active.png','gallery','image/png',1,'active',1);INSERT INTO media_deletion_queue(object_key,operation_id,next_attempt_at,created_at)VALUES('once.png','op',1,1),('active.png','op',1,1)");
+ const deleted=[],env={DB:db,MEDIA:{async delete(key){deleted.push(key);}}};await Promise.all([drainMediaDeletionQueue(env,100),drainMediaDeletionQueue(env,100)]);assert.deepEqual(deleted,['once.png']);assert.equal((await db.prepare("SELECT state FROM social_media WHERE id='active'").first()).state,'active');
+ }finally{db.close();}
+});
+test('fixture cleanup scope leaves unrelated queued objects untouched',async()=>{
+ const db=new TestD1();try{db.exec("INSERT INTO media_deletion_queue(object_key,operation_id,next_attempt_at,created_at)VALUES('this-test','op',1,1),('unrelated','other',1,1)");const deleted=[];await drainMediaDeletionQueue({DB:db,MEDIA:{delete:async key=>deleted.push(key)}},100,{objectKeys:['this-test']});assert.deepEqual(deleted,['this-test']);assert.equal((await db.prepare("SELECT completed_at FROM media_deletion_queue WHERE object_key='unrelated'").first()).completed_at,null);}finally{db.close();}
+});
+
 test("media cleanup deletes due objects, records completion, and leaves future work", async () => {
   const database = new TestD1();
   database.exec(`

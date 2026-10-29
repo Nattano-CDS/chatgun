@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-17T18:01:26.772Z",
+  "fictionalPublicFilesRemoved": 21,
+  "fictionalGalleryGeneratorShipped": false,
+  "fictionalMessagesShipped": 0,
+  "fictionalProfilesShipped": 0,
+  "removedSourceAssets": [
+    "assets/demo/network.json",
+    "assets/demo/01.png … 20.png"
+  ],
+  "browserDemoAutoInit": false,
+  "sourceGeneratorsRetainedOnlyAsNonPublicTestFixtures": true,
+  "publicPackageHasDemoDirectory": false,
+  "productionDeployed": false
+}

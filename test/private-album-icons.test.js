@@ -5,7 +5,7 @@ import {readFileSync} from 'node:fs';
 const window={};
 vm.runInNewContext(readFileSync('app/near-icons.js','utf8'),{window});
 vm.runInNewContext(readFileSync('app/near-components.js','utf8'),{window});
-const c={person:{name:'สมมติ'},id:'fixture',html:String,portrait:()=>'',photos:[],config:{},album:{granted:false},media:()=>'',images:'',grid:'',star:''};
+const c={person:{name:'สมมติ'},id:'fixture',html:String,portrait:()=>'',photos:[],config:{mediaUploadEnabled:true,messagingEnabled:true},album:{granted:false},media:()=>'',images:'',grid:'',star:''};
 const profile=overrides=>window.ChatgunNearComponents.profile({...c,...overrides});
 test('approved locked and unlocked composition uses identical Lucide image with distinct standard locks',()=>{
   const locked=profile({}),unlocked=profile({album:{granted:true}});
@@ -36,4 +36,9 @@ test('public and private album rendering are separate, never inferred from an un
   assert.doesNotMatch(render({privateAlbumOpen:true,album:{granted:false}}),/data-photo="private"/);
   assert.match(render({privateAlbumOpen:true,album:{granted:true}}),/data-photo="private"/);
   assert.doesNotMatch(render({privateAlbumOpen:true,album:{granted:true}}),/data-photo="public"/);
+});
+test('media-closed profiles expose no Gallery or private-album controls',()=>{
+  const out=profile({config:{mediaUploadEnabled:false,messagingEnabled:true}});
+  assert.doesNotMatch(out,/data-profile-gallery|data-private-album|Gallery/);
+  assert.match(out,/data-action="chat"/);
 });

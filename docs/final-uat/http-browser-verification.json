@@ -1,0 +1,136 @@
+{
+  "checkedAt": "2026-10-23T19:56:07.225Z",
+  "origin": "https://uat.chatgun-final-uat.pages.dev",
+  "sha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+  "checks": [
+    {
+      "path": "/api/health",
+      "status": "PASS"
+    },
+    {
+      "path": "/api/auth/config",
+      "status": "PASS"
+    },
+    {
+      "path": "/api/social/config",
+      "status": "PASS"
+    },
+    {
+      "path": "/api/auth/me",
+      "status": "PASS",
+      "http": 401
+    },
+    {
+      "path": "/api/auth/sessions",
+      "status": "PASS",
+      "http": 401
+    },
+    {
+      "path": "/api/admin/session",
+      "status": "PASS",
+      "http": 404
+    }
+  ],
+  "assetHashesMatched": 39,
+  "timings": [
+    {
+      "path": "/api/health",
+      "status": 200,
+      "elapsedMs": 77
+    },
+    {
+      "path": "/api/auth/config",
+      "status": 200,
+      "elapsedMs": 23
+    },
+    {
+      "path": "/api/social/config",
+      "status": 200,
+      "elapsedMs": 22
+    }
+  ],
+  "screens": [
+    {
+      "width": 390,
+      "loadMs": 210,
+      "totalSameOriginRequests": 38,
+      "apiRequests": 2,
+      "scriptErrors": 0,
+      "horizontalOverflow": false,
+      "screenshot": "screens/prelaunch-390.png"
+    },
+    {
+      "width": 768,
+      "loadMs": 189,
+      "totalSameOriginRequests": 38,
+      "apiRequests": 2,
+      "scriptErrors": 0,
+      "horizontalOverflow": false,
+      "screenshot": "screens/prelaunch-768.png"
+    },
+    {
+      "width": 1440,
+      "loadMs": 251,
+      "totalSameOriginRequests": 38,
+      "apiRequests": 2,
+      "scriptErrors": 0,
+      "horizontalOverflow": false,
+      "screenshot": "screens/prelaunch-1440.png"
+    }
+  ],
+  "d1Plans": [
+    {
+      "label": "session_lookup",
+      "plan": [
+        {
+          "id": 3,
+          "parent": 0,
+          "notused": 39,
+          "detail": "SEARCH sessions USING INDEX sqlite_autoindex_sessions_1 (token_hash=?)"
+        }
+      ]
+    },
+    {
+      "label": "conversation_messages",
+      "plan": [
+        {
+          "id": 5,
+          "parent": 0,
+          "notused": 61,
+          "detail": "SEARCH social_messages USING INDEX idx_messages_sender_receiver (sender_user_id=? AND receiver_user_id=?)"
+        }
+      ]
+    },
+    {
+      "label": "presence_expiration",
+      "plan": [
+        {
+          "id": 4,
+          "parent": 0,
+          "notused": 203,
+          "detail": "SEARCH member_presence_leases USING INDEX idx_presence_expiry (touched_at<?)"
+        }
+      ]
+    }
+  ],
+  "negativeTurnstile": {
+    "status": "PASS",
+    "invalidResponseRejected": true,
+    "errorCodes": [
+      "invalid-input-response"
+    ],
+    "genuineChallenge": "NOT RUN",
+    "hostnameActionAndExpiryHumanProof": "BLOCKED until the consolidated genuine campaign"
+  },
+  "staticRouting": {
+    "include": [
+      "/api/*"
+    ],
+    "note": "Frozen _routes.json restricts Functions to API paths; no claimed billing attribution."
+  },
+  "limitations": [
+    "Closed prelaunch timings only; authenticated workflow performance is reported separately.",
+    "No account-wide billing/capacity estimate; no plan change.",
+    "Actual hidden-tab heartbeat/poll suppression not independently measured in this run; existing deterministic regression evidence retained."
+  ]
+}

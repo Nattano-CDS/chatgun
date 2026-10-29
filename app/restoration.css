@@ -110,6 +110,7 @@ dialog .dialog-close{z-index: 10;}
 .moderation-daily-grid{grid-template-columns: repeat(2, minmax(0px, 1fr));}
 .moderation-toolbar{gap: 8px;}
 }
+#admin-access-logout{display:block;min-height:44px;width:fit-content;white-space:nowrap;margin:0 0 16px auto;}
 html, body{background: rgb(247, 247, 251); font-family: Arial, "Noto Sans Thai", Tahoma, sans-serif; font-synthesis: none;}
 #app{padding-bottom: 0px;}
 #app > main{width: 100%; max-width: 1280px; padding: 0 48px calc(100px + env(safe-area-inset-bottom)); margin: auto;}

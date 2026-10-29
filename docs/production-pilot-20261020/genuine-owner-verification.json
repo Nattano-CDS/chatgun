@@ -1,0 +1,40 @@
+{
+  "checkedAt": "2026-10-20T04:20:18.002Z",
+  "productionSha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+  "invitationConsumedExactlyOnce": true,
+  "enrollmentActive": true,
+  "accountActive": true,
+  "lineIdentityLinked": true,
+  "approvedAcceptance": true,
+  "selfDeclaredAgeRecorded": true,
+  "profilePersisted": true,
+  "activeSessions": 3,
+  "revokedSessions": 1,
+  "profileFields": {
+    "namePresent": true,
+    "genderPresent": true,
+    "bioPresent": false,
+    "interestsPresent": false,
+    "discoveryVisible": false,
+    "preciseLocationStored": false,
+    "directMessagesPreference": true
+  },
+  "counts": {
+    "users": 1,
+    "identities": 1,
+    "member_profiles": 1,
+    "sessions": 4,
+    "beta_invitations": 1,
+    "social_messages": 0,
+    "social_media": 0,
+    "moderation_roles": 0,
+    "moderation_access_grants": 2
+  },
+  "foreignKeyViolations": 0,
+  "duplicateProviderSubjects": 0,
+  "presencePreferenceStored": 0,
+  "flagsPreserved": true,
+  "rolesGrantedByVerifier": 0,
+  "productionWrites": 0,
+  "historicalProviderTranscript": "Not retained; code path and persisted records support genuine completion, not a replay of historical token/claims evidence"
+}

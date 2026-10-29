@@ -1,0 +1,156 @@
+{
+  "checkedAt": "2026-10-19T14:26:14.826Z",
+  "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "stage": "preview",
+  "commit": "a6544bce7532316208b31f4f86df30730986a4b3",
+  "staticPrelaunch": true,
+  "passed": 35,
+  "failed": 0,
+  "skipped": 0,
+  "hashedAssets": 24,
+  "checks": [
+    {
+      "name": "actual release SHA and static mode",
+      "status": "PASS"
+    },
+    {
+      "name": "manifest digest",
+      "status": "PASS"
+    },
+    {
+      "name": "versioned JavaScript/CSS hashes match build",
+      "status": "PASS"
+    },
+    {
+      "name": "retired /assets/demo/network.json",
+      "status": "PASS"
+    },
+    {
+      "name": "retired /assets/demo/01.png",
+      "status": "PASS"
+    },
+    {
+      "name": "retired /app/demo-network.js",
+      "status": "PASS"
+    },
+    {
+      "name": "retired /app/demo-gallery.js",
+      "status": "PASS"
+    },
+    {
+      "name": "retired /app/demo-bootstrap.js",
+      "status": "PASS"
+    },
+    {
+      "name": "prelaunch renders without JavaScript",
+      "status": "PASS"
+    },
+    {
+      "name": "no fictional cards or Online 390",
+      "status": "PASS"
+    },
+    {
+      "name": "no overflow 390",
+      "status": "PASS"
+    },
+    {
+      "name": "no provider controls /signup 390",
+      "status": "PASS"
+    },
+    {
+      "name": "no provider controls /account 390",
+      "status": "PASS"
+    },
+    {
+      "name": "no provider controls /acceptance 390",
+      "status": "PASS"
+    },
+    {
+      "name": "zero API calls during startup/timers/navigation 390",
+      "status": "PASS"
+    },
+    {
+      "name": "no JavaScript errors 390",
+      "status": "PASS"
+    },
+    {
+      "name": "all loaded local assets available 390",
+      "status": "PASS"
+    },
+    {
+      "name": "no fictional cards or Online 768",
+      "status": "PASS"
+    },
+    {
+      "name": "no overflow 768",
+      "status": "PASS"
+    },
+    {
+      "name": "no provider controls /signup 768",
+      "status": "PASS"
+    },
+    {
+      "name": "no provider controls /account 768",
+      "status": "PASS"
+    },
+    {
+      "name": "no provider controls /acceptance 768",
+      "status": "PASS"
+    },
+    {
+      "name": "zero API calls during startup/timers/navigation 768",
+      "status": "PASS"
+    },
+    {
+      "name": "no JavaScript errors 768",
+      "status": "PASS"
+    },
+    {
+      "name": "all loaded local assets available 768",
+      "status": "PASS"
+    },
+    {
+      "name": "no fictional cards or Online 1440",
+      "status": "PASS"
+    },
+    {
+      "name": "no overflow 1440",
+      "status": "PASS"
+    },
+    {
+      "name": "no provider controls /signup 1440",
+      "status": "PASS"
+    },
+    {
+      "name": "no provider controls /account 1440",
+      "status": "PASS"
+    },
+    {
+      "name": "no provider controls /acceptance 1440",
+      "status": "PASS"
+    },
+    {
+      "name": "zero API calls during startup/timers/navigation 1440",
+      "status": "PASS"
+    },
+    {
+      "name": "no JavaScript errors 1440",
+      "status": "PASS"
+    },
+    {
+      "name": "all loaded local assets available 1440",
+      "status": "PASS"
+    },
+    {
+      "name": "returning browser can export edits",
+      "status": "PASS"
+    },
+    {
+      "name": "selective removal preserves unrelated storage and cookie",
+      "status": "PASS"
+    }
+  ],
+  "realOAuth": "NOT RUN; disabled",
+  "realSocialActivation": false,
+  "browserRecovery": "disposable test context only; no owner browser storage accessed"
+}

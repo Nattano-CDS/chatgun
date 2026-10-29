@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-18T06:18:01.629Z",
+  "origin": "https://chatgun.social",
+  "release": {
+    "commit": "6c824ab0ecf5e70f414e7d34d74b7abe7bae3a8c",
+    "fictionalDemoEnabled": false,
+    "staticPrelaunch": true,
+    "assetsManifestSha256": "dfc23f33c8aed863ce9a2b16f78a035f25e4c5249c6924d9273f8ff901c82cec"
+  },
+  "aliasChecks": [
+    {
+      "path": "/",
+      "status": 200,
+      "location": null
+    },
+    {
+      "path": "/api/auth/config",
+      "status": 308,
+      "location": "https://chatgun.social/api/auth/config"
+    }
+  ]
+}

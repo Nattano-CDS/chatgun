@@ -1,0 +1,49 @@
+{
+  "checkedAt": "2026-10-20T07:22:08.863Z",
+  "origin": "https://chatgun.social",
+  "sha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "results": [
+    {
+      "width": 390,
+      "path": "/",
+      "status": 200,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "path": "/signup",
+      "status": 200,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "path": "/",
+      "status": 200,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "path": "/signup",
+      "status": 200,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "path": "/",
+      "status": 200,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "path": "/signup",
+      "status": 200,
+      "overflow": false
+    }
+  ],
+  "passed": 6,
+  "failed": 0,
+  "driverCorrection": "Initial networkidle wait timed out on third-party challenge traffic; a second attempt read provider controls before async configuration completed. Final run waits for the actual anonymous signup redirect and completed LINE-only provider visibility, not global network silence.",
+  "realOAuth": "NOT RUN: owner will perform Production UAT; CAPTCHA/consent untouched",
+  "authenticatedJourneys": "NOT CLAIMED",
+  "publicSignupEnabled": false
+}

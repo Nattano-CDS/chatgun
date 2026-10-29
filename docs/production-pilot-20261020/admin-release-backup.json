@@ -1,0 +1,21 @@
+{
+  "checkedAt": "2026-10-20T04:12:22.391Z",
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "database": "9738a051-d914-42d0-8e7b-8098ef2b959d",
+  "backupSha256": "4c9c2aae433d806e7a427aae4f4dcd5d583a6df4b71f6ba26ef46a51f68a74ca",
+  "localRestorePassed": true,
+  "foreignKeyViolations": 0,
+  "counts": {
+    "users": 1,
+    "identities": 1,
+    "member_profiles": 1,
+    "moderation_access_grants": 2,
+    "moderation_role_events": 2,
+    "beta_invitations": 1,
+    "social_media": 0,
+    "social_messages": 0
+  },
+  "recoveryBookmarkProtected": true,
+  "permissions": "0700 directory, 0600 files",
+  "productionRestored": false
+}

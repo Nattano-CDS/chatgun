@@ -1,0 +1,16 @@
+{
+  "applicationSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+  "syntheticAccountsCreated": 10,
+  "syntheticAccountsDeletedByAuthenticatedWorkflow": 9,
+  "newHeldControlAccountsRetained": 1,
+  "activeFixtureSessions": 0,
+  "providerIdentitiesCreated": 0,
+  "mediaObjectsCreated": 0,
+  "preExistingTablesVerified": 58,
+  "preExistingRowsUnchanged": true,
+  "foreignKeyViolations": 0,
+  "protectedBackups": true,
+  "productionUnchanged": true,
+  "productionWrites": 0,
+  "protectedStagingWrites": 0
+}

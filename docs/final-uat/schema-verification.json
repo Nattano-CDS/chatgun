@@ -1,0 +1,674 @@
+{
+  "checkedAt": "2026-10-23T19:48:45.246Z",
+  "databaseId": "e3cb426c-b88a-4b93-90fd-39df524f68ae",
+  "migrationCount": 21,
+  "checksums": [
+    {
+      "name": "0001_auth.sql",
+      "sha256": "131d6557ff4cf50e91d372e54c0f6509e5342f365223aee5712866041a04d933"
+    },
+    {
+      "name": "0002_privacy_safety.sql",
+      "sha256": "7b8a47789d26aba629ab386ebdc7fa7c7d05859fddb9418d4fad07222ba61560"
+    },
+    {
+      "name": "0003_social.sql",
+      "sha256": "2c26c6aa146f899baca519855a7191e3cc12bde0b1286b3664ce28b5626e8bf6"
+    },
+    {
+      "name": "0004_moderation_audit.sql",
+      "sha256": "970f0265235570d37bb6bbcf01f38f060b565ad833f69b4e157c1eec32c00778"
+    },
+    {
+      "name": "0005_trust_safety.sql",
+      "sha256": "ceead2b71e75576864d543dfabc354af8c72ae85483952444e8bc481086e1dcd"
+    },
+    {
+      "name": "0006_media_review_concurrency.sql",
+      "sha256": "4ca403ed19c94837bdc3575a7f34e0f2dc7de6c8454d204dfbe8d7f001c4ece8"
+    },
+    {
+      "name": "0007_controlled_beta.sql",
+      "sha256": "18f20ea06b270feb0d94acb980b48b10093ae1b25aa90411efe7839fa1a6720b"
+    },
+    {
+      "name": "0008_post_oauth_acceptance.sql",
+      "sha256": "b96631a0cb7b81088785dd4e4cb36d9a03e47f1da5fa4ac9b08cc86f7fca6f79"
+    },
+    {
+      "name": "0009_media_moderation.sql",
+      "sha256": "9c0219e693ec117100f230a1f10112c8fd1b35f7cae9e307e64c8a7b3bfde55a"
+    },
+    {
+      "name": "0010_moderation_access_management.sql",
+      "sha256": "e3fb35f8b59693c43337e61676862e90e7f5eec0591003c5084127556ab8b8fc"
+    },
+    {
+      "name": "0011_daily_media_upload_quotas.sql",
+      "sha256": "970d703379f68150593b5ae86cd757123e7c0786561895d0aff6b16cb6fc95ab"
+    },
+    {
+      "name": "0012_synthetic_seed_batches.sql",
+      "sha256": "6e565c4e167ad3ff78e9e1d128511d3599e2308c1853dd6aaa3f7c315fa7ab0b"
+    },
+    {
+      "name": "0013_direct_chat_private_albums.sql",
+      "sha256": "a96fa03519eaf91fc298a2065a7576b65312256aeeefbc66ec3daa8594e3d962"
+    },
+    {
+      "name": "0014_gallery_capacity.sql",
+      "sha256": "7b1cf53865a1f9089b468b2353108692e8d88cef76be683b491aaf48ec64a1bf"
+    },
+    {
+      "name": "0015_authenticated_online_presence.sql",
+      "sha256": "23843f4791b99b597da82ec0f7e165a3e3c5160c8bbca45358b5646540f5fdaa"
+    },
+    {
+      "name": "0016_beta_account_moderation.sql",
+      "sha256": "9ab57b00bbbe5c02966b0bd0c3b3aee1dded32100752652298407aa17770c27c"
+    },
+    {
+      "name": "0017_delivery_and_review_claims.sql",
+      "sha256": "d08733d758cfadd301940d0aca6eaa3c01affa2ef0cdc41c0e7ce85a62191486"
+    },
+    {
+      "name": "0018_cloudflare_admin_sessions.sql",
+      "sha256": "d7ab7d2a438ff1c5d3c3d83cdbf35b4b7837146af3898c282714d382a7e822d6"
+    },
+    {
+      "name": "0019_member_age_safety_holds.sql",
+      "sha256": "696683be68db9f43efd0d62973173f28b1c4e916aca0adaaf887aab859d347e6"
+    },
+    {
+      "name": "0020_age_hold_write_guards.sql",
+      "sha256": "ec4774ca2db46c4525b64fe5ca266040d70443b311400579e909009c767411b9"
+    },
+    {
+      "name": "0021_eligibility_review_requests.sql",
+      "sha256": "0e4d2bfe7a3adcd5a86dc4f9ac6ebc5b1e21c2964aea23c709d19199586968a4"
+    }
+  ],
+  "objects": [
+    {
+      "type": "index",
+      "name": "account_safety_notifications_user"
+    },
+    {
+      "type": "index",
+      "name": "administration_access_created"
+    },
+    {
+      "type": "index",
+      "name": "eligibility_one_pending"
+    },
+    {
+      "type": "index",
+      "name": "eligibility_review_queue"
+    },
+    {
+      "type": "index",
+      "name": "idx_account_acceptances_user_accepted"
+    },
+    {
+      "type": "index",
+      "name": "idx_age_assurance_user"
+    },
+    {
+      "type": "index",
+      "name": "idx_album_owner_status"
+    },
+    {
+      "type": "index",
+      "name": "idx_album_viewer_status"
+    },
+    {
+      "type": "index",
+      "name": "idx_beta_appeals_queue"
+    },
+    {
+      "type": "index",
+      "name": "idx_beta_enrollments_status"
+    },
+    {
+      "type": "index",
+      "name": "idx_beta_invitations_available"
+    },
+    {
+      "type": "index",
+      "name": "idx_beta_restriction_active"
+    },
+    {
+      "type": "index",
+      "name": "idx_blocks_blocked"
+    },
+    {
+      "type": "index",
+      "name": "idx_chat_events_owner"
+    },
+    {
+      "type": "index",
+      "name": "idx_chat_events_requester"
+    },
+    {
+      "type": "index",
+      "name": "idx_chat_initiations_daily"
+    },
+    {
+      "type": "index",
+      "name": "idx_cloudflare_admin_sessions_expiry"
+    },
+    {
+      "type": "index",
+      "name": "idx_cloudflare_admin_sessions_user"
+    },
+    {
+      "type": "index",
+      "name": "idx_deletion_receipts_expiry"
+    },
+    {
+      "type": "index",
+      "name": "idx_deletion_requests_expiry"
+    },
+    {
+      "type": "index",
+      "name": "idx_discovery_candidates"
+    },
+    {
+      "type": "index",
+      "name": "idx_identities_user"
+    },
+    {
+      "type": "index",
+      "name": "idx_independent_age_user_status"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_appeals_status_created"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_decisions_actor_created"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_decisions_media_created"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_deletion_due"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_owner_created"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_reports_media_status"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_reports_status_created"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_safety_audit_created"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_safety_decision_nonce"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_safety_queue"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_safety_status_category"
+    },
+    {
+      "type": "index",
+      "name": "idx_media_upload_quota_day"
+    },
+    {
+      "type": "index",
+      "name": "idx_messages_client_request"
+    },
+    {
+      "type": "index",
+      "name": "idx_messages_receiver_unread"
+    },
+    {
+      "type": "index",
+      "name": "idx_messages_sender_receiver"
+    },
+    {
+      "type": "index",
+      "name": "idx_moderation_access_active_role"
+    },
+    {
+      "type": "index",
+      "name": "idx_moderation_access_expiry"
+    },
+    {
+      "type": "index",
+      "name": "idx_moderation_audit_created"
+    },
+    {
+      "type": "index",
+      "name": "idx_moderation_notifications_user"
+    },
+    {
+      "type": "index",
+      "name": "idx_moderation_role_events_created"
+    },
+    {
+      "type": "index",
+      "name": "idx_moderation_role_events_target"
+    },
+    {
+      "type": "index",
+      "name": "idx_oauth_expiry"
+    },
+    {
+      "type": "index",
+      "name": "idx_oauth_reauth_expiry"
+    },
+    {
+      "type": "index",
+      "name": "idx_otp_email_created"
+    },
+    {
+      "type": "index",
+      "name": "idx_otp_expiry"
+    },
+    {
+      "type": "index",
+      "name": "idx_otp_ip_created"
+    },
+    {
+      "type": "index",
+      "name": "idx_photo_comments_created"
+    },
+    {
+      "type": "index",
+      "name": "idx_photo_visibility"
+    },
+    {
+      "type": "index",
+      "name": "idx_presence_expiry"
+    },
+    {
+      "type": "index",
+      "name": "idx_presence_user_fresh"
+    },
+    {
+      "type": "index",
+      "name": "idx_profile_photos_owner"
+    },
+    {
+      "type": "index",
+      "name": "idx_profiles_discovery"
+    },
+    {
+      "type": "index",
+      "name": "idx_rate_limits_expiry"
+    },
+    {
+      "type": "index",
+      "name": "idx_ratings_receiver"
+    },
+    {
+      "type": "index",
+      "name": "idx_relationships_high_status"
+    },
+    {
+      "type": "index",
+      "name": "idx_relationships_low_status"
+    },
+    {
+      "type": "index",
+      "name": "idx_reports_reason_status"
+    },
+    {
+      "type": "index",
+      "name": "idx_reports_status"
+    },
+    {
+      "type": "index",
+      "name": "idx_session_auth_evidence_expiry"
+    },
+    {
+      "type": "index",
+      "name": "idx_sessions_expiry"
+    },
+    {
+      "type": "index",
+      "name": "idx_sessions_user"
+    },
+    {
+      "type": "index",
+      "name": "idx_synthetic_seed_objects_media"
+    },
+    {
+      "type": "index",
+      "name": "idx_synthetic_seed_records_type"
+    },
+    {
+      "type": "table",
+      "name": "_cf_KV"
+    },
+    {
+      "type": "table",
+      "name": "account_acceptances"
+    },
+    {
+      "type": "table",
+      "name": "account_deletion_requests"
+    },
+    {
+      "type": "table",
+      "name": "account_safety_notifications"
+    },
+    {
+      "type": "table",
+      "name": "administration_access_events"
+    },
+    {
+      "type": "table",
+      "name": "age_assurance_events"
+    },
+    {
+      "type": "table",
+      "name": "album_access_grants"
+    },
+    {
+      "type": "table",
+      "name": "album_access_requests"
+    },
+    {
+      "type": "table",
+      "name": "beta_account_appeals"
+    },
+    {
+      "type": "table",
+      "name": "beta_account_moderation_events"
+    },
+    {
+      "type": "table",
+      "name": "beta_account_restrictions"
+    },
+    {
+      "type": "table",
+      "name": "beta_enrollments"
+    },
+    {
+      "type": "table",
+      "name": "beta_invitations"
+    },
+    {
+      "type": "table",
+      "name": "chat_initiations"
+    },
+    {
+      "type": "table",
+      "name": "chat_preferences"
+    },
+    {
+      "type": "table",
+      "name": "chat_system_events"
+    },
+    {
+      "type": "table",
+      "name": "cloudflare_admin_sessions"
+    },
+    {
+      "type": "table",
+      "name": "d1_migrations"
+    },
+    {
+      "type": "table",
+      "name": "deletion_receipts"
+    },
+    {
+      "type": "table",
+      "name": "eligibility_review_events"
+    },
+    {
+      "type": "table",
+      "name": "eligibility_review_requests"
+    },
+    {
+      "type": "table",
+      "name": "identities"
+    },
+    {
+      "type": "table",
+      "name": "identity_verification_requests"
+    },
+    {
+      "type": "table",
+      "name": "independent_age_assurances"
+    },
+    {
+      "type": "table",
+      "name": "media_appeals"
+    },
+    {
+      "type": "table",
+      "name": "media_deletion_queue"
+    },
+    {
+      "type": "table",
+      "name": "media_moderation_decisions"
+    },
+    {
+      "type": "table",
+      "name": "media_reports"
+    },
+    {
+      "type": "table",
+      "name": "media_safety_audit_events"
+    },
+    {
+      "type": "table",
+      "name": "media_safety_reviews"
+    },
+    {
+      "type": "table",
+      "name": "media_upload_quota_attempts"
+    },
+    {
+      "type": "table",
+      "name": "member_age_safety_holds"
+    },
+    {
+      "type": "table",
+      "name": "member_presence_leases"
+    },
+    {
+      "type": "table",
+      "name": "member_presence_preferences"
+    },
+    {
+      "type": "table",
+      "name": "member_profiles"
+    },
+    {
+      "type": "table",
+      "name": "moderation_access_grants"
+    },
+    {
+      "type": "table",
+      "name": "moderation_audit_events"
+    },
+    {
+      "type": "table",
+      "name": "moderation_notifications"
+    },
+    {
+      "type": "table",
+      "name": "moderation_role_events"
+    },
+    {
+      "type": "table",
+      "name": "moderation_roles"
+    },
+    {
+      "type": "table",
+      "name": "oauth_flows"
+    },
+    {
+      "type": "table",
+      "name": "oauth_reauth_contexts"
+    },
+    {
+      "type": "table",
+      "name": "otp_challenges"
+    },
+    {
+      "type": "table",
+      "name": "photo_comments"
+    },
+    {
+      "type": "table",
+      "name": "photo_likes"
+    },
+    {
+      "type": "table",
+      "name": "profile_photos"
+    },
+    {
+      "type": "table",
+      "name": "proximity_ratings"
+    },
+    {
+      "type": "table",
+      "name": "rate_limits"
+    },
+    {
+      "type": "table",
+      "name": "session_auth_evidence"
+    },
+    {
+      "type": "table",
+      "name": "sessions"
+    },
+    {
+      "type": "table",
+      "name": "social_blocks"
+    },
+    {
+      "type": "table",
+      "name": "social_media"
+    },
+    {
+      "type": "table",
+      "name": "social_messages"
+    },
+    {
+      "type": "table",
+      "name": "social_relationships"
+    },
+    {
+      "type": "table",
+      "name": "social_reports"
+    },
+    {
+      "type": "table",
+      "name": "synthetic_seed_batches"
+    },
+    {
+      "type": "table",
+      "name": "synthetic_seed_objects"
+    },
+    {
+      "type": "table",
+      "name": "synthetic_seed_records"
+    },
+    {
+      "type": "table",
+      "name": "uat_migration_checksums"
+    },
+    {
+      "type": "table",
+      "name": "users"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_album_grant_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_album_grant_update_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_album_request_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_album_request_update_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_message_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_presence_lease_insert_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_presence_lease_update_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_presence_preference_insert_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_presence_preference_update_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_privacy_insert"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_privacy_update"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_profile_insert_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "age_hold_profile_update_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "album_block_revokes"
+    },
+    {
+      "type": "trigger",
+      "name": "album_request_created"
+    },
+    {
+      "type": "trigger",
+      "name": "album_request_transition"
+    },
+    {
+      "type": "trigger",
+      "name": "direct_chat_spam_guard"
+    },
+    {
+      "type": "trigger",
+      "name": "gallery_capacity_guard"
+    }
+  ],
+  "foreignKeyViolations": 0,
+  "protectedBackup": true,
+  "sqliteRestoreRehearsal": "PASS",
+  "productionWrites": 0,
+  "protectedStagingWrites": 0
+}

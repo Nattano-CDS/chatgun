@@ -1,0 +1,487 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/26.5.0/bin/node",
+      "/Users/nattano/.codex/worktrees/chatgun-release-candidate/node_modules/.bin/playwright",
+      "test",
+      "--config=playwright.youth-cloud.config.js"
+    ],
+    "configFile": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/playwright.youth-cloud.config.js",
+    "rootDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/youth-cloud-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "youth-cloud.spec.js"
+        ],
+        "timeout": 90000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/youth-cloud-artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "snapshotDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": "youth-cloud.spec.js",
+        "timeout": 90000,
+        "use": {
+          "baseURL": "https://issue13.chatgun-issue13-staging.pages.dev",
+          "trace": "off",
+          "video": "off",
+          "screenshot": "only-on-failure"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/youth-cloud-browser.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "youth-cloud.spec.js",
+      "file": "youth-cloud.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "isolated Preview remains closed to real registration and anonymous member access",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 289,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:11:43.618Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c3fe2f6897ab578b7be-e264ceb47693796d815c",
+          "file": "youth-cloud.spec.js",
+          "line": 21,
+          "column": 1
+        },
+        {
+          "title": "Cloudflare held under_13 rights, bypass denial and deletion at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5665,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:11:44.072Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c3fe2f6897ab578b7be-a8b475a927ebcabc33b4",
+          "file": "youth-cloud.spec.js",
+          "line": 25,
+          "column": 66
+        },
+        {
+          "title": "Cloudflare held under_13 rights, bypass denial and deletion at 768px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6477,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:11:49.962Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c3fe2f6897ab578b7be-fe509094063430f04363",
+          "file": "youth-cloud.spec.js",
+          "line": 25,
+          "column": 66
+        },
+        {
+          "title": "Cloudflare held under_13 rights, bypass denial and deletion at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6277,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:11:56.446Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c3fe2f6897ab578b7be-8ca0fb040ac70092ff80",
+          "file": "youth-cloud.spec.js",
+          "line": 25,
+          "column": 66
+        },
+        {
+          "title": "Cloudflare held 13_17 rights, bypass denial and deletion at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6537,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:12:02.732Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c3fe2f6897ab578b7be-c5787d4249737ab21669",
+          "file": "youth-cloud.spec.js",
+          "line": 25,
+          "column": 66
+        },
+        {
+          "title": "Cloudflare held 13_17 rights, bypass denial and deletion at 768px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5501,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:12:09.275Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c3fe2f6897ab578b7be-8d60c40f08d4c4b32d80",
+          "file": "youth-cloud.spec.js",
+          "line": 25,
+          "column": 66
+        },
+        {
+          "title": "Cloudflare held 13_17 rights, bypass denial and deletion at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5673,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:12:14.781Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c3fe2f6897ab578b7be-ff2e0e2a10d6bf37dd77",
+          "file": "youth-cloud.spec.js",
+          "line": 25,
+          "column": 66
+        },
+        {
+          "title": "Cloudflare held 18_19 rights, bypass denial and deletion at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 9877,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:12:20.460Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c3fe2f6897ab578b7be-5cf95fb0e31a0fdd5b16",
+          "file": "youth-cloud.spec.js",
+          "line": 25,
+          "column": 66
+        },
+        {
+          "title": "Cloudflare held 18_19 rights, bypass denial and deletion at 768px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5886,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:12:30.341Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c3fe2f6897ab578b7be-c00e06b9b07c91898499",
+          "file": "youth-cloud.spec.js",
+          "line": 25,
+          "column": 66
+        },
+        {
+          "title": "Cloudflare held 18_19 rights, bypass denial and deletion at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5710,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:12:36.233Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c3fe2f6897ab578b7be-72713c4e189d48bbc9a5",
+          "file": "youth-cloud.spec.js",
+          "line": 25,
+          "column": 66
+        },
+        {
+          "title": "Cloudflare expired/stale sessions and held-account logout remain enforced",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1146,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-23T19:12:41.949Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c3fe2f6897ab578b7be-718170356d40f30a90d1",
+          "file": "youth-cloud.spec.js",
+          "line": 69,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-23T19:11:43.414Z",
+    "duration": 59718.807,
+    "expected": 11,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

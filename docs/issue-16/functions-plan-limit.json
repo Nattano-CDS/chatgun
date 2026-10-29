@@ -1,0 +1,8 @@
+{
+  "checkedAt": "2026-10-17T17:43:27.468Z",
+  "isolatedProject": "chatgun-issue13-staging",
+  "path": "/api/health",
+  "status": 429,
+  "error1046": true,
+  "message": "The owner has reached their plan limits; fail-open was masking the failure as static HTML 404."
+}

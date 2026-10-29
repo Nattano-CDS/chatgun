@@ -1,0 +1,28 @@
+{
+  "status": "DRAFT_NOT_APPROVED",
+  "scope": "final-uat-social-location-chat-privacy",
+  "productionDocumentsChanged": false,
+  "documents": {
+    "adultNotice": { "path": "policies/final-uat/beta-notice.html", "version": "adult-social-uat-2026-10-28-rc3", "sha256": "bed1712129fa59f26683bfa5f00b4c5de6ca3a88de103c8c48b6ca55d7d703a0" },
+    "terms": { "path": "policies/final-uat/terms.html", "version": "terms-social-uat-2026-10-28-rc3", "sha256": "ca712150dcf45a93854325215e4eaf4b5a7eaa25f9817f809ff30daf16af4240" },
+    "privacy": { "path": "policies/final-uat/privacy.html", "version": "privacy-social-uat-2026-10-28-rc3", "sha256": "38a01bd8731481aafab92b480a002bc411c37b0f9e48281cc4aad8890d52d0ed" },
+    "deletion": { "path": "policies/final-uat/data-deletion.html", "version": "deletion-social-uat-2026-10-28-rc3", "sha256": "8112d26ec9a0ad5bbef74d737e38662a1c0050f3fe0910ac4d190dbbe5bb3c9a" }
+  },
+  "activation": {
+    "requiresPrivateOwnerApproval": true,
+    "requiresExactVersionAndHashMatch": true,
+    "mediaEnabled": false,
+    "publicRegistrationEnabled": false,
+    "youthAdmissionEnabled": false,
+    "productionChangesAuthorized": false
+  },
+  "retention": {
+    "proposal": "campaign-plus-7-days-logical-cleanup-with-recovery-caveat",
+    "ownerDecisionPending": false,
+    "minimumAuditEvidenceRetentionDays": 90,
+    "minimumAuditEvidenceRetentionStartsAt": "actual-campaign-close",
+    "participantAAutomaticDeletion": false,
+    "participantBSeparateConsentRequired": true,
+    "sevenDaysMeansPhysicalBackupErasure": false
+  }
+}

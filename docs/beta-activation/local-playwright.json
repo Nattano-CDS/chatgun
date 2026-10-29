@@ -1,0 +1,467 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/26.5.0/bin/node",
+      "/Users/nattano/.codex/worktrees/chatgun-release-candidate/node_modules/.bin/playwright",
+      "test",
+      "--config=playwright.issue16.config.js"
+    ],
+    "configFile": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/playwright.issue16.config.js",
+    "rootDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/issue16",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "issue16-*.spec.js"
+        ],
+        "timeout": 45000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/issue16",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "snapshotDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": "issue16-*.spec.js",
+        "timeout": 45000,
+        "use": {
+          "baseURL": "https://localhost:8797",
+          "ignoreHTTPSErrors": true,
+          "screenshot": "only-on-failure",
+          "trace": "retain-on-failure"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/issue-16/local-playwright.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": {
+      "command": "node scripts/serve-issue16-local.mjs",
+      "url": "https://localhost:8797/api/health",
+      "ignoreHTTPSErrors": true,
+      "reuseExistingServer": false,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "issue16-beta-admission.spec.js",
+      "file": "issue16-beta-admission.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "private admission transport and provider filtering, localhost 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 452,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:33.066Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3dc0655c4d38cf182e34-911f490ea30a9aca6504",
+          "file": "issue16-beta-admission.spec.js",
+          "line": 4,
+          "column": 35
+        },
+        {
+          "title": "private admission transport and provider filtering, localhost 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 267,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:33.747Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3dc0655c4d38cf182e34-8bdc3a9fce3024fd5e8a",
+          "file": "issue16-beta-admission.spec.js",
+          "line": 4,
+          "column": 35
+        },
+        {
+          "title": "private admission transport and provider filtering, localhost 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 356,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:34.019Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3dc0655c4d38cf182e34-d21ec132f90dbe11446b",
+          "file": "issue16-beta-admission.spec.js",
+          "line": 4,
+          "column": 35
+        }
+      ]
+    },
+    {
+      "title": "issue16-presence-retirement.spec.js",
+      "file": "issue16-presence-retirement.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticated Online across four surfaces, opt-out and logout 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 916,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:34.385Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c37d2265a07c7505dc07-a1d4797e8d8ba4c911ba",
+          "file": "issue16-presence-retirement.spec.js",
+          "line": 11,
+          "column": 3
+        },
+        {
+          "title": "prelaunch and exact-key export/removal preserve unrelated data 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 377,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:35.305Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c37d2265a07c7505dc07-8d2417dfde84cb3349e0",
+          "file": "issue16-presence-retirement.spec.js",
+          "line": 36,
+          "column": 3
+        },
+        {
+          "title": "authenticated Online across four surfaces, opt-out and logout 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1139,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:35.687Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c37d2265a07c7505dc07-942276d24ee3a6846408",
+          "file": "issue16-presence-retirement.spec.js",
+          "line": 11,
+          "column": 3
+        },
+        {
+          "title": "prelaunch and exact-key export/removal preserve unrelated data 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 319,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:36.831Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c37d2265a07c7505dc07-2b2e6b17ba597c3cd702",
+          "file": "issue16-presence-retirement.spec.js",
+          "line": 36,
+          "column": 3
+        },
+        {
+          "title": "authenticated Online across four surfaces, opt-out and logout 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1301,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:37.155Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c37d2265a07c7505dc07-febd9d7011dd7be05f3f",
+          "file": "issue16-presence-retirement.spec.js",
+          "line": 11,
+          "column": 3
+        },
+        {
+          "title": "prelaunch and exact-key export/removal preserve unrelated data 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 348,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:38.460Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c37d2265a07c7505dc07-5d16fb091d1bd3c2116e",
+          "file": "issue16-presence-retirement.spec.js",
+          "line": 36,
+          "column": 3
+        },
+        {
+          "title": "retirement refuses to remove data edited concurrently in another tab",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 264,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-19T14:21:38.812Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c37d2265a07c7505dc07-bf3378db2517efbe4228",
+          "file": "issue16-presence-retirement.spec.js",
+          "line": 58,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-19T14:21:32.436Z",
+    "duration": 6689.543,
+    "expected": 10,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

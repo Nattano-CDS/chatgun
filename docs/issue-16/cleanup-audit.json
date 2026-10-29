@@ -1,0 +1,21 @@
+{
+  "checkedAt": "2026-10-17T17:48:14.132Z",
+  "batch": "chatgun-owner-review-v1",
+  "database": "chatgun-auth-staging",
+  "databaseId": "5bbfd55d-eb22-4324-8a7d-57bef14110ea",
+  "backupBytes": 330560,
+  "backupSha256": "a7eff0853762d807c55134e2d3aa1fcc7cb1234829a5d4d566587d6ed90171a4",
+  "backupMode": "0600",
+  "backupLocation": "protected outside repository",
+  "trackedRecords": 369,
+  "simulatedAffectedRows": 903,
+  "simulatedForeignKeyViolations": 0,
+  "untrackedAffectedCounts": {
+    "session_auth_evidence": 3,
+    "photo_likes": 30,
+    "moderation_audit_events": 21,
+    "media_safety_audit_events": 77
+  },
+  "safeToExecute": false,
+  "remoteWrites": 0
+}

@@ -1,0 +1,75 @@
+{
+  "checkedAt": "2026-10-20T04:16:51.369Z",
+  "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "stage": "preview",
+  "commit": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+  "passed": 14,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "exact controlled release SHA and no demo",
+      "status": "PASS"
+    },
+    {
+      "name": "asset manifest digest",
+      "status": "PASS"
+    },
+    {
+      "name": "all manifest HTML/JS/CSS hashes verified",
+      "status": "PASS"
+    },
+    {
+      "name": "approved published privacy.html",
+      "status": "PASS"
+    },
+    {
+      "name": "approved published terms.html",
+      "status": "PASS"
+    },
+    {
+      "name": "approved published data-deletion.html",
+      "status": "PASS"
+    },
+    {
+      "name": "approved published beta-notice.html",
+      "status": "PASS"
+    },
+    {
+      "name": "retired demo unavailable /assets/demo/network.json",
+      "status": "PASS"
+    },
+    {
+      "name": "retired demo unavailable /app/demo-network.js",
+      "status": "PASS"
+    },
+    {
+      "name": "retired demo unavailable /app/demo-gallery.js",
+      "status": "PASS"
+    },
+    {
+      "name": "retired demo unavailable /app/demo-bootstrap.js",
+      "status": "PASS"
+    },
+    {
+      "name": "JSON /api/health",
+      "status": "PASS"
+    },
+    {
+      "name": "JSON /api/auth/config",
+      "status": "PASS"
+    },
+    {
+      "name": "JSON /api/social/config",
+      "status": "PASS"
+    }
+  ],
+  "hashedAssets": 38,
+  "policyVersions": {
+    "adultNotice": "adult-beta-2026-10-20-rc1",
+    "terms": "terms-beta-2026-10-20-rc1",
+    "privacy": "privacy-beta-2026-10-20-rc1",
+    "beta": "beta-2026-10-20-rc1"
+  },
+  "realOAuth": "NOT RUN by this checker; human interaction required",
+  "realUserCreated": false
+}

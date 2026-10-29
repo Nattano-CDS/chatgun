@@ -1,0 +1,13 @@
+{
+  "observedOn": "2026-10-20",
+  "initialPilotSha": "8c378c9bbe8c79671f4f9729f3fddae0edeb8348",
+  "failedCheck": "Strict full-manifest HTML digest verification on Production",
+  "affectedPaths": ["beta-notice.html","canary-notice.html","data-deletion.html","privacy.html","terms.html"],
+  "observedMarkers": ["data-cfemail","email-decode.min.js"],
+  "cause": "Cloudflare Email Address Obfuscation transformed HTML at the zone edge; Preview had no such transformation",
+  "repair": "Targeted Cache-Control no-cache, no-transform response headers, preserving approved policy source files and CSP/auth controls",
+  "officialDocumentation": "https://developers.cloudflare.com/waf/tools/scrape-shield/email-address-obfuscation/",
+  "invitationsIssuedBeforeRepair": 0,
+  "genuineUsersCreatedBeforeRepair": 0,
+  "authSuccessClaimed": false
+}

@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 const window={};for(const file of ['app/near-icons.js','app/near-components.js'])vm.runInNewContext(readFileSync(file,'utf8'),{window});
-const c={person:{name:'สมมติ',identity_verified:1},id:'sample',html:String,portrait:()=>'',photos:[],config:{messagingEnabled:true},album:{granted:false},media:()=>'',images:'',grid:'',star:'<svg></svg>'};
+const c={person:{name:'สมมติ',identity_verified:1},id:'sample',html:String,portrait:()=>'',photos:[],config:{messagingEnabled:true,mediaUploadEnabled:true},album:{granted:false},media:()=>'',images:'',grid:'',star:'<svg></svg>'};
 test('every member and own card has one semantic profile link and no action buttons',()=>{
   for(const own of [false,true]){
     const out=window.ChatgunNearComponents.card({...c,own,canRate:true,messagingEnabled:true});
@@ -21,11 +21,11 @@ test('all profile consent states have exactly one Gallery and no verbose album c
     assert.doesNotMatch(out,/profile-gallery-top|album-feedback|album-management|data-demo-owner|data-album-action|ส่งคำขอแล้ว · รออนุมัติในแชท|ยกเลิกคำขอ<\/button>/);
   }
 });
-test('final approved image and padlock SVG composition is source-exact and demo switching is chat-only',()=>{
+test('final approved image and padlock SVG composition is source-exact and demo switching is removed',()=>{
   const before=execFileSync('git',['show','b6ba87434a82e655bff0cea39ce637fca5488b4a:app/near-components.js'],{encoding:'utf8'});
   const now=readFileSync('app/near-components.js','utf8');
   const extract=s=>s.match(/  function albumIconButton\(c\)\{[\s\S]*?\n  \}/)[0];assert.equal(extract(now),extract(before));
   const css=readFileSync('app/near-components.css','utf8'),oldCss=execFileSync('git',['show','b6ba87434a82e655bff0cea39ce637fca5488b4a:app/near-components.css'],{encoding:'utf8'});
   const rules=s=>s.split('\n').filter(l=>/private-album-icon|album-icon-art|album-lock-badge/.test(l)).join('\n');assert.equal(rules(css),rules(oldCss));
-  const script=readFileSync('app/social.js','utf8');assert.match(script,/if\(state.demo\)safety.insertAdjacentHTML\('beforeend',`<button type="button" data-demo-owner=/);
+  const script=readFileSync('app/social.js','utf8');assert.doesNotMatch(script,/data-demo-owner/);
 });

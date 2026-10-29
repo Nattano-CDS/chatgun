@@ -1,0 +1,61 @@
+{
+  "checkedAt": "2026-10-20T01:36:38.703Z",
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "windowStart": "2026-10-20T00:00:00.000Z",
+  "usageIsAdaptiveEstimate": true,
+  "usage": [],
+  "pagesUsage": [
+    {
+      "dimensions": {
+        "scriptName": "pages-worker--21536565-preview",
+        "status": "success"
+      },
+      "sum": {
+        "requests": 9
+      }
+    },
+    {
+      "dimensions": {
+        "scriptName": "pages-worker--21410320-production",
+        "status": "success"
+      },
+      "sum": {
+        "requests": 36
+      }
+    }
+  ],
+  "pagesRequestEstimate": 45,
+  "usageErrors": [],
+  "currentApis": [
+    {
+      "origin": "https://chatgun.social",
+      "path": "/api/social/config",
+      "status": 200,
+      "json": true
+    },
+    {
+      "origin": "https://chatgun.social",
+      "path": "/api/auth/config",
+      "status": 200,
+      "json": true
+    },
+    {
+      "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+      "path": "/api/social/config",
+      "status": 200,
+      "json": true
+    },
+    {
+      "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+      "path": "/api/auth/config",
+      "status": 200,
+      "json": true
+    }
+  ],
+  "currently1046Observed": false,
+  "pagesProductionBranch": "main",
+  "liveDeployment": "336fe5fa-c4ab-4bdd-a4da-6b91f0df1d88",
+  "liveSha": "c1116c25a77e0a96f1e53f9fe662b6a9c4aab671",
+  "billingChanged": false,
+  "exactPlanEntitlement": "Not inferred from adaptive counts; owner billing review required if limit recurs"
+}

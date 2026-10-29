@@ -1,0 +1,11 @@
+{
+ "name":"chatgun-final-uat-media-cleanup",
+ "account_id":"23017b53386fb67fc62a52cdd017454c",
+ "main":"workers/media-cleanup.js",
+ "compatibility_date":"2026-10-15",
+ "workers_dev":false,"preview_urls":false,"send_metrics":false,
+ "triggers":{"crons":["37 3 * * *"]},
+ "vars":{"MEDIA_CLEANUP_ENABLED":"true"},
+ "d1_databases":[{"binding":"DB","database_name":"chatgun-final-uat","database_id":"e3cb426c-b88a-4b93-90fd-39df524f68ae","migrations_dir":"migrations"}],
+ "r2_buckets":[{"binding":"MEDIA","bucket_name":"chatgun-final-uat-media"}]
+}

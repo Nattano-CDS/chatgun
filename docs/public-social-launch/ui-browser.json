@@ -1,0 +1,3106 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/26.5.0/bin/node",
+      "/Users/nattano/.codex/worktrees/chatgun-release-candidate/node_modules/.bin/playwright",
+      "test",
+      "--config=playwright.platform-local.config.js"
+    ],
+    "configFile": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/playwright.platform-local.config.js",
+    "rootDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/platform-local",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "viewport-390",
+        "name": "viewport-390",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "auth.spec.js",
+          "social.spec.js",
+          "moderation.spec.js"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/platform-local",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "viewport-768",
+        "name": "viewport-768",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "auth.spec.js",
+          "social.spec.js",
+          "moderation.spec.js"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/platform-local",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "viewport-1440",
+        "name": "viewport-1440",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "auth.spec.js",
+          "social.spec.js",
+          "moderation.spec.js"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/platform-local",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "viewport-390",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "snapshotDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "auth.spec.js",
+          "social.spec.js",
+          "moderation.spec.js"
+        ],
+        "timeout": 30000,
+        "use": {
+          "baseURL": "https://localhost:8797",
+          "ignoreHTTPSErrors": true,
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "viewport": {
+            "width": 390,
+            "height": 900
+          },
+          "browserName": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "viewport-390"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/platform-local",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "viewport-768",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "snapshotDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "auth.spec.js",
+          "social.spec.js",
+          "moderation.spec.js"
+        ],
+        "timeout": 30000,
+        "use": {
+          "baseURL": "https://localhost:8797",
+          "ignoreHTTPSErrors": true,
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "viewport": {
+            "width": 768,
+            "height": 900
+          },
+          "browserName": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "viewport-768"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/platform-local",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "viewport-1440",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "snapshotDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "auth.spec.js",
+          "social.spec.js",
+          "moderation.spec.js"
+        ],
+        "timeout": 30000,
+        "use": {
+          "baseURL": "https://localhost:8797",
+          "ignoreHTTPSErrors": true,
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "browserName": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "viewport-1440"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/production-pilot-20261020/platform-local-browser.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": {
+      "command": "node scripts/serve-issue16-local.mjs",
+      "url": "https://localhost:8797/api/health",
+      "ignoreHTTPSErrors": true,
+      "reuseExistingServer": false,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "auth.spec.js",
+      "file": "auth.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "signup explains a Turnstile connection failure in Thai and retries before OAuth",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 473,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:54.962Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-807f444d3d4a97aa44a0",
+          "file": "auth.spec.js",
+          "line": 14,
+          "column": 1
+        },
+        {
+          "title": "signup permits existing social login while public registration remains closed",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 174,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:55.732Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-4963ce3fddf9d9174a01",
+          "file": "auth.spec.js",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 337,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:55.911Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-da3a2434e64cb3edb426",
+          "file": "auth.spec.js",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "privacy notice explains social identity data use",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 488,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:56.253Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-94fbe7420904b8ace82c",
+          "file": "auth.spec.js",
+          "line": 147,
+          "column": 1
+        },
+        {
+          "title": "approved owner-pilot legal pages retain version, scope and unresolved wider-release decisions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 534,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:56.748Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-e639d0c4ec12801b3edd",
+          "file": "auth.spec.js",
+          "line": 156,
+          "column": 1
+        },
+        {
+          "title": "account page redirects unauthenticated users to signup",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 128,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:57.288Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-61d61dea5c51fe2ce82b",
+          "file": "auth.spec.js",
+          "line": 167,
+          "column": 1
+        },
+        {
+          "title": "Pages Functions expose secure config and reject cross-origin mutations",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 44,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:57.420Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-680c30fd1f316fbb78c2",
+          "file": "auth.spec.js",
+          "line": 173,
+          "column": 1
+        },
+        {
+          "title": "signup explains a Turnstile connection failure in Thai and retries before OAuth",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 276,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:09.831Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-c1c20faff868d39db276",
+          "file": "auth.spec.js",
+          "line": 14,
+          "column": 1
+        },
+        {
+          "title": "signup permits existing social login while public registration remains closed",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 226,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:10.202Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-829d9f97b45e24300c90",
+          "file": "auth.spec.js",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 380,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:10.433Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-681991ea023cdaf93a70",
+          "file": "auth.spec.js",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "privacy notice explains social identity data use",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 480,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:10.817Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-17bb14ed0b2eeaedd034",
+          "file": "auth.spec.js",
+          "line": 147,
+          "column": 1
+        },
+        {
+          "title": "approved owner-pilot legal pages retain version, scope and unresolved wider-release decisions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 491,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:11.305Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-d4322695594ad539d97c",
+          "file": "auth.spec.js",
+          "line": 156,
+          "column": 1
+        },
+        {
+          "title": "account page redirects unauthenticated users to signup",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 193,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:11.801Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-369b99e79905b191c8f6",
+          "file": "auth.spec.js",
+          "line": 167,
+          "column": 1
+        },
+        {
+          "title": "Pages Functions expose secure config and reject cross-origin mutations",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 44,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:12.000Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-1233dca5b6f292a2b547",
+          "file": "auth.spec.js",
+          "line": 173,
+          "column": 1
+        },
+        {
+          "title": "signup explains a Turnstile connection failure in Thai and retries before OAuth",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 278,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:24.713Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-7b9074b4abce1866a1a3",
+          "file": "auth.spec.js",
+          "line": 14,
+          "column": 1
+        },
+        {
+          "title": "signup permits existing social login while public registration remains closed",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 400,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:25.087Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-1a1f14a3c53c9ca7e4a6",
+          "file": "auth.spec.js",
+          "line": 72,
+          "column": 1
+        },
+        {
+          "title": "post-OAuth acceptance is responsive, starts unchecked, and continues only after both confirmations",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 453,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:25.492Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-1f9a8a9b0a69894f4e49",
+          "file": "auth.spec.js",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "privacy notice explains social identity data use",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 547,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:25.949Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-e4bfbb9181433b539152",
+          "file": "auth.spec.js",
+          "line": 147,
+          "column": 1
+        },
+        {
+          "title": "approved owner-pilot legal pages retain version, scope and unresolved wider-release decisions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 501,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:26.502Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-210e57af4ec779556c5b",
+          "file": "auth.spec.js",
+          "line": 156,
+          "column": 1
+        },
+        {
+          "title": "account page redirects unauthenticated users to signup",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 186,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:27.008Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-c32ecb8e68d876f83cd2",
+          "file": "auth.spec.js",
+          "line": 167,
+          "column": 1
+        },
+        {
+          "title": "Pages Functions expose secure config and reject cross-origin mutations",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 43,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:27.199Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d5ed79a6b333c2ba7209-2a5eae6bafa0dd834c58",
+          "file": "auth.spec.js",
+          "line": 173,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "moderation.spec.js",
+      "file": "moderation.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "admin dashboard opens routine overview automatically and requires justification for restricted evidence",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 454,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:57.473Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e9919751db06e06847bf-e8d79658d233ddd875d6",
+          "file": "moderation.spec.js",
+          "line": 48,
+          "column": 1
+        },
+        {
+          "title": "admin dashboard opens routine overview automatically and requires justification for restricted evidence",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 529,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:12.052Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e9919751db06e06847bf-1e338fc0c6527859e2bc",
+          "file": "moderation.spec.js",
+          "line": 48,
+          "column": 1
+        },
+        {
+          "title": "admin dashboard opens routine overview automatically and requires justification for restricted evidence",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 444,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:27.251Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e9919751db06e06847bf-05ae6f46925a591b474b",
+          "file": "moderation.spec.js",
+          "line": 48,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "social.spec.js",
+      "file": "social.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "restricted public account reaches account privacy/deletion and appeal controls instead of a retry dead end",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 139,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:57.943Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-4a9844972343bc7e19dd",
+          "file": "social.spec.js",
+          "line": 54,
+          "column": 1
+        },
+        {
+          "title": "authenticated chat deep link opens the actual inbox immediately",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 148,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:58.087Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-647f9d9ddec6e441d5e0",
+          "file": "social.spec.js",
+          "line": 63,
+          "column": 1
+        },
+        {
+          "title": "root is the authenticated discovery entry while welcome retains marketing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 635,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:58.242Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-554b39a3aafd48a761f5",
+          "file": "social.spec.js",
+          "line": 68,
+          "column": 1
+        },
+        {
+          "title": "authenticated shortcut is session-owned, deduplicated and independent of discovery visibility",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 266,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:58.881Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-b9c976555e3452103d63",
+          "file": "social.spec.js",
+          "line": 77,
+          "column": 1
+        },
+        {
+          "title": "gallery failed comment keeps its draft and inline reason; likes are disabled while pending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2341,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:46:59.152Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-836ac9dab7dad1a7d266",
+          "file": "social.spec.js",
+          "line": 90,
+          "column": 1
+        },
+        {
+          "title": "public photo stays open without a private grant and foreground updates preserve comment draft",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 204,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:01.498Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-7e7c58c29e73fcc22e35",
+          "file": "social.spec.js",
+          "line": 115,
+          "column": 1
+        },
+        {
+          "title": "core configuration outage exposes a working recovery action without fake members",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 218,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:01.707Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-dbea772c9c7455bfa447",
+          "file": "social.spec.js",
+          "line": 121,
+          "column": 1
+        },
+        {
+          "title": "unread badges refresh across screens and opt-in foreground notifications do not require hidden polling",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 307,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:01.930Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-6d2856034e337d974c3e",
+          "file": "social.spec.js",
+          "line": 124,
+          "column": 1
+        },
+        {
+          "title": "moderation withdrawal clears an already-open photo on permission refresh",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 187,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:02.242Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-23e68dd49aae53af50b8",
+          "file": "social.spec.js",
+          "line": 131,
+          "column": 1
+        },
+        {
+          "title": "desktop social shell preserves discovery, direct chat, reviews, and profile without game",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 314,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:02.434Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-d63599409254de1512f6",
+          "file": "social.spec.js",
+          "line": 139,
+          "column": 1
+        },
+        {
+          "title": "mobile social shell uses bottom navigation and remains usable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 251,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:02.752Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-f9c52d5e7b24b35c86f5",
+          "file": "social.spec.js",
+          "line": 155,
+          "column": 1
+        },
+        {
+          "title": "disabled social environment reveals no member features",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 116,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:03.007Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-a5d7a473e6fff9d1dfe0",
+          "file": "social.spec.js",
+          "line": 164,
+          "column": 1
+        },
+        {
+          "title": "member profile routes are deep-linkable and preserve browser history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 241,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:03.128Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-4c2d9ca5df20b87df035",
+          "file": "social.spec.js",
+          "line": 172,
+          "column": 1
+        },
+        {
+          "title": "coarse live distance does not silently remove the server-authorized rating workflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 214,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:03.374Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-325957596f60948a3c74",
+          "file": "social.spec.js",
+          "line": 184,
+          "column": 1
+        },
+        {
+          "title": "source header switches out discovery controls; gallery distinguishes loading failure from empty and retries",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4918,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:03.592Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-4918ffb7725579909a65",
+          "file": "social.spec.js",
+          "line": 193,
+          "column": 1
+        },
+        {
+          "title": "retired demo cannot be re-enabled by a stale configuration flag",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 191,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:08.516Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-72c934585096f15a6c21",
+          "file": "social.spec.js",
+          "line": 212,
+          "column": 1
+        },
+        {
+          "title": "profile names cannot break out of text or media attributes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 193,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:08.712Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-6b58edcb7dfff12cc8cb",
+          "file": "social.spec.js",
+          "line": 223,
+          "column": 1
+        },
+        {
+          "title": "real-data shell never substitutes demo photos when uploads are disabled",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 198,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:08.911Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-3685b6aa4e2d3141c57b",
+          "file": "social.spec.js",
+          "line": 232,
+          "column": 1
+        },
+        {
+          "title": "social shell reports offline state and recovers when connectivity returns",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 169,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:09.114Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-e906c524f927230af126",
+          "file": "social.spec.js",
+          "line": 240,
+          "column": 1
+        },
+        {
+          "title": "daily image quota disables only the exhausted category while chat text remains available",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-390",
+              "projectName": "viewport-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 281,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:09.288Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-8ba6de63f6583ff84273",
+          "file": "social.spec.js",
+          "line": 251,
+          "column": 1
+        },
+        {
+          "title": "restricted public account reaches account privacy/deletion and appeal controls instead of a retry dead end",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 145,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:12.599Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-5dcfd2a2de8ebbc2983a",
+          "file": "social.spec.js",
+          "line": 54,
+          "column": 1
+        },
+        {
+          "title": "authenticated chat deep link opens the actual inbox immediately",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 154,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:12.749Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-8fa77c20d8ad4f3043b5",
+          "file": "social.spec.js",
+          "line": 63,
+          "column": 1
+        },
+        {
+          "title": "root is the authenticated discovery entry while welcome retains marketing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 630,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:12.907Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-ef06f04a08782da0853b",
+          "file": "social.spec.js",
+          "line": 68,
+          "column": 1
+        },
+        {
+          "title": "authenticated shortcut is session-owned, deduplicated and independent of discovery visibility",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 305,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:13.543Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-386d1e5b1b7fbcd5ff6a",
+          "file": "social.spec.js",
+          "line": 77,
+          "column": 1
+        },
+        {
+          "title": "gallery failed comment keeps its draft and inline reason; likes are disabled while pending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2316,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:13.854Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-1f0a85b2c783f8f8ce0d",
+          "file": "social.spec.js",
+          "line": 90,
+          "column": 1
+        },
+        {
+          "title": "public photo stays open without a private grant and foreground updates preserve comment draft",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 196,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:16.175Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-6a0549ac29dcbde053d9",
+          "file": "social.spec.js",
+          "line": 115,
+          "column": 1
+        },
+        {
+          "title": "core configuration outage exposes a working recovery action without fake members",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 240,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:16.375Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-c5cecaf2342a8579e458",
+          "file": "social.spec.js",
+          "line": 121,
+          "column": 1
+        },
+        {
+          "title": "unread badges refresh across screens and opt-in foreground notifications do not require hidden polling",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 336,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:16.620Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-6a6ad72d37c7110195c2",
+          "file": "social.spec.js",
+          "line": 124,
+          "column": 1
+        },
+        {
+          "title": "moderation withdrawal clears an already-open photo on permission refresh",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 173,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:16.960Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-0a9eea6227667f11b27a",
+          "file": "social.spec.js",
+          "line": 131,
+          "column": 1
+        },
+        {
+          "title": "desktop social shell preserves discovery, direct chat, reviews, and profile without game",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 335,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:17.138Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-5e2dc7ef69e71e9f0053",
+          "file": "social.spec.js",
+          "line": 139,
+          "column": 1
+        },
+        {
+          "title": "mobile social shell uses bottom navigation and remains usable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 253,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:17.477Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-b5155f12b17082c8dc73",
+          "file": "social.spec.js",
+          "line": 155,
+          "column": 1
+        },
+        {
+          "title": "disabled social environment reveals no member features",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 104,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:17.735Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-5dda342e27230c35b6a2",
+          "file": "social.spec.js",
+          "line": 164,
+          "column": 1
+        },
+        {
+          "title": "member profile routes are deep-linkable and preserve browser history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 281,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:17.843Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-441f5741a2e4ab5d5fe2",
+          "file": "social.spec.js",
+          "line": 172,
+          "column": 1
+        },
+        {
+          "title": "coarse live distance does not silently remove the server-authorized rating workflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 242,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:18.129Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-8e358ae9b73fc2c0cb60",
+          "file": "social.spec.js",
+          "line": 184,
+          "column": 1
+        },
+        {
+          "title": "source header switches out discovery controls; gallery distinguishes loading failure from empty and retries",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4938,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:18.376Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-a5e7128be3a4cf2f12e5",
+          "file": "social.spec.js",
+          "line": 193,
+          "column": 1
+        },
+        {
+          "title": "retired demo cannot be re-enabled by a stale configuration flag",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 155,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:23.320Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-52788c7db9d3df53fdbb",
+          "file": "social.spec.js",
+          "line": 212,
+          "column": 1
+        },
+        {
+          "title": "profile names cannot break out of text or media attributes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 252,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:23.480Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-6a2e1d0fb35b02f0c9a7",
+          "file": "social.spec.js",
+          "line": 223,
+          "column": 1
+        },
+        {
+          "title": "real-data shell never substitutes demo photos when uploads are disabled",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 186,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:23.737Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-bccceff22e7bb8d9abdb",
+          "file": "social.spec.js",
+          "line": 232,
+          "column": 1
+        },
+        {
+          "title": "social shell reports offline state and recovers when connectivity returns",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 196,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:23.927Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-396f4a4801961adab451",
+          "file": "social.spec.js",
+          "line": 240,
+          "column": 1
+        },
+        {
+          "title": "daily image quota disables only the exhausted category while chat text remains available",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-768",
+              "projectName": "viewport-768",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 334,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:24.128Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-077ef277080e111da9a2",
+          "file": "social.spec.js",
+          "line": 251,
+          "column": 1
+        },
+        {
+          "title": "restricted public account reaches account privacy/deletion and appeal controls instead of a retry dead end",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 184,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:27.711Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-6c0117c90d74cc5b2271",
+          "file": "social.spec.js",
+          "line": 54,
+          "column": 1
+        },
+        {
+          "title": "authenticated chat deep link opens the actual inbox immediately",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 172,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:27.900Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-38b7d941f398206cc176",
+          "file": "social.spec.js",
+          "line": 63,
+          "column": 1
+        },
+        {
+          "title": "root is the authenticated discovery entry while welcome retains marketing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 639,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:28.077Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-b8577816a1c49d6a4ddc",
+          "file": "social.spec.js",
+          "line": 68,
+          "column": 1
+        },
+        {
+          "title": "authenticated shortcut is session-owned, deduplicated and independent of discovery visibility",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 378,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:28.721Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-d7967a1ed16d6e24a08c",
+          "file": "social.spec.js",
+          "line": 77,
+          "column": 1
+        },
+        {
+          "title": "gallery failed comment keeps its draft and inline reason; likes are disabled while pending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2415,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:29.106Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-66a4ca111d3a7fa213b8",
+          "file": "social.spec.js",
+          "line": 90,
+          "column": 1
+        },
+        {
+          "title": "public photo stays open without a private grant and foreground updates preserve comment draft",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 220,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:31.525Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-2925b7f637f2701acd4b",
+          "file": "social.spec.js",
+          "line": 115,
+          "column": 1
+        },
+        {
+          "title": "core configuration outage exposes a working recovery action without fake members",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 267,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:31.750Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-a7f0281bfcc5b1500c1c",
+          "file": "social.spec.js",
+          "line": 121,
+          "column": 1
+        },
+        {
+          "title": "unread badges refresh across screens and opt-in foreground notifications do not require hidden polling",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 344,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:32.022Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-7e78e86c3125468c4776",
+          "file": "social.spec.js",
+          "line": 124,
+          "column": 1
+        },
+        {
+          "title": "moderation withdrawal clears an already-open photo on permission refresh",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 195,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:32.371Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-44f0f3bbd0db7361c411",
+          "file": "social.spec.js",
+          "line": 131,
+          "column": 1
+        },
+        {
+          "title": "desktop social shell preserves discovery, direct chat, reviews, and profile without game",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 372,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:32.570Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-05e1c54408d658240c89",
+          "file": "social.spec.js",
+          "line": 139,
+          "column": 1
+        },
+        {
+          "title": "mobile social shell uses bottom navigation and remains usable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 294,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:32.947Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-8bd68207421564959091",
+          "file": "social.spec.js",
+          "line": 155,
+          "column": 1
+        },
+        {
+          "title": "disabled social environment reveals no member features",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 123,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:33.246Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-ba2b4070db446170d897",
+          "file": "social.spec.js",
+          "line": 164,
+          "column": 1
+        },
+        {
+          "title": "member profile routes are deep-linkable and preserve browser history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 341,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:33.373Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-a651dbf6c5b5d4eeae1e",
+          "file": "social.spec.js",
+          "line": 172,
+          "column": 1
+        },
+        {
+          "title": "coarse live distance does not silently remove the server-authorized rating workflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 232,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:33.718Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-12af7739e4deefb43142",
+          "file": "social.spec.js",
+          "line": 184,
+          "column": 1
+        },
+        {
+          "title": "source header switches out discovery controls; gallery distinguishes loading failure from empty and retries",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 457,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:33.955Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-b5f7835973aaf5eff42e",
+          "file": "social.spec.js",
+          "line": 193,
+          "column": 1
+        },
+        {
+          "title": "retired demo cannot be re-enabled by a stale configuration flag",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 157,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:34.417Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-e8b7942230ba7e4e9d0c",
+          "file": "social.spec.js",
+          "line": 212,
+          "column": 1
+        },
+        {
+          "title": "profile names cannot break out of text or media attributes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 321,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:34.579Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-bd9deb1c05353d444a73",
+          "file": "social.spec.js",
+          "line": 223,
+          "column": 1
+        },
+        {
+          "title": "real-data shell never substitutes demo photos when uploads are disabled",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 182,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:34.906Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-e4f63ee73c05e79d2413",
+          "file": "social.spec.js",
+          "line": 232,
+          "column": 1
+        },
+        {
+          "title": "social shell reports offline state and recovers when connectivity returns",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 210,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:35.093Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-321e4ce09d6b3b57cfff",
+          "file": "social.spec.js",
+          "line": 240,
+          "column": 1
+        },
+        {
+          "title": "daily image quota disables only the exhausted category while chat text remains available",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "viewport-1440",
+              "projectName": "viewport-1440",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 361,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-20T08:47:35.307Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d02c6404527e785b31c1-ae610599d6aee2d59928",
+          "file": "social.spec.js",
+          "line": 251,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-20T08:46:54.529Z",
+    "duration": 41191.901999999995,
+    "expected": 84,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

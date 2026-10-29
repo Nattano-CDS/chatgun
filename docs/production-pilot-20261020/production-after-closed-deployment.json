@@ -1,0 +1,267 @@
+{
+  "checkedAt": "2026-10-20T01:20:54.411Z",
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "database": "9738a051-d914-42d0-8e7b-8098ef2b959d",
+  "counts": [
+    {
+      "name": "account_acceptances",
+      "count": 0
+    },
+    {
+      "name": "account_deletion_requests",
+      "count": 0
+    },
+    {
+      "name": "age_assurance_events",
+      "count": 0
+    },
+    {
+      "name": "album_access_grants",
+      "count": 0
+    },
+    {
+      "name": "album_access_requests",
+      "count": 0
+    },
+    {
+      "name": "beta_enrollments",
+      "count": 0
+    },
+    {
+      "name": "beta_invitations",
+      "count": 0
+    },
+    {
+      "name": "chat_initiations",
+      "count": 0
+    },
+    {
+      "name": "chat_preferences",
+      "count": 0
+    },
+    {
+      "name": "chat_system_events",
+      "count": 0
+    },
+    {
+      "name": "d1_migrations",
+      "count": 15
+    },
+    {
+      "name": "deletion_receipts",
+      "count": 0
+    },
+    {
+      "name": "identities",
+      "count": 0
+    },
+    {
+      "name": "identity_verification_requests",
+      "count": 0
+    },
+    {
+      "name": "independent_age_assurances",
+      "count": 0
+    },
+    {
+      "name": "media_appeals",
+      "count": 0
+    },
+    {
+      "name": "media_deletion_queue",
+      "count": 0
+    },
+    {
+      "name": "media_moderation_decisions",
+      "count": 0
+    },
+    {
+      "name": "media_reports",
+      "count": 0
+    },
+    {
+      "name": "media_safety_audit_events",
+      "count": 0
+    },
+    {
+      "name": "media_safety_reviews",
+      "count": 0
+    },
+    {
+      "name": "media_upload_quota_attempts",
+      "count": 0
+    },
+    {
+      "name": "member_presence_leases",
+      "count": 0
+    },
+    {
+      "name": "member_presence_preferences",
+      "count": 0
+    },
+    {
+      "name": "member_profiles",
+      "count": 0
+    },
+    {
+      "name": "moderation_access_grants",
+      "count": 0
+    },
+    {
+      "name": "moderation_audit_events",
+      "count": 0
+    },
+    {
+      "name": "moderation_notifications",
+      "count": 0
+    },
+    {
+      "name": "moderation_role_events",
+      "count": 0
+    },
+    {
+      "name": "moderation_roles",
+      "count": 0
+    },
+    {
+      "name": "oauth_flows",
+      "count": 0
+    },
+    {
+      "name": "oauth_reauth_contexts",
+      "count": 0
+    },
+    {
+      "name": "otp_challenges",
+      "count": 0
+    },
+    {
+      "name": "photo_comments",
+      "count": 0
+    },
+    {
+      "name": "photo_likes",
+      "count": 0
+    },
+    {
+      "name": "profile_photos",
+      "count": 0
+    },
+    {
+      "name": "proximity_ratings",
+      "count": 0
+    },
+    {
+      "name": "rate_limits",
+      "count": 0
+    },
+    {
+      "name": "session_auth_evidence",
+      "count": 0
+    },
+    {
+      "name": "sessions",
+      "count": 0
+    },
+    {
+      "name": "social_blocks",
+      "count": 0
+    },
+    {
+      "name": "social_media",
+      "count": 0
+    },
+    {
+      "name": "social_messages",
+      "count": 0
+    },
+    {
+      "name": "social_relationships",
+      "count": 0
+    },
+    {
+      "name": "social_reports",
+      "count": 0
+    },
+    {
+      "name": "synthetic_seed_batches",
+      "count": 0
+    },
+    {
+      "name": "synthetic_seed_objects",
+      "count": 0
+    },
+    {
+      "name": "synthetic_seed_records",
+      "count": 0
+    },
+    {
+      "name": "users",
+      "count": 0
+    }
+  ],
+  "schemaSha256": "6f72480a619d88672293abf2b863e1fe5ff8d03100e7bf5a8e721256bca310a0",
+  "foreignKeyViolations": 0,
+  "flags": {
+    "ACCEPTANCE_FLOW_ENABLED": "false",
+    "ADULT_ONBOARDING_ENABLED": "false",
+    "BETA_INVITATION_REGISTRATION_ENABLED": "false",
+    "DEMO_AUTO_START_ENABLED": "false",
+    "DEMO_MODE_ENABLED": "false",
+    "EMAIL_OTP_ENABLED": "false",
+    "FACEBOOK_EMAIL_ENABLED": "false",
+    "FRIEND_REQUESTS_ENABLED": "false",
+    "IDENTITY_VERIFICATION_ENABLED": "false",
+    "LINE_EMAIL_ENABLED": "false",
+    "MEDIA_QUARANTINE_ENABLED": "true",
+    "MEDIA_UPLOAD_ENABLED": "false",
+    "MESSAGING_ENABLED": "false",
+    "MOBILE_OTP_ENABLED": "false",
+    "MODERATION_TOOLS_ENABLED": "false",
+    "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
+    "OAUTH_LOGIN_ENABLED": "false",
+    "PRESENCE_ENABLED": "false",
+    "PUBLIC_DEMO_CANARY_ENABLED": "true",
+    "PUBLIC_DISCOVERY_ENABLED": "false",
+    "RATINGS_ENABLED": "false",
+    "SENSITIVE_CONTENT_ENABLED": "false",
+    "SOCIAL_APP_ENABLED": "false"
+  },
+  "productionD1": {
+    "DB": {
+      "id": "9738a051-d914-42d0-8e7b-8098ef2b959d"
+    }
+  },
+  "productionR2": {
+    "MEDIA": {
+      "name": "chatgun-media-production"
+    }
+  },
+  "previewD1": {
+    "DB": {
+      "id": "5bbfd55d-eb22-4324-8a7d-57bef14110ea"
+    }
+  },
+  "previewR2": {
+    "MEDIA": {
+      "name": "chatgun-media-staging"
+    }
+  },
+  "secretNames": [
+    "FACEBOOK_CLIENT_ID",
+    "FACEBOOK_CLIENT_SECRET",
+    "FACEBOOK_GRAPH_VERSION",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "LINE_CLIENT_ID",
+    "LINE_CLIENT_SECRET",
+    "OTP_PEPPER",
+    "RATE_LIMIT_PEPPER",
+    "TURNSTILE_SECRET_KEY",
+    "TURNSTILE_SITE_KEY"
+  ],
+  "customDomain": "active",
+  "deployment": "24034f85-1a14-4837-a600-068598d097a0",
+  "sha": "9c856eea06b8d959a3e33491429e30c9b4c99bfa",
+  "productionWrites": 0
+}

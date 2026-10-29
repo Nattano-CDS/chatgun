@@ -1,0 +1,15 @@
+{
+  "reviewedOn": "2026-10-19",
+  "method": "Read-only authenticated owner-opened LINE Developers console; no secrets, personal identifiers or role assignments recorded",
+  "provider": {"name": "ChatGun", "id": "2005640887", "status": "PASS"},
+  "channel": {"name": "ChatGun Production", "id": "2012039306", "type": "LINE Login", "publishingStatus": "Developing", "status": "PASS"},
+  "roles": {"adminEntriesObserved": 1, "testerEntriesObserved": 0, "currentConsoleRole": "Admin", "personalIdentityRecorded": false, "intendedHumanLoginIdentityConfirmed": false, "status": "BLOCKED for genuine login identity confirmation; console Admin role itself observed"},
+  "platform": {"webApp": true, "webLoginEnabled": true, "twoFactorRequired": true, "status": "PASS"},
+  "callback": {"url": "https://chatgun.social/api/auth/oauth/line/callback", "savedExactMatch": true, "status": "PASS"},
+  "permissions": {"observed": ["PROFILE", "OPENID_CONNECT"], "emailPermission": "Unapplied", "preparedScope": "openid profile", "status": "PASS"},
+  "privacy": {"savedUrl": "https://chatgun.social/privacy.html", "urlRegistration": "PASS", "approvedPublishedPolicy": "BLOCKED: live closed release serves a prelaunch notice, not approved policy content"},
+  "terms": {"savedUrl": null, "status": "MISSING: optional console field; set only after actual policy approval/publication"},
+  "credentialPair": {"status": "BLOCKED", "reason": "Cloudflare encrypted credentials cannot be matched by metadata alone; genuine code exchange not authorized while Production OAuth is closed"},
+  "mutations": {"createdChannels": 0, "publishedChannels": 0, "savedConsoleChanges": 0, "rolesGranted": 0, "secretsRevealed": 0},
+  "screenshot": "screens/line-callback.jpg"
+}

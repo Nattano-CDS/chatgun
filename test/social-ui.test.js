@@ -49,19 +49,21 @@ test("social client uses same-origin APIs, CSRF, escaped rendering, and fail-clo
   assert.match(script, /credentials: "same-origin"/u);
   assert.match(script, /headers\["x-csrf-token"\]/u);
   assert.match(script, /node\.textContent = String/u);
-  assert.match(script, /if \(!state\.config\.socialAppEnabled\)/u);
+  assert.match(script, /!state\.config\.socialAppEnabled/u);
   assert.match(script, /\/api\/social\/onboarding\/member/u);
   assert.match(script, /ระวังการหลอกโอนเงินและขอข้อมูลส่วนตัว/u);
   assert.match(script, /last_message_sender_id/u);
   assert.match(script, /navigator\.permissions\.query\(\{ name: "geolocation" \}\)/u);
   assert.match(script, /revokeLocationPublication/u);
   assert.match(script, /refreshOpenThread/u);
-  assert.match(script, /10_000/u);
+  assert.match(script, /hadUnread && await loadRelationships\(\)/u);
+  assert.match(script, /if \(!state\.config\.mediaUploadEnabled\) return state\.myGallery = \[\], renderOwnGallery\(\)/u);
+  assert.match(script, /#manage-gallery[^\n]+hidden = !state\.config\.mediaUploadEnabled/u);
+  assert.match(script, /10_000|1e4/u);
   assert.match(script, /\/app\/people\//u);
   assert.match(script, /popstate/u);
   assert.match(script, /fileDataUrl/u);
-  assert.match(script, /demoGallery/u);
-  assert.match(script, /demoAssets/u);
+  assert.doesNotMatch(script, /demoGallery|demoAssets|startDemo|demoSave/u);
   assert.match(script, /\/api\/social\/upload-quotas/u);
   assert.match(script, /"idempotency-key"/u);
   assert.match(script, /รีเซ็ต 00:00 น\. เวลาไทย/u);
@@ -70,6 +72,16 @@ test("social client uses same-origin APIs, CSRF, escaped rendering, and fail-clo
   assert.match(html, /id="gallery-upload-quota"/u);
   assert.match(styles, /\.upload-quota/u);
   assert.doesNotMatch(script, /innerHTML\s*=\s*(?:location|document\.cookie)/u);
+});
+
+test("chat renders chronological DOM without reverse flex and preserves timeline scrolling", () => {
+  assert.doesNotMatch(styles, /\.messages[^}]*column-reverse/u);
+  assert.match(styles, /\.messages[^}]*flex-direction: column/u);
+  assert.match(script, /mergeTimelineMessages/u);
+  assert.match(script, /visibleTimelineAnchor/u);
+  assert.match(script, /new-messages-indicator/u);
+  assert.match(script, /isNearTimelineBottom/u);
+  assert.match(script, /state\.threadMessages\[0\]/u);
 });
 
 test("responsive social route receives only the required geolocation permission", () => {
@@ -117,13 +129,14 @@ test("staging social and private media activation remain isolated from productio
     assert.match(wrangler, new RegExp(`"${capability}": "false"`, "u"));
     assert.match(production, new RegExp(`"${capability}": "false"`, "u"));
   }
-  assert.match(production, /"DEMO_MODE_ENABLED": "true"/u);
+  assert.match(production, /"DEMO_MODE_ENABLED": "false"/u);
   assert.match(production, /"OAUTH_LOGIN_ENABLED": "false"/u);
   assert.match(wrangler, /"ADULT_ONBOARDING_ENABLED": "true"/u);
   assert.match(production, /"ADULT_ONBOARDING_ENABLED": "false"/u);
   assert.match(wrangler, /"database_name": "chatgun-auth-staging"/u);
   assert.match(wrangler, /"binding": "MEDIA"[\s\S]*"bucket_name": "chatgun-media-staging"/u);
   assert.match(production, /"database_name": "chatgun-auth"/u);
-  assert.match(production, /"r2_buckets": \[\]/u);
-  assert.doesNotMatch(production, /"binding": "MEDIA"/u);
+  const configured=JSON.parse(wrangler).env.production;
+  assert.deepEqual(configured.r2_buckets,[{binding:'MEDIA',bucket_name:'chatgun-media-production'}]);
+  assert.equal(configured.vars.MEDIA_UPLOAD_ENABLED,'false');
 });

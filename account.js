@@ -5,6 +5,44 @@ let turnstileReady = false;
 let busy = false;
 let account = null;
 let pendingDeletion = null;
+let availableProviders = new Set();
+
+async function eligibilityApi(body) {
+  const response = await fetch('/api/auth/eligibility-review', { credentials: 'same-origin',
+    ...(body ? { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': readCookie('__Host-cg_csrf') }, body: JSON.stringify(body) } : {}),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || 'ไม่สามารถดำเนินการได้ กรุณาลองใหม่');
+  return result;
+}
+async function loadEligibility() {
+  const result = await eligibilityApi();
+  document.getElementById('eligibility-review').hidden = !result.enabled;
+  const history = document.getElementById('eligibility-history'); history.replaceChildren();
+  const pending = (result.requests || []).some(item => item.status === 'pending');
+  document.getElementById('eligibility-form').hidden = pending;
+  const labels = { pending: 'รอทบทวน', withdrawn: 'ถอนคำขอแล้ว', upheld: 'คงข้อจำกัด', deferred: 'รอแนวทางที่ได้รับอนุมัติ' };
+  for (const item of result.requests || []) {
+    const row = document.createElement('div'), status = document.createElement('p');
+    status.textContent = `${labels[item.status] || item.status}${item.decision_reason ? ' · ' + item.decision_reason : ''}`; row.append(status);
+    if (item.status === 'pending') {
+      const withdraw = document.createElement('button'); withdraw.type = 'button'; withdraw.textContent = 'ถอนคำขอทบทวน (ข้อจำกัดยังคงอยู่)';
+      withdraw.addEventListener('click', async () => {
+        if (!confirm('ถอนคำขอทบทวนนี้หรือไม่? การถอนคำขอไม่ปลดข้อจำกัดบัญชี')) return;
+        withdraw.disabled = true;
+        try { await eligibilityApi({ action: 'withdraw', id: item.id, revision: item.revision, reason: 'สมาชิกยืนยันถอนคำขอทบทวนผ่านหน้าบัญชี' }); await loadEligibility(); }
+        catch (error) { document.getElementById('eligibility-message').textContent = error.message; withdraw.disabled = false; }
+      }); row.append(withdraw);
+    }
+    history.append(row);
+  }
+}
+document.getElementById('eligibility-form').addEventListener('submit', async event => {
+  event.preventDefault(); const button = event.currentTarget.querySelector('button'); button.disabled = true;
+  try { await eligibilityApi({ action: 'request', reason: document.getElementById('eligibility-reason').value }); document.getElementById('eligibility-message').textContent = 'รับคำขอแล้ว ข้อจำกัดบัญชียังคงอยู่ระหว่างทบทวน ไม่มีการรับรองเวลาตอบกลับทันที'; await loadEligibility(); }
+  catch (error) { document.getElementById('eligibility-message').textContent = error.message; }
+  finally { button.disabled = false; }
+});
 
 function readCookie(name) {
   const prefix = `${name}=`;
@@ -25,6 +63,9 @@ async function initializeTurnstile() {
   const response = await fetch("/api/auth/config", { credentials: "same-origin" });
   const config = await response.json();
   if (!response.ok || !config.turnstileSiteKey) throw new Error("ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย");
+  availableProviders=new Set(config.oauthProviders||[]);
+  document.querySelectorAll('.link-provider').forEach(button=>{button.hidden=!availableProviders.has(button.dataset.provider);});
+  if(!availableProviders.size){message("ผู้ให้บริการยืนยันตัวตนยังไม่พร้อมใช้งาน หากต้องการความช่วยเหลือกรุณาติดต่อผู้ดูแล");return;}
   const script = document.createElement("script");
   script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
   script.async = true;
@@ -63,9 +104,12 @@ async function startOauth(provider, payload) {
 }
 
 function showReauthentication() {
+  // Deletion verification must remain usable even when identity linking is denied.
+  document.getElementById('account-security').hidden = false;
   const container = document.getElementById("reauth-providers");
   container.replaceChildren();
-  for (const provider of account.providers) {
+  const providers=account.providers.filter(provider=>availableProviders.has(provider));
+  for (const provider of providers) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "reauth-provider";
@@ -78,13 +122,13 @@ function showReauthentication() {
       catch (error) {
         deletionMessage(error.message);
         lock(false);
-        window.turnstile.reset(turnstileWidget);
+        if(turnstileWidget!==null)window.turnstile?.reset(turnstileWidget);
       }
     });
     container.appendChild(button);
   }
   document.getElementById("delete-reauth").hidden = false;
-  deletionMessage("ต้องยืนยันตัวตนล่าสุดก่อนสร้างคำขอลบบัญชี");
+  deletionMessage(providers.length?"ต้องยืนยันตัวตนล่าสุดก่อนสร้างคำขอลบบัญชี":"ผู้ให้บริการที่เชื่อมบัญชียังไม่พร้อมยืนยันตัวตน กรุณาติดต่อผู้ดูแลเพื่อดำเนินการอย่างปลอดภัย");
 }
 
 async function createDeletionRequest() {
@@ -113,14 +157,27 @@ fetch("/api/auth/me", { credentials: "same-origin" })
   })
   .then((result) => {
     account = result;
+    // Never trust an age-review query string as evidence of an account hold.
+    document.getElementById('age-safety-notice').hidden = account.ageSafetyReviewRequired !== true;
+    if (account.ageSafetyReviewRequired === true) loadEligibility().catch(error => { document.getElementById('eligibility-message').textContent = error.message; });
+    if (account.ageSafetyReviewRequired === true) {
+      const socialNavigation = document.querySelector('.auth-navigation');
+      if (socialNavigation) socialNavigation.hidden = true;
+      const homeLink = document.querySelector('.auth-header-link');
+      if (homeLink) homeLink.textContent = 'กลับหน้าแรก';
+    }
     document.getElementById("status").textContent = `เข้าสู่ระบบแล้ว ${account.user.displayName || account.user.email || "สมาชิก ChatGun"}`;
     document.getElementById("logout").hidden = false;
-    document.getElementById("linking").hidden = !account.canLinkAccounts;
+    document.getElementById("linking").hidden = !account.canLinkAccounts || account.ageSafetyReviewRequired === true;
+    document.getElementById('account-security').hidden = document.getElementById('linking').hidden;
     document.getElementById("deletion").hidden = false;
+    document.getElementById('session-management').hidden=false;loadSessions();
     fetch("/api/social/config", { credentials: "same-origin" })
       .then((response) => response.ok ? response.json() : null)
       .then((config) => {
-        if (config?.socialAppEnabled && account.nextPath === "/app/") document.getElementById("open-social").hidden = false;
+        if (config?.socialAppEnabled && account.nextPath === "/app/" && account.ageSafetyReviewRequired !== true) document.getElementById("open-social").hidden = false;
+        document.getElementById('account-appeals-link').hidden = !config?.accountModerationEnabled || account.ageSafetyReviewRequired === true;
+        if(config?.moderationToolsEnabled)fetch('/api/social/moderation/capabilities',{credentials:'same-origin'}).then(r=>r.ok?r.json():null).then(c=>{document.getElementById('account-moderation-link').hidden=!(c?.canReviewReports||c?.canReviewMedia);}).catch(()=>{});
       })
       .catch(() => {});
     if (new URLSearchParams(window.location.search).get("reauth") === "account_deletion") {
@@ -141,7 +198,7 @@ document.querySelectorAll(".link-provider").forEach((button) => {
     catch (error) {
       message(error.message);
       lock(false);
-      window.turnstile.reset(turnstileWidget);
+      if(turnstileWidget!==null)window.turnstile?.reset(turnstileWidget);
     }
   });
 });
@@ -201,4 +258,15 @@ document.getElementById("logout").addEventListener("click", async () => {
     headers: { "X-CSRF-Token": readCookie("__Host-cg_csrf") },
   });
   if (response.ok) window.location.replace("./");
+});
+
+async function loadSessions(){
+  try{const r=await fetch('/api/auth/sessions',{credentials:'same-origin'}),j=await r.json();if(!r.ok)throw Error(j.message||'โหลดเซสชันไม่สำเร็จ');const host=document.getElementById('session-list');host.replaceChildren(...j.sessions.map(s=>{const p=document.createElement('p');p.textContent=`${s.current?'เซสชันนี้':'เซสชันอื่น'} · เริ่ม ${new Date(s.createdAt*1000).toLocaleString('th-TH')} · หมดอายุ ${new Date(s.expiresAt*1000).toLocaleString('th-TH')}`;return p;}));document.getElementById('revoke-other-sessions').disabled=!j.sessions.some(s=>!s.current)&&!j.hasMore;}
+  catch(error){document.getElementById('session-message').textContent=error.message||'โหลดเซสชันไม่สำเร็จ กรุณารีเฟรชหน้า';}
+}
+document.getElementById('revoke-other-sessions').addEventListener('click',async(event)=>{
+  if(!confirm('ยืนยันออกจากระบบบนเซสชันอื่นทั้งหมดหรือไม่? เซสชันนี้จะยังใช้งานได้'))return;
+  event.currentTarget.disabled=true;
+  try{const r=await fetch('/api/auth/sessions',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json','x-csrf-token':readCookie('__Host-cg_csrf')},body:JSON.stringify({action:'revoke_others'})}),j=await r.json();if(!r.ok)throw Error(j.message||'ไม่สามารถเพิกถอนเซสชันได้');document.getElementById('session-message').textContent=`เพิกถอนเซสชันอื่นแล้ว ${j.revoked} รายการ`;await loadSessions();}
+  catch(error){document.getElementById('session-message').textContent=error.message;event.currentTarget.disabled=false;}
 });

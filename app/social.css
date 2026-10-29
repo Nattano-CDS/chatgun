@@ -80,7 +80,7 @@ button:disabled{opacity: 0.5; cursor: not-allowed;}
 .rules b{color: var(--primary); font-size: 22px;}
 .rules strong{display: block; margin: 8px 0px 4px;}
 .rules p{margin: 0px; color: var(--muted); font-size: 12px;}
-.chat-layout{min-height: 620px; display: grid; grid-template-columns: 280px 1fr; border: 1px solid var(--line); border-radius: 22px; overflow: hidden; background: rgb(255, 255, 255);}
+.chat-layout{height: var(--chat-height, 620px); min-height: 620px; display: grid; grid-template-columns: 280px 1fr; border: 1px solid var(--line); border-radius: 22px; overflow: hidden; background: rgb(255, 255, 255);}
 .conversation-list{border-right: 1px solid var(--line); padding: 10px;}
 .conversation{width: 100%; display: flex; gap: 11px; align-items: center; padding: 12px; border: 0px; border-radius: 14px; background: transparent; text-align: left;}
 .conversation:hover, .conversation.active{background: var(--primary-soft);}
@@ -90,18 +90,20 @@ button:disabled{opacity: 0.5; cursor: not-allowed;}
 .conversation-copy small{display: block; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap;}
 .inbox-unread{min-width: 22px; height: 22px; display: grid; place-items: center; border-radius: 999px; color: rgb(255, 255, 255); background: var(--primary); font-size: 11px;}
 .avatar{width: 42px; height: 42px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; color: var(--primary); background: rgb(233, 227, 250); font-weight: 800;}
-.thread{display: flex; flex-direction: column; min-width: 0px;}
+.thread{display: flex; flex-direction: column; min-width: 0px; min-height: 0px;}
 .thread-head{display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--line);}
 .chat-safety{padding: 9px 18px; border-bottom: 1px solid rgb(234, 223, 179); color: rgb(95, 74, 0); background: rgb(255, 249, 223); font-size: 12px;}
 .chat-safety summary{cursor: pointer; font-weight: 800;}
 .chat-safety p{margin: 7px 0px 0px; line-height: 1.5;}
-.messages{flex: 1 1 0%; display: flex; flex-direction: column-reverse; gap: 8px; padding: 18px; overflow-y: auto;}
+.messages{flex: 1 1 0%; min-height: 0px; display: flex; flex-direction: column; gap: 8px; padding: 18px; overflow-y: auto; overflow-anchor: none;}
+.messages > :first-child:not(.empty){margin-top: auto;}
 .message{max-width: 75%; align-self: flex-start; padding: 10px 13px; border-radius: 15px 15px 15px 4px; background: rgb(240, 239, 243);}
 .message.mine{align-self: flex-end; color: rgb(255, 255, 255); background: var(--primary); border-radius: 15px 15px 4px;}
 .message.unsent{color: var(--muted); font-style: italic; background: transparent; border: 1px dashed var(--line);}
 .message time{display: block; margin-top: 4px; font-size: 10px; opacity: 0.7;}
 .message-tools{display: flex; justify-content: flex-end; margin-top: 4px;}
 .message-tools button{padding: 0px; border: 0px; color: inherit; background: transparent; font-size: 10px; text-decoration: underline;}
+.new-messages-indicator{align-self: center; margin: -54px 0px 10px; z-index: 2; min-height: 38px; padding: 8px 15px; border: 1px solid rgb(221, 207, 247); border-radius: 999px; color: var(--primary); background: rgb(255, 255, 255); box-shadow: var(--shadow); font-weight: 750;}
 .chat-image{display: block; width: min(320px, 100%); max-height: 360px; object-fit: contain; margin-bottom: 7px; border-radius: 10px;}
 .composer{display: flex; gap: 10px; padding: 14px; border-top: 1px solid var(--line);}
 .composer input{flex: 1 1 0%;}
@@ -300,7 +302,7 @@ body:not([data-active-tab="near"]) .app .toolbar h1{font-size: 25px; color: var(
 .moderation-daily-grid strong, .moderation-daily-grid span{display: block;}
 .moderation-daily-grid strong{margin-bottom: 3px; font-size: 20px;}
 .moderation-daily-grid span{color: var(--muted); font-size: 12px;}
-.moderation-results{display: grid; gap: 12px;}
+.moderation-results{display: grid; gap: 12px; min-width:0; overflow-wrap:anywhere;}
 .moderation-card{padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: rgb(255, 255, 255); box-shadow: rgba(43, 33, 74, 0.04) 0px 8px 26px;}
 .moderation-card header{display: flex; justify-content: space-between; gap: 12px;}
 .moderation-card header > div:first-child{display: grid; gap: 4px;}

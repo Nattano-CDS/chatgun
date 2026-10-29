@@ -1,0 +1,8 @@
+{
+  "batch": "chatgun-owner-review-v1",
+  "trackedUsers": 20,
+  "trackedRecords": 369,
+  "trackedR2Objects": 33,
+  "executed": false,
+  "blockedReason": "Untracked related rows in protected backup cleanup simulation require provenance review; no remote deletion performed."
+}

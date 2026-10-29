@@ -1,0 +1,71 @@
+{
+  "checkedAt": "2026-10-19T14:26:20.012Z",
+  "commit": "a6544bce7532316208b31f4f86df30730986a4b3",
+  "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "status": "PASS",
+  "authenticatedFunctionsVerified": true,
+  "passed": 15,
+  "checks": [
+    {
+      "name": "anonymous heartbeat denied",
+      "status": "PASS"
+    },
+    {
+      "name": "missing CSRF denied",
+      "status": "PASS"
+    },
+    {
+      "name": "default opt-out",
+      "status": "PASS"
+    },
+    {
+      "name": "authenticated heartbeat accepted",
+      "status": "PASS"
+    },
+    {
+      "name": "authorized boolean Online",
+      "status": "PASS"
+    },
+    {
+      "name": "no raw timestamps or sessions disclosed",
+      "status": "PASS"
+    },
+    {
+      "name": "TTL expires",
+      "status": "PASS"
+    },
+    {
+      "name": "another active tab remains Online",
+      "status": "PASS"
+    },
+    {
+      "name": "opt-out immediate",
+      "status": "PASS"
+    },
+    {
+      "name": "blocked viewer denied",
+      "status": "PASS"
+    },
+    {
+      "name": "hidden profile suppressed",
+      "status": "PASS"
+    },
+    {
+      "name": "logout accepted",
+      "status": "PASS"
+    },
+    {
+      "name": "logout immediately offline",
+      "status": "PASS"
+    },
+    {
+      "name": "revoked session heartbeat denied",
+      "status": "PASS"
+    },
+    {
+      "name": "foreign keys intact",
+      "status": "PASS"
+    }
+  ],
+  "productionWrites": 0
+}

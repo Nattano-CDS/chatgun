@@ -1,0 +1,814 @@
+{
+  "checkedAt": "2026-10-23T19:58:14.852Z",
+  "syntheticOnly": true,
+  "origin": "https://engineering.chatgun-final-uat.pages.dev",
+  "windowMs": 30000,
+  "visibility": "visible",
+  "initialLoadMs": 1657,
+  "totalBrowserResponses": 99,
+  "observedApiResponses": 45,
+  "foregroundApiResponses": 3,
+  "foregroundPresenceResponses": 2,
+  "foregroundChatResponses": 1,
+  "server5xx": 0,
+  "responses": [
+    {
+      "phase": "initial",
+      "path": "/",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "document",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/near-v91.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/gallery-approved.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/online-presence.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/restoration.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/social.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/near-components.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/logo.svg",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "image",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/near-icons.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/near-components.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/gallery-approved.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/social.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/online-presence.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/message-delivery.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/app/retire-demo.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/assets/fonts/noto-sans-thai-400.woff",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "font",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "phase": "initial",
+      "path": "/assets/fonts/noto-sans-thai-700.woff",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "font",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/config",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/profile",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/assets/fonts/noto-sans-thai-800.woff",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "font",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/moderation/notifications",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/moderation/capabilities",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/ratings",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/discovery",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/blocks",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/gallery",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/upload-quotas",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/media/appeals",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/gallery",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "initial",
+      "path": "/api/social/conversations",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/online",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "document",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/logo.svg",
+      "method": "GET",
+      "status": 304,
+      "resourceType": "image",
+      "cacheControl": null
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/online-presence.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/social.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/near-components.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/gallery-approved.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/restoration.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/near-v91.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/gallery-approved.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/near-components.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/near-icons.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/social.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/assets/fonts/noto-sans-thai-400.woff",
+      "method": "GET",
+      "status": 304,
+      "resourceType": "font",
+      "cacheControl": null
+    },
+    {
+      "phase": "navigation",
+      "path": "/assets/fonts/noto-sans-thai-700.woff",
+      "method": "GET",
+      "status": 304,
+      "resourceType": "font",
+      "cacheControl": null
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/message-delivery.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/online-presence.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/app/retire-demo.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/config",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/profile",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/assets/fonts/noto-sans-thai-800.woff",
+      "method": "GET",
+      "status": 304,
+      "resourceType": "font",
+      "cacheControl": null
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/moderation/capabilities",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/moderation/notifications",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/ratings",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/discovery",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/blocks",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/gallery",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/gallery",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/media/appeals",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/upload-quotas",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/conversations",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/online",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "navigation",
+      "path": "/api/social/online",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "foreground_observation",
+      "path": "/api/social/conversations",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "foreground_observation",
+      "path": "/api/social/online",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "foreground_observation",
+      "path": "/api/social/online",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "document",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/logo.svg",
+      "method": "GET",
+      "status": 304,
+      "resourceType": "image",
+      "cacheControl": null
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/restoration.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/gallery-approved.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/online-presence.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/near-v91.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/social.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/near-icons.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/near-components.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/near-components.css",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "stylesheet",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/gallery-approved.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/social.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/assets/fonts/noto-sans-thai-700.woff",
+      "method": "GET",
+      "status": 304,
+      "resourceType": "font",
+      "cacheControl": null
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/assets/fonts/noto-sans-thai-400.woff",
+      "method": "GET",
+      "status": 304,
+      "resourceType": "font",
+      "cacheControl": null
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/message-delivery.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/online-presence.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/app/retire-demo.js",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "script",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/config",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/profile",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/assets/fonts/noto-sans-thai-800.woff",
+      "method": "GET",
+      "status": 304,
+      "resourceType": "font",
+      "cacheControl": null
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/moderation/notifications",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/moderation/capabilities",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/blocks",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/ratings",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/discovery",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/media/appeals",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/upload-quotas",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/gallery",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/gallery",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    },
+    {
+      "phase": "repeat_navigation",
+      "path": "/api/social/conversations",
+      "method": "GET",
+      "status": 200,
+      "resourceType": "fetch",
+      "cacheControl": "no-store"
+    }
+  ],
+  "limitations": [
+    "Single synthetic browser observation, not overall Pages/D1/R2 billable usage.",
+    "No chat thread selected in this idle-inbox sample.",
+    "Hidden-tab suppression covered by existing deterministic tests; not fabricated as an actual browser measurement.",
+    "No projected concurrent-user capacity or monthly cost claimed."
+  ]
+}

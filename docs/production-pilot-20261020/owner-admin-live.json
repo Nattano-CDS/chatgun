@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-20T04:23:00.386Z",
+  "productionSha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+  "deployment": "118728d1-90ef-45c5-804c-2f270b4ba31b",
+  "roles": [
+    "report_reviewer",
+    "safety_admin"
+  ],
+  "expiresAt": 1793073705,
+  "ownerUuidPrivateConfirmation": true,
+  "approval": "Explicit seven-day exact owner report/safety scope confirmed by human",
+  "roleGrantEvents": 2,
+  "moderationToolsEnabled": true,
+  "accountModerationEnabled": false,
+  "productionMigrations": 15,
+  "isolatedMigrations": 16,
+  "foreignKeyViolations": 0,
+  "isolatedForeignKeyViolations": 0,
+  "counts": {
+    "users": 1,
+    "identities": 1,
+    "member_profiles": 1,
+    "beta_invitations": 1,
+    "moderation_access_grants": 2,
+    "moderation_role_events": 2,
+    "social_messages": 0,
+    "social_media": 0
+  },
+  "routineOverviewAuditEvents": 2,
+  "restrictedAuditEvents": 0,
+  "anonymousOverviewDenied": true,
+  "rolesExcluded": [
+    "moderation_admin",
+    "identity_reviewer"
+  ],
+  "productionWritesByVerifier": 0
+}

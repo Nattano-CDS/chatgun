@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-20T08:55:56.016Z",
+  "database": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
+  "bucket": "chatgun-issue13-media",
+  "fixtureBatches": 8,
+  "manifestFixtureUsers": 96,
+  "fixtureMediaQueued": 6,
+  "objectsCompleted": 21,
+  "sessionsRevokedInThisRun": 9,
+  "temporaryGrantsRevokedInThisRun": 12,
+  "activeFixtureSessionsRemaining": 0,
+  "activeFixtureGrantsRemaining": 0,
+  "unrelatedPendingQueueRowsUnchanged": 0,
+  "cleanup": {
+    "selected": 9,
+    "completed": 9,
+    "failed": 0,
+    "exhausted": 0
+  },
+  "checks": [
+    {
+      "name": "Only exact manifest-owned R2 objects deleted; unrelated queues unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "All fixture sessions and temporary grants revoked",
+      "status": "PASS"
+    },
+    {
+      "name": "Foreign keys valid after fixture account deletion and R2 cleanup",
+      "status": "PASS"
+    }
+  ],
+  "productionWrites": 0,
+  "existingFixtureUsersDeleted": 0,
+  "protectedStagingWrites": 0
+}

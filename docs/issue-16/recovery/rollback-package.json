@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-10-18T06:14:04.095Z",
+  "sourceSha": "f0d54f99a4915ba384e4f999fbb833e849e49651",
+  "storage": "protected durable directory outside Git",
+  "directoryMode": "0700",
+  "manifestSha256": "ca7523e698bbf082d814fbcb203db5b34eacf67379a0196807e3e648607d5b89",
+  "manifestMatchesValidatedBuild": true,
+  "noFictionalAssets": true,
+  "restoration": "Redeploy this closed package to project chatgun / branch main after verifying account, bindings and disabled gates; never restore the old fictional demo. Re-run static and API/security checks. No database restore or migration is part of this recovery."
+}
