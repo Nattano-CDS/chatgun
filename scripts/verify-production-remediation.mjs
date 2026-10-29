@@ -3,16 +3,19 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
+import { verifyProductionPreservation } from './verify-production-preservation.mjs';
 
 const sha256 = path => createHash('sha256').update(readFileSync(path)).digest('hex');
 const config = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'));
 const production = config.env.production;
 assert.equal(production.vars.DEPLOYMENT_ENVIRONMENT, 'production');
 assert.equal(production.vars.ADMIN_CLOUDFLARE_ACCESS_REQUIRED, 'true');
-for (const flag of ['OAUTH_LOGIN_ENABLED', 'NEW_ACCOUNT_REGISTRATION_ENABLED', 'SOCIAL_APP_ENABLED',
-  'MESSAGING_ENABLED', 'MEDIA_UPLOAD_ENABLED', 'MODERATION_TOOLS_ENABLED', 'ACCOUNT_MODERATION_ENABLED']) {
-  assert.equal(production.vars[flag], 'false', flag);
-}
+const fingerprint = JSON.parse(readFileSync('docs/production-readiness/phase6/production-owner-pilot-fingerprint.json', 'utf8'));
+const preservation = verifyProductionPreservation(production.vars, fingerprint);
+assert.equal(preservation.result, 'PASS');
+assert.equal(preservation.totalChecks, 25);
+assert.equal(production.vars.ADMIN_ACCESS_STANDALONE_ENABLED, 'false');
+assert.equal(production.vars.ELIGIBILITY_REVIEW_ENABLED, 'false');
 assert.equal(production.d1_databases[0].migrations_dir, 'migrations/production');
 
 const lane = readdirSync('migrations/production').filter(name => name.endsWith('.sql')).sort();
@@ -36,6 +39,6 @@ assert.equal(JSON.parse(readFileSync('package-lock.json', 'utf8')).packages[''].
 
 console.log(JSON.stringify({
   result: 'PASS', baseline: 'f1759505fe3b6d99fdfe524ed81091d734b859d3',
-  productionWrites: 0, productionFlagsChanged: 0, migrationLane: { from: 17, to: 21, pending },
+  productionWrites: 0, candidatePreservationChecks: 25, migrationLane: { from: 17, to: 21, pending },
   cleanupWorkers: 'prepared-inert', access: 'required-fail-closed',
 }, null, 2));
