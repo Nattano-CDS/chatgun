@@ -1,7 +1,6 @@
 import { spawn } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
-import https from 'node:https';
-import { chromium } from '@playwright/test';
+import { chromium, request as playwrightRequest } from '@playwright/test';
 
 const origin = 'https://localhost:8797';
 const output = 'docs/production-readiness/phase6/performance-measurements.json';
@@ -11,20 +10,17 @@ const server = spawn(process.execPath, ['scripts/serve-issue16-local.mjs'], {
   stdio: ['ignore', 'pipe', 'pipe'],
 });
 
-function health() {
-  return new Promise(resolve => {
-    const request = https.get(`${origin}/api/health`, { rejectUnauthorized: false }, response => {
-      response.resume();
-      resolve(response.statusCode === 200);
-    });
-    request.on('error', () => resolve(false));
-  });
-}
-
 async function waitForServer() {
-  for (let attempt = 0; attempt < 60; attempt += 1) {
-    if (await health()) return;
-    await new Promise(resolve => setTimeout(resolve, 250));
+  const client = await playwrightRequest.newContext({ baseURL: origin, ignoreHTTPSErrors: true });
+  try {
+    for (let attempt = 0; attempt < 60; attempt += 1) {
+      try {
+        if ((await client.get('/api/health')).status() === 200) return;
+      } catch {}
+      await new Promise(resolve => setTimeout(resolve, 250));
+    }
+  } finally {
+    await client.dispose();
   }
   throw new Error('Isolated performance server did not become ready');
 }

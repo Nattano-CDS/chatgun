@@ -1,6 +1,6 @@
 # Phase 6 security results
 
-Result: **PASS for independently executable controls; BLOCKED for genuine Production identity and operational gates.** No unresolved Critical or High application-security defect was found.
+Result: **PASS for independently executable controls; BLOCKED for genuine Production identity and operational gates.** CodeQL found one High issue in the new local-only performance probe (`PH6-SEC-001`); it was fixed by removing the raw TLS validation override. No unresolved Critical or High application-security defect remains.
 
 Automated checks passed for OAuth state/nonce/PKCE and callback validation; invitation binding; duplicate identity prevention; session expiry/revocation; Access JWT signature, algorithm, issuer, audience, claims and key outage; service-token denial; RBAC expiry/revocation; CSRF and replay prevention; purpose audit; role separation; ordinary-user denial; age holds; block privacy; private R2 authorization; quarantine; deletion; cleanup retry; and fail-closed feature gates.
 
