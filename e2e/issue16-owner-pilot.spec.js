@@ -20,7 +20,7 @@ for(const width of [390,768,1440])test(`owner-only shell renders own real-record
     await expect(page.locator('#profile-dialog-content .profile-name, #profile-dialog-content h1').first()).toBeVisible();
     await expect(page.locator('#toast')).not.toContainText('โหลด Gallery ไม่สำเร็จ');
     expect(albumRequests.length).toBe(0);
-    await expect(page.locator('.private-album-icon')).toBeEnabled();const before=galleryReads.length;
+    await expect(page.locator('.private-album-icon, [data-profile-gallery]')).toHaveCount(0);const before=galleryReads.length;
     await page.clock.fastForward(31000);expect(galleryReads.length).toBe(before);
   }finally{await context.close();}
 });
