@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-10-29T16:33:13.888Z",
+  "sourceExportSha256": "278c1aaf85aa10c1f79e0dc1175628f367afedcf1c46f666d14e76af8322bc61",
+  "sourceExportBytes": 44831,
+  "sourcePermissions": "0600",
+  "sourceSchema": 17,
+  "targetSchema": 21,
+  "applied": [
+    {
+      "name": "0018_cloudflare_admin_sessions.sql",
+      "sha256": "d7ab7d2a438ff1c5d3c3d83cdbf35b4b7837146af3898c282714d382a7e822d6"
+    },
+    {
+      "name": "0019_member_age_safety_holds.sql",
+      "sha256": "696683be68db9f43efd0d62973173f28b1c4e916aca0adaaf887aab859d347e6"
+    },
+    {
+      "name": "0020_age_hold_write_guards.sql",
+      "sha256": "ec4774ca2db46c4525b64fe5ca266040d70443b311400579e909009c767411b9"
+    },
+    {
+      "name": "0021_eligibility_review_requests.sql",
+      "sha256": "0e4d2bfe7a3adcd5a86dc4f9ac6ebc5b1e21c2964aea23c709d19199586968a4"
+    }
+  ],
+  "excludedFromProduction": [
+    "0022_always_on_private_uat_cohort.sql"
+  ],
+  "existingRowCountsPreserved": true,
+  "foreignKeyViolations": 0,
+  "candidateSchemaObjectCounts": {
+    "table": 58,
+    "index": 66,
+    "trigger": 18
+  },
+  "rollbackRestore": "PASS schema17, row counts and FK0",
+  "productionWrites": 0
+}
