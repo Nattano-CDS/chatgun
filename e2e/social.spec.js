@@ -254,8 +254,6 @@ test("chat messages flow oldest-to-newest with latest at bottom and older-page s
     return route.fulfill({ json: { messages: (olderRequest ? older : latest).slice().reverse(), hasMore: !olderRequest } });
   });
   await page.goto("/app/");
-  // Make the thread independently scrollable on desktop and mobile.
-  await page.addStyleTag({ content: ".chat-layout{height:460px!important;min-height:460px!important}.thread,.messages{min-height:0}" });
   await page.locator('#primary-nav button[data-tab="chat"]').click();
   await page.locator('#conversation-list [data-chat="friend-1"]').click();
 
