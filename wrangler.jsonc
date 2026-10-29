@@ -46,21 +46,20 @@
     "production": {
       "vars": {
         "DEPLOYMENT_ENVIRONMENT": "production",
-        "OAUTH_ENABLED_PROVIDERS": "",
+        "OAUTH_ENABLED_PROVIDERS": "line",
         "FACEBOOK_EMAIL_ENABLED": "false",
         "PRESENCE_ENABLED": "false",
         "EMAIL_OTP_ENABLED": "false",
         "MOBILE_OTP_ENABLED": "false",
         "LINE_EMAIL_ENABLED": "false",
         "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
-        "BETA_INVITATION_REGISTRATION_ENABLED": "false",
-        "BETA_ENROLLMENT_REQUIRED": "true",
-        "ACCEPTANCE_FLOW_ENABLED": "false",
-        "SOCIAL_APP_ENABLED": "false",
-        "ADULT_ONBOARDING_ENABLED": "false",
-        "ADULT_NOTICE_VERSION": "controlled-beta-v1",
-        "TERMS_VERSION": "pending-owner-approval",
-        "PRIVACY_VERSION": "pending-owner-approval",
+        "BETA_INVITATION_REGISTRATION_ENABLED": "true",
+        "ACCEPTANCE_FLOW_ENABLED": "true",
+        "SOCIAL_APP_ENABLED": "true",
+        "ADULT_ONBOARDING_ENABLED": "true",
+        "ADULT_NOTICE_VERSION": "adult-beta-2026-10-20-rc1",
+        "TERMS_VERSION": "terms-beta-2026-10-20-rc1",
+        "PRIVACY_VERSION": "privacy-beta-2026-10-20-rc1",
         "PUBLIC_DISCOVERY_ENABLED": "false",
         "FRIEND_REQUESTS_ENABLED": "false",
         "MESSAGING_ENABLED": "false",
@@ -69,7 +68,7 @@
         "SENSITIVE_CONTENT_ENABLED": "false",
         "RATINGS_ENABLED": "false",
         "IDENTITY_VERIFICATION_ENABLED": "false",
-        "MODERATION_TOOLS_ENABLED": "false",
+        "MODERATION_TOOLS_ENABLED": "true",
         "ACCOUNT_MODERATION_ENABLED": "false",
         "ELIGIBILITY_REVIEW_ENABLED": "false",
         "ADMIN_ACCESS_STANDALONE_ENABLED": "false",
@@ -77,7 +76,7 @@
         "DEMO_MODE_ENABLED": "false",
         "DEMO_AUTO_START_ENABLED": "false",
         "PUBLIC_DEMO_CANARY_ENABLED": "false",
-        "OAUTH_LOGIN_ENABLED": "false"
+        "OAUTH_LOGIN_ENABLED": "true"
       },
       "d1_databases": [
         {
@@ -87,7 +86,12 @@
           "migrations_dir": "migrations/production"
         }
       ],
-      "r2_buckets": [{"binding":"MEDIA","bucket_name":"chatgun-media-production"}]
+      "r2_buckets": [
+        {
+          "binding": "MEDIA",
+          "bucket_name": "chatgun-media-production"
+        }
+      ]
     }
   }
 }
