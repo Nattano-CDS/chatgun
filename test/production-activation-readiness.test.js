@@ -35,7 +35,7 @@ test('Phase 5 Access handoff is exact, non-authorizing and preserves the owner p
     'ADMIN_ACCESS_OWNER_USER_ID',
     '10 minutes',
     'Not authorized for Production execution',
-  ]) assert.match(accessFlat, new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'), 'u'));
+  ]) assert.ok(accessFlat.includes(phrase), phrase);
   for (const phrase of ['LINE OAuth on', 'invitation-only', 'Social shell/onboarding on', 'NO-GO']) {
     assert.match(report, new RegExp(phrase, 'u'));
   }
