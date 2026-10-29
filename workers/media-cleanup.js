@@ -10,7 +10,7 @@ function retryDelay(attempts) {
 }
 
 export async function drainMediaDeletionQueue(env, timestamp = unixTime(), {objectKeys} = {}) {
-  if(String(env.MEDIA_CLEANUP_ENABLED).toLowerCase()==='false')return {disabled:true,completed:0,failed:0};
+  if(env.MEDIA_CLEANUP_ENABLED !== 'true')return {disabled:true,completed:0,failed:0};
   if (!env.DB || !env.MEDIA) throw new Error("missing_staging_bindings");
   if(objectKeys!==undefined&&(!Array.isArray(objectKeys)||objectKeys.length>100||objectKeys.some(k=>typeof k!=='string'||!k||k.length>1024)))throw new Error('invalid_cleanup_scope');
   const scope=objectKeys===undefined?'':` AND object_key IN (${objectKeys.map(()=>'?').join(',')||'NULL'})`;

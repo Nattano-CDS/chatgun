@@ -45,6 +45,7 @@
   "env": {
     "production": {
       "vars": {
+        "DEPLOYMENT_ENVIRONMENT": "production",
         "OAUTH_ENABLED_PROVIDERS": "",
         "FACEBOOK_EMAIL_ENABLED": "false",
         "PRESENCE_ENABLED": "false",

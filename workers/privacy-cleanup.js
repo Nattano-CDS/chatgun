@@ -10,7 +10,9 @@ export default {
   },
 
   async scheduled(controller, env, context) {
-    if(String(env.RETENTION_CLEANUP_ENABLED).toLowerCase()==='false')return;
+    // Missing, misspelled and mixed-case flags are disabled. A cleanup cron is
+    // destructive and must be enabled by an exact, reviewed configuration.
+    if(env.RETENTION_CLEANUP_ENABLED !== 'true')return;
     const timestamp = Math.floor(controller.scheduledTime / 1000);
     context.waitUntil((async () => {
       const deleted = await runRetentionCleanup(env.DB, timestamp);

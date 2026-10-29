@@ -106,7 +106,7 @@ test("moderation UI auto-loads routine overview, justifies restricted evidence, 
 });
 
 test("staging social and private media activation remain isolated from production", () => {
-  const production = wrangler.split('"production"', 2)[1];
+  const production = JSON.stringify(JSON.parse(wrangler).env.production, null, 2);
   for (const capability of ["SOCIAL_APP_ENABLED", "PUBLIC_DISCOVERY_ENABLED", "MESSAGING_ENABLED", "RATINGS_ENABLED"]) {
     assert.match(wrangler, new RegExp(`"${capability}": "true"`, "u"));
     assert.match(production, new RegExp(`"${capability}": "false"`, "u"));

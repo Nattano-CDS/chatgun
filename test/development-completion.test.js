@@ -151,7 +151,7 @@ test('gallery comment reads hide both directions of blocked authors without leak
 });
 test('cleanup tombstones image-only forwarded messages before ON DELETE SET NULL',async t=>{
  const{db,media,now,objects}=await fixture(t);media();db.exec(`INSERT INTO social_messages(id,sender_user_id,receiver_user_id,body,media_id,created_at)VALUES('forwarded','viewer','independent','','photo',${now})`);
- const result=await drainMediaDeletionQueue({DB:db,MEDIA:{delete:async key=>objects.delete(key)}},now+8*86400);
+ const result=await drainMediaDeletionQueue({DB:db,MEDIA_CLEANUP_ENABLED:'true',MEDIA:{delete:async key=>objects.delete(key)}},now+8*86400);
  assert.equal(result.completed,1);assert.equal(result.failed,0);const message=await db.prepare("SELECT media_id,unsent_at FROM social_messages WHERE id='forwarded'").first();assert.equal(message.media_id,null);assert.ok(message.unsent_at);assert.equal(db.database.prepare('PRAGMA foreign_key_check').all().length,0);
 });
 test('deleting the original uploader preserves other members and safely tombstones forwarded media',async t=>{
