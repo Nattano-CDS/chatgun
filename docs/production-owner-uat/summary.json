@@ -1,0 +1,51 @@
+{
+  "checkedAt": "2026-10-20T07:22:08.919Z",
+  "decision": "DEPLOYED — OWNER-ONLY PRODUCTION UAT; NOT PUBLIC SOCIAL LAUNCH",
+  "url": "https://chatgun.social",
+  "sha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "deploymentId": "f705d7cd-974d-4e48-8b61-73ec1a760c42",
+  "priorSha": "b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7",
+  "scope": "line-owner-production-uat",
+  "unitIntegrationSecurity": {
+    "passed": 202,
+    "failed": 0,
+    "skipped": 0
+  },
+  "ci": {
+    "conclusion": "success",
+    "databaseId": 39385151283,
+    "headSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+    "status": "completed",
+    "url": "https://github.com/Nattano-CDS/chatgun/actions/runs/39385151283"
+  },
+  "previewReleaseChecks": 14,
+  "productionReleaseChecks": 22,
+  "assetHashesVerified": 39,
+  "anonymousBrowserCases": 6,
+  "viewports": [
+    390,
+    768,
+    1440
+  ],
+  "migrationCount": 17,
+  "foreignKeyViolations": 0,
+  "ownerAccounts": 1,
+  "identities": 1,
+  "identityUserMismatches": 0,
+  "publicSignup": false,
+  "discovery": false,
+  "messaging": false,
+  "presence": false,
+  "uploads": false,
+  "sensitive": false,
+  "newInvitationsIssued": 0,
+  "rolesGrantedOrExtended": 0,
+  "privateR2": true,
+  "secretMetadataPreserved": true,
+  "previewBindingsPreserved": true,
+  "rollbackReady": true,
+  "humanUatPassed": false,
+  "humanUatStatus": "PENDING OWNER TEST ON PRODUCTION AS EXPLICITLY REQUESTED",
+  "authenticatedBrowserResults": "NOT CLAIMED — no CAPTCHA/MFA/consent or user sessions automated",
+  "browserDriverCorrections": "Initial networkidle wait timed out on third-party challenge traffic; a second attempt read provider controls before async configuration completed. Final run waits for the actual anonymous signup redirect and completed LINE-only provider visibility, not global network silence."
+}

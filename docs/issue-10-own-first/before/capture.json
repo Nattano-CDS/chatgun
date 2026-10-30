@@ -1,0 +1,21 @@
+{
+  "target": "https://94825247.chatgun.pages.dev",
+  "commit": "0a4bd1d25c730d131615960e892c77b257b16947",
+  "kind": "live-site",
+  "fixture": "chatgun-browser-demo-v1; browser-only adapter and empty-state variations",
+  "viewports": [
+    [
+      390,
+      844
+    ],
+    [
+      768,
+      1024
+    ],
+    [
+      1440,
+      1100
+    ]
+  ],
+  "failures": []
+}

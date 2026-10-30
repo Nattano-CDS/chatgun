@@ -1,0 +1,88 @@
+{
+  "checkedAt": "2026-10-23T19:07:03.623Z",
+  "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "sha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+  "requiredSchema": 21,
+  "assetHashesMatched": 39,
+  "checks": [
+    {
+      "path": "/api/health",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/auth/config",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/config",
+      "status": 200,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/profile",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/discovery",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/messages?target=nonexistent",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/conversations",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/gallery",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/online",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/moderation/overview",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/moderation/reports",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/moderation/members",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/moderation/eligibility",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/social/account-appeals",
+      "status": 401,
+      "result": "PASS"
+    },
+    {
+      "path": "/api/auth/sessions",
+      "status": 401,
+      "result": "PASS"
+    }
+  ],
+  "passed": 15,
+  "failed": 0,
+  "noFictionalReleaseAssets": true,
+  "realOAuthUat": "NOT RUN — isolated synthetic sessions only"
+}

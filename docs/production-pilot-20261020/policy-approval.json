@@ -1,0 +1,32 @@
+{
+  "preparedOn": "2026-10-20",
+  "timezone": "Asia/Bangkok",
+  "state": "DRAFT FOR OWNER AND QUALIFIED LEGAL REVIEW; NOT EFFECTIVE",
+  "versions": {
+    "terms": "terms-beta-2026-10-20-rc1",
+    "privacy": "privacy-beta-2026-10-20-rc1",
+    "deletion": "deletion-beta-2026-10-20-rc1",
+    "adult": "adult-beta-2026-10-20-rc1",
+    "beta": "beta-2026-10-20-rc1",
+    "social": "social-safety-beta-2026-10-20-rc1"
+  },
+  "ownerApproved": false,
+  "qualifiedReviewConfirmed": false,
+  "effectiveDate": null,
+  "effectiveDateDecision": "Owner/reviewer must choose the actual date at or after approved publication; no backdating",
+  "sourceHashes": {
+    "privacy.html": "b7e973d15587fc7c5466df4ea76f032cd143a5e01b9c5e07eabfdc0785001803",
+    "terms.html": "5bd839d2c2f73bb3fa424ff098b350dd54685429ca0b6b725487e23f12eb0776",
+    "data-deletion.html": "06ec2fcff3d4db9a004585c106ce3dd7df444cd9c476eed277acb9b6c7d4e9b6"
+  },
+  "decisionsRequired": [
+    "Final reviewed wording and effective date; governing law/dispute/liability/content licence",
+    "Thai age/capacity treatment for 18–19 and proportionate age assurance; no independent verification claimed",
+    "LINE-only owner admission and later separately approved two-adult waves; private consenting tester identities",
+    "Location inference/precision/retention and optional discovery/online visibility",
+    "Manual quarantine, prohibited-content handling, emergency escalation, appeals, owner absence; no scanning or backup staff invented",
+    "Actual retention/deletion exceptions, security logs, protected backup lifecycle and cleanup schedules",
+    "Approve support/appeals channel and final Beta participation notice; contact is confirmed but operational procedures still require approval"
+  ],
+  "publicationAuthorized": false
+}

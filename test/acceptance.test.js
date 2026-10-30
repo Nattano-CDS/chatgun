@@ -99,6 +99,7 @@ test("pending OAuth account cannot bypass acceptance and underage declaration is
 test("acceptance evidence transitions to onboarding and onboarding alone activates social access", async () => {
   const database = new TestD1();
   const env = acceptanceEnvironment(database);
+  env.BETA_ENROLLMENT_REQUIRED='true';
   const session = await seedPending(database);
 
   const accepted = await postAuth(env, "/api/auth/acceptance", session, acceptanceBody());

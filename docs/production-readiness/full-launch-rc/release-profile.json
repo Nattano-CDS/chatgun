@@ -1,0 +1,45 @@
+{
+  "profileVersion": 1,
+  "apply": false,
+  "description": "Review-only activation profile. This file is not a deployable Cloudflare configuration.",
+  "currentProductionMustRemain": {
+    "schema": 21,
+    "publicRegistration": false,
+    "publicDiscovery": false,
+    "friendRequests": false,
+    "messaging": false,
+    "mediaUploads": false,
+    "presence": false,
+    "ratings": false,
+    "sensitiveContent": false,
+    "otp": false,
+    "demo": false
+  },
+  "proposedActivationWaves": [
+    {
+      "wave": 1,
+      "features": ["google-oauth", "facebook-oauth", "line-oauth", "registration", "profiles"],
+      "requires": ["provider-console-verification", "approved-public-policies", "genuine-oauth-smoke-tests"]
+    },
+    {
+      "wave": 2,
+      "features": ["discovery", "approximate-location", "presence"],
+      "requires": ["wave-1-stable", "location-privacy-smoke-test", "monitoring-owner"]
+    },
+    {
+      "wave": 3,
+      "features": ["friend-requests", "text-messaging"],
+      "requires": ["wave-2-stable", "friend-only-e2e", "moderation-and-report-coverage"]
+    },
+    {
+      "wave": 4,
+      "features": ["ratings"],
+      "requires": ["wave-3-stable", "proximity-and-abuse-control-smoke-tests"]
+    },
+    {
+      "wave": 5,
+      "features": ["media"],
+      "requires": ["separate-owner-approval", "moderation-operations-ready", "cleanup-schedule-ready"]
+    }
+  ]
+}

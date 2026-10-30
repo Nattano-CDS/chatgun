@@ -1,0 +1,9 @@
+{
+  "commit": "a2f6f5d5d42caa997c18495ccca2babfce3fbab8",
+  "command": "npm test",
+  "tests": 132,
+  "passed": 132,
+  "failed": 0,
+  "skipped": 0,
+  "node": "v26.5.0"
+}

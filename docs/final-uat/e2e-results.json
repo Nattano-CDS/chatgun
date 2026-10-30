@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-28T20:34:45+07:00",
+  "timezone": "Asia/Bangkok",
+  "classification": "PARTIAL UAT — SPECIFIC EXTERNAL GATES REMAIN",
+  "baseline": {
+    "pullRequest": 17,
+    "pullRequestHeadAtExecutionStart": "9c8689566b78f87952e38d7be3504b5a9e419451",
+    "testedUatApplicationSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+    "productionSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+    "uatOrigin": "https://uat.chatgun-final-uat.pages.dev"
+  },
+  "counts": {
+    "automatedAssertions": { "total": 270, "pass": 270, "fail": 0, "blocked": 0, "notRun": 0 },
+    "genuineHumanScenarios": { "total": 50, "pass": 0, "fail": 0, "blocked": 50, "notRun": 0 },
+    "physicalDeviceChecks": { "total": 2, "pass": 0, "fail": 0, "blocked": 0, "notRun": 2 }
+  },
+  "automatedSuites": [
+    {
+      "id": "LOCAL-REGRESSION",
+      "status": "PASS",
+      "passed": 250,
+      "failed": 0,
+      "skipped": 0,
+      "command": "npm test",
+      "scope": "Local implementation, security, privacy, RBAC, OAuth validation, invitation, D1 and media regression",
+      "limitation": "Mocked/isolated provider checks are not genuine OAuth, Turnstile, Access MFA or human consent evidence."
+    },
+    {
+      "id": "LIVE-CLOSED-NEGATIVE",
+      "status": "PASS",
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0,
+      "evidence": "oauth-access-setup/live-negative-security.json",
+      "scope": "Closed provider starts/callbacks, foreign-origin rejection, anonymous session denial, Access redirects and disabled OTP",
+      "limitation": "Admission and providers intentionally remained disabled."
+    },
+    {
+      "id": "RESPONSIVE-CLOSED-STATE",
+      "status": "PASS",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "viewports": [390, 768, 1440],
+      "evidence": [
+        "oauth-access-setup/closed-390.png",
+        "oauth-access-setup/closed-768.png",
+        "oauth-access-setup/closed-1440.png"
+      ],
+      "limitation": "Viewport emulation of the closed state is not physical-device or authenticated-journey testing."
+    }
+  ],
+  "providerResults": [
+    {
+      "provider": "google",
+      "configuration": "PASS",
+      "encryptedUatCredentials": true,
+      "callback": "https://uat.chatgun-final-uat.pages.dev/api/auth/oauth/google/callback",
+      "genuineOAuth": "NOT RUN",
+      "reason": "Owner/participant authorization, invitations, policy approval and coordinated human window are not complete."
+    },
+    {
+      "provider": "facebook",
+      "configuration": "PASS",
+      "encryptedUatCredentials": true,
+      "callback": "https://uat.chatgun-final-uat.pages.dev/api/auth/oauth/facebook/callback",
+      "genuineOAuth": "NOT RUN",
+      "reason": "Owner/participant authorization, invitations, policy approval and coordinated human window are not complete."
+    },
+    {
+      "provider": "line",
+      "configuration": "PASS",
+      "encryptedUatCredentials": true,
+      "callback": "https://uat.chatgun-final-uat.pages.dev/api/auth/oauth/line/callback",
+      "genuineOAuth": "NOT RUN",
+      "reason": "Owner/participant authorization, invitations, policy approval and coordinated human window are not complete."
+    }
+  ],
+  "humanCampaign": [
+    {
+      "group": "A — Authentication",
+      "status": "BLOCKED",
+      "execution": "NOT RUN",
+      "cases": [
+        "Genuine owner OAuth",
+        "Genuine second-user OAuth",
+        "Real Turnstile",
+        "Versioned acceptance",
+        "Onboarding",
+        "Secure session persistence",
+        "Logout and re-login",
+        "Duplicate-account prevention",
+        "Invitation replay rejection"
+      ],
+      "blockers": ["Expanded UAT policy approval", "Participant A private confirmation", "Participant B private confirmation", "Invitation issuance approval"]
+    },
+    {
+      "group": "B — Admin and Security",
+      "status": "BLOCKED",
+      "execution": "NOT RUN",
+      "cases": [
+        "Genuine Cloudflare Access login",
+        "Authenticator/TOTP verification",
+        "Fresh-authentication verification",
+        "Admin Dashboard",
+        "Restricted queues",
+        "Purpose logging",
+        "Role authorization",
+        "Permission expiry",
+        "Anonymous/ordinary-user denial",
+        "Audit events"
+      ],
+      "blockers": ["Genuine owner UAT UUID", "Explicit exact role-grant approval", "Protected-app human MFA challenge"]
+    },
+    {
+      "group": "C — Social",
+      "status": "BLOCKED",
+      "execution": "NOT RUN",
+      "cases": [
+        "Member profiles",
+        "Discovery",
+        "Search and filters",
+        "Location consent",
+        "Distance privacy",
+        "Direct Chat",
+        "Message persistence",
+        "Read/unread state",
+        "Online presence",
+        "Blocking and reporting"
+      ],
+      "blockers": ["Two genuine adult accounts", "Expanded social/location approval"]
+    },
+    {
+      "group": "D — Media",
+      "status": "BLOCKED",
+      "execution": "NOT RUN",
+      "cases": [
+        "Public Gallery upload",
+        "Quarantine",
+        "Manual moderation",
+        "Public image visibility",
+        "Likes and comments",
+        "Private Gallery request",
+        "Owner approval",
+        "Private Gallery access",
+        "Permission revocation",
+        "Unauthorized raw-media denial",
+        "Delete and cleanup"
+      ],
+      "blockers": ["Media-specific consent", "Named independent appeal reviewer or explicit media-off decision", "Moderation window approval"]
+    },
+    {
+      "group": "E — Privacy and Lifecycle",
+      "status": "BLOCKED",
+      "execution": "NOT RUN",
+      "cases": [
+        "Profile editing",
+        "Privacy settings",
+        "Online opt-out",
+        "Location disable/retirement",
+        "Block/unblock",
+        "Ratings and private reviews",
+        "Reports and appeals",
+        "Session revocation",
+        "Disposable participant account deletion",
+        "D1/R2 integrity verification"
+      ],
+      "blockers": ["Approved disposable Participant B account", "Retention/deletion approval", "Two genuine adult accounts"]
+    }
+  ],
+  "admin": {
+    "accessApplicationId": "c2c866d3-3d41-410b-909f-4beac2683a17",
+    "configurationEvidence": "PASS",
+    "ownerAuthenticatorEnrollment": "PASS",
+    "protectedApplicationMfa": "NOT RUN",
+    "ownerUatUuid": null,
+    "roleGrant": "NOT EXECUTED",
+    "anonymousDenial": "PASS",
+    "ordinaryUserDenial": "NOT RUN"
+  },
+  "environment": {
+    "d1": { "uuid": "e3cb426c-b88a-4b93-90fd-39df524f68ae", "schema": 21, "foreignKeyViolations": 0, "users": 0, "invitations": 0, "sessions": 0, "roleGrants": 0 },
+    "r2": { "bucket": "chatgun-final-uat-media", "publicR2Dev": false, "customDomains": 0, "mediaObjectsRepresentedInD1": 0 },
+    "cleanupWorkers": { "privacy": "PASS", "media": "PASS", "firstScheduledExecution": "NOT RUN" },
+    "productionWrites": 0
+  },
+  "deviceCoverage": {
+    "emulated": [
+      { "width": 390, "status": "PASS", "scope": "Closed-state only" },
+      { "width": 768, "status": "PASS", "scope": "Closed-state only" },
+      { "width": 1440, "status": "PASS", "scope": "Closed-state only" }
+    ],
+    "physical": [
+      { "device": "iPhone browser", "status": "NOT RUN" },
+      { "device": "Android browser", "status": "NOT RUN" }
+    ]
+  }
+}

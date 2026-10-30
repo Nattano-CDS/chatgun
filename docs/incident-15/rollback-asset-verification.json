@@ -1,0 +1,59 @@
+{
+  "checkedAt": "2026-10-17T17:22:03.468Z",
+  "origin": "https://chatgun.social",
+  "commit": "d9a11c52722175b93236f8e09e74928430013fba",
+  "deploymentId": "3e111666-ad69-49ba-91ca-d2495c561076",
+  "status": "PASS",
+  "assets": [
+    {
+      "file": "app/index.html",
+      "sha256": "7ad26229b03ad815658cf35899e7ba61caa6734ea9223ce8a1b42ec204b91e26",
+      "matchesCommit": true
+    },
+    {
+      "file": "app/social.js",
+      "sha256": "3180f119316c7e5ea5b3fb8f36a2583cf564c100762ce02081b4f5e46eccc2e6",
+      "matchesCommit": true
+    },
+    {
+      "file": "app/demo-network.js",
+      "sha256": "376bec1f21ea75248fe2643283c62fff679037b9be69cb98ee134c7a88cdc98c",
+      "matchesCommit": true
+    },
+    {
+      "file": "app/near-components.js",
+      "sha256": "c04877c3fa7a82422d78a68e38ffb04b824ac32a8cc9f9fc07c45096004b6741",
+      "matchesCommit": true
+    },
+    {
+      "file": "app/near-components.css",
+      "sha256": "02c74e0a563ae5d0857f0e2f05841204d47dd355c185c29ed7d041344f1c3f44",
+      "matchesCommit": true
+    },
+    {
+      "file": "app/gallery-approved.js",
+      "sha256": "996cbaf1fbd474f5c97d7c0b5d445f01100738ede7531ace6b7dd7492bf6fbd2",
+      "matchesCommit": true
+    },
+    {
+      "file": "app/gallery-approved.css",
+      "sha256": "dd2d5a316f88b5a8d63299dca23ca3f894a78d9ffe9d3dfc295b62bfeeba506c",
+      "matchesCommit": true
+    },
+    {
+      "file": "app/demo-gallery.js",
+      "sha256": "6ffa0dd31123d492ed6d3403b370340569dcd15a27f69aecdb7087973ee384bb",
+      "matchesCommit": true
+    },
+    {
+      "file": "auth-nav.js",
+      "sha256": "0470aae02cce6a97dbefa12b1372c63b22163e63cd815f7b22b14231377e2ed9",
+      "matchesCommit": true
+    },
+    {
+      "file": "assets/demo/network.json",
+      "sha256": "6fb65ee61a8352816330304e8c2c9c9f73f23bebc4e3dcbb2d27927d4b1fc8da",
+      "matchesCommit": true
+    }
+  ]
+}

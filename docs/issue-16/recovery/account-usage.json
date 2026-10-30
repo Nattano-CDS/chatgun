@@ -1,0 +1,91 @@
+{
+  "checkedAt": "2026-10-20T04:06:16.840Z",
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "windowStart": "2026-10-20T00:00:00.000Z",
+  "usageIsAdaptiveEstimate": true,
+  "usage": [
+    {
+      "dimensions": {
+        "scriptName": "chatgun-media-cleanup-staging",
+        "status": "success"
+      },
+      "sum": {
+        "errors": 0,
+        "requests": 1
+      }
+    },
+    {
+      "dimensions": {
+        "scriptName": "chatgun-privacy-cleanup-staging",
+        "status": "success"
+      },
+      "sum": {
+        "errors": 0,
+        "requests": 1
+      }
+    }
+  ],
+  "pagesUsage": [
+    {
+      "dimensions": {
+        "scriptName": "pages-worker--21536565-preview",
+        "status": "success"
+      },
+      "sum": {
+        "requests": 14
+      }
+    },
+    {
+      "dimensions": {
+        "scriptName": "pages-worker--21410320-production",
+        "status": "success"
+      },
+      "sum": {
+        "requests": 271
+      }
+    },
+    {
+      "dimensions": {
+        "scriptName": "pages-worker--21410320-production",
+        "status": "clientDisconnected"
+      },
+      "sum": {
+        "requests": 1
+      }
+    }
+  ],
+  "pagesRequestEstimate": 286,
+  "usageErrors": [],
+  "currentApis": [
+    {
+      "origin": "https://chatgun.social",
+      "path": "/api/social/config",
+      "status": 200,
+      "json": true
+    },
+    {
+      "origin": "https://chatgun.social",
+      "path": "/api/auth/config",
+      "status": 200,
+      "json": true
+    },
+    {
+      "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+      "path": "/api/social/config",
+      "status": 200,
+      "json": true
+    },
+    {
+      "origin": "https://issue13.chatgun-issue13-staging.pages.dev",
+      "path": "/api/auth/config",
+      "status": 200,
+      "json": true
+    }
+  ],
+  "currently1046Observed": false,
+  "pagesProductionBranch": "main",
+  "liveDeployment": "6930ba48-5511-422e-9dc0-b7cdcf604d7f",
+  "liveSha": "815c2c401e095bb2dc3e6a1a2497269f4f268fb6",
+  "billingChanged": false,
+  "exactPlanEntitlement": "Not inferred from adaptive counts; owner billing review required if limit recurs"
+}

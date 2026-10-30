@@ -1,0 +1,77 @@
+{
+  "ok": true,
+  "origin": "https://chatgun.social",
+  "release": {
+    "commit": "b6ba87434a82e655bff0cea39ce637fca5488b4a",
+    "demoBatch": "chatgun-browser-demo-v1"
+  },
+  "fictionalProfiles": 20,
+  "fictionalMessages": 120,
+  "oauth": "disabled",
+  "liveSocial": "disabled",
+  "media": "disabled/unbound",
+  "checks": [
+    {
+      "path": "/test-results/staging-social-sessions.json",
+      "status": 404
+    },
+    {
+      "path": "/scripts/fixtures/social-owner-review-v1.json",
+      "status": 404
+    },
+    {
+      "path": "/.dev.vars",
+      "status": 404
+    },
+    {
+      "path": "/docs/release-candidate-validation.md",
+      "status": 404
+    },
+    {
+      "path": "/game",
+      "status": 404
+    },
+    {
+      "path": "/api/social/profile",
+      "status": 404
+    },
+    {
+      "path": "/api/social/relationships",
+      "status": 404
+    },
+    {
+      "path": "/api/social/conversations",
+      "status": 404
+    },
+    {
+      "path": "/api/social/albums/access",
+      "status": 404
+    },
+    {
+      "path": "/api/social/gallery?user=demo-01&photo=demo-private-01",
+      "status": 404
+    },
+    {
+      "path": "/api/social/messages?target=demo-02",
+      "status": 404
+    },
+    {
+      "path": "/api/social/media/unknown",
+      "status": 404
+    },
+    {
+      "path": "/api/social/moderation/overview",
+      "status": 404
+    },
+    {
+      "path": "/api/social/albums/access",
+      "method": "POST",
+      "status": 404
+    },
+    {
+      "path": "/api/social/chat-preferences",
+      "method": "POST",
+      "status": 404
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+<anonymous_script>:1
+<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ไม่พบหน้านี้ | ChatGun</title><link rel="stylesheet" href="/auth-shell.css"><body class="auth-page"><main class="auth-content"><section class="auth-panel"><div class="auth-mark"><img src="/logo.svg" alt="ChatGun"></div><h1>ไม่พบหน้านี้</h1><p class="auth-intro">ลิงก์นี้อาจเปลี่ยนไปแล้ว</p><a class="auth-secondary" href="/">กลับไปหาเพื่อน</a></section></main></body></html>
+^
+
+SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at parseJSONFromBytes (node:internal/deps/undici/undici:4349:19)
+    at successSteps (node:internal/deps/undici/undici:6987:27)
+    at readAllBytes (node:internal/deps/undici/undici:5811:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v26.5.0

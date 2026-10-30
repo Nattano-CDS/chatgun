@@ -1,0 +1,100 @@
+{
+  "measuredAt": "2026-10-30T03:17:03.417Z",
+  "environment": "isolated local real-handler harness with synthetic identities, in-memory D1 and R2",
+  "iterations": 20,
+  "browser": "Playwright Chromium",
+  "metrics": [
+    {
+      "name": "discovery API",
+      "iterations": 20,
+      "p50Ms": 1.34,
+      "p95Ms": 2.51,
+      "maxMs": 13.72
+    },
+    {
+      "name": "authenticated initial application load",
+      "iterations": 20,
+      "p50Ms": 548.91,
+      "p95Ms": 560.11,
+      "maxMs": 562.25
+    },
+    {
+      "name": "profile API",
+      "iterations": 20,
+      "p50Ms": 1.17,
+      "p95Ms": 3.07,
+      "maxMs": 15.59
+    },
+    {
+      "name": "conversation list API",
+      "iterations": 20,
+      "p50Ms": 0.91,
+      "p95Ms": 1.22,
+      "maxMs": 2.8
+    },
+    {
+      "name": "message send API",
+      "iterations": 20,
+      "p50Ms": 0.91,
+      "p95Ms": 1.14,
+      "maxMs": 2.11
+    },
+    {
+      "name": "moderation dashboard load",
+      "iterations": 20,
+      "p50Ms": 531.63,
+      "p95Ms": 536.08,
+      "maxMs": 539.27
+    },
+    {
+      "name": "concurrent profile reads (5)",
+      "iterations": 20,
+      "p50Ms": 2.01,
+      "p95Ms": 6.85,
+      "maxMs": 16.7
+    }
+  ],
+  "browserMetrics": {
+    "routeTransitions": {
+      "iterations": 20,
+      "p50Ms": 33.34,
+      "p95Ms": 35.16,
+      "maxMs": 58.79
+    },
+    "initialPageRequests": 33,
+    "initialApiRequests": 14,
+    "conversationListRenderMs": 1.2,
+    "longConversation": {
+      "renderedMessages": 250,
+      "renderAndPaginationMs": 146.52,
+      "scrollTopToBottomMs": 1.78
+    },
+    "heap": {
+      "beforeBytes": 910684,
+      "afterTwentyRouteTransitionsBytes": 3105480,
+      "growthBytes": 2194796
+    },
+    "hiddenSurfacePolling": {
+      "observationMs": 11000,
+      "messageRequests": 0,
+      "conversationRequests": 0
+    },
+    "mobileHorizontalOverflow": false
+  },
+  "discoveryRateLimit": {
+    "requestsBeforeProbe": 30,
+    "permittedStatuses": [
+      200
+    ],
+    "probeStatus": 429,
+    "result": "PASS"
+  },
+  "excluded": [
+    "Production load testing",
+    "external OAuth provider latency",
+    "Cloudflare edge and remote D1/R2 network latency",
+    "physical-device rendering and radio latency"
+  ],
+  "productionWrites": 0,
+  "result": "PASS"
+}

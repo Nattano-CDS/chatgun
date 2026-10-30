@@ -1,0 +1,50 @@
+{
+  "status": "PREPARATION PASS; PUBLIC YOUTH LAUNCH AND GENUINE ACCESS LOGIN BLOCKED",
+  "decisionDateBangkok": "2026-10-20",
+  "testedSourceSha": "bba908a37d79dade6e4ddd3424ebe3d491536072",
+  "preview": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "immutablePreview": "https://aab893f2.chatgun-issue13-staging.pages.dev",
+  "productionShaUnchanged": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "ownerSelectedMinimumAge": 13,
+  "ownerSelectedAdminEmail": "natttano@outlook.com",
+  "implementation": {
+    "accessServerSideAdditionalGate": true,
+    "ageBandClassifierOnly": true,
+    "minorRegistrationActivated": false,
+    "standaloneCloudflareAdminSessionImplemented": false,
+    "existingRolesGrantedOrExtended": false,
+    "policyPublished": false
+  },
+  "tests": {
+    "unitIntegrationSecurity": { "passed": 213, "failed": 0, "skipped": 0 },
+    "mockedBrowserRegression": { "passed": 84, "failed": 0, "skipped": 0, "widths": [390, 768, 1440] },
+    "accessJwtAndHandlerTests": "Local synthetic RSA assertions and accounts only, including claim/signature rejection, role denial, revocation, CSRF, routine audit and certificate outage",
+    "genuineAccessLogin": "BLOCKED: API authorization 403; application/IdP setup and human login not completed",
+    "youthRegistrationAndSocialE2e": "NOT IMPLEMENTED / NOT RUN",
+    "currentRunFullSystemCloudSocialE2e": "NOT RUN; prior evidence is historical, not attributed to this source",
+    "previewAssetHashesMatched": 39,
+    "previewAnonymousAccountAndAdminDenied": true,
+    "productionJsonApisAvailable": true,
+    "productionAnonymousAccountAndAdminDenied": true
+  },
+  "infrastructure": {
+    "accountVerified": "23017b53386fb67fc62a52cdd017454c",
+    "accessOrganizationReadStatus": 403,
+    "accessApplicationsReadStatus": 403,
+    "accessIdentityProvidersReadStatus": 403,
+    "productionSchema": 17,
+    "productionForeignKeyViolations": 0,
+    "productionAndPreviewBindingsPreserved": true,
+    "protectedStagingAggregateCountsUnchanged": true,
+    "productionWrites": 0,
+    "productionDeployments": 0,
+    "cleanupExecuted": false
+  },
+  "remaining": [
+    "Authorized Zero Trust dashboard setup or locally scoped API permission; actual owner Access identity and private account binding verification.",
+    "Standalone CF-only Admin login/session bridge remains separate implementation; this gate does not replace LINE member login or renew D1 roles.",
+    "Versioned youth admission and authorization model, backend age-based visibility/contact controls, privacy defaults, safety operations and qualified review of revised youth policies.",
+    "Independent media appeal reviewer remains unassigned; quarantine and Sensitive denial remain in force.",
+    "Production cleanup and broader exact-release readiness gates remain unresolved."
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "preparedAt": "2026-10-29T16:55:34Z",
+  "repository": "Nattano-CDS/chatgun",
+  "baselinePullRequest": 19,
+  "candidateApplicationSha": "cfb94c92190a17ebb73983cef4017ca227df5d42",
+  "candidateGitTreeSha": "4214e4bce20e52bc1c519927774b38c4f536c19c",
+  "currentProductionSourcePrefix": "a73ff21",
+  "productionSchemaCurrent": 17,
+  "productionSchemaTarget": 21,
+  "migrationHashes": {
+    "0018_cloudflare_admin_sessions.sql": "d7ab7d2a438ff1c5d3c3d83cdbf35b4b7837146af3898c282714d382a7e822d6",
+    "0019_member_age_safety_holds.sql": "696683be68db9f43efd0d62973173f28b1c4e916aca0adaaf887aab859d347e6",
+    "0020_age_hold_write_guards.sql": "ec4774ca2db46c4525b64fe5ca266040d70443b311400579e909009c767411b9",
+    "0021_eligibility_review_requests.sql": "0e4d2bfe7a3adcd5a86dc4f9ac6ebc5b1e21c2964aea23c709d19199586968a4"
+  },
+  "protectedBackup": {
+    "sha256": "278c1aaf85aa10c1f79e0dc1175628f367afedcf1c46f666d14e76af8322bc61",
+    "bytes": 44831,
+    "fileMode": "0600",
+    "locationRecordedInGit": false,
+    "restoreRehearsal": "PASS: schema17, preserved row counts, FK0"
+  },
+  "isolatedMigrationRehearsal": {
+    "result": "PASS",
+    "sourceSchema": 17,
+    "targetSchema": 21,
+    "existingRowCountsPreserved": true,
+    "foreignKeyViolations": 0,
+    "schema22Excluded": true,
+    "productionWrites": 0
+  },
+  "productionCapabilitiesRequiredClosed": [
+    "OAuth login", "new registration", "invitation registration", "acceptance",
+    "Social", "Discovery", "messaging", "Presence", "Media upload", "moderation tools",
+    "account moderation", "identity verification", "eligibility review", "Sensitive",
+    "youth admission", "OTP", "Demo", "public canary", "Admin grants"
+  ],
+  "productionAccess": {
+    "requiredFailClosedInCandidate": true,
+    "issuerConfigured": false,
+    "audienceConfigured": false,
+    "genuineProductionMfaTested": false
+  },
+  "cleanupWorkers": {
+    "productionDeployed": false,
+    "productionSchedules": [],
+    "preparedConfigsEnabled": false
+  },
+  "authorization": {
+    "deploymentAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthenticationAuthorized": false,
+    "providerPublishingAuthorized": false,
+    "publicFeatureActivationAuthorized": false,
+    "repositorySettingMutationAuthorized": false
+  },
+  "verdict": "NO-GO"
+}

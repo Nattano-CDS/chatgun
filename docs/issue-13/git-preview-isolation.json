@@ -1,0 +1,15 @@
+{
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "project": "chatgun",
+  "excludedBranch": "codex/issue-13-direct-chat-albums",
+  "previewSetting": "custom",
+  "previewIncludes": [
+    "*"
+  ],
+  "previewExcludes": [
+    "codex/issue-13-direct-chat-albums"
+  ],
+  "productionConfigurationUnchanged": true,
+  "allExistingD1R2BindingsUnchanged": true,
+  "isolatedPreview": "https://issue13.chatgun-issue13-staging.pages.dev"
+}

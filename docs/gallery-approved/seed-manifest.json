@@ -1,0 +1,32 @@
+{
+  "origin": "https://chatgun.social",
+  "batch": "chatgun-gallery-approved-v1",
+  "photos": 210,
+  "photosByScope": {
+    "public": 106,
+    "private": 104
+  },
+  "newBatchPhotos": 168,
+  "ownerPhotos": 10,
+  "ownerAlbumCounts": {
+    "public": 6,
+    "private": 4
+  },
+  "owners": 21,
+  "privateAlbumOwners": 21,
+  "originalMessages": 120,
+  "conversations": 10,
+  "comments": 186,
+  "moderationExamples": {
+    "pending": 1,
+    "rejected": 1
+  },
+  "permissionExamples": [
+    "approved",
+    "pending",
+    "revoked",
+    "rejected"
+  ],
+  "automaticExpiry": false,
+  "persistence": "IndexedDB; additive versioned upgrade; no automatic reset; explicit batch-only reset in Demo Chat preserves uploads and quota"
+}

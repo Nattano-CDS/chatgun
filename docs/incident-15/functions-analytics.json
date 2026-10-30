@@ -1,0 +1,69 @@
+{
+  "checkedAt": "2026-10-17T17:26:43.445Z",
+  "data": {
+    "viewer": {
+      "accounts": [
+        {
+          "pagesFunctionsInvocationsAdaptiveGroups": [
+            {
+              "dimensions": {
+                "scriptName": "pages-worker--21536565-preview",
+                "status": "success",
+                "usageModel": "standard"
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 69606
+              }
+            },
+            {
+              "dimensions": {
+                "scriptName": "pages-worker--21410320-production",
+                "status": "success",
+                "usageModel": "standard"
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 29062
+              }
+            },
+            {
+              "dimensions": {
+                "scriptName": "pages-worker--21410320-preview",
+                "status": "success",
+                "usageModel": "standard"
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 26485
+              }
+            },
+            {
+              "dimensions": {
+                "scriptName": "pages-worker--21536565-preview",
+                "status": "clientDisconnected",
+                "usageModel": "standard"
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 20
+              }
+            },
+            {
+              "dimensions": {
+                "scriptName": "pages-worker--21410320-preview",
+                "status": "clientDisconnected",
+                "usageModel": "standard"
+              },
+              "sum": {
+                "errors": 0,
+                "requests": 9
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "errors": null
+}

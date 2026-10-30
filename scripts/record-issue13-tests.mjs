@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,copyFileSync,mkdirSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+const sha=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+const unit=readFileSync('/tmp/chatgun-issue13-unit-frozen.log','utf8'),browser=readFileSync('/tmp/chatgun-issue13-frozen-preview.log','utf8');
+const number=(text,pattern)=>Number(text.match(pattern)?.[1]||0);
+const units={total:number(unit,/ℹ tests (\d+)/),passed:number(unit,/ℹ pass (\d+)/),failed:number(unit,/ℹ fail (\d+)/),skipped:number(unit,/ℹ skipped (\d+)/)};
+const browsers={passed:number(browser,/\n\s+(\d+) passed \(/),skipped:number(browser,/\n\s+(\d+) skipped/),failed:number(browser,/\n\s+(\d+) failed/)};
+assert.equal(units.total,118);assert.equal(units.passed,118);assert.equal(units.failed,0);assert.equal(browsers.passed,80);assert.equal(browsers.failed,0);assert.equal(browsers.skipped,36);
+assert.match(browser,/✓.*real isolated D1\/R2 private-album cards, owner consent, revocation and logout/);
+const cloud=JSON.parse(readFileSync('docs/issue-13/cloud-test-results.json'));assert.equal(cloud.commit,sha);assert.equal(cloud.passed,32);assert.equal(cloud.failed,0);
+const audit=JSON.parse(readFileSync('docs/issue-13/dependency-audit.json'));assert.equal(audit.metadata.vulnerabilities.total,0);
+const stage=await(await fetch('https://issue13.chatgun-issue13-staging.pages.dev/release.json',{cache:'no-store'})).json();assert.equal(stage.commit,sha);
+const summary={commit:sha,checkedAt:new Date().toISOString(),unitIntegrationSecurity:units,playwright:{...browsers,total:browsers.passed+browsers.skipped+browsers.failed,viewports:[390,768,1440],skipReasons:{protectedLegacyFixtureSuites:16,duplicateExplicitViewportCases:18,desktopInapplicableMobileCase:1,realIsolatedCaseRunOnce:1}},realCloudflare:cloud.passed,realTwoSessionBrowser:'PASS',dependencyVulnerabilities:0,oauth:'No real provider flow rerun; UI mocks are not provider/CAPTCHA E2E proof',preview:stage,guardedFictionalRelease:'GO',realProductionServices:'NO-GO / disabled'};
+mkdirSync('docs/issue-13/logs',{recursive:true});
+for(const [source,target] of [['/tmp/chatgun-issue13-unit-frozen.log','unit.log'],['/tmp/chatgun-issue13-frozen-preview.log','playwright-preview.log'],['/tmp/chatgun-issue13-cloud-frozen.log','cloud-api.log'],['/tmp/chatgun-issue13-migrations.log','migrations-initial.log'],['/tmp/chatgun-issue13-migration-repeat.log','migrations-repeat.log'],['/tmp/chatgun-issue13-production-pending.log','production-migrations-readonly.log']])copyFileSync(source,'docs/issue-13/logs/'+target);
+writeFileSync('docs/issue-13/test-summary.json',JSON.stringify(summary,null,2)+'\n');console.log(JSON.stringify(summary,null,2));

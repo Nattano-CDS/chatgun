@@ -1,0 +1,11 @@
+{
+  "issuedAt": "2026-10-20T03:36:51.096Z",
+  "singleUse": true,
+  "ttlSeconds": 1800,
+  "scope": "Human-confirmed consenting owner and LINE role; self-declared age20plus",
+  "independentAgeVerification": false,
+  "delivery": "Protected local file; fragment scrubbed by signup; never GitHub/log/chat",
+  "realAccountsCreatedByIssuer": 0,
+  "publicRegistration": false,
+  "credentialsExposed": false
+}

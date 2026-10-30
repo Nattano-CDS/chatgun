@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-10-17T16:52:08.230Z",
+  "sha": "a555e0563c8f0e84f6f871d0f70c831262868883",
+  "unitPass": 133,
+  "cloudPass": 48,
+  "preview": {
+    "startTime": "2026-10-17T16:44:51.021Z",
+    "duration": 398564.84500000003,
+    "expected": 119,
+    "skipped": 43,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "cleanup": {
+    "selected": 3,
+    "completed": 3,
+    "failed": 0,
+    "exhausted": 0
+  },
+  "activeSyntheticSessions": 0,
+  "approvedScope": "guarded fictional demo only",
+  "result": "PASS"
+}

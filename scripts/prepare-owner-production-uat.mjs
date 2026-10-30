@@ -1,0 +1,41 @@
+// Read-only Production preflight and protected backup for the explicitly approved
+// owner-only Production-UAT deployment. No admission, roles or service activation.
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,chmodSync,statSync,cpSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {DatabaseSync} from 'node:sqlite';
+import {resolve} from 'node:path';
+assert.equal(process.env.CHATGUN_PRODUCTION_UAT_PREPARE,'approved');
+process.umask(0o077);
+const account='23017b53386fb67fc62a52cdd017454c',database='9738a051-d914-42d0-8e7b-8098ef2b959d',priorSha='b45aa4f9d28ca9bb1ec3e1fb22b31bc8b0f331d7';
+const {token}=JSON.parse(execFileSync('npx',['wrangler@4.151.1','auth','token','--json'],{encoding:'utf8'}));
+async function cf(path,body){const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'content-type':'application/json'},...(body?{body:JSON.stringify(body)}:{})}),j=await r.json();assert.ok(r.ok&&j.success,'Owner-UAT account-scoped preflight failed');return j.result;}
+assert.equal((await cf('')).id,account);
+const p=await cf('/pages/projects/chatgun'),prod=p.deployment_configs.production;
+assert.equal(p.canonical_deployment.deployment_trigger.metadata.commit_hash,priorSha);
+assert.equal(prod.d1_databases.DB.id,database);assert.equal(prod.r2_buckets.MEDIA.name,'chatgun-media-production');
+assert.equal(p.deployment_configs.preview.d1_databases.DB.id,'5bbfd55d-eb22-4324-8a7d-57bef14110ea');assert.equal(p.deployment_configs.preview.r2_buckets.MEDIA.name,'chatgun-media-staging');
+for(const key of['NEW_ACCOUNT_REGISTRATION_ENABLED','PUBLIC_DISCOVERY_ENABLED','MESSAGING_ENABLED','PRESENCE_ENABLED','MEDIA_UPLOAD_ENABLED','SENSITIVE_CONTENT_ENABLED','ACCOUNT_MODERATION_ENABLED'])assert.equal(prod.env_vars[key]?.value,'false');
+assert.equal(prod.env_vars.OAUTH_ENABLED_PROVIDERS.value,'line');
+assert.equal((await cf('/r2/buckets/chatgun-media-production/domains/managed')).enabled,false);
+assert.equal(((await cf('/r2/buckets/chatgun-media-production/domains/custom')).domains||[]).length,0);
+const priorPackage=readFileSync('/tmp/chatgun-owner-pilot-package-path','utf8').trim();
+assert.ok(priorPackage.includes('/chatgun-owner-pilot-'));
+assert.equal(JSON.parse(readFileSync(priorPackage+'/dist/release.json')).commit,priorSha);
+const parent='/Users/nattano/.codex/private-backups/chatgun';mkdirSync(parent,{recursive:true,mode:0o700});
+const directory=mkdtempSync(parent+'/owner-production-uat-');chmodSync(directory,0o700);
+cpSync(priorPackage,directory+'/rollback-package',{recursive:true});
+const recovery=await cf('/d1/database/'+database+'/time_travel/bookmark');assert.ok(recovery.bookmark);
+writeFileSync(directory+'/time-travel.json',JSON.stringify(recovery),{mode:0o600});
+const cfg=directory+'/wrangler.jsonc';writeFileSync(cfg,JSON.stringify({name:'chatgun-owner-uat-backup',compatibility_date:'2026-10-15',d1_databases:[{binding:'DB',database_name:'chatgun-auth',database_id:database,migrations_dir:resolve('migrations')}]}),{mode:0o600});
+execFileSync('npx',['wrangler@4.151.1','d1','export','chatgun-auth','--remote','--config',cfg,'--output',directory+'/production.sql'],{env:{...process.env,CLOUDFLARE_ACCOUNT_ID:account},stdio:'pipe'});
+chmodSync(directory+'/production.sql',0o600);assert.equal(statSync(directory+'/production.sql').mode&0o777,0o600);
+const bytes=readFileSync(directory+'/production.sql'),db=new DatabaseSync(':memory:');db.exec(bytes.toString());
+assert.equal(db.prepare('SELECT COUNT(*) n FROM d1_migrations').get().n,17);assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);
+const counts={};for(const name of['users','identities','member_profiles','sessions','account_acceptances','moderation_access_grants','social_messages','social_media'])counts[name]=db.prepare('SELECT COUNT(*) n FROM '+name).get().n;
+assert.equal(counts.users,1);assert.equal(counts.identities,1);assert.equal(counts.social_messages,0);assert.equal(counts.social_media,0);db.close();
+const out='docs/production-owner-uat';mkdirSync(out,{recursive:true});
+writeFileSync(out+'/preflight.json',JSON.stringify({checkedAt:new Date().toISOString(),account,productionDatabase:database,priorSha,priorDeployment:p.canonical_deployment.id,migrations:17,foreignKeyViolations:0,counts,backupBytes:bytes.length,backupSha256:createHash('sha256').update(bytes).digest('hex'),backupPermissions:'0700/0600',backupRestore:'PASS local SQLite',recoveryBookmarkAvailable:true,rollbackPackagePreserved:true,secretNames:Object.entries(prod.env_vars).filter(([,v])=>v.type==='secret_text').map(([key])=>key).sort(),productionWrites:0,humanUatPassed:false,publicLaunchApproved:false},null,2)+'\n');
+writeFileSync('/tmp/chatgun-owner-production-uat-backup-path',directory,{mode:0o600});
+console.log('Production account, owner-only flags, schema17/FK0 and private R2 verified. Fresh protected D1 backup and exact prior rollback package preserved.');

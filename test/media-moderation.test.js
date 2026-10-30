@@ -37,7 +37,7 @@ async function seedMedia(database, media, owner, id = "media-1") {
   const now = unixTime();
   const key = `gallery/${id}`;
   await database.prepare("INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,created_at) VALUES (?,?,?,'gallery','image/png',4,?)").bind(id, owner, key, now).run();
-  await database.prepare("INSERT INTO profile_photos(media_id,owner_user_id,created_at) VALUES (?,?,?)").bind(id, owner, now).run();
+  await database.prepare("INSERT INTO profile_photos(media_id,owner_user_id,created_at,visibility) VALUES (?,?,?,'public')").bind(id, owner, now).run();
   await database.prepare("INSERT INTO media_safety_reviews(media_id,status,source,created_at) VALUES (?,'pending','manual',?)").bind(id, now).run();
   media.objects.set(key, new Uint8Array([1, 2, 3, 4]));
 }
@@ -177,10 +177,12 @@ test("media classification is role-gated, concurrency-safe, and revokes access i
 test("media reports protect reporter privacy and appeals restore only after audited review", async () => {
   const database = new TestD1(); const media = new TestR2();
   const admin = await member(database, "appeal-admin");
+  const independentAdmin=await member(database,'appeal-independent');
   const owner = await member(database, "appeal-owner");
   const reporter = await member(database, "appeal-reporter");
   const now = unixTime();
   await database.prepare("INSERT INTO moderation_roles(user_id,role,created_at) VALUES ('appeal-admin','safety_admin',?)").bind(now).run();
+  await database.prepare("INSERT INTO moderation_roles(user_id,role,created_at) VALUES ('appeal-independent','safety_admin',?)").bind(now).run();
   await database.prepare("INSERT INTO social_relationships(id,user_low,user_high,requested_by,status,created_at,updated_at) VALUES ('appeal-friend','appeal-owner','appeal-reporter','appeal-owner','accepted',?,?)").bind(now, now).run();
   await seedMedia(database, media, "appeal-owner", "appeal-media");
   await database.prepare("UPDATE media_safety_reviews SET status='released',category='general',revision=1 WHERE media_id='appeal-media'").run();
@@ -208,7 +210,9 @@ test("media reports protect reporter privacy and appeals restore only after audi
   }) });
   assert.equal(appeal.status, 201);
   const appealId = (await appeal.json()).id;
-  const granted = await onRequest({ env, request: request("/api/social/moderation/appeals", admin, {
+  const selfReview=await onRequest({env,request:request('/api/social/moderation/appeals',admin,{method:'POST',body:{id:appealId,decision:'granted',category:'general',reason:'ผู้ตัดสินเดิมห้ามอนุมัติอุทธรณ์ของตัวเอง',revision:0}})});
+  assert.equal(selfReview.status,409);
+  const granted = await onRequest({ env, request: request("/api/social/moderation/appeals", independentAdmin, {
     method: "POST", body: { id: appealId, decision: "granted", category: "general", reason: "ตรวจซ้ำแล้วไม่เข้าข่ายต้องห้าม", revision: 0 },
   }) });
   assert.equal(granted.status, 200);

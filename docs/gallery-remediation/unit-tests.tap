@@ -1,0 +1,814 @@
+TAP version 13
+# Subtest: signup defers age and policy confirmation until after OAuth
+ok 1 - signup defers age and policy confirmation until after OAuth
+  ---
+  duration_ms: 0.420542
+  type: 'test'
+  ...
+# Subtest: acceptance page exposes both unchecked confirmations, policy links, and decline
+ok 2 - acceptance page exposes both unchecked confirmations, policy links, and decline
+  ---
+  duration_ms: 0.441541
+  type: 'test'
+  ...
+# Subtest: acceptance client sends versioned evidence with same-origin CSRF
+ok 3 - acceptance client sends versioned evidence with same-origin CSRF
+  ---
+  duration_ms: 0.070083
+  type: 'test'
+  ...
+# Subtest: pending OAuth account cannot bypass acceptance and underage declaration is rejected
+ok 4 - pending OAuth account cannot bypass acceptance and underage declaration is rejected
+  ---
+  duration_ms: 27.445125
+  type: 'test'
+  ...
+# Subtest: acceptance evidence transitions to onboarding and onboarding alone activates social access
+ok 5 - acceptance evidence transitions to onboarding and onboarding alone activates social access
+  ---
+  duration_ms: 8.67125
+  type: 'test'
+  ...
+# Subtest: a Terms version change requires acceptance once without repeating onboarding
+ok 6 - a Terms version change requires acceptance once without repeating onboarding
+  ---
+  duration_ms: 7.505084
+  type: 'test'
+  ...
+# Subtest: an existing account without a Beta enrollment can resume incomplete onboarding
+ok 7 - an existing account without a Beta enrollment can resume incomplete onboarding
+  ---
+  duration_ms: 5.706583
+  type: 'test'
+  ...
+# Subtest: declining acceptance revokes the session and preserves the pending account
+ok 8 - declining acceptance revokes the session and preserves the pending account
+  ---
+  duration_ms: 5.374375
+  type: 'test'
+  ...
+# Subtest: acceptance endpoints enforce same-origin CSRF
+ok 9 - acceptance endpoints enforce same-origin CSRF
+  ---
+  duration_ms: 5.03575
+  type: 'test'
+  ...
+# Subtest: age calculation uses the Bangkok calendar date and exact birthday boundary
+ok 10 - age calculation uses the Bangkok calendar date and exact birthday boundary
+  ---
+  duration_ms: 15.083458
+  type: 'test'
+  ...
+# Subtest: age declaration rejects invalid, future, and implausibly old dates
+ok 11 - age declaration rejects invalid, future, and implausibly old dates
+  ---
+  duration_ms: 0.604166
+  type: 'test'
+  ...
+# Subtest: invalid cross-origin POST is returned as JSON instead of escaping the handler
+ok 12 - invalid cross-origin POST is returned as JSON instead of escaping the handler
+  ---
+  duration_ms: 18.589291
+  type: 'test'
+  ...
+# Subtest: OTP endpoints are disabled by feature flag without removing the schema
+ok 13 - OTP endpoints are disabled by feature flag without removing the schema
+  ---
+  duration_ms: 6.135958
+  type: 'test'
+  ...
+# Subtest: email OTP is hashed, authenticates once, and establishes secure cookies
+ok 14 - email OTP is hashed, authenticates once, and establishes secure cookies
+  ---
+  duration_ms: 10.547959
+  type: 'test'
+  ...
+# Subtest: OTP expires after five minutes
+ok 15 - OTP expires after five minutes
+  ---
+  duration_ms: 5.523417
+  type: 'test'
+  ...
+# Subtest: OTP locks after five incorrect attempts
+ok 16 - OTP locks after five incorrect attempts
+  ---
+  duration_ms: 7.227375
+  type: 'test'
+  ...
+# Subtest: OTP request rate limit applies per normalized email
+ok 17 - OTP request rate limit applies per normalized email
+  ---
+  duration_ms: 6.930625
+  type: 'test'
+  ...
+# Subtest: Google authorization uses state, nonce, and S256 PKCE
+ok 18 - Google authorization uses state, nonce, and S256 PKCE
+  ---
+  duration_ms: 5.492167
+  type: 'test'
+  ...
+# Subtest: Turnstile verification requires the expected hostname and action
+ok 19 - Turnstile verification requires the expected hostname and action
+  ---
+  duration_ms: 5.019334
+  type: 'test'
+  ...
+# Subtest: provider denial validates state and consumes the OAuth flow
+ok 20 - provider denial validates state and consumes the OAuth flow
+  ---
+  duration_ms: 5.712166
+  type: 'test'
+  ...
+# Subtest: account linking requires the authenticated session and matching CSRF token
+ok 21 - account linking requires the authenticated session and matching CSRF token
+  ---
+  duration_ms: 5.551458
+  type: 'test'
+  ...
+# Subtest: account linking callback attaches a new provider identity to the authenticated user
+ok 22 - account linking callback attaches a new provider identity to the authenticated user
+  ---
+  duration_ms: 6.535583
+  type: 'test'
+  ...
+# {"event":"oauth_callback_failed","provider":"line","reason":"identity_already_linked"}
+# Subtest: account linking callback rejects an identity owned by another user
+ok 23 - account linking callback rejects an identity owned by another user
+  ---
+  duration_ms: 5.763209
+  type: 'test'
+  ...
+# Subtest: LINE callback validates ID token claims, creates identity, and rejects replay
+ok 24 - LINE callback validates ID token claims, creates identity, and rejects replay
+  ---
+  duration_ms: 5.822042
+  type: 'test'
+  ...
+# Subtest: Google callback verifies the ID token signature, audience, and nonce
+ok 25 - Google callback verifies the ID token signature, audience, and nonce
+  ---
+  duration_ms: 66.439333
+  type: 'test'
+  ...
+# Subtest: Facebook callback debugs the token and does not mark its email verified
+ok 26 - Facebook callback debugs the token and does not mark its email verified
+  ---
+  duration_ms: 6.018292
+  type: 'test'
+  ...
+# Subtest: Facebook unverified email cannot take over an existing verified email account
+ok 27 - Facebook unverified email cannot take over an existing verified email account
+  ---
+  duration_ms: 4.725542
+  type: 'test'
+  ...
+# Subtest: invalid Beta invitation fails closed without persisting an OAuth flow
+ok 28 - invalid Beta invitation fails closed without persisting an OAuth flow
+  ---
+  duration_ms: 19.167209
+  type: 'test'
+  ...
+# Subtest: expired and revoked Beta invitations fail with the same generic response
+ok 29 - expired and revoked Beta invitations fail with the same generic response
+  ---
+  duration_ms: 11.443542
+  type: 'test'
+  ...
+# Subtest: multi-use invitation records are rejected even if inserted outside the issuer
+ok 30 - multi-use invitation records are rejected even if inserted outside the issuer
+  ---
+  duration_ms: 6.152042
+  type: 'test'
+  ...
+# Subtest: existing identity can sign in without an invitation while public registration is closed
+ok 31 - existing identity can sign in without an invitation while public registration is closed
+  ---
+  duration_ms: 7.080166
+  type: 'test'
+  ...
+# {"event":"oauth_callback_failed","provider":"line","reason":"invitation_unavailable"}
+# Subtest: one-time invitation is bound to OAuth, stored only as a hash, and consumed atomically
+ok 32 - one-time invitation is bound to OAuth, stored only as a hash, and consumed atomically
+  ---
+  duration_ms: 7.415958
+  type: 'test'
+  ...
+# Subtest: invited account must pass the server-side 18+ gate before Beta activation
+ok 33 - invited account must pass the server-side 18+ gate before Beta activation
+  ---
+  duration_ms: 17.6095
+  type: 'test'
+  ...
+# Subtest: legacy read conversations remain read without replacing message history
+ok 34 - legacy read conversations remain read without replacing message history
+  ---
+  duration_ms: 0.702167
+  type: 'test'
+  ...
+# Subtest: legacy unread count maps to newest incoming messages and preserves explicit reads
+ok 35 - legacy unread count maps to newest incoming messages and preserves explicit reads
+  ---
+  duration_ms: 0.349333
+  type: 'test'
+  ...
+# Subtest: current consent-model snapshots are never reinterpreted using obsolete friendship counters
+ok 36 - current consent-model snapshots are never reinterpreted using obsolete friendship counters
+  ---
+  duration_ms: 0.076333
+  type: 'test'
+  ...
+# Subtest: direct DM creates inbox without friendship, persists text, read and unsend
+ok 37 - direct DM creates inbox without friendship, persists text, read and unsend
+  ---
+  duration_ms: 24.879333
+  type: 'test'
+  ...
+# Subtest: DM denies anonymous/self/nonadult/inactive/opt-out/both block directions and CSRF
+ok 38 - DM denies anonymous/self/nonadult/inactive/opt-out/both block directions and CSRF
+  ---
+  duration_ms: 8.1235
+  type: 'test'
+  ...
+# Subtest: duplicate and distinct-recipient spam guards are durable and atomic
+ok 39 - duplicate and distinct-recipient spam guards are durable and atomic
+  ---
+  duration_ms: 8.465
+  type: 'test'
+  ...
+# Subtest: album requests are durable typed events, duplicate-safe and owner-only with revision/CSRF
+ok 40 - album requests are durable typed events, duplicate-safe and owner-only with revision/CSRF
+  ---
+  duration_ms: 15.216917
+  type: 'test'
+  ...
+# Subtest: private gallery metadata, comments, likes and old raw URL deny until grant; revoke is immediate
+ok 41 - private gallery metadata, comments, likes and old raw URL deny until grant; revoke is immediate
+  ---
+  duration_ms: 13.262292
+  type: 'test'
+  ...
+# Subtest: block revokes grants permanently across unblock; account deletion cascades all new personal data
+ok 42 - block revokes grants permanently across unblock; account deletion cascades all new personal data
+  ---
+  duration_ms: 7.839333
+  type: 'test'
+  ...
+# Subtest: public publication is explicit; grants never override quarantine, prohibited or Sensitive denial
+ok 43 - public publication is explicit; grants never override quarantine, prohibited or Sensitive denial
+  ---
+  duration_ms: 9.870292
+  type: 'test'
+  ...
+# Subtest: requester may cancel but not approve; owner may reject; no text or forged event grants access
+ok 44 - requester may cancel but not approve; owner may reject; no text or forged event grants access
+  ---
+  duration_ms: 7.884708
+  type: 'test'
+  ...
+# Subtest: Production closed gates deny new routes before touching migration-13 tables
+ok 45 - Production closed gates deny new routes before touching migration-13 tables
+  ---
+  duration_ms: 5.402083
+  type: 'test'
+  ...
+# Subtest: unmigrated Production schema supports guarded fictional release without migration 0013
+ok 46 - unmigrated Production schema supports guarded fictional release without migration 0013
+  ---
+  duration_ms: 3.941125
+  type: 'test'
+  ...
+# Subtest: real deletion transaction cascades album evidence and sessions, queues media, preserves unrelated users
+ok 47 - real deletion transaction cascades album evidence and sessions, queues media, preserves unrelated users
+  ---
+  duration_ms: 7.116459
+  type: 'test'
+  ...
+# Subtest: blocking while request pending makes stale approval fail and cannot resurrect a grant
+ok 48 - blocking while request pending makes stale approval fail and cannot resurrect a grant
+  ---
+  duration_ms: 7.467209
+  type: 'test'
+  ...
+# Subtest: non-owner profiles omit presence-linked timestamps and require eligible viewers
+ok 49 - non-owner profiles omit presence-linked timestamps and require eligible viewers
+  ---
+  duration_ms: 6.213292
+  type: 'test'
+  ...
+# Subtest: contact opt-out stops sends, not history read receipts or explicitly granted album profiles
+ok 50 - contact opt-out stops sends, not history read receipts or explicitly granted album profiles
+  ---
+  duration_ms: 7.592375
+  type: 'test'
+  ...
+# Subtest: Public responses exclude Private IDs, captions and comments even for owner/granted viewer
+ok 51 - Public responses exclude Private IDs, captions and comments even for owner/granted viewer
+  ---
+  duration_ms: 31.796875
+  type: 'test'
+  ...
+# Subtest: separate upload scopes share quota, preserve quarantine, and reject cross-album retry reuse
+ok 52 - separate upload scopes share quota, preserve quarantine, and reject cross-album retry reuse
+  ---
+  duration_ms: 12.5455
+  type: 'test'
+  ...
+# Subtest: shared 12-photo capacity is transaction-enforced and releases failed upload reservations
+ok 53 - shared 12-photo capacity is transaction-enforced and releases failed upload reservations
+  ---
+  duration_ms: 7.971334
+  type: 'test'
+  ...
+# Subtest: simultaneous public/private uploads cannot exceed one remaining album space
+ok 54 - simultaneous public/private uploads cannot exceed one remaining album space
+  ---
+  duration_ms: 6.755584
+  type: 'test'
+  ...
+# Subtest: fictional gallery upgrade is bounded, additive, idempotent, and never restores deleted fixtures
+ok 55 - fictional gallery upgrade is bounded, additive, idempotent, and never restores deleted fixtures
+  ---
+  duration_ms: 2.901875
+  type: 'test'
+  ...
+# {"event":"social_request_failed","reason":"simulated media commit failure"}
+# Subtest: failed media commit plus R2 deletion failure creates a durable cleanup retry
+ok 56 - failed media commit plus R2 deletion failure creates a durable cleanup retry
+  ---
+  duration_ms: 6.79875
+  type: 'test'
+  ...
+# Subtest: failed upload attempts are rate-limited independently of the successful daily quota
+ok 57 - failed upload attempts are rate-limited independently of the successful daily quota
+  ---
+  duration_ms: 25.043417
+  type: 'test'
+  ...
+# Subtest: Gallery glyphs use the exact approved prototype paths, not alternative drawings
+ok 58 - Gallery glyphs use the exact approved prototype paths, not alternative drawings
+  ---
+  duration_ms: 2.303791
+  type: 'test'
+  ...
+# Subtest: Public Gallery never reuses a private selected photo as its owner avatar
+ok 59 - Public Gallery never reuses a private selected photo as its owner avatar
+  ---
+  duration_ms: 0.46125
+  type: 'test'
+  ...
+# Subtest: image sanitizer verifies structure, MIME, and dimensions
+ok 60 - image sanitizer verifies structure, MIME, and dimensions
+  ---
+  duration_ms: 0.966166
+  type: 'test'
+  ...
+# Subtest: image sanitizer strips embedded PNG text metadata before storage
+ok 61 - image sanitizer strips embedded PNG text metadata before storage
+  ---
+  duration_ms: 0.175125
+  type: 'test'
+  ...
+# Subtest: image sanitizer accepts decoded JPEG and strips WebP ICC metadata
+ok 62 - image sanitizer accepts decoded JPEG and strips WebP ICC metadata
+  ---
+  duration_ms: 0.194083
+  type: 'test'
+  ...
+# Subtest: media cleanup deletes due objects, records completion, and leaves future work
+ok 63 - media cleanup deletes due objects, records completion, and leaves future work
+  ---
+  duration_ms: 6.946667
+  type: 'test'
+  ...
+# Subtest: media cleanup backs off failed objects without logging or exposing their content
+ok 64 - media cleanup backs off failed objects without logging or exposing their content
+  ---
+  duration_ms: 4.84075
+  type: 'test'
+  ...
+# Subtest: media cleanup surfaces exhausted retries without logging object identifiers
+ok 65 - media cleanup surfaces exhausted retries without logging object identifiers
+  ---
+  duration_ms: 4.9745
+  type: 'test'
+  ...
+# Subtest: approved Bangkok moderation coverage opens exactly from 19:00 through 21:59
+ok 66 - approved Bangkok moderation coverage opens exactly from 19:00 through 21:59
+  ---
+  duration_ms: 11.624083
+  type: 'test'
+  ...
+# Subtest: single-operator overview prioritizes urgent queues and exposes aggregate workload health
+ok 67 - single-operator overview prioritizes urgent queues and exposes aggregate workload health
+  ---
+  duration_ms: 21.320583
+  type: 'test'
+  ...
+# Subtest: media classification is role-gated, concurrency-safe, and revokes access immediately
+ok 68 - media classification is role-gated, concurrency-safe, and revokes access immediately
+  ---
+  duration_ms: 12.850792
+  type: 'test'
+  ...
+# Subtest: media reports protect reporter privacy and appeals restore only after audited review
+ok 69 - media reports protect reporter privacy and appeals restore only after audited review
+  ---
+  duration_ms: 10.516833
+  type: 'test'
+  ...
+# Subtest: redirects the production pages.dev hostname to the canonical origin
+ok 70 - redirects the production pages.dev hostname to the canonical origin
+  ---
+  duration_ms: 10.018334
+  type: 'test'
+  ...
+# Subtest: does not redirect Preview or custom hostnames
+ok 71 - does not redirect Preview or custom hostnames
+  ---
+  duration_ms: 0.31075
+  type: 'test'
+  ...
+# Subtest: migration is idempotent and creates required tables and indexes
+ok 72 - migration is idempotent and creates required tables and indexes
+  ---
+  duration_ms: 6.687
+  type: 'test'
+  ...
+# Subtest: moderation is fail-closed, role-gated, purpose-logged, and supports report decisions
+ok 73 - moderation is fail-closed, role-gated, purpose-logged, and supports report decisions
+  ---
+  duration_ms: 21.441041
+  type: 'test'
+  ...
+# Subtest: message audit requires safety_admin and records access purpose
+ok 74 - message audit requires safety_admin and records access purpose
+  ---
+  duration_ms: 6.2855
+  type: 'test'
+  ...
+# Subtest: message media audit is role-gated, private, purpose-logged, and hides unsent media
+ok 75 - message media audit is role-gated, private, purpose-logged, and hides unsent media
+  ---
+  duration_ms: 7.067708
+  type: 'test'
+  ...
+# Subtest: moderation purpose safely decodes non-Latin text for the audit trail
+ok 76 - moderation purpose safely decodes non-Latin text for the audit trail
+  ---
+  duration_ms: 5.652709
+  type: 'test'
+  ...
+# Subtest: media quarantine hides pending objects and requires an audited safety-admin release
+ok 77 - media quarantine hides pending objects and requires an audited safety-admin release
+  ---
+  duration_ms: 7.645125
+  type: 'test'
+  ...
+# Subtest: role administration is separated, recent-authenticated, audited, and revocable
+ok 78 - role administration is separated, recent-authenticated, audited, and revocable
+  ---
+  duration_ms: 8.101
+  type: 'test'
+  ...
+# Subtest: Phase 2 auth and acceptance use the canonical compact NEAR shell
+ok 79 - Phase 2 auth and acceptance use the canonical compact NEAR shell
+  ---
+  duration_ms: 2.13525
+  type: 'test'
+  ...
+# Subtest: Phase 2 onboarding and member profile retain state and authorization hooks
+ok 80 - Phase 2 onboarding and member profile retain state and authorization hooks
+  ---
+  duration_ms: 1.87875
+  type: 'test'
+  ...
+# Subtest: retention cleanup removes only expired or aged security records
+ok 81 - retention cleanup removes only expired or aged security records
+  ---
+  duration_ms: 7.052417
+  type: 'test'
+  ...
+# Subtest: account deletion requires CSRF and recent authentication
+ok 82 - account deletion requires CSRF and recent authentication
+  ---
+  duration_ms: 18.90525
+  type: 'test'
+  ...
+# Subtest: confirmed deletion erases account data, queues owned media, revokes access, and leaves a minimal receipt
+ok 83 - confirmed deletion erases account data, queues owned media, revokes access, and leaves a minimal receipt
+  ---
+  duration_ms: 7.799375
+  type: 'test'
+  ...
+# Subtest: deletion transaction rolls back completely on failure and can be retried
+ok 84 - deletion transaction rolls back completely on failure and can be retried
+  ---
+  duration_ms: 6.745542
+  type: 'test'
+  ...
+# Subtest: concurrent deletion confirmations produce one receipt
+ok 85 - concurrent deletion confirmations produce one receipt
+  ---
+  duration_ms: 6.675167
+  type: 'test'
+  ...
+# {"event":"oauth_callback_failed","provider":"line","reason":"reauth_identity_mismatch"}
+# Subtest: provider reauthentication refreshes only the matching active session
+ok 86 - provider reauthentication refreshes only the matching active session
+  ---
+  duration_ms: 8.385666
+  type: 'test'
+  ...
+# {"event":"oauth_callback_failed","provider":"line","reason":"registration_closed"}
+# Subtest: closed registration rejects an unknown provider identity without creating a user
+ok 87 - closed registration rejects an unknown provider identity without creating a user
+  ---
+  duration_ms: 5.633333
+  type: 'test'
+  ...
+# Subtest: closed registration cannot be bypassed by enabling the dormant OTP flag
+ok 88 - closed registration cannot be bypassed by enabling the dormant OTP flag
+  ---
+  duration_ms: 4.823417
+  type: 'test'
+  ...
+# Subtest: approved locked and unlocked composition uses identical Lucide image with distinct standard locks
+ok 89 - approved locked and unlocked composition uses identical Lucide image with distinct standard locks
+  ---
+  duration_ms: 0.816
+  type: 'test'
+  ...
+# Subtest: pending duplicate prevention, loading fail-closed and own-profile management remain explicit
+ok 90 - pending duplicate prevention, loading fail-closed and own-profile management remain explicit
+  ---
+  duration_ms: 0.331458
+  type: 'test'
+  ...
+# Subtest: public and private album rendering are separate, never inferred from an unlocked client flag
+ok 91 - public and private album rendering are separate, never inferred from an unlocked client flag
+  ---
+  duration_ms: 0.183709
+  type: 'test'
+  ...
+# Subtest: canary rejects OAuth initiation and callbacks before any provider or database access
+ok 92 - canary rejects OAuth initiation and callbacks before any provider or database access
+  ---
+  duration_ms: 11.856791
+  type: 'test'
+  ...
+# Subtest: public canary never publishes unapproved legal drafts
+ok 93 - public canary never publishes unapproved legal drafts
+  ---
+  duration_ms: 1.025792
+  type: 'test'
+  ...
+# Subtest: public fixture has only explicit fictional fields and 120 Thai messages
+ok 94 - public fixture has only explicit fictional fields and 120 Thai messages
+  ---
+  duration_ms: 0.689542
+  type: 'test'
+  ...
+# Subtest: public build excludes test bundles, credentials, scripts and backups
+ok 95 - public build excludes test bundles, credentials, scripts and backups
+  ---
+  duration_ms: 65.116375
+  type: 'test'
+  ...
+# Subtest: all deployable root and app JavaScript parses before release
+ok 96 - all deployable root and app JavaScript parses before release
+  ---
+  duration_ms: 349.365958
+  type: 'test'
+  ...
+# Subtest: gallery validates bytes, stores private media, authorizes reads, and queues deletion
+ok 97 - gallery validates bytes, stores private media, authorizes reads, and queues deletion
+  ---
+  duration_ms: 28.905459
+  type: 'test'
+  ...
+# Subtest: gallery rejects MIME spoofing and leaves no R2 object or D1 row
+ok 98 - gallery rejects MIME spoofing and leaves no R2 object or D1 row
+  ---
+  duration_ms: 6.063917
+  type: 'test'
+  ...
+# Subtest: chat images require eligible participants, remain private, and retain only five active sender assets
+ok 99 - chat images require eligible participants, remain private, and retain only five active sender assets
+  ---
+  duration_ms: 11.413875
+  type: 'test'
+  ...
+# Subtest: received chat images require message participation and no block, not friendship
+ok 100 - received chat images require message participation and no block, not friendship
+  ---
+  duration_ms: 10.1155
+  type: 'test'
+  ...
+# Subtest: daily gallery quota allows ten, rejects eleven, and deletion or rejection does not restore it
+ok 101 - daily gallery quota allows ten, rejects eleven, and deletion or rejection does not restore it
+  ---
+  duration_ms: 12.069167
+  type: 'test'
+  ...
+# Subtest: chat and gallery quotas are independent and concurrent chat uploads cannot exceed ten
+ok 102 - chat and gallery quotas are independent and concurrent chat uploads cannot exceed ten
+  ---
+  duration_ms: 12.271084
+  type: 'test'
+  ...
+# {"event":"social_request_failed","reason":"synthetic_r2_failure"}
+# Subtest: failed media storage releases a reservation and an idempotent retry is counted once
+ok 103 - failed media storage releases a reservation and an idempotent retry is counted once
+  ---
+  duration_ms: 6.864458
+  type: 'test'
+  ...
+# Subtest: upload API requires idempotency and deleting an account cascades quota records
+ok 104 - upload API requires idempotency and deleting an account cascades quota records
+  ---
+  duration_ms: 6.460792
+  type: 'test'
+  ...
+# Subtest: Bangkok upload window resets exactly at local midnight
+ok 105 - Bangkok upload window resets exactly at local midnight
+  ---
+  duration_ms: 0.098792
+  type: 'test'
+  ...
+# Subtest: completed uploads from the previous Bangkok day do not consume today's quota
+ok 106 - completed uploads from the previous Bangkok day do not consume today's quota
+  ---
+  duration_ms: 6.065791
+  type: 'test'
+  ...
+# Subtest: social UI exposes only the approved non-game navigation
+ok 107 - social UI exposes only the approved non-game navigation
+  ---
+  duration_ms: 0.53075
+  type: 'test'
+  ...
+# Subtest: root is the authenticated discovery entry and marketing moved to welcome
+ok 108 - root is the authenticated discovery entry and marketing moved to welcome
+  ---
+  duration_ms: 0.099458
+  type: 'test'
+  ...
+# Subtest: Phase 1 uses the canonical NEAR tokens, typography, navigation and portrait cards
+ok 109 - Phase 1 uses the canonical NEAR tokens, typography, navigation and portrait cards
+  ---
+  duration_ms: 0.243
+  type: 'test'
+  ...
+# Subtest: social client uses same-origin APIs, CSRF, escaped rendering, and fail-closed config
+ok 110 - social client uses same-origin APIs, CSRF, escaped rendering, and fail-closed config
+  ---
+  duration_ms: 0.393041
+  type: 'test'
+  ...
+# Subtest: responsive social route receives only the required geolocation permission
+ok 111 - responsive social route receives only the required geolocation permission
+  ---
+  duration_ms: 0.078417
+  type: 'test'
+  ...
+# Subtest: moderation UI auto-loads routine overview, justifies restricted evidence, and renders untrusted data as text
+ok 112 - moderation UI auto-loads routine overview, justifies restricted evidence, and renders untrusted data as text
+  ---
+  duration_ms: 0.120833
+  type: 'test'
+  ...
+# Subtest: staging social and private media activation remain isolated from production
+ok 113 - staging social and private media activation remain isolated from production
+  ---
+  duration_ms: 0.165208
+  type: 'test'
+  ...
+# Subtest: social capabilities fail closed and never expose a game capability
+ok 114 - social capabilities fail closed and never expose a game capability
+  ---
+  duration_ms: 19.460583
+  type: 'test'
+  ...
+# Subtest: adult onboarding requires CSRF, recent auth, registration flag, and matching notice
+ok 115 - adult onboarding requires CSRF, recent auth, registration flag, and matching notice
+  ---
+  duration_ms: 19.617709
+  type: 'test'
+  ...
+# Subtest: discovery preserves proximity behavior without returning precise coordinates
+ok 116 - discovery preserves proximity behavior without returning precise coordinates
+  ---
+  duration_ms: 9.527834
+  type: 'test'
+  ...
+# Subtest: discovery throttles repeated reads used for location inference
+ok 117 - discovery throttles repeated reads used for location inference
+  ---
+  duration_ms: 11.177959
+  type: 'test'
+  ...
+# Subtest: direct messaging, blocking, and reports require no friendship
+ok 118 - direct messaging, blocking, and reports require no friendship
+  ---
+  duration_ms: 8.71625
+  type: 'test'
+  ...
+# Subtest: message cursor pagination is stable when many messages share a timestamp
+ok 119 - message cursor pagination is stable when many messages share a timestamp
+  ---
+  duration_ms: 11.051125
+  type: 'test'
+  ...
+# Subtest: proximity ratings are recipient-private and limited to once per Bangkok day
+ok 120 - proximity ratings are recipient-private and limited to once per Bangkok day
+  ---
+  duration_ms: 7.266292
+  type: 'test'
+  ...
+# Subtest: self shortcut never fabricates proximity, ratings, verification or self-social actions
+ok 121 - self shortcut never fabricates proximity, ratings, verification or self-social actions
+  ---
+  duration_ms: 0.56525
+  type: 'test'
+  ...
+# Subtest: source card has one semantic full-card link, original hierarchy and no action buttons
+ok 122 - source card has one semantic full-card link, original hierarchy and no action buttons
+  ---
+  duration_ms: 0.190417
+  type: 'test'
+  ...
+# Subtest: full profile and gallery are source route structures, never duplicated modal/footer compositions
+ok 123 - full profile and gallery are source route structures, never duplicated modal/footer compositions
+  ---
+  duration_ms: 0.448042
+  type: 'test'
+  ...
+# Subtest: server-authorized photo comments render independently of historical friendship
+ok 124 - server-authorized photo comments render independently of historical friendship
+  ---
+  duration_ms: 0.216083
+  type: 'test'
+  ...
+# Subtest: old card/profile/gallery adapter selectors are removed, not patched with another overlay
+ok 125 - old card/profile/gallery adapter selectors are removed, not patched with another overlay
+  ---
+  duration_ms: 0.602833
+  type: 'test'
+  ...
+# Subtest: owner-review manifest contains complete fictional Thai social fixtures
+ok 126 - owner-review manifest contains complete fictional Thai social fixtures
+  ---
+  duration_ms: 5.354416
+  type: 'test'
+  ...
+# Subtest: seed infrastructure is staging-only, batch-traceable, and not a public quota bypass
+ok 127 - seed infrastructure is staging-only, batch-traceable, and not a public quota bypass
+  ---
+  duration_ms: 0.171583
+  type: 'test'
+  ...
+# Subtest: cleanup defaults to dry-run and requires exact confirmation for deletion
+ok 128 - cleanup defaults to dry-run and requires exact confirmation for deletion
+  ---
+  duration_ms: 0.062208
+  type: 'test'
+  ...
+# Subtest: every member and own card has one semantic profile link and no action buttons
+ok 129 - every member and own card has one semantic profile link and no action buttons
+  ---
+  duration_ms: 0.528125
+  type: 'test'
+  ...
+# Subtest: all profile consent states have exactly one Gallery and no verbose album controls
+ok 130 - all profile consent states have exactly one Gallery and no verbose album controls
+  ---
+  duration_ms: 0.490875
+  type: 'test'
+  ...
+# Subtest: final approved image and padlock SVG composition is source-exact and demo switching is chat-only
+ok 131 - final approved image and padlock SVG composition is source-exact and demo switching is chat-only
+  ---
+  duration_ms: 26.46275
+  type: 'test'
+  ...
+# Subtest: verification evidence is private, reviewed by role, and queued for deletion after decision
+ok 132 - verification evidence is private, reviewed by role, and queued for deletion after decision
+  ---
+  duration_ms: 36.007708
+  type: 'test'
+  ...
+# Subtest: verification remains server-disabled when its feature flag is false
+ok 133 - verification remains server-disabled when its feature flag is false
+  ---
+  duration_ms: 12.602417
+  type: 'test'
+  ...
+1..133
+# tests 133
+# suites 0
+# pass 133
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2525.512041

@@ -1,0 +1,2646 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/26.5.0/bin/node",
+      "/Users/nattano/.codex/worktrees/chatgun-release-candidate/node_modules/.bin/playwright",
+      "test",
+      "e2e/gallery-approved.spec.js",
+      "e2e/gallery-remediation.spec.js",
+      "e2e/direct-chat-albums.spec.js",
+      "e2e/private-album-icons.spec.js",
+      "e2e/ui-cleanup.spec.js",
+      "e2e/own-first.spec.js",
+      "e2e/owner-release.spec.js",
+      "--reporter=list,json"
+    ],
+    "configFile": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/playwright.config.js",
+    "rootDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop-chromium",
+        "name": "desktop-chromium",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-chromium",
+        "name": "mobile-chromium",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "desktop-chromium",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "snapshotDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "https://chatgun.social",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "screen": {
+            "width": 1920,
+            "height": 1080
+          },
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop-chromium"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/test-results/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "mobile-chromium",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "snapshotDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "https://chatgun.social",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1",
+          "viewport": {
+            "width": 390,
+            "height": 664
+          },
+          "screen": {
+            "width": 390,
+            "height": 844
+          },
+          "deviceScaleFactor": 3,
+          "isMobile": true,
+          "hasTouch": true,
+          "defaultBrowserType": "webkit",
+          "browserName": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "mobile-chromium"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "direct-chat-albums.spec.js",
+      "file": "direct-chat-albums.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "direct DM and two-sided fictional album consent at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11431,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:39:49.515Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ca4e5e41f7c496ccf7c1-f0ecb7798980f95ff583",
+          "file": "direct-chat-albums.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "direct DM and two-sided fictional album consent at 768px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7159,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:01.035Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ca4e5e41f7c496ccf7c1-5ae16c285b831b8f584a",
+          "file": "direct-chat-albums.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "direct DM and two-sided fictional album consent at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2831,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:08.198Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ca4e5e41f7c496ccf7c1-ff62ee123e79761a66ce",
+          "file": "direct-chat-albums.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "legacy fictional inbox upgrade preserves read states, 120 messages and all 20 members",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1303,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:11.033Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ca4e5e41f7c496ccf7c1-76babb42170160b6c92e",
+          "file": "direct-chat-albums.spec.js",
+          "line": 49,
+          "column": 1
+        },
+        {
+          "title": "fictional owner media decisions persist and private portraits never become public covers",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12224,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:12.340Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ca4e5e41f7c496ccf7c1-d89602a86c11b1c39ed5",
+          "file": "direct-chat-albums.spec.js",
+          "line": 62,
+          "column": 1
+        },
+        {
+          "title": "direct DM and two-sided fictional album consent at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12318,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:12.130Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ca4e5e41f7c496ccf7c1-e9a585dfbc2860c13745",
+          "file": "direct-chat-albums.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "direct DM and two-sided fictional album consent at 768px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 9531,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:24.544Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ca4e5e41f7c496ccf7c1-fd1efa472efd462f47ca",
+          "file": "direct-chat-albums.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "direct DM and two-sided fictional album consent at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7063,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:34.079Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ca4e5e41f7c496ccf7c1-7f23e3d319d93d5c11f4",
+          "file": "direct-chat-albums.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "legacy fictional inbox upgrade preserves read states, 120 messages and all 20 members",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 896,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:41.146Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ca4e5e41f7c496ccf7c1-c9b666cb8539215f5f5d",
+          "file": "direct-chat-albums.spec.js",
+          "line": 49,
+          "column": 1
+        },
+        {
+          "title": "fictional owner media decisions persist and private portraits never become public covers",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12040,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:42.046Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ca4e5e41f7c496ccf7c1-a082f295f80b76dec95b",
+          "file": "direct-chat-albums.spec.js",
+          "line": 62,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "gallery-approved.spec.js",
+      "file": "gallery-approved.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "approved Gallery: four destinations, uploads and bounded lightbox 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3178,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:24.578Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-bd6d98bb7ea2b6ff2750",
+          "file": "gallery-approved.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "approved Gallery: four destinations, uploads and bounded lightbox 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3462,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:27.760Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-de486f59c92faccd0053",
+          "file": "gallery-approved.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "approved Gallery: four destinations, uploads and bounded lightbox 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3421,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:31.227Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-fbd1e714be74e7ff0005",
+          "file": "gallery-approved.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "fictional upgrade preserves user edits and deleted fixtures across reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 989,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:34.652Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-3319d42e25daf8fbc890",
+          "file": "gallery-approved.spec.js",
+          "line": 41,
+          "column": 1
+        },
+        {
+          "title": "gallery upload rejects invalid images and shows shared Bangkok quota exhaustion",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1602,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:35.645Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-cb77779b01e5a12d9a87",
+          "file": "gallery-approved.spec.js",
+          "line": 48,
+          "column": 1
+        },
+        {
+          "title": "optional demo reset requires confirmation and preserves uploads, original data and quota",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1661,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:37.251Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-21861a59d7dd2133468c",
+          "file": "gallery-approved.spec.js",
+          "line": 55,
+          "column": 1
+        },
+        {
+          "title": "own private profile photo is not serialized into Public Gallery avatar or tiles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 810,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:38.917Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-3c16b684c6174a265d91",
+          "file": "gallery-approved.spec.js",
+          "line": 67,
+          "column": 1
+        },
+        {
+          "title": "approved Gallery: four destinations, uploads and bounded lightbox 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "explicit owner reference viewport",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-approved.spec.js",
+                    "line": 7,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 73,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:54.099Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "explicit owner reference viewport",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-approved.spec.js",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-17caa38ff3bfc6db41e1",
+          "file": "gallery-approved.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "approved Gallery: four destinations, uploads and bounded lightbox 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "explicit owner reference viewport",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-approved.spec.js",
+                    "line": 7,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 73,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:54.175Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "explicit owner reference viewport",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-approved.spec.js",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-b592c89e40bc14fd8b95",
+          "file": "gallery-approved.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "approved Gallery: four destinations, uploads and bounded lightbox 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "explicit owner reference viewport",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-approved.spec.js",
+                    "line": 7,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 77,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:54.252Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "explicit owner reference viewport",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-approved.spec.js",
+                        "line": 7,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-742d1e732e26788e6588",
+          "file": "gallery-approved.spec.js",
+          "line": 6,
+          "column": 35
+        },
+        {
+          "title": "fictional upgrade preserves user edits and deleted fixtures across reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 969,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:54.334Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-12cc847b61ea51359c55",
+          "file": "gallery-approved.spec.js",
+          "line": 41,
+          "column": 1
+        },
+        {
+          "title": "gallery upload rejects invalid images and shows shared Bangkok quota exhaustion",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1571,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:55.307Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-a8233392d629b3cc2cc7",
+          "file": "gallery-approved.spec.js",
+          "line": 48,
+          "column": 1
+        },
+        {
+          "title": "optional demo reset requires confirmation and preserves uploads, original data and quota",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1724,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:56.882Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-7a443a4eae8b8d1361f7",
+          "file": "gallery-approved.spec.js",
+          "line": 55,
+          "column": 1
+        },
+        {
+          "title": "own private profile photo is not serialized into Public Gallery avatar or tiles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1111,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:58.610Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "33a33bf53b39cadf7221-c8c42dad8935753bd78e",
+          "file": "gallery-approved.spec.js",
+          "line": 67,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "gallery-remediation.spec.js",
+      "file": "gallery-remediation.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "upload navigation preserves scope, warns on leaving, browser Back/Forward and reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2320,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:39.739Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-7d31f7602a04364c5194",
+          "file": "gallery-remediation.spec.js",
+          "line": 18,
+          "column": 1
+        },
+        {
+          "title": "10/12 capacity rejects an oversized selection without dropping or charging, success has no X",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1090,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:42.063Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-abdaf758e232c9079148",
+          "file": "gallery-remediation.spec.js",
+          "line": 36,
+          "column": 1
+        },
+        {
+          "title": "empty/full albums and daily quota are separate, invalid format/size/decode and Add More",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1915,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:43.157Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-78d2cd69bb589590f07d",
+          "file": "gallery-remediation.spec.js",
+          "line": 51,
+          "column": 1
+        },
+        {
+          "title": "partial IndexedDB failure retries only failed file with no duplicate quota",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1122,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:45.076Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-c3d4778124188ce2f5d7",
+          "file": "gallery-remediation.spec.js",
+          "line": 63,
+          "column": 1
+        },
+        {
+          "title": "slow photo load and empty caption/comments recover without blocking navigation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 908,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:46.201Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-7b98d7dbf7e65b4849aa",
+          "file": "gallery-remediation.spec.js",
+          "line": 74,
+          "column": 1
+        },
+        {
+          "title": "upload and viewer visual usability 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3544,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:47.115Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-e650ff37ef39d806c0b2",
+          "file": "gallery-remediation.spec.js",
+          "line": 82,
+          "column": 35
+        },
+        {
+          "title": "upload and viewer visual usability 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3038,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:50.663Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-ef8f8a9c928de85e7498",
+          "file": "gallery-remediation.spec.js",
+          "line": 82,
+          "column": 35
+        },
+        {
+          "title": "upload and viewer visual usability 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3186,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:53.706Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-5307e5f6debab0f6c406",
+          "file": "gallery-remediation.spec.js",
+          "line": 82,
+          "column": 35
+        },
+        {
+          "title": "upload navigation preserves scope, warns on leaving, browser Back/Forward and reload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2609,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:59.730Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-e86fcff957af39a5902f",
+          "file": "gallery-remediation.spec.js",
+          "line": 18,
+          "column": 1
+        },
+        {
+          "title": "10/12 capacity rejects an oversized selection without dropping or charging, success has no X",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1268,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:02.343Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-01cca7317ae90c2fd454",
+          "file": "gallery-remediation.spec.js",
+          "line": 36,
+          "column": 1
+        },
+        {
+          "title": "empty/full albums and daily quota are separate, invalid format/size/decode and Add More",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2066,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:03.615Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-8df522934ea8a108382d",
+          "file": "gallery-remediation.spec.js",
+          "line": 51,
+          "column": 1
+        },
+        {
+          "title": "partial IndexedDB failure retries only failed file with no duplicate quota",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1425,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:05.685Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-29911d3b291bc5449ff9",
+          "file": "gallery-remediation.spec.js",
+          "line": 63,
+          "column": 1
+        },
+        {
+          "title": "slow photo load and empty caption/comments recover without blocking navigation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1075,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:07.115Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "aae8008825a852d08494-6908b8f07515b621f254",
+          "file": "gallery-remediation.spec.js",
+          "line": 74,
+          "column": 1
+        },
+        {
+          "title": "upload and viewer visual usability 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "explicit viewport comparison",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-remediation.spec.js",
+                    "line": 83,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 75,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:08.193Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "explicit viewport comparison",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-remediation.spec.js",
+                        "line": 83,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "aae8008825a852d08494-b0b289e9577e26dd8f00",
+          "file": "gallery-remediation.spec.js",
+          "line": 82,
+          "column": 35
+        },
+        {
+          "title": "upload and viewer visual usability 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "explicit viewport comparison",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-remediation.spec.js",
+                    "line": 83,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 73,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:08.272Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "explicit viewport comparison",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-remediation.spec.js",
+                        "line": 83,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "aae8008825a852d08494-1a8dd8ace04973543428",
+          "file": "gallery-remediation.spec.js",
+          "line": 82,
+          "column": 35
+        },
+        {
+          "title": "upload and viewer visual usability 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "explicit viewport comparison",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-remediation.spec.js",
+                    "line": 83,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 74,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:08.349Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "explicit viewport comparison",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-remediation.spec.js",
+                        "line": 83,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "aae8008825a852d08494-f118a275f709272fff19",
+          "file": "gallery-remediation.spec.js",
+          "line": 82,
+          "column": 35
+        }
+      ]
+    },
+    {
+      "title": "own-first.spec.js",
+      "file": "own-first.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "viewer self shortcut, filters, pagination, edit, primary photo and recovery 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2149,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:56.901Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9516c7ec36f35f24969f-f452df54a57fd5fb3c9e",
+          "file": "own-first.spec.js",
+          "line": 4,
+          "column": 2
+        },
+        {
+          "title": "viewer self shortcut, filters, pagination, edit, primary photo and recovery 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2335,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:40:59.054Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9516c7ec36f35f24969f-929be42a55dcc366090f",
+          "file": "own-first.spec.js",
+          "line": 4,
+          "column": 2
+        },
+        {
+          "title": "viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2204,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:41:01.393Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9516c7ec36f35f24969f-ee74922aded85081d6b7",
+          "file": "own-first.spec.js",
+          "line": 4,
+          "column": 2
+        },
+        {
+          "title": "viewer self shortcut, filters, pagination, edit, primary photo and recovery 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "three explicit reference sizes",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/own-first.spec.js",
+                    "line": 5,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 72,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:08.430Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "three explicit reference sizes",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/own-first.spec.js",
+                        "line": 5,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "9516c7ec36f35f24969f-db08e0ae458ad64f1052",
+          "file": "own-first.spec.js",
+          "line": 4,
+          "column": 2
+        },
+        {
+          "title": "viewer self shortcut, filters, pagination, edit, primary photo and recovery 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "three explicit reference sizes",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/own-first.spec.js",
+                    "line": 5,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 71,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:08.506Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "three explicit reference sizes",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/own-first.spec.js",
+                        "line": 5,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "9516c7ec36f35f24969f-cd4975913fe19b0a1d35",
+          "file": "own-first.spec.js",
+          "line": 4,
+          "column": 2
+        },
+        {
+          "title": "viewer self shortcut, filters, pagination, edit, primary photo and recovery 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "three explicit reference sizes",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/own-first.spec.js",
+                    "line": 5,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 74,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:08.581Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "three explicit reference sizes",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/own-first.spec.js",
+                        "line": 5,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "9516c7ec36f35f24969f-a932608948a46aa80736",
+          "file": "own-first.spec.js",
+          "line": 4,
+          "column": 2
+        }
+      ]
+    },
+    {
+      "title": "owner-release.spec.js",
+      "file": "owner-release.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "owner package: isolated fictional network and layout at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6515,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:41:03.606Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2726f6a88e9669cf4869-4e0f7f0385f3a22099ca",
+          "file": "owner-release.spec.js",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "owner package: isolated fictional network and layout at 768px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7168,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:41:10.125Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2726f6a88e9669cf4869-8da76fea872d4717df93",
+          "file": "owner-release.spec.js",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "owner package: isolated fictional network and layout at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3750,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:41:17.297Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2726f6a88e9669cf4869-2292fcb5a58ebfe87414",
+          "file": "owner-release.spec.js",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "owner package: isolated fictional network and layout at 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "explicit viewports run once",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/owner-release.spec.js",
+                    "line": 7,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 74,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:08.665Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "explicit viewports run once",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/owner-release.spec.js",
+                        "line": 7,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "2726f6a88e9669cf4869-88640d3506873e0dc64b",
+          "file": "owner-release.spec.js",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "owner package: isolated fictional network and layout at 768px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "explicit viewports run once",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/owner-release.spec.js",
+                    "line": 7,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 72,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:08.742Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "explicit viewports run once",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/owner-release.spec.js",
+                        "line": 7,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "2726f6a88e9669cf4869-bd88c2db219c3a9da35c",
+          "file": "owner-release.spec.js",
+          "line": 6,
+          "column": 3
+        },
+        {
+          "title": "owner package: isolated fictional network and layout at 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "explicit viewports run once",
+                  "location": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/owner-release.spec.js",
+                    "line": 7,
+                    "column": 10
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "skipped",
+                  "duration": 79,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:08.818Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "explicit viewports run once",
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/owner-release.spec.js",
+                        "line": 7,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "2726f6a88e9669cf4869-7b3fa65be7e1d07ef765",
+          "file": "owner-release.spec.js",
+          "line": 6,
+          "column": 3
+        }
+      ]
+    },
+    {
+      "title": "private-album-icons.spec.js",
+      "file": "private-album-icons.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "approved album icons and keyboard consent journey 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5815,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:41:21.056Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "22ec1a4c7b8476ae4619-e30019d0884013feef1a",
+          "file": "private-album-icons.spec.js",
+          "line": 5,
+          "column": 35
+        },
+        {
+          "title": "approved album icons and keyboard consent journey 768px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6014,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:41:26.876Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "22ec1a4c7b8476ae4619-5cf9f45eb04fa400c2b7",
+          "file": "private-album-icons.spec.js",
+          "line": 5,
+          "column": 35
+        },
+        {
+          "title": "approved album icons and keyboard consent journey 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6329,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:41:32.894Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "22ec1a4c7b8476ae4619-cd87e91e7ad1b22122e4",
+          "file": "private-album-icons.spec.js",
+          "line": 5,
+          "column": 35
+        },
+        {
+          "title": "approved album icons and keyboard consent journey 390px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6850,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:08.905Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "22ec1a4c7b8476ae4619-73d73d00be93c130e9f6",
+          "file": "private-album-icons.spec.js",
+          "line": 5,
+          "column": 35
+        },
+        {
+          "title": "approved album icons and keyboard consent journey 768px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8251,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:15.759Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "22ec1a4c7b8476ae4619-41b16e677841cadd4659",
+          "file": "private-album-icons.spec.js",
+          "line": 5,
+          "column": 35
+        },
+        {
+          "title": "approved album icons and keyboard consent journey 1440px",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8656,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:24.014Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "22ec1a4c7b8476ae4619-dd2262f3cf33ed81e435",
+          "file": "private-album-icons.spec.js",
+          "line": 5,
+          "column": 35
+        }
+      ]
+    },
+    {
+      "title": "ui-cleanup.spec.js",
+      "file": "ui-cleanup.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "owner cleanup: cards, single Gallery and chat-only consent 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10525,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:41:39.231Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c15fb107cc73e999c13d-83ba142bd2fdd5f61423",
+          "file": "ui-cleanup.spec.js",
+          "line": 4,
+          "column": 35
+        },
+        {
+          "title": "owner cleanup: cards, single Gallery and chat-only consent 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10927,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:41:49.760Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c15fb107cc73e999c13d-326117805a628e2c3fe7",
+          "file": "ui-cleanup.spec.js",
+          "line": 4,
+          "column": 35
+        },
+        {
+          "title": "owner cleanup: cards, single Gallery and chat-only consent 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11164,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:42:00.691Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c15fb107cc73e999c13d-c9f73cd64b5978c4c5b8",
+          "file": "ui-cleanup.spec.js",
+          "line": 4,
+          "column": 35
+        },
+        {
+          "title": "owner cleanup: cards, single Gallery and chat-only consent 390",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12630,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:32.684Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c15fb107cc73e999c13d-a8d4b2091b2dd487b344",
+          "file": "ui-cleanup.spec.js",
+          "line": 4,
+          "column": 35
+        },
+        {
+          "title": "owner cleanup: cards, single Gallery and chat-only consent 768",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14838,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:43:45.318Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c15fb107cc73e999c13d-d1f6d84de0f58888cb78",
+          "file": "ui-cleanup.spec.js",
+          "line": 4,
+          "column": 35
+        },
+        {
+          "title": "owner cleanup: cards, single Gallery and chat-only consent 1440",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-chromium",
+              "projectName": "mobile-chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 17041,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:44:00.161Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c15fb107cc73e999c13d-db003abd29d55503ed7f",
+          "file": "ui-cleanup.spec.js",
+          "line": 4,
+          "column": 35
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-17T16:39:49.264Z",
+    "duration": 268045.10099999997,
+    "expected": 52,
+    "skipped": 12,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

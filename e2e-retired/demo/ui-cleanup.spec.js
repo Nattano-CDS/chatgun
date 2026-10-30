@@ -1,0 +1,27 @@
+import {test,expect} from '@playwright/test';
+import {mkdirSync} from 'node:fs';
+import {resolve} from 'node:path';
+for(const width of [390,768,1440])test(`owner cleanup: cards, single Gallery and chat-only consent ${width}`,async({page},info)=>{
+  test.setTimeout(90000);await page.setViewportSize({width,height:width===390?844:1024});
+  const dir=resolve(process.env.CLEANUP_EVIDENCE_DIR||'test-results/ui-cleanup');mkdirSync(dir,{recursive:true});
+  const shot=async name=>{if(name==='discovery')await expect.poll(()=>page.locator('#people-grid img').evaluateAll(images=>images.filter(i=>{const r=i.getBoundingClientRect();return r.top<innerHeight&&r.bottom>0;}).every(i=>i.complete&&i.naturalWidth>0))).toBe(true);await expect(page.locator('#toast')).toBeHidden();await page.screenshot({path:resolve(dir,`${info.project.name}-${name}-${width}.png`)});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);};
+  const errors=[],writes=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/')&&!['GET','HEAD'].includes(r.method()))writes.push(r.url());});
+  await page.goto('/');await expect(page.locator('#people-count')).toHaveText('20');
+  await expect(page.locator('.person-card button,.person-card [data-action]')).toHaveCount(0);
+  await expect(page.locator('.person-card a.card-open')).toHaveCount(17);await shot('discovery');
+  const own=page.locator('[data-person=demo-me] .card-open');await own.focus();await page.keyboard.press('Space');await expect(page).toHaveURL(/\/people\/demo-me$/);
+  await expect(page.locator('#profile-dialog [data-demo-owner],#profile-dialog .album-management')).toHaveCount(0);await page.keyboard.press('Escape');await expect(own).toBeFocused();
+  await page.locator('[data-person=demo-01] .card-open').focus();await page.keyboard.press('Enter');await expect(page).toHaveURL(/\/people\/demo-01$/);
+  await expect(page.locator('#profile-dialog [data-profile-gallery]')).toHaveCount(1);await expect(page.locator('.profile-gallery-top')).toHaveCount(0);
+  expect(await page.locator('[data-private-album]').evaluate(b=>b.previousElementSibling.hasAttribute('data-profile-gallery'))).toBe(true);await shot('profile');
+  await page.locator('[data-private-album]').click();await expect(page.locator('[data-private-album]')).toBeDisabled();await expect(page.locator('[data-private-album]')).toHaveAccessibleName('ส่งคำขอแล้ว รออนุมัติอัลบั้มส่วนตัว');
+  await expect(page.locator('#profile-dialog .album-feedback,#profile-dialog [data-album-action],#profile-dialog [data-demo-owner]')).toHaveCount(0);await expect(page.locator('#profile-dialog')).not.toContainText('ส่งคำขอแล้ว · รออนุมัติในแชท');await shot('pending-profile');
+  await page.locator('.full-profile-actions [data-action=chat]').click();await expect(page.locator('#thread [data-album-action=cancel]')).toBeVisible();await expect(page.locator('#thread [data-demo-owner]')).toBeVisible();await shot('requester-chat');
+  await page.locator('#thread [data-demo-owner]').click();await expect(page.locator('#demo-actor')).toHaveValue('demo-01');await expect(page.locator('#thread [data-album-action=approve]')).toBeVisible();await expect(page.locator('#thread [data-album-action=reject]')).toBeVisible();await shot('owner-chat');
+  await page.locator('#thread [data-album-action=approve]').click();await page.locator('#demo-actor').selectOption('demo-me');await page.locator('[data-chat=demo-01]').click();await expect(page.locator('#thread')).toContainText('อนุมัติสิทธิ์อัลบั้มส่วนตัวแล้ว');
+  await page.locator('#primary-nav [data-tab=near]').click();await page.locator('[data-person=demo-01] .card-open').click();await expect(page.locator('[data-private-album]')).toHaveAttribute('data-album-state','unlocked');await shot('approved-profile');
+  await page.keyboard.press('Escape');await page.locator('[data-person=demo-02] .person-name').scrollIntoViewIfNeeded();const name=await page.locator('[data-person=demo-02] .person-name').boundingBox();await page.mouse.click(name.x+name.width/2,name.y+name.height/2);await expect(page).toHaveURL(/\/people\/demo-02$/);await page.keyboard.press('Escape');
+  await page.locator('[data-discovery-page="2"]').click();await expect(page.locator('.person-card')).toHaveCount(5);await expect(page.locator('.person-card button')).toHaveCount(0);await page.locator('[data-person=demo-20] .card-open').click();await expect(page).toHaveURL(/\/people\/demo-20$/);
+  await page.locator('[data-private-album]').click();await expect(page.locator('[data-private-album]')).toBeDisabled();await page.locator('.full-profile-actions [data-action=chat]').click();await page.locator('#thread [data-album-action=cancel]').click();await expect(page.locator('#thread')).toContainText('ยกเลิกคำขออัลบั้มส่วนตัว');
+  expect(errors).toEqual([]);expect(writes).toEqual([]);
+});

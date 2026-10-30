@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-10-23T19:50:14.833Z",
+  "host": "uat.chatgun-final-uat.pages.dev",
+  "roleGrantsIssued": 0,
+  "organizationChanges": 0,
+  "genuineMfa": "NOT RUN",
+  "checks": [
+    {
+      "path": "",
+      "status": 200,
+      "success": true,
+      "errorCodes": []
+    },
+    {
+      "path": "/access/apps",
+      "status": 200,
+      "success": true,
+      "errorCodes": []
+    },
+    {
+      "path": "/access/apps",
+      "status": 403,
+      "success": false,
+      "errorCodes": [
+        1010
+      ]
+    }
+  ],
+  "status": "BLOCKED",
+  "remaining": "Scoped Access API rejected 403; finish the dedicated UAT application/policy in ChatGun Zero Trust. No account-wide changes or role grants made."
+}

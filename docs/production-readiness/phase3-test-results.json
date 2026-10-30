@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-29T16:59:00Z",
+  "candidateApplicationSha": "cfb94c92190a17ebb73983cef4017ca227df5d42",
+  "result": "PASS for automated candidate coverage; genuine Production authentication and provider-console tests remain BLOCKED/NOT RUN",
+  "dependencyAudit": {"command": "npm audit --audit-level=high", "vulnerabilities": 0, "result": "PASS"},
+  "unitIntegrationSecurity": {"command": "npm test", "passed": 279, "failed": 0, "skipped": 0, "result": "PASS"},
+  "browser": [
+    {"configuration": "playwright.issue16.config.js", "passed": 16, "failed": 0, "result": "PASS"},
+    {"configuration": "playwright.platform-local.config.js", "passed": 102, "failed": 0, "viewports": [390, 768, 1440], "result": "PASS"},
+    {"configuration": "playwright.full-system-local.config.js", "passed": 10, "failed": 0, "viewports": [390, 768, 1440], "result": "PASS"}
+  ],
+  "closedRelease": {"command": "node scripts/test-closed-release.mjs --local", "passed": 35, "hashedAssets": 27, "result": "PASS"},
+  "buildModes": ["default canary", "controlled-beta", "closed-prelaunch canary"],
+  "packageVerifiers": ["verify:production-remediation", "verify:production-activation"],
+  "continuousIntegration": {
+    "pullRequest": 19,
+    "headMatched": true,
+    "checks": {"javascript": "PASS", "local-regression": "PASS", "Cloudflare Pages": "PASS", "CodeQL": "PASS"},
+    "openCodeScanningAlerts": 0
+  },
+  "excludedInvalidInvocation": {
+    "command": "npm run test:e2e",
+    "countedAsRegression": false,
+    "reason": "The generic configuration targets an older live candidate and includes local fixture suites without starting their harness. It produced expected stale-target/connection failures and was stopped. The exact repository CI configurations above were then run and passed."
+  },
+  "notRun": [
+    "Genuine Production Cloudflare Access login/MFA, RBAC and revocation",
+    "Genuine Production Google, Meta or LINE OAuth cancel/login",
+    "Production cleanup Worker schedule and alert delivery",
+    "Production migration or recovery operation"
+  ],
+  "productionMutations": 0
+}

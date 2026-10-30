@@ -1,0 +1,3 @@
+import{defineConfig}from'@playwright/test';
+if(process.env.CHATGUN_ISOLATED_STAGING!=='issue13'||!process.env.CHATGUN_FULL_SYSTEM_BUNDLE)throw Error('Explicit isolated synthetic staging bundle required');
+export default defineConfig({testDir:'e2e',testMatch:'full-system-local.spec.js',workers:1,retries:0,timeout:180000,expect:{timeout:20000},reporter:[['list'],['json',{outputFile:'docs/development-completion/full-system-cloud-browser.json'}]],use:{baseURL:'https://issue13.chatgun-issue13-staging.pages.dev',trace:'off',video:'off',screenshot:'only-on-failure'},outputDir:'test-results/full-system-cloud'});

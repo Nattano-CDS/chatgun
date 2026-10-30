@@ -1,0 +1,5 @@
+# Deployment and rollback plan
+
+No Production deployment is authorized by this package. After all blockers pass, bind approval to the exact commit/tree/artifact inventory and take fresh configuration, D1 and rollback evidence. Deploy configuration-free built assets only, verify zero binding/secret/flag drift, schema/FK/data preservation, OAuth callbacks and restricted flags. Roll back Pages to the recorded prior successful deployment if application verification fails; do not automatically restore or down-migrate D1. Database changes, secrets, provider consoles, roles, schedules and feature activation each require their own exact authorization.
+
+For UAT, the code-only script asserts the correct account/project, separate schema-22 D1/private R2, exact two-identity allowlist, rc5 policy hashes and disabled Friends/Media/public registration. It deploys from a configuration-free temporary directory, compares configuration and D1 fingerprints before/after and rechecks the Production canonical SHA. Any mismatch stops closed.

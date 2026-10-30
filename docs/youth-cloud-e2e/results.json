@@ -1,0 +1,50 @@
+{
+  "dateBangkok": "2026-10-24",
+  "applicationSha": "b84f1475cba938169bdb3bfdc95f45e9f5329f57",
+  "preview": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "schema": 20,
+  "productionShaUnchanged": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "automated": {
+    "unitIntegrationSecurity": {"passed": 231, "failed": 0, "skipped": 0},
+    "mockedPlatformUi": {"passed": 93, "failed": 0, "skipped": 0},
+    "realHandlerLocalBrowser": {"passed": 10, "failed": 0, "skipped": 0},
+    "realCloudflareBrowserFinalFullRun": {"passed": 11, "failed": 0, "skipped": 0}
+  },
+  "cloudScope": {
+    "backend": "Actual Cloudflare Pages Functions and isolated D1",
+    "authentication": "Explicit synthetic session fixtures; not genuine OAuth",
+    "ageBands": ["under_13", "13_17", "18_19"],
+    "viewports": [390, 768, 1440],
+    "rightsJourneys": 9,
+    "negativeCases": ["social_api_bypass", "direct_route", "csrf", "cross_origin", "revoked_session", "expired_session", "stale_authentication", "deletion_replay"],
+    "genuineOAuth": "BLOCKED: intentionally disabled on isolated Preview",
+    "oauthInitiationNegativeHttpChecks": {"google": 503, "facebook": 503, "line": 503, "code": "oauth_unavailable"},
+    "genuineTurnstile": "NOT TESTED: no human provider reauthentication attempted",
+    "youthRegistrationAndGuardianAuthorization": "BLOCKED: admission workflow not ready"
+  },
+  "fixtureIntegrity": {
+    "batches": 2,
+    "newSyntheticAccountsTotal": 20,
+    "newSyntheticAccountsDeletedByAuthenticatedWorkflow": 18,
+    "newHeldControlAccountsRetained": 2,
+    "activeFixtureSessionsRemaining": 0,
+    "providerIdentitiesCreated": 0,
+    "profilesCreated": 0,
+    "r2ObjectsCreated": 0,
+    "adminRolesGranted": 0,
+    "preExistingTablesIncludingMigrationHistoryCheckedPerBatch": 54,
+    "preExistingRowsUnchangedBothBatches": true,
+    "foreignKeyViolations": 0,
+    "protectedBackupAndRestoreChecks": true,
+    "productionWrites": 0,
+    "protectedStagingWrites": 0
+  },
+  "priorHarnessCorrections": [
+    "Initial interrupted run expected .html/age-review instead of actual Pages canonical /account?access=restricted; no application defect was found.",
+    "Next run passed 10 and failed logout because the assertion ran before the POST response. Awaiting the real logout response passed the targeted rerun.",
+    "A fresh complete batch then passed all 11 with zero failures or skips. No application security check was disabled or app code changed."
+  ],
+  "publicYouthAdmission": "NO-GO",
+  "adminMfaSetup": "PAUSED",
+  "productionDeploymentPerformed": false
+}

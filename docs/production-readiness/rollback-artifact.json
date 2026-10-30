@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-29T16:33:35.272Z",
+  "deployedSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "releaseMode": "controlled-beta",
+  "requiredD1MigrationNumber": 17,
+  "assetsManifestSha256": "943f00f3add31f9214e43d7ae70a0c032ea8315effeb9c91b6c9da776364b433",
+  "checkedFiles": 39,
+  "exactSourceRebuildMatchesLive": true,
+  "rollbackArtifactPermissions": "directories 0700; files 0600",
+  "rollbackArtifactPrivate": true,
+  "productionWrites": 0
+}

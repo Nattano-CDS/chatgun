@@ -1,5 +1,12 @@
 # Minor safety launch gate
 
+> Current decision addendum — 20 October 2026: the owner selected a **minimum age of
+> 13**. This is a product direction, not activation or an independently verified age
+> model. See [13+ and Access decision](public-social-launch/13-plus-access-decision.md)
+> for current implementation gaps. Historical Preview/DOB/flag descriptions below
+> are not the current Production configuration. Production still uses post-OAuth
+> adult self-declaration without storing DOB; youth admission remains closed.
+
 This is a technical/product decision record, not legal advice. A minimum age of 13 is not
 treated as sufficient consent or contractual capacity under Thai law.
 

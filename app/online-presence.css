@@ -1,0 +1,11 @@
+.member-online-slot:empty{display:none}
+.member-online-slot{display:inline-flex;align-items:center;gap:.3em;font-size:12px;font-weight:600;line-height:1.5;white-space:nowrap;vertical-align:baseline;color:#166534}
+.member-online-dot{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#16a34a}
+.card-name-row,.full-name-row{flex-wrap:wrap;align-items:center;gap:6px}
+.card-name-row .person-name,.full-name-row h1,.member-name-status strong{min-width:0;overflow-wrap:anywhere}
+.card-name-row .member-online-slot,.full-name-row .member-online-slot{color:#bbf7d0}
+.member-name-status{display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:.35em;min-width:0}
+.conversation-copy .member-name-status{justify-content:flex-start}
+.retired-demo{margin:24px auto;max-width:620px;padding:20px}.retired-demo button{min-height:44px;margin:8px;max-width:100%;white-space:normal}
+body[data-prelaunch=true] #primary-nav{display:none}
+body[data-prelaunch=true] #disabled-view{min-height:60vh;margin:auto;max-width:620px}

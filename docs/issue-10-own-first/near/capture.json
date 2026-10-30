@@ -1,0 +1,21 @@
+{
+  "target": "http://127.0.0.1:5173",
+  "kind": "canonical-source-render",
+  "referenceCommit": "98bb83e44bf88eddb9822d7875f18cd4fe833ee2",
+  "fixture": "chatgun-browser-demo-v1; browser-only adapter and empty-state variations",
+  "viewports": [
+    [
+      390,
+      844
+    ],
+    [
+      768,
+      1024
+    ],
+    [
+      1440,
+      1100
+    ]
+  ],
+  "failures": []
+}

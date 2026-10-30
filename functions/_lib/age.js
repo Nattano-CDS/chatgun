@@ -36,3 +36,14 @@ export function selfDeclaredAdult(dateOfBirth, timestampMs = Date.now()) {
   const age = ageOnDate(dateOfBirth, bangkokDate(timestampMs));
   return { valid: age !== null, adult: age !== null && age >= 18, age };
 }
+
+// Preparation for the owner-approved minimum of 13. This classifier does NOT
+// admit minors or grant social permissions; existing adult gates stay intact
+// until the reviewed youth/capacity workflow and endpoint protections exist.
+// The input date is transient; callers must never log or persist it.
+export function selfDeclaredAgeBand(dateOfBirth, timestampMs = Date.now()) {
+  const age = ageOnDate(dateOfBirth, bangkokDate(timestampMs));
+  if (age === null) return { valid: false, band: null, independentlyVerified: false };
+  const band = age < 13 ? 'under_13' : age < 18 ? '13_17' : age < 20 ? '18_19' : '20_plus';
+  return { valid: true, band, independentlyVerified: false };
+}

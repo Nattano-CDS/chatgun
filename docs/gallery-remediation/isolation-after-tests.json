@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-10-17T16:37:10.507Z",
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "protectedDatabase": "5bbfd55d-eb22-4324-8a7d-57bef14110ea",
+  "protectedCounts": {
+    "users": 25,
+    "identities": 2,
+    "member_profiles": 25,
+    "social_messages": 122,
+    "social_relationships": 16,
+    "profile_photos": 37,
+    "social_media": 38,
+    "synthetic_seed_records": 369,
+    "synthetic_seed_objects": 33
+  },
+  "protectedAlbumMigrationApplied": false,
+  "isolatedDatabase": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
+  "isolatedMigrationCount": 14,
+  "foreignKeyViolations": 0,
+  "photoMediaOwnerMismatches": 0,
+  "exactSourceTriggersVerified": 5,
+  "privateVisibilityDefault": true,
+  "managedR2PublicAccess": false,
+  "originalBindingsUnchanged": true,
+  "productionR2Bindings": 0,
+  "aggregateFingerprint": "6768cc6b45b2adfd4c508068250013d5c2bd1dcb717c80ddaa5157618a8f080b",
+  "databaseWrites": 0,
+  "protectedCountsUnchangedSinceBaseline": true
+}

@@ -1,0 +1,125 @@
+{
+  "checkedAt": "2026-10-23T19:14:05.528Z",
+  "classification": "DEVELOPMENT COMPLETE — READY FOR ONE FINAL E2E/UAT",
+  "applicationSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+  "prHeadAtApplicationFreeze": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+  "evidenceHeadNote": "Final report-only PR HEAD and its completed CI are recorded in the closing PR comment, with an application-tree equivalence check.",
+  "preview": "https://issue13.chatgun-issue13-staging.pages.dev",
+  "productionSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "productionDeployed": false,
+  "migrations": {
+    "production": 17,
+    "isolated": 21,
+    "new": "0021_eligibility_review_requests.sql",
+    "oldTablesPreservedDuringMigration": 53,
+    "foreignKeyViolations": 0
+  },
+  "unit": {
+    "passed": 238,
+    "failed": 0,
+    "skipped": 0
+  },
+  "ui": {
+    "passed": 93,
+    "failed": 0,
+    "skipped": 0,
+    "kind": "mocked platform UI"
+  },
+  "localBrowser": {
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "kind": "real handlers/SQLite/in-memory R2"
+  },
+  "cloudBrowser": {
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "kind": "actual Pages Functions/D1/private R2 with synthetic sessions"
+  },
+  "cloudYouth": {
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0,
+    "kind": "actual Cloudflare held-session rights and request races"
+  },
+  "ci": {
+    "conclusion": "success",
+    "databaseId": 40008332912,
+    "headSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+    "status": "completed",
+    "url": "https://github.com/Nattano-CDS/chatgun/actions/runs/40008332912"
+  },
+  "previewHttpChecks": 15,
+  "assetHashesMatched": 39,
+  "cleanup": {
+    "checkedAt": "2026-10-23T19:11:22.167Z",
+    "database": "275d9820-6aec-494a-8bb5-b7ed9b8b74cc",
+    "bucket": "chatgun-issue13-media",
+    "fixtureBatches": 1,
+    "manifestFixtureUsers": 15,
+    "fixtureMediaQueued": 6,
+    "objectsCompleted": 9,
+    "sessionsRevokedInThisRun": 9,
+    "temporaryGrantsRevokedInThisRun": 15,
+    "activeFixtureSessionsRemaining": 0,
+    "activeFixtureGrantsRemaining": 0,
+    "unrelatedPendingQueueRowsUnchanged": 0,
+    "cleanup": {
+      "selected": 9,
+      "completed": 9,
+      "failed": 0,
+      "exhausted": 0
+    },
+    "checks": [
+      {
+        "name": "Only exact manifest-owned R2 objects deleted; unrelated queues unchanged",
+        "status": "PASS"
+      },
+      {
+        "name": "All fixture sessions and temporary grants revoked",
+        "status": "PASS"
+      },
+      {
+        "name": "Foreign keys valid after fixture account deletion and R2 cleanup",
+        "status": "PASS"
+      },
+      {
+        "name": "Every pre-existing isolated row preserved by private backup hashes",
+        "status": "PASS"
+      }
+    ],
+    "productionWrites": 0,
+    "existingFixtureUsersDeleted": 0,
+    "protectedStagingWrites": 0
+  },
+  "youthIntegrity": {
+    "applicationSha": "4a7dee32c52bc474ee3cc50d13e293e66e771c1a",
+    "syntheticAccountsCreated": 10,
+    "syntheticAccountsDeletedByAuthenticatedWorkflow": 9,
+    "newHeldControlAccountsRetained": 1,
+    "activeFixtureSessions": 0,
+    "providerIdentitiesCreated": 0,
+    "mediaObjectsCreated": 0,
+    "preExistingTablesVerified": 58,
+    "preExistingRowsUnchanged": true,
+    "foreignKeyViolations": 0,
+    "protectedBackups": true,
+    "productionUnchanged": true,
+    "productionWrites": 0,
+    "protectedStagingWrites": 0
+  },
+  "engineeringDefectsRemaining": [],
+  "genuineOAuthThisWorkstream": "NOT RUN — deferred consolidated human campaign",
+  "externalBlockers": [
+    "Genuine owner Admin Access/MFA/fresh-auth configuration and final UAT; no new real role grant or expiry extension",
+    "Distinct consenting eligible adult participant and expanded social/legal/operational scope approval",
+    "Google/Meta publishing/tester eligibility and genuine-provider configuration checks before their human UAT",
+    "Youth capacity/parental-authority/consent/safeguarding model: admission remains closed",
+    "Backup moderator, independent appeal reviewer, emergency escalation and scanning-vendor decision; no invented staffing"
+  ],
+  "productionDecision": "NO-GO for expanded activation; existing owner pilot preserved",
+  "productionWrites": 0,
+  "protectedStagingWrites": 0,
+  "history": "Earlier Cloud7/10 with three local-only skips is superseded by fresh10/10. One unused overlapping youth preparation was revoked/retained with no E2E/preservation PASS claimed; final youth campaign uses a fresh post-cleanup baseline."
+}

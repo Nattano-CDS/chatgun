@@ -1,0 +1,31 @@
+{
+  "accountId": "23017b53386fb67fc62a52cdd017454c",
+  "projectName": "chatgun",
+  "productionBranch": "main",
+  "wranglerProfile": "chatgun",
+  "wranglerVersion": "4.156.0",
+  "requiredPlainVariables": {
+    "ADMIN_ACCESS_STANDALONE_ENABLED": "true",
+    "ADMIN_CLOUDFLARE_ACCESS_REQUIRED": "true",
+    "DEPLOYMENT_ENVIRONMENT": "production"
+  },
+  "requiredSecretBindings": [
+    "ADMIN_ACCESS_AUDIENCE",
+    "ADMIN_ACCESS_EMAIL",
+    "ADMIN_ACCESS_ISSUER",
+    "ADMIN_ACCESS_OWNER_USER_ID",
+    "FACEBOOK_CLIENT_ID",
+    "FACEBOOK_CLIENT_SECRET",
+    "FACEBOOK_GRAPH_VERSION",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "LINE_CLIENT_ID",
+    "LINE_CLIENT_SECRET",
+    "OTP_PEPPER",
+    "RATE_LIMIT_PEPPER",
+    "TURNSTILE_SECRET_KEY",
+    "TURNSTILE_SITE_KEY"
+  ],
+  "requiredD1Bindings": ["DB"],
+  "requiredR2Bindings": ["MEDIA"]
+}

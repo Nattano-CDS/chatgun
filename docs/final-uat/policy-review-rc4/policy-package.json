@@ -1,0 +1,14 @@
+{
+  "status": "DRAFT_NOT_APPROVED",
+  "ownerDirectiveComment": 6473130647,
+  "productionDocumentsChanged": false,
+  "rc3DocumentsPreserved": true,
+  "documents": {
+    "adultNotice": {"version":"adult-social-always-on-uat-2026-10-28-rc4","path":"policies/final-uat/always-on-rc4/beta-notice.html","sha256":"40fc351a36f4152b1be777e36d80f2ce3ed758dcf3e8787ff498bba7d7d0f33a"},
+    "terms": {"version":"terms-social-always-on-uat-2026-10-28-rc4","path":"policies/final-uat/always-on-rc4/terms.html","sha256":"05e29c0bf3add6c9c265f4c0f88ef8a233d6671d615c74a3abef89f450236cc3"},
+    "privacy": {"version":"privacy-social-always-on-uat-2026-10-28-rc4","path":"policies/final-uat/always-on-rc4/privacy.html","sha256":"e21371102282875933be8cf9349880c82dc9cd9a9762e6e34248907c6a0e79b1"},
+    "deletion": {"version":"deletion-social-always-on-uat-2026-10-28-rc4","path":"policies/final-uat/always-on-rc4/data-deletion.html","sha256":"7d880152078a479a42574bb846609911b67b857205c6c200dee98bff525915cd"}
+  },
+  "activation": {"requiresPrivateOwnerApproval":true,"requiresBothParticipantsAlwaysOnConsent":true,"realActivationAllowed":false},
+  "retention": {"logicalCleanupWithinDaysAfterActualClose":7,"minimumAuditEvidenceRetentionDays":90,"minimumAuditEvidenceRetentionStartsAt":"actual-explicit-close","backupPhysicalErasurePromised":false}
+}

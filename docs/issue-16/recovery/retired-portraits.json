@@ -1,0 +1,88 @@
+{
+  "checkedAt": "2026-10-18T06:18:37.605Z",
+  "origin": "https://chatgun.social",
+  "sha": "6c824ab0ecf5e70f414e7d34d74b7abe7bae3a8c",
+  "passed": 20,
+  "checks": [
+    {
+      "path": "/assets/demo/01.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/02.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/03.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/04.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/05.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/06.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/07.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/08.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/09.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/10.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/11.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/12.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/13.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/14.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/15.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/16.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/17.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/18.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/19.png",
+      "status": 404
+    },
+    {
+      "path": "/assets/demo/20.png",
+      "status": 404
+    }
+  ]
+}

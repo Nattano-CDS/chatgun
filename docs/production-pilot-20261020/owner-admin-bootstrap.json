@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-10-20T04:01:46.501Z",
+  "account": "23017b53386fb67fc62a52cdd017454c",
+  "database": "9738a051-d914-42d0-8e7b-8098ef2b959d",
+  "roles": [
+    "report_reviewer",
+    "safety_admin"
+  ],
+  "days": 7,
+  "expiresAt": 1793073705,
+  "grantCount": 2,
+  "auditEvents": 2,
+  "ownerPrivateUuidReconfirmed": true,
+  "backupSha256": "49b3c1cc26123559759614c0c7ad30bb7ac6ca102ef3cd67abedce9207d7b952",
+  "backupPermissions": "0700 directory / 0600 files",
+  "backupRestoredLocally": true,
+  "rolesExcluded": [
+    "moderation_admin",
+    "identity_reviewer"
+  ],
+  "otherFeatureFlagsUnchanged": true,
+  "existingUserPreserved": true
+}

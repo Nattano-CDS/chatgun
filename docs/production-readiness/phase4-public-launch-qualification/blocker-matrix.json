@@ -1,0 +1,109 @@
+{
+  "version": 2,
+  "recordedAt": "2026-10-30T15:14:15Z",
+  "phase1PublicLaunchWithoutMedia": "NO-GO",
+  "fullPublicLaunch": "NO-GO",
+  "productionMutations": 0,
+  "blockers": [
+    {
+      "id": 1,
+      "name": "Public Social policy approval",
+      "status": "BLOCKED — OWNER/QUALIFIED REVIEW REQUIRED",
+      "evidence": "Five complete public drafts and exact hashes exist; status remains DRAFT_NOT_APPROVED_NOT_PUBLISHED.",
+      "requiredAction": "Review and explicitly approve or reject the exact five public-policy bytes and hashes; publish only after approval.",
+      "responsibleParty": "Owner and qualified legal/privacy reviewer",
+      "ownerIntervention": true,
+      "verification": "Signed exact-version/hash receipt plus byte/hash equality in the release artifact"
+    },
+    {
+      "id": 2,
+      "name": "Google OAuth public qualification",
+      "status": "BLOCKED — OWNER CONSOLE/HUMAN AUTH REQUIRED",
+      "evidence": "RC6a proves a genuine allowlisted Google UAT identity, returning session and account mapping on the exact UAT SHA; it does not prove public publication or exact-RC new-user enrollment.",
+      "requiredAction": "Verify Production OAuth consent-screen publication, exact callback and minimum scopes; then run genuine new-user, returning-user, cancellation/error and session-recovery journeys on the release candidate.",
+      "responsibleParty": "Owner/provider-console administrator",
+      "ownerIntervention": true,
+      "verification": "Redacted console evidence and sanitized backend identity/session evidence from genuine flows"
+    },
+    {
+      "id": 3,
+      "name": "Facebook qualification and LINE public revalidation",
+      "status": "BLOCKED — OWNER CONSOLE/HUMAN AUTH REQUIRED",
+      "evidence": "RC6a proves genuine LINE UAT returning access and identity mapping. Dedicated Facebook UAT metadata says unpublished and genuineOAuth NOT RUN. Private UAT is not public-provider approval.",
+      "requiredAction": "Verify Meta Live/App Review/test-role state and LINE channel publication, exact Production callbacks and minimum scopes; run genuine Facebook new/returning flows and a LINE public-candidate reauthentication/error smoke.",
+      "responsibleParty": "Owner/provider-console administrator",
+      "ownerIntervention": true,
+      "verification": "Redacted provider-console evidence and sanitized genuine-flow results"
+    },
+    {
+      "id": 4,
+      "name": "Exact-RC isolated Friends/Messaging UAT",
+      "status": "CLEARED — PASS",
+      "evidence": "RC6a SHA 38804ae940203108ee08abb98f2a521559501413; relationship E2E 11/11 PASS; CI 8/8; focused 19/19; full unit 331/331; schema22/FK0; 15 messages preserved.",
+      "requiredAction": "Preserve the evidence; rerun only if relevant application/configuration changes.",
+      "responsibleParty": "Release operator",
+      "ownerIntervention": false,
+      "verification": "Pinned UAT artifact hash, exact policy hashes, D1 aggregate fingerprint and CI URLs"
+    },
+    {
+      "id": 5,
+      "name": "Physical iOS Safari and Android Chrome",
+      "status": "BLOCKED — PHYSICAL DEVICES/OWNER ACTION REQUIRED",
+      "evidence": "Desktop browsers and responsive automation passed, but neither is physical-device evidence.",
+      "requiredAction": "Run the prepared minimal checklist on one real iPhone/iPad Safari and one real Android Chrome device, including genuine OAuth, keyboard/safe-area, reconnect, scrolling, Friends, Messaging and block/unblock.",
+      "responsibleParty": "Owner/device test operator",
+      "ownerIntervention": true,
+      "verification": "Sanitized device/OS/browser/timestamp record and observed PASS/FAIL for every checklist row"
+    },
+    {
+      "id": 6,
+      "name": "Moderation, escalation, incidents and independent appeals",
+      "status": "BLOCKED — OPERATING OWNERS NOT ASSIGNED",
+      "evidence": "Least-privilege technical workflows and runbook exist; the only known coverage is 19:00–22:00 Asia/Bangkok and no independent reviewer/backup is confirmed.",
+      "requiredAction": "Name and train primary moderation, backup/out-of-hours escalation, independent appeals, privacy/deletion and incident-command owners; approve truthful response targets.",
+      "responsibleParty": "Owner/operations leadership",
+      "ownerIntervention": true,
+      "verification": "Named ownership roster, acknowledgement, escalation drill and coverage calendar"
+    },
+    {
+      "id": 7,
+      "name": "Cleanup schedules, monitoring, alerting and cost controls",
+      "status": "BLOCKED — SCHEDULES/ALERT OWNERSHIP NOT ACTIVE",
+      "evidence": "UAT privacy/media cleanup Workers exist but currently have zero schedules. Account alert-policy read was unavailable with current read-only credentials; no ChatGun alert routing or cost thresholds are proven.",
+      "requiredAction": "Approve and configure cleanup schedules, alert destinations, responders, escalation, storage/request thresholds and billing limits; run a controlled alert-delivery and cleanup-retry test before public intake.",
+      "responsibleParty": "Owner, privacy operator and infrastructure/on-call owner",
+      "ownerIntervention": true,
+      "verification": "Read-only schedule/policy evidence plus observed test alert and cleanup completion/retry evidence"
+    },
+    {
+      "id": 8,
+      "name": "Media operational readiness",
+      "status": "DEFERRED FOR PHASE 1; BLOCKED FOR FULL LAUNCH",
+      "evidence": "Private/quarantine/deletion controls have isolated coverage, but public moderation/scanning, appeals and staffing are not approved.",
+      "requiredAction": "Keep Media disabled for Phase 1. For full launch, approve the operating/scanning model, staff moderation and appeals, test quarantine/revocation/deletion, and authorize Media separately.",
+      "responsibleParty": "Owner, safety/moderation and privacy operations",
+      "ownerIntervention": true,
+      "verification": "Separate exact-scope approval and genuine isolated Media E2E with operational evidence"
+    },
+    {
+      "id": 9,
+      "name": "GitHub main protection and stacked-PR integration",
+      "status": "BLOCKED — REPOSITORY ADMIN ACTION REQUIRED",
+      "evidence": "main is unprotected; rulesets list is empty. PR #25 is Draft/clean/mergeable but targets PR #24, not main. The release branch is 178 commits ahead and 0 behind main; 3,393 files differ.",
+      "requiredAction": "Review the ordered dependency chain, choose an integration branch/merge sequence, reconcile conflicting stale PRs, apply the proposed main ruleset and verify required checks at the final integration head.",
+      "responsibleParty": "Repository owner/maintainer",
+      "ownerIntervention": true,
+      "verification": "GitHub ruleset API, protected main, reviewed ancestry and all required checks green on the final main-targeting PR"
+    },
+    {
+      "id": 10,
+      "name": "Dependabot and Dependency Review",
+      "status": "BLOCKED — REPOSITORY SECURITY SETTINGS DISABLED",
+      "evidence": "Dependabot configuration exists, but security updates are disabled, the alerts endpoint returns disabled, the dependency graph/SBOM is unavailable, and Dependency Review remains proposed rather than active. npm audit reports zero vulnerabilities; CodeQL and secret scanning have zero open alerts.",
+      "requiredAction": "Enable dependency graph, Dependabot alerts and security updates; activate the pinned Dependency Review workflow and require its green check on protected main.",
+      "responsibleParty": "Repository owner/security administrator",
+      "ownerIntervention": true,
+      "verification": "GitHub security API shows enabled controls and a real Dependency Review check passes"
+    }
+  ]
+}

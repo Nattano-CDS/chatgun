@@ -1,0 +1,454 @@
+
+ ⛅️ wrangler 4.151.1
+────────────────────
+Resource location: remote 
+
+Migrations to be applied:
+┌───────────────────────────────────────┐
+│ name                                  │
+├───────────────────────────────────────┤
+│ 0001_auth.sql                         │
+├───────────────────────────────────────┤
+│ 0002_privacy_safety.sql               │
+├───────────────────────────────────────┤
+│ 0003_social.sql                       │
+├───────────────────────────────────────┤
+│ 0004_moderation_audit.sql             │
+├───────────────────────────────────────┤
+│ 0005_trust_safety.sql                 │
+├───────────────────────────────────────┤
+│ 0006_media_review_concurrency.sql     │
+├───────────────────────────────────────┤
+│ 0007_controlled_beta.sql              │
+├───────────────────────────────────────┤
+│ 0008_post_oauth_acceptance.sql        │
+├───────────────────────────────────────┤
+│ 0009_media_moderation.sql             │
+├───────────────────────────────────────┤
+│ 0010_moderation_access_management.sql │
+├───────────────────────────────────────┤
+│ 0011_daily_media_upload_quotas.sql    │
+├───────────────────────────────────────┤
+│ 0012_synthetic_seed_batches.sql       │
+├───────────────────────────────────────┤
+│ 0013_direct_chat_private_albums.sql   │
+└───────────────────────────────────────┘
+? About to apply 13 migration(s)
+Your database may not be available to serve requests during the migration, continue?
+🤖 Using fallback value in non-interactive context: yes
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 16 commands in 1.97ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 10 commands in 1.41ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 29 commands in 4.29ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 4 commands in 0.91ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 9 commands in 1.87ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 4 commands in 1.34ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 7 commands in 1.71ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 4 commands in 1.43ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 19 commands in 4.11ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 9 commands in 1.31ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 4 commands in 0.75ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ 🕒️    │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 7 commands in 1.13ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ 🕒️    │
+└───────────────────────────────────────┴────────┘
+🌀 Executing on remote database chatgun-issue13-staging (275d9820-6aec-494a-8bb5-b7ed9b8b74cc):
+🌀 To execute on your local development database, remove the --remote flag from your wrangler command.
+🚣 Executed 19 commands in 5.03ms
+┌───────────────────────────────────────┬────────┐
+│ name                                  │ status │
+├───────────────────────────────────────┼────────┤
+│ 0001_auth.sql                         │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0002_privacy_safety.sql               │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0003_social.sql                       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0004_moderation_audit.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0005_trust_safety.sql                 │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0006_media_review_concurrency.sql     │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0007_controlled_beta.sql              │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0008_post_oauth_acceptance.sql        │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0009_media_moderation.sql             │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0010_moderation_access_management.sql │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0011_daily_media_upload_quotas.sql    │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0012_synthetic_seed_batches.sql       │ ✅     │
+├───────────────────────────────────────┼────────┤
+│ 0013_direct_chat_private_albums.sql   │ ✅     │
+└───────────────────────────────────────┴────────┘

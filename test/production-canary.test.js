@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readFileSync, mkdtempSync, readdirSync } from "node:fs";
+import { readFileSync, mkdtempSync, readdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
@@ -22,17 +22,15 @@ test("public canary never publishes unapproved legal drafts", async () => {
   for (const path of ["/privacy","/privacy.html","/terms","/terms.html","/data-deletion","/data-deletion.html"]) {
     const response = await middleware({env:{PUBLIC_DEMO_CANARY_ENABLED:"true"},request:new Request(`https://chatgun.social${path}`),next(){throw Error("draft must not be published");}});
     assert.equal(response.status,200);
-    assert.match(await response.text(),/บุคคลและบทสนทนาสมมติ/u);
+    const body=await response.text();
+    assert.match(body,/กำลังเตรียมเปิดให้บริการ/u);
+    assert.doesNotMatch(body,/เปิดให้ชมด้วยบุคคล|กลับโหมดตัวอย่าง/u);
     assert.equal(response.headers.get("cache-control"),"no-store");
   }
 });
 
-test("public fixture has only explicit fictional fields and 120 Thai messages",()=>{
-  const fixture=JSON.parse(readFileSync("assets/demo/network.json","utf8"));
-  assert.equal(fixture.fictional,true);assert.equal(fixture.profiles.length,20);
-  assert.equal(fixture.conversations.length,10);assert.equal(fixture.conversations.reduce((n,c)=>n+c.messages.length,0),120);
-  assert.ok(fixture.profiles.every(p=>Object.keys(p).sort().join(",")==="bio,gender,interests,name,slug"));
-  assert.doesNotMatch(JSON.stringify(fixture),/token|csrf|subject|latitude|longitude|@/iu);
+test("public fictional network asset is removed",()=>{
+  assert.equal(existsSync('assets/demo/network.json'),false);
 });
 
 test("public build excludes test bundles, credentials, scripts and backups",()=>{
@@ -41,5 +39,5 @@ test("public build excludes test bundles, credentials, scripts and backups",()=>
   const names=readdirSync(directory);
   for(const forbidden of ["test-results","playwright-report","scripts","docs",".git",".dev.vars","functions","wrangler.jsonc"]) assert.ok(!names.includes(forbidden));
   assert.ok(names.includes("assets"));assert.ok(names.includes("app"));assert.ok(names.includes("signup.html"));
-  for(const file of ["privacy.html","terms.html","data-deletion.html"])assert.equal(readFileSync(join(directory,file),"utf8"),readFileSync("canary-notice.html","utf8"));
+  for(const file of ["privacy.html","terms.html","data-deletion.html"])assert.equal(readFileSync(join(directory,file),"utf8").replaceAll(/\?v=[a-f0-9]{40}/g,''),readFileSync("canary-notice.html","utf8"));
 });

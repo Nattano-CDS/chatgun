@@ -1,0 +1,214 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/26.5.0/bin/node",
+      "/Users/nattano/.codex/worktrees/chatgun-release-candidate/node_modules/.bin/playwright",
+      "test",
+      "e2e/gallery-approved-live.spec.js",
+      "--project=desktop-chromium",
+      "--reporter=list,json",
+      "--output=/tmp/chatgun-remediation-retry-only"
+    ],
+    "configFile": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/playwright.config.js",
+    "rootDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/tmp/chatgun-remediation-retry-only",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop-chromium",
+        "name": "desktop-chromium",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/tmp/chatgun-remediation-retry-only",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-chromium",
+        "name": "mobile-chromium",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/tmp/chatgun-remediation-retry-only",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "desktop-chromium",
+        "testDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "snapshotDir": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "https://issue13.chatgun-issue13-staging.pages.dev",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "screen": {
+            "width": 1920,
+            "height": 1080
+          },
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop-chromium"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "gallery-approved-live.spec.js",
+      "file": "gallery-approved-live.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "real isolated owner uploads use distinct server scopes, shared quota and quarantine",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-chromium",
+              "projectName": "desktop-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 13778,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeEnabled\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('[data-upload-submit]')\nExpected: enabled\nReceived: disabled\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeEnabled\" locator('[data-upload-submit]') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-upload-submit]')\u001b[22m\n\u001b[2m    24 × locator resolved to <button disabled class=\"primary\" data-upload-submit=\"\">กำลังบันทึก…</button>\u001b[22m\n\u001b[2m       - unexpected value \"disabled\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeEnabled\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('[data-upload-submit]')\nExpected: enabled\nReceived: disabled\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeEnabled\" locator('[data-upload-submit]') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-upload-submit]')\u001b[22m\n\u001b[2m    24 × locator resolved to <button disabled class=\"primary\" data-upload-submit=\"\">กำลังบันทึก…</button>\u001b[22m\n\u001b[2m       - unexpected value \"disabled\"\u001b[22m\n\n    at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-approved-live.spec.js:27:243",
+                    "location": {
+                      "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-approved-live.spec.js",
+                      "column": 243,
+                      "line": 27
+                    },
+                    "snippet": "  25 |     let savedId,lost=false;\n  26 |     const loseAck=async route=>{if(route.request().method()!=='POST'||lost)return route.continue();lost=true;const r=await route.fetch();expect(r.status()).toBe(201);savedId=(await r.json()).id;uploaded.push(savedId);await route.abort('failed');};\n> 27 |     await page.route('**/api/social/gallery',loseAck);await page.locator('[data-upload-submit]').click();await expect(page.locator('#gallery-upload-status')).toContainText('ไม่สำเร็จ 1 รูป');await expect(page.locator('[data-upload-submit]')).toBeEnabled();\n     |                                                                                                                                                                                                                                                   ^\n  28 |     const retry=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/social/gallery'&&r.request().method()==='POST');await page.locator('[data-upload-submit]').click();const replay=await retry;expect(replay.status()).toBe(201);expect((await replay.json()).id).toBe(savedId);await expect(page.locator('[data-upload-success]')).toBeVisible();\n  29 |     const quota=await (await context.request.get(baseURL+'/api/social/upload-quotas')).json();expect(quota.gallery.used).toBe(initialQuota.gallery.used+(retryOnly?1:3));\n  30 |   }finally{"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-approved-live.spec.js",
+                        "column": 243,
+                        "line": 27
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeEnabled\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('[data-upload-submit]')\nExpected: enabled\nReceived: disabled\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeEnabled\" locator('[data-upload-submit]') with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-upload-submit]')\u001b[22m\n\u001b[2m    24 × locator resolved to <button disabled class=\"primary\" data-upload-submit=\"\">กำลังบันทึก…</button>\u001b[22m\n\u001b[2m       - unexpected value \"disabled\"\u001b[22m\n\n\n  25 |     let savedId,lost=false;\n  26 |     const loseAck=async route=>{if(route.request().method()!=='POST'||lost)return route.continue();lost=true;const r=await route.fetch();expect(r.status()).toBe(201);savedId=(await r.json()).id;uploaded.push(savedId);await route.abort('failed');};\n> 27 |     await page.route('**/api/social/gallery',loseAck);await page.locator('[data-upload-submit]').click();await expect(page.locator('#gallery-upload-status')).toContainText('ไม่สำเร็จ 1 รูป');await expect(page.locator('[data-upload-submit]')).toBeEnabled();\n     |                                                                                                                                                                                                                                                   ^\n  28 |     const retry=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/social/gallery'&&r.request().method()==='POST');await page.locator('[data-upload-submit]').click();const replay=await retry;expect(replay.status()).toBe(201);expect((await replay.json()).id).toBe(savedId);await expect(page.locator('[data-upload-success]')).toBeVisible();\n  29 |     const quota=await (await context.request.get(baseURL+'/api/social/upload-quotas')).json();expect(quota.gallery.used).toBe(initialQuota.gallery.used+(retryOnly?1:3));\n  30 |   }finally{\n    at /Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-approved-live.spec.js:27:243"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-17T16:25:55.503Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/tmp/chatgun-remediation-retry-only/gallery-approved-live-real-26425-shared-quota-and-quarantine-desktop-chromium/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/tmp/chatgun-remediation-retry-only/gallery-approved-live-real-26425-shared-quota-and-quarantine-desktop-chromium/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/tmp/chatgun-remediation-retry-only/gallery-approved-live-real-26425-shared-quota-and-quarantine-desktop-chromium/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/nattano/.codex/worktrees/chatgun-release-candidate/e2e/gallery-approved-live.spec.js",
+                    "column": 243,
+                    "line": 27
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "5438366688c14a729dd5-3bd5fa9f7dcb6d42f191",
+          "file": "gallery-approved-live.spec.js",
+          "line": 5,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-17T16:25:55.263Z",
+    "duration": 14169.104,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

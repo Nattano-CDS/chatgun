@@ -1,0 +1,56 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+ExpectError: expect(locator).toHaveCount(expected) failed
+
+Locator:  locator('#people-grid .photo-card')
+Expected: 16
+Received: 17
+Timeout:  5000ms
+
+Call log:
+  - Expect "toHaveCount" locator('#people-grid .photo-card') with timeout 5000ms
+  - waiting for locator('#people-grid .photo-card')
+    4 × locator resolved to 0 elements
+      - unexpected value "0"
+    10 × locator resolved to 17 elements
+       - unexpected value "17"
+
+    at captureRawStack (/Users/nattano/.codex/worktrees/chatgun-release-candidate/node_modules/playwright-core/lib/coreBundle.js:9282:17)
+    at callMatcherAsStep (/Users/nattano/.codex/worktrees/chatgun-release-candidate/node_modules/playwright/lib/matchers/expect.js:13316:57)
+    at Object.toHaveCount (/Users/nattano/.codex/worktrees/chatgun-release-candidate/node_modules/playwright/lib/matchers/expect.js:13308:23)
+    at /Users/nattano/.codex/worktrees/chatgun-release-candidate/scripts/verify-production-components.mjs:16:81 {
+  matcherResult: {
+    actual: 17,
+    expected: 16,
+    message: 'expect(locator).toHaveCount(expected) failed\n' +
+      '\n' +
+      "Locator:  locator('#people-grid .photo-card')\n" +
+      'Expected: 16\n' +
+      'Received: 17\n' +
+      'Timeout:  5000ms\n' +
+      '\n' +
+      'Call log:\n' +
+      `  - Expect "toHaveCount" locator('#people-grid .photo-card') with timeout 5000ms\n` +
+      "  - waiting for locator('#people-grid .photo-card')\n" +
+      '    4 × locator resolved to 0 elements\n' +
+      '      - unexpected value "0"\n' +
+      '    10 × locator resolved to 17 elements\n' +
+      '       - unexpected value "17"\n',
+    name: 'toHaveCount',
+    pass: false,
+    log: [
+      `  - Expect "toHaveCount" locator('#people-grid .photo-card') with timeout 5000ms`,
+      "  - waiting for locator('#people-grid .photo-card')",
+      '    4 × locator resolved to 0 elements',
+      '      - unexpected value "0"',
+      '    10 × locator resolved to 17 elements',
+      '       - unexpected value "17"'
+    ],
+    timeout: 5000,
+    ariaSnapshot: undefined
+  }
+}
+
+Node.js v26.5.0
