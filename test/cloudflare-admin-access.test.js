@@ -122,6 +122,18 @@ test('Access key service outages fail closed; a token cannot supply an alternate
   } finally { globalThis.fetch = originalFetch; }
 });
 
+test('bare Admin namespace redirects only safe reads into the Access-protected session route', async () => {
+  const enabled = { ADMIN_ACCESS_STANDALONE_ENABLED: 'true' };
+  for (const method of ['GET', 'HEAD']) {
+    const response = await adminRequest({ env: enabled, request: new Request('https://chatgun.social/api/admin?untrusted=1', { method }) });
+    assert.equal(response.status, 302);
+    assert.equal(response.headers.get('location'), '/api/admin/session');
+    assert.equal(response.headers.get('cache-control'), 'private, no-store, max-age=0');
+  }
+  assert.equal((await adminRequest({ env: enabled, request: new Request('https://chatgun.social/api/admin', { method: 'POST' }) })).status, 404);
+  assert.equal((await adminRequest({ env: {}, request: new Request('https://chatgun.social/api/admin') })).status, 404);
+});
+
 test('standalone Access login needs no LINE/member cookie, retains RBAC/CSRF, and logout rejects assertion replay', async () => {
   const db = new TestD1(), originalFetch = globalThis.fetch;
   const issuer = 'https://chatgun-standalone-test.cloudflareaccess.com';
@@ -136,7 +148,9 @@ test('standalone Access login needs no LINE/member cookie, retains RBAC/CSRF, an
     });
     const call = (path, ...args) => adminRequest({ env, request: req(path, ...args) });
     assert.equal((await call('session')).status, 403, 'A valid Access identity without a role cannot start');
-    await db.prepare("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES('standalone-role',?,'safety_admin','Local Access fixture only',?,?)").bind(config.userId, now, now + 3600).run();
+    await db.prepare("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES('expired-role',?,'report_reviewer','Expired local Access fixture only',?,?)").bind(config.userId, now - 7200, now - 3600).run();
+    assert.equal((await call('session')).status, 403, 'An expired role cannot start an Admin session');
+    await db.prepare("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES('standalone-role',?,'moderation_admin','Local Access fixture only',?,?)").bind(config.userId, now, now + 3600).run();
     let response = await call('session'); assert.equal(response.status, 200);
     const challenge = await response.json(); assert.equal(challenge.authenticated, false);
     assert.equal(response.headers.get('set-cookie'), null);
@@ -145,7 +159,10 @@ test('standalone Access login needs no LINE/member cookie, retains RBAC/CSRF, an
     assert.equal((await call('session', { action: 'start' }, challenge.csrfToken, 'https://attacker.example.test')).status, 403);
     response = await call('session', { action: 'start' }, challenge.csrfToken); assert.equal(response.status, 200);
     const login = await response.json(); assert.equal(login.authenticated, true); assert.equal(login.recentlyAuthenticated, false);
-    assert.equal((await call('overview')).status, 200, 'Routine dashboard needs no repeated member OAuth');
+    assert.equal((await call('overview')).status, 403, 'moderation_admin cannot read the reviewer overview');
+    const capabilities = await (await call('capabilities')).json();
+    assert.deepEqual({ manage: capabilities.canManageRoles, reports: capabilities.canReviewReports, media: capabilities.canReviewMedia },
+      { manage: true, reports: false, media: false }, 'moderation_admin grants role management only');
     assert.equal((await call('reports')).status, 400, 'Exceptional purpose is still mandatory');
     const reports = new Request(req('reports'), { headers: { 'cf-access-jwt-assertion': jwt, 'x-moderation-purpose': 'Inspect local fixture reports only' } });
     response = await adminRequest({ env, request: reports }); assert.equal(response.status, 403);
@@ -156,7 +173,12 @@ test('standalone Access login needs no LINE/member cookie, retains RBAC/CSRF, an
     response = await adminRequest({ env, request: req('session', { action: 'start' }, freshChallenge.csrfToken, undefined, freshJwt) });
     const fresh = await response.json(); assert.equal(fresh.recentlyAuthenticated, true);
     const freshReports = new Request(req('reports', undefined, undefined, undefined, freshJwt), { headers: { 'cf-access-jwt-assertion': freshJwt, 'x-moderation-purpose': 'Inspect local fixture reports only' } });
-    assert.equal((await adminRequest({ env, request: freshReports })).status, 200);
+    assert.equal((await adminRequest({ env, request: freshReports })).status, 403,
+      'fresh authentication does not let moderation_admin inspect reports');
+    await db.prepare("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES('standalone-safety',?,'safety_admin','Separate local review fixture only',?,?)").bind(config.userId, now, now + 3600).run();
+    assert.equal((await adminRequest({ env, request: freshReports })).status, 200,
+      'private reports require the separate safety_admin role');
+    assert.equal((await call('overview')).status, 200, 'reviewer overview requires a separate review role');
     assert.equal((await db.prepare('SELECT COUNT(*) n FROM sessions').first()).n, 0);
     assert.equal((await db.prepare('SELECT COUNT(*) n FROM identities').first()).n, 0);
     assert.equal((await authRequest({ env, request: new Request('https://chatgun.pages.dev/api/auth/me', { headers: { 'cf-access-jwt-assertion': jwt } }) })).status, 401, 'Admin assertion is not a member login');
@@ -166,7 +188,7 @@ test('standalone Access login needs no LINE/member cookie, retains RBAC/CSRF, an
     const retry = await (await call('session')).json();
     assert.equal((await call('session', { action: 'start' }, retry.csrfToken)).status, 403, 'Logged-out assertion cannot revive a session');
     assert.equal(await cleanupAdminAccessSessions(db, now + 1000), 0, 'Do not delete revocation tombstones before assertion expiry');
-    await db.prepare("UPDATE moderation_access_grants SET revoked_at=?,revocation_reason='Local revocation test only' WHERE id='standalone-role'").bind(now).run();
+    await db.prepare("UPDATE moderation_access_grants SET revoked_at=?,revocation_reason='Local revocation test only' WHERE id IN ('standalone-role','standalone-safety')").bind(now).run();
     assert.equal((await adminRequest({ env, request: freshReports })).status, 403);
     await db.prepare('UPDATE cloudflare_admin_sessions SET authenticated_at=?,created_at=?,expires_at=? WHERE revoked_at IS NULL AND user_id=?').bind(now-3601,now-3600,now-1,config.userId).run();
     assert.equal((await adminRequest({env,request:req('session',{action:'logout'},fresh.csrfToken,undefined,freshJwt)})).status,200,'Own-session logout remains possible after role revocation');

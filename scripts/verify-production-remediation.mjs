@@ -3,16 +3,26 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
+import { verifyProductionPreservation } from './verify-production-preservation.mjs';
 
 const sha256 = path => createHash('sha256').update(readFileSync(path)).digest('hex');
 const config = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'));
 const production = config.env.production;
 assert.equal(production.vars.DEPLOYMENT_ENVIRONMENT, 'production');
 assert.equal(production.vars.ADMIN_CLOUDFLARE_ACCESS_REQUIRED, 'true');
-for (const flag of ['OAUTH_LOGIN_ENABLED', 'NEW_ACCOUNT_REGISTRATION_ENABLED', 'SOCIAL_APP_ENABLED',
-  'MESSAGING_ENABLED', 'MEDIA_UPLOAD_ENABLED', 'MODERATION_TOOLS_ENABLED', 'ACCOUNT_MODERATION_ENABLED']) {
+// The existing Production LINE owner pilot is an approved state that this
+// verifier must preserve, not silently close. Restricted public and social
+// capabilities remain closed independently.
+assert.equal(production.vars.OAUTH_LOGIN_ENABLED, 'true');
+assert.equal(production.vars.OAUTH_ENABLED_PROVIDERS, 'line');
+assert.equal(production.vars.SOCIAL_APP_ENABLED, 'true');
+assert.equal(production.vars.MODERATION_TOOLS_ENABLED, 'true');
+for (const flag of ['NEW_ACCOUNT_REGISTRATION_ENABLED', 'MESSAGING_ENABLED', 'MEDIA_UPLOAD_ENABLED',
+  'ACCOUNT_MODERATION_ENABLED', 'PUBLIC_DISCOVERY_ENABLED', 'PRESENCE_ENABLED', 'SENSITIVE_CONTENT_ENABLED']) {
   assert.equal(production.vars[flag], 'false', flag);
 }
+const fingerprint = JSON.parse(readFileSync('docs/production-readiness/phase6/production-owner-pilot-fingerprint.json', 'utf8'));
+assert.equal(verifyProductionPreservation(production.vars, fingerprint).result, 'PASS');
 assert.equal(production.d1_databases[0].migrations_dir, 'migrations/production');
 
 const lane = readdirSync('migrations/production').filter(name => name.endsWith('.sql')).sort();

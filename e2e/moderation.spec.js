@@ -8,8 +8,12 @@ test.beforeAll(() => mkdirSync(screenshotDirectory, { recursive: true }));
 test.beforeEach(() => { overviewRequests.length = 0; });
 
 test.beforeEach(async ({ page }) => {
+  await page.route('**/api/social/config',route=>route.fulfill({json:{socialAppEnabled:true,moderationToolsEnabled:true,accountModerationEnabled:false,adminAccessStandaloneEnabled:false}}));
   await page.route("**/api/social/moderation/**", async (route) => {
     const request = route.request(); const url = new URL(request.url());
+    if (url.pathname === "/api/social/moderation/capabilities") {
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ canReviewReports: true, canReviewMedia: true, canReviewEligibility: false, canInspectMembers: false, canManageRoles: false, canModerateAccounts: false }) });
+    }
     if (url.pathname === "/api/social/moderation/overview") {
       overviewRequests.push(request.headers());
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
@@ -67,6 +71,35 @@ test('standalone Cloudflare Admin bootstrap uses its own namespace and CSRF with
   await expect(page.locator('#admin-access-logout')).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:resolve(screenshotDirectory,`admin-access-standalone-${testInfo.project.name}.png`),fullPage:true});
+});
+
+test('standalone least-privilege role administrator opens role management without report or media access', async ({page}) => {
+  let active=false, overviewCalls=0, rolePurpose='';
+  await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:true,moderationToolsEnabled:true,accountModerationEnabled:false,adminAccessStandaloneEnabled:true}}));
+  await page.route('**/api/admin/**',async r=>{
+    const url=new URL(r.request().url());
+    if(url.pathname==='/api/admin/session'){
+      if(r.request().method()==='POST')active=true;
+      return r.fulfill({json:{authentication:'cloudflare_access',authenticated:active,csrfToken:'local-role-admin-challenge'}});
+    }
+    expect(active).toBe(true);
+    if(url.pathname==='/api/admin/capabilities')return r.fulfill({json:{canReviewReports:false,canReviewMedia:false,canReviewEligibility:false,canInspectMembers:false,canManageRoles:true,canModerateAccounts:false}});
+    if(url.pathname==='/api/admin/overview'){overviewCalls+=1;return r.fulfill({status:403,json:{message:'Role administrator cannot inspect moderation overview'}});}
+    if(url.pathname==='/api/admin/roles'){
+      rolePurpose=decodeURIComponent(r.request().headers()['x-moderation-purpose']||'');
+      return r.fulfill({json:{grants:[],events:[]}});
+    }
+    return r.fulfill({status:404,json:{message:'Not a local role-admin fixture route'}});
+  });
+  page.once('dialog',dialog=>dialog.accept('Review approved administrator role grants'));
+  await page.goto('/app/moderation.html');
+  await expect(page.locator('#moderation-status')).toContainText('โหลดข้อมูลเรียบร้อยแล้ว');
+  await expect(page.getByRole('button',{name:'สิทธิ์ผู้ดูแล'})).toBeVisible();
+  await expect(page.getByRole('button',{name:'รายงานผู้ใช้'})).toBeHidden();
+  await expect(page.getByRole('button',{name:'รอตรวจ'})).toBeHidden();
+  await expect(page.getByRole('button',{name:'ให้สิทธิ์ที่มีวันหมดอายุ'})).toBeVisible();
+  expect(overviewCalls).toBe(0);
+  expect(rolePurpose).toBe('Review approved administrator role grants');
 });
 
 test("admin dashboard opens routine overview automatically and requires justification for restricted evidence", async ({ page }, testInfo) => {
