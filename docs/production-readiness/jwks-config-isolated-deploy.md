@@ -43,11 +43,11 @@ node scripts/pages-isolated-release.mjs \
   --project chatgun \
   --before /private/pages-immediate-predeploy.json \
   --current /private/pages-after.json \
-  --fingerprint docs/production-readiness/phase6/production-owner-pilot-fingerprint.json \\
+  --fingerprint docs/production-readiness/phase6/production-owner-pilot-fingerprint.json \
   --sha ed9df39081d2b0a6e2a0ea1ef3815e720a8a5bd4
 ```
 
-This performs a strict configuration comparison and requires Cloudflare's canonical Production deployment commit SHA to exactly match but **does not** independently inspect remote assets, secret contents or runtime behavior; these remain separately required checks.
+This performs a strict configuration comparison and requires Cloudflare's canonical Production deployment commit SHA to exactly match the requested SHA, but **does not** independently inspect remote assets, secret contents or runtime behavior; these remain separately required checks.
 
 ## Role grants: read-only and identity-free query
 
