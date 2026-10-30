@@ -3,8 +3,34 @@ dist/
 coverage/
 playwright-report/
 test-results/
+.phase8-evidence/
+artifacts/
+blob-report/
+*.trace.zip
+client_secret_*.json
+**/private-handoff*.json
+docs/generated-evidence/
+docs/**/performance-measurements.json
 .wrangler/
 .dev.vars
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+# Keep full redundant regression screenshots locally; commit the Gallery package
+# and actual isolated-cloud evidence rather than repeating older NEAR reports.
+/docs/gallery-approved/screens/preview/account/
+/docs/gallery-approved/screens/preview/cleanup/
+/docs/gallery-approved/screens/preview/icons/
+/docs/gallery-approved/screens/preview/owner/
+/docs/gallery-approved/screens/preview/self/
+/docs/gallery-approved/screens/preview/albums/*
+!/docs/gallery-approved/screens/preview/albums/real-owner-request-*.png
+/docs/gallery-approved/screens/production-tests/cleanup/
+/docs/gallery-approved/screens/production-tests/owner/
+/docs/gallery-approved/screens/production-tests/albums/
+/docs/gallery-approved/screens/production-tests/self/
+/docs/gallery-approved/screens/production-tests/icons/*
+!/docs/gallery-approved/screens/production-tests/icons/desktop-chromium-390-locked-unlocked.png
+/docs/gallery-remediation/screens/local/
+/docs/gallery-remediation/screens/preview/albums/*
+!/docs/gallery-remediation/screens/preview/albums/real-owner-request-*.png

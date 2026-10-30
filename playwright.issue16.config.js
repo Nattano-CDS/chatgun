@@ -1,0 +1,2 @@
+import {defineConfig} from '@playwright/test';
+export default defineConfig({testDir:'e2e',testMatch:'issue16-*.spec.js',workers:1,retries:0,timeout:45000,reporter:[['list'],['json',{outputFile:'docs/issue-16/local-playwright.json'}]],use:{baseURL:'https://localhost:8797',ignoreHTTPSErrors:true,screenshot:'only-on-failure',trace:'retain-on-failure'},outputDir:'test-results/issue16',webServer:{command:'node scripts/serve-issue16-local.mjs',url:'https://localhost:8797/api/health',ignoreHTTPSErrors:true,reuseExistingServer:false,timeout:30000}});

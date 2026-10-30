@@ -4,13 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>ChatGun · เพื่อนใกล้คุณ</title>
-  <meta name="description" content="ค้นหาเพื่อนใกล้เคียง แชทเมื่อเป็นเพื่อนกัน และส่งความคิดเห็นส่วนตัว">
+  <meta name="description" content="ค้นหาเพื่อนใกล้เคียง แชทโดยตรงอย่างปลอดภัย และส่งความคิดเห็นส่วนตัว">
   <link rel="icon" href="/favicon.svg">
   <link rel="stylesheet" href="/app/social.css">
   <link rel="stylesheet" href="/app/near-v91.css">
   <link rel="stylesheet" href="/app/restoration.css">
-  <script defer src="/app/demo-network.js"></script>
-  <script defer src="/app/social.js"></script>
+  <link rel="stylesheet" href="/app/near-components.css">
+  <link rel="stylesheet" href="/app/gallery-approved.css">
+  <link rel="stylesheet" href="/app/online-presence.css">
+  <script defer src="/app/gallery-approved.js"></script>
+  <script defer src="/app/near-icons.js"></script>
+  <script defer src="/app/near-components.js"></script>
+  <script type="module" src="/app/social.js"></script>
 </head>
 <body>
   <div id="app" class="app" aria-busy="true">
@@ -19,7 +24,7 @@
       <p class="brand-caption">เพื่อนใกล้คุณ</p>
       <nav id="primary-nav" aria-label="เมนูหลัก">
         <button data-tab="near" aria-label="หาเพื่อน" class="active"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-compass" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path></svg></span><b>หาเพื่อน</b></button>
-        <button data-tab="friends" aria-label="เพื่อน"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg></span><b>เพื่อน</b><em id="request-badge" hidden></em></button>
+        <button id="friends-nav" data-tab="friends" aria-label="เพื่อน" hidden><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.74"></path></svg></span><b>เพื่อน</b><em id="request-badge" hidden></em></button>
         <button data-tab="chat" aria-label="แชท"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path></svg></span><b>แชท</b><em id="message-badge" hidden></em></button>
         <button data-tab="reviews" aria-label="ความคิดเห็น"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg></span><b>ความคิดเห็น</b></button>
         <button data-tab="profile" aria-label="โปรไฟล์"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span><b>โปรไฟล์</b></button>
@@ -29,14 +34,16 @@
 
     <main>
       <div id="global-status" class="status" role="status" aria-live="polite">กำลังโหลด ChatGun…</div>
+      <section id="section-recovery" class="panel" hidden aria-label="ข้อมูลบางส่วนโหลดไม่สำเร็จ"><p id="section-recovery-message" role="status"></p><button type="button" class="secondary" id="section-retry">ลองโหลดข้อมูลที่ขาดอีกครั้ง</button></section>
 
       <section id="disabled-view" class="empty" hidden>
         <img src="/logo.svg" alt="" width="72">
-        <h1>ChatGun Social ยังไม่เปิดใช้งาน</h1>
-        <p>ระบบอยู่ระหว่างการทดสอบในสภาพแวดล้อม Preview ที่แยกจาก Production</p>
-        <button id="demo-start" class="secondary" type="button" hidden>ลองโหมดสาธิตแบบไม่บันทึกลงเซิร์ฟเวอร์</button>
-        <a class="primary" href="/account.html">กลับไปบัญชี</a>
+        <h1>ChatGun กำลังเตรียมเปิดให้บริการ</h1>
+        <p id="service-status">ยังไม่เปิดรับสมาชิกหรือใช้งานบริการสังคมออนไลน์ ไม่มีการแสดงสมาชิกหรือบทสนทนาตัวอย่าง</p>
+        <a class="primary" href="/welcome">เกี่ยวกับ ChatGun</a>
+        <button id="service-retry" type="button" class="secondary" hidden>ลองเชื่อมต่ออีกครั้ง</button>
       </section>
+      <section id="retired-demo" class="panel retired-demo" hidden aria-label="สำรองและลบข้อมูลตัวอย่างเดิม"></section>
 
       <section id="onboarding-view" class="onboarding" hidden>
         <div class="onboarding-panel">
@@ -55,6 +62,7 @@
       </section>
 
       <section id="social-view" hidden>
+        <section id="always-on-uat-notice" class="panel" hidden aria-label="เวลาการเข้าถึงและการดูแล UAT"><strong>Private UAT สำหรับผู้ปฏิบัติการหนึ่งคนผ่าน LINE และ Google ที่ได้รับอนุญาต เข้าได้ตลอด 24 ชั่วโมง</strong><p>นี่คือ dual-account functional testing ไม่ใช่การทดสอบโดยมนุษย์สองคน ผู้ดูแลตรวจเฉพาะ 19:00–22:00 น. Asia/Bangkok รายงานนอกช่วงจะเข้าคิว ไม่มีการตอบสนองฉุกเฉินหรือการดูแลตลอด 24 ชั่วโมง</p></section>
         <header class="toolbar">
           <div class="toolbar-context"><a class="toolbar-brand" href="/"><img src="/logo.svg" alt=""><b>ChatGun</b></a><h1 id="page-title">หาเพื่อน</h1></div>
           <div class="discovery-controls">
@@ -63,13 +71,11 @@
             <div class="filter-row" aria-label="ตัวกรองการค้นหา">
               <label><span>เพศ</span><select id="gender-filter" aria-label="เพศ"><option>ทั้งหมด</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option><option>ไม่ระบุ</option></select></label>
               <label><span>ความสนใจ</span><select id="interest-filter" aria-label="ความสนใจ"><option value="">ทั้งหมด</option></select></label>
-              <label><span>เพื่อน</span><select id="relationship-filter" aria-label="สถานะเพื่อน"><option value="all">ทั้งหมด</option><option value="friend">เพื่อน</option><option value="not-friend">ยังไม่เป็นเพื่อน</option></select></label>
-              <label><span>ระยะ</span><select id="radius-filter" aria-label="ระยะค้นหา"><option value="100">100 ม.</option><option value="1000">1 กม.</option><option value="5000" selected>5 กม.</option></select></label>
+              <label><span>ระยะโดยประมาณ</span><select id="radius-filter" aria-label="ระยะค้นหา"><option value="500">ภายในประมาณ 500 ม.</option><option value="1000">1 กม.</option><option value="5000" selected>5 กม.</option></select></label>
             </div>
           </div>
-          <div class="toolbar-actions"><button id="refresh" class="icon-button" aria-label="รีเฟรช">↻</button><a class="icon-button" href="/account.html" aria-label="บัญชี">⚙</a></div>
         </header>
-        <div id="demo-banner" class="demo-banner" hidden><div><strong>โหมดตัวอย่าง</strong><span>บุคคลและบทสนทนาสมมติ · บันทึกเฉพาะในเบราว์เซอร์</span></div><a class="secondary" href="/signup">บัญชี</a><button class="demo-info" type="button" aria-label="ข้อมูลเกี่ยวกับโหมดตัวอย่าง">ข้อมูลสมมติ</button></div>
+        <div id="discovery-control-storage" hidden></div>
 
         <div id="near-tab" class="tab-view">
           <section id="location-banner" class="location-banner">
@@ -78,43 +84,63 @@
             <button id="location-toggle" class="lime">เปิดตำแหน่ง</button>
           </section>
           <div class="section-heading"><h2>คนใกล้คุณ <span id="people-count">0</span></h2></div>
-          <div id="people-grid" class="people-grid"></div>
+          <div id="people-grid" class="people-grid near-components"></div>
           <nav id="discovery-pagination" class="discovery-pagination" aria-label="หน้ารายชื่อเพื่อน"></nav>
-          <div class="rules"><div><svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg><strong>เป็นเพื่อนก่อนแชท</strong><p>เริ่มคุยเมื่อทั้งสองคนยอมรับ</p></div><div><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg><strong>คะแนนจากคนใกล้ตัว</strong><p>คนละ 1 ครั้งต่อวัน ในระยะ 100 ม.</p></div><div><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><strong>ความคิดเห็นส่วนตัว</strong><p>เจ้าของโปรไฟล์เท่านั้นที่อ่านได้</p></div></div>
+          <button id="discovery-more" class="secondary" type="button" hidden>โหลดรายชื่อเพิ่มเติม</button>
+          <div class="rules"><div><svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg><strong>แชทได้ทันที</strong><p>เคารพความเป็นส่วนตัวและการบล็อก</p></div><div><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg><strong>คะแนนจากคนใกล้ตัว</strong><p>คนละ 1 ครั้งต่อวัน ในระยะ 100 ม.</p></div><div><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><strong>ความคิดเห็นส่วนตัว</strong><p>เจ้าของโปรไฟล์เท่านั้นที่อ่านได้</p></div></div>
         </div>
 
-        <div id="friends-tab" class="tab-view" hidden><p class="subtitle">การเชื่อมต่อที่ทั้งสองคนเลือก</p><h2>คำขอเป็นเพื่อน</h2><div id="requests-grid" class="people-grid"></div><h2>เพื่อน</h2><div id="friends-grid" class="people-grid"></div></div>
+
+        <div id="friends-tab" class="tab-view near-components" hidden>
+          <h2>คำขอเป็นเพื่อน</h2>
+          <div id="requests-grid" class="people-grid"></div>
+          <h2>เพื่อน</h2>
+          <div id="friends-grid" class="people-grid"></div>
+        </div>
 
         <div id="chat-tab" class="tab-view" hidden>
-          <div class="chat-layout"><aside id="conversation-list" class="conversation-list"></aside><section id="thread" class="thread"><div class="empty"><h2>เลือกเพื่อนเพื่อเริ่มแชท</h2></div></section></div>
+          <div class="chat-layout"><aside id="conversation-list" class="conversation-list"></aside><section id="thread" class="thread"><div class="empty"><h2>เลือกสมาชิกเพื่อเริ่มแชท</h2></div></section></div>
         </div>
 
-        <div id="reviews-tab" class="tab-view" hidden><p class="subtitle">▣ มีเพียงคุณที่อ่านความคิดเห็นเหล่านี้ได้</p><div id="reviews-list"></div></div>
+        <div id="reviews-tab" class="tab-view" hidden><p class="subtitle">▣ มีเพียงคุณที่อ่านความคิดเห็นเหล่านี้ได้</p><div id="reviews-list"></div><button id="reviews-more" type="button" class="secondary" hidden>โหลดความคิดเห็นเพิ่มเติม</button></div>
 
-        <div id="profile-tab" class="tab-view" hidden>
+        <div id="profile-tab" class="tab-view near-components" hidden>
           <p class="subtitle">แนะนำตัวในแบบที่เป็นคุณ</p>
-          <form id="profile-form" class="panel form-grid profile-form">
+          <form id="profile-form" class="panel profile-form">
             <div id="profile-avatar" class="avatar large" aria-label="รูปโปรไฟล์ของคุณ"></div>
             <label>ชื่อที่แสดง<input name="name" maxlength="50" required></label>
             <label>เพศ<select name="gender"><option>ไม่ระบุ</option><option>ชาย</option><option>หญิง</option><option>เกย์</option><option>ทอม</option><option>ดี้</option><option>เลสเบี้ยน</option><option>ไบเซ็กชวล</option><option>นอนไบนารี</option><option>อื่น ๆ</option></select></label>
             <label class="wide">เกี่ยวกับคุณ<textarea name="bio" maxlength="250"></textarea></label>
             <label class="wide">ความสนใจ<input name="interests" maxlength="100"></label>
-            <button class="primary" type="submit">บันทึกโปรไฟล์</button><button id="manage-gallery" class="primary" type="button">อัปโหลดรูปโปรไฟล์และ Gallery</button><button id="view-own-profile" class="secondary" type="button">ดูโปรไฟล์และแกลเลอรี</button><button id="hide-discovery" class="secondary" type="button">ปิดการหาเพื่อนและลบตำแหน่ง</button>
-            <button id="notification-toggle" class="secondary wide" type="button">เปิดการแจ้งเตือนข้อความในอุปกรณ์นี้</button>
+            <button class="primary" type="submit">บันทึกโปรไฟล์</button><button id="manage-gallery" class="primary" type="button">อัปโหลดรูปโปรไฟล์และ Gallery</button><button id="view-own-profile" class="secondary" type="button">ดูโปรไฟล์และแกลเลอรี</button>
+            <button id="profile-verification" class="verify-cta" type="button" disabled title="การส่งหลักฐานยังไม่เปิดใช้งาน">ยืนยันตัวตน รับตรา Verify</button>
+            <button id="hide-discovery" class="secondary" type="button">ปิดการหาเพื่อนและลบตำแหน่ง</button>
+            <label class="wide"><input id="direct-contact-toggle" type="checkbox" checked> <span id="direct-contact-label">รับข้อความโดยตรงจากสมาชิกที่มีสิทธิ์ (ปิดได้ทุกเมื่อ)</span></label>
+            <label class="wide" id="online-preference" hidden><input id="online-status-toggle" type="checkbox"> แสดงสถานะออนไลน์ <small>ปิดไว้เป็นค่าเริ่มต้น แยกจากการแชร์ตำแหน่ง</small></label>
+            <button id="notification-toggle" class="secondary wide" type="button">เปิดการแจ้งเตือนขณะเปิดแอป</button>
+            <small class="wide">การแจ้งเตือนนี้ทำงานขณะเปิด ChatGun ไม่ใช่ Push เมื่อปิดแอป และไม่ดึงข้อความในแท็บเบื้องหลัง</small>
+            <a id="moderation-link" class="secondary wide" href="/app/moderation.html" hidden>ศูนย์ดูแลและรายงาน</a>
+            <div id="blocked-list" class="blocked-users"></div>
           </form>
-          <section class="panel gallery-panel">
-            <button id="gallery-settings-back" class="secondary" type="button">← กลับโปรไฟล์</button>
-            <div class="section-heading"><div><small>รูปโปรไฟล์และแกลเลอรี</small><h2>รูปภาพของคุณ</h2></div><span id="gallery-count">0 / 12</span></div>
-            <p id="gallery-upload-quota" class="upload-quota" aria-live="polite">แกลเลอรี: กำลังตรวจสอบโควตา…</p>
-            <form id="gallery-upload" class="upload-form" hidden>
-              <label>เลือกรูป JPG, PNG หรือ WebP ไม่เกิน 8 MB<input type="file" name="file" accept="image/jpeg,image/png,image/webp" required></label>
-              <label>คำบรรยาย<input name="caption" maxlength="300"></label>
-              <button class="primary" type="submit">อัปโหลดรูป</button>
-            </form>
-            <p id="gallery-disabled" class="subtitle">การอัปโหลดรูปยังไม่เปิดใช้งาน คุณยังดูรูปเดิมได้</p>
-            <div id="my-gallery" class="gallery-grid"></div>
+          <div class="toolbar-actions" aria-label="เครื่องมือบัญชี ChatGun"><button id="refresh" class="icon-button" aria-label="รีเฟรช">↻</button><a class="icon-button" href="/account.html" aria-label="บัญชี">⚙</a></div>
+          <section class="gallery-panel upload-page">
+            <header class="upload-header"><button id="gallery-settings-back" type="button" aria-label="กลับไปโปรไฟล์">←</button><a class="toolbar-brand" href="/"><img src="/logo.svg" alt="">ChatGun</a><h1>จัดการรูป</h1></header>
+            <div class="upload-content">
+              <section class="upload-profile-panel"><div class="upload-cover" id="manage-cover"></div><div><h2 id="manage-owner"></h2><p>รูปโปรไฟล์ของคุณ</p><button class="secondary" data-choose-profile type="button">เปลี่ยนรูปโปรไฟล์</button></div></section>
+              <section class="upload-editor">
+                <div class="upload-kind" role="group" aria-label="ประเภทของรูป"><button type="button" class="selected" data-upload-kind="profile" aria-pressed="true">รูปโปรไฟล์</button><button type="button" data-upload-kind="gallery" aria-pressed="false">Gallery</button></div>
+                <p id="gallery-upload-quota" class="upload-quota" aria-live="polite">แกลเลอรี: กำลังตรวจสอบโควตา…</p>
+                <form id="gallery-upload" class="upload-source-form" hidden>
+                  <input type="hidden" name="kind" value="profile">
+                  <label class="photo-drop"><span data-upload-preview></span><strong>เลือกรูปจากอุปกรณ์</strong><span>JPG, PNG หรือ WebP ไม่เกิน 8 MB</span><input type="file" name="file" accept="image/jpeg,image/png,image/webp" required></label>
+                  <div class="upload-pending" hidden><input class="upload-caption" name="caption" aria-label="คำบรรยายรูป" maxlength="300" placeholder="คำบรรยายรูป (ไม่บังคับ)"><div class="upload-save"><button class="secondary" type="button" data-cancel-upload>ยกเลิก</button><button class="primary" type="submit">บันทึกรูป</button></div></div>
+                </form>
+                <p id="gallery-disabled" class="subtitle">การอัปโหลดรูปยังไม่เปิดใช้งาน คุณยังดูรูปเดิมได้</p>
+                <small>รูปโปรไฟล์เก็บร่วมกับ Gallery · สูงสุด 12 รูป · รูปจริงรอผู้ดูแลตรวจ</small>
+              </section>
+              <section><div class="upload-gallery-title"><h2>รูปของคุณ</h2><span id="gallery-count">0 / 12</span></div><div id="my-gallery" class="manage-photo-grid"></div></section>
+            </div>
           </section>
-          <section class="panel blocked-panel"><h2>ผู้ใช้ที่คุณบล็อก</h2><div id="blocked-list"><p>ยังไม่มีผู้ใช้ที่บล็อก</p></div></section>
           <section id="media-moderation-panel" class="panel blocked-panel">
             <div class="section-heading"><div><small>ความปลอดภัยของสื่อ</small><h2>ผลการตรวจและคำอุทธรณ์</h2></div></div>
             <div id="appealable-media"><p class="subtitle">ไม่มีรูปที่ยื่นอุทธรณ์ได้</p></div>
@@ -136,7 +162,7 @@
   </div>
 
   <dialog id="discovery-filters" class="filter-dialog" aria-labelledby="filter-title"><button class="dialog-close" aria-label="ปิดตัวกรอง">×</button><h2 id="filter-title">ตัวกรองการค้นหา</h2><div class="filter-host"></div><footer><button class="secondary" data-clear-filters>ล้างตัวกรอง</button><button class="primary" data-apply-filters>แสดงผล</button></footer></dialog>
-  <dialog id="profile-dialog"><button class="dialog-close" aria-label="ปิด">←</button><div id="profile-dialog-content"></div></dialog>
+  <div id="profile-dialog" class="near-components" hidden><div id="profile-dialog-content"></div></div>
   <dialog id="rating-dialog"><button class="dialog-close" aria-label="ปิด">×</button><form id="rating-form"><h2>ให้คะแนน</h2><input type="hidden" name="target"><label>คะแนน<select name="score"><option value="5">5 ดาว</option><option value="4">4 ดาว</option><option value="3">3 ดาว</option><option value="2">2 ดาว</option><option value="1">1 ดาว</option></select></label><label>ความคิดเห็น<textarea name="comment" maxlength="500"></textarea></label><button class="primary">ส่งความคิดเห็น</button></form></dialog>
   <dialog id="report-dialog"><button class="dialog-close" aria-label="ปิด">×</button><form id="report-form"><h2>รายงานผู้ใช้</h2><input type="hidden" name="target"><label>ประเภท<select name="category"><option value="harassment">การคุกคาม</option><option value="threat">การข่มขู่หรืออันตรายเร่งด่วน</option><option value="ncii">ภาพส่วนตัวที่เผยแพร่โดยไม่ยินยอม</option><option value="child_safety">ความปลอดภัยของเด็ก</option><option value="spam">สแปม</option><option value="impersonation">แอบอ้างตัวตน</option><option value="sexual_content">เนื้อหาทางเพศ</option><option value="violence">ความรุนแรง</option><option value="privacy">ละเมิดความเป็นส่วนตัว</option><option value="other">อื่น ๆ</option></select></label><label>รายละเอียด<textarea name="details" maxlength="1000" required></textarea></label><p class="subtitle">ข้อมูลนี้ส่งให้ผู้ดูแลที่มีสิทธิ์เท่านั้น หากมีอันตรายเร่งด่วน โปรดติดต่อบริการฉุกเฉินในพื้นที่ก่อน</p><button class="primary">ส่งรายงาน</button></form></dialog>
   <dialog id="media-report-dialog"><button class="dialog-close" aria-label="ปิด">×</button><form id="media-report-form"><h2>รายงานรูปภาพ</h2><input type="hidden" name="mediaId"><label>เหตุผล<select name="reason"><option value="harassment">การคุกคาม</option><option value="ncii">ภาพส่วนตัวที่เผยแพร่โดยไม่ยินยอม</option><option value="minor_safety">ความปลอดภัยของผู้เยาว์</option><option value="sexual_content">เนื้อหาทางเพศ</option><option value="violence">ความรุนแรง</option><option value="privacy">ละเมิดความเป็นส่วนตัว</option><option value="spam">สแปม</option><option value="other">อื่น ๆ</option></select></label><label>รายละเอียด<textarea name="details" maxlength="1000" required></textarea></label><p class="subtitle">ผู้ถูกรายงานจะไม่เห็นตัวตนผู้รายงานจากเครื่องมือดูแลสื่อ</p><button class="primary">ส่งรายงานรูปภาพ</button></form></dialog>

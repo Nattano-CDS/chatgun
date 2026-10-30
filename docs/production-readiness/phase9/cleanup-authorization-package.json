@@ -1,0 +1,47 @@
+{
+  "status": "PROPOSED_NOT_AUTHORIZED",
+  "productionAccount": "23017b53386fb67fc62a52cdd017454c",
+  "productionDatabase": "9738a051-d914-42d0-8e7b-8098ef2b959d",
+  "requiredSchema": 21,
+  "privacyWorker": {
+    "name": "chatgun-privacy-cleanup-production",
+    "source": "workers/privacy-cleanup.js",
+    "sourceSha256": "9e7b65c31a8bbb6a59231adef789556c43d676fa1295060d9ce0ca926a4dbe9d",
+    "preparedConfig": "wrangler.cleanup-production-prepared.jsonc",
+    "preparedConfigSha256": "ae583afec518ce704ff6bb79ba0c31d0165ed46867b1d2793c5728f67f61277a",
+    "proposedCronUtc": "20 12 * * *",
+    "proposedBangkokSchedule": "daily 19:20 Asia/Bangkok",
+    "enableFlag": "RETENTION_CLEANUP_ENABLED",
+    "preVerificationValue": "false"
+  },
+  "mediaWorker": {
+    "name": "chatgun-media-cleanup-production",
+    "source": "workers/media-cleanup.js",
+    "sourceSha256": "9971b8dc05726caebf8a96a2fe207ed7ae970dece796195805a55a8f20ea9bb4",
+    "preparedConfig": "wrangler.media-cleanup-production-prepared.jsonc",
+    "preparedConfigSha256": "3316442e7e10ff39d6799d7bacfb6e1a5084b02c7023b2ba258740a5bd4a1373",
+    "proposedCronUtc": "*/15 12-14 * * *",
+    "proposedBangkokSchedule": "every 15 minutes from 19:00 through 21:45 Asia/Bangkok",
+    "enableFlag": "MEDIA_CLEANUP_ENABLED",
+    "preVerificationValue": "false"
+  },
+  "requiredAlerts": [
+    "worker invocation failure",
+    "one or more exhausted retries",
+    "oldest due queue item exceeds 24 hours",
+    "foreign-key violation is nonzero",
+    "unexpected deletion-count deviation"
+  ],
+  "requiredOwnerDecisions": [
+    "approve retention and deletion scope",
+    "approve both schedules",
+    "name alert destination and primary/backup responder",
+    "authorize deployment after schema21",
+    "authorize enable flags only after disabled post-deploy verification"
+  ],
+  "isolatedFocusedTests": {"passed": 25, "failed": 0},
+  "productionWorkersPresent": false,
+  "productionSchedules": [],
+  "productionMutations": 0,
+  "deploymentAuthorized": false
+}

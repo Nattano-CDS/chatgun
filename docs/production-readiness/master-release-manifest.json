@@ -1,0 +1,79 @@
+{
+  "manifestVersion": 1,
+  "decision": "NO-GO",
+  "scope": "restricted-line-owner-pilot-plus-separately-gated-admin",
+  "productionMutationCount": 0,
+  "baselineCandidateSha": "baf0d1406e4124b179420fc215bfc34e868b77f2",
+  "exactCandidateSha": {
+    "source": "git rev-parse HEAD after this manifest is committed",
+    "storage": "protected mode-0600 execution manifest",
+    "mustEqualPrHead": true,
+    "mustEqualDeploymentArtifact": true
+  },
+  "observedProduction": {
+    "applicationSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+    "schema": 17,
+    "writesDuringAssessment": 0
+  },
+  "targetSchema": 21,
+  "migrations": [
+    {"file": "0018_cloudflare_admin_sessions.sql", "sha256": "d7ab7d2a438ff1c5d3c3d83cdbf35b4b7837146af3898c282714d382a7e822d6"},
+    {"file": "0019_member_age_safety_holds.sql", "sha256": "696683be68db9f43efd0d62973173f28b1c4e916aca0adaaf887aab859d347e6"},
+    {"file": "0020_age_hold_write_guards.sql", "sha256": "ec4774ca2db46c4525b64fe5ca266040d70443b311400579e909009c767411b9"},
+    {"file": "0021_eligibility_review_requests.sql", "sha256": "0e4d2bfe7a3adcd5a86dc4f9ac6ebc5b1e21c2964aea23c709d19199586968a4"}
+  ],
+  "excludedMigration": "0022_always_on_private_uat_cohort.sql",
+  "releaseProfile": "docs/production-readiness/phase6/owner-pilot-preservation-profile.json",
+  "rollbackArtifact": "docs/production-readiness/rollback-artifact.json",
+  "consolidatedReport": "docs/production-readiness/master-production-release-gate.md",
+  "evidence": {
+    "nodeTests": {"passed": 292, "failed": 0},
+    "masterBrowserMatrix": {"chromium": 280, "firefox": 280, "webkit": 280, "failed": 0},
+    "dedicatedWebkit": {"passed": 105, "failed": 0},
+    "productionPreservation": {"passed": 25, "failed": 0},
+    "focusedAdminRbac": {"passed": 24, "failed": 0},
+    "dependencyVulnerabilities": 0,
+    "physicalIphone": "NOT RUN",
+    "genuineProductionOauth": "NOT RUN",
+    "genuineProductionRbac": "NOT RUN"
+  },
+  "requiredDisabledFeatures": [
+    "public-registration",
+    "public-discovery",
+    "messaging",
+    "media-upload",
+    "presence",
+    "ratings",
+    "sensitive-content",
+    "email-otp",
+    "mobile-otp",
+    "demo",
+    "account-moderation",
+    "identity-verification"
+  ],
+  "releaseBlockers": [
+    "bare-admin-path-not-edge-protected",
+    "fresh-protected-production-backup-not-run",
+    "production-schema-17",
+    "production-admin-settings-absent",
+    "production-role-bootstrap-not-authorized",
+    "genuine-production-access-rbac-not-run",
+    "fresh-line-console-and-login-verification-not-run",
+    "operations-and-cleanup-owners-unassigned",
+    "main-branch-unprotected",
+    "dependabot-security-updates-disabled",
+    "physical-iphone-not-run"
+  ],
+  "forbiddenWithoutSeparateApproval": [
+    "production-deployment",
+    "production-migration",
+    "production-restore",
+    "production-role-grant",
+    "production-secret-or-flag-change",
+    "cloudflare-access-policy-change",
+    "oauth-provider-change",
+    "repository-setting-change",
+    "pull-request-merge",
+    "public-feature-activation"
+  ]
+}

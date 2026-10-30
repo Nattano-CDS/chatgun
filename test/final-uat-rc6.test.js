@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { RC6_POLICY, buildPagesPlainEnvPatch, finalUatRc6Vars, validateFinalUatRc6Approval } from '../scripts/lib/final-uat-rc6.mjs';
+
+const identity = (reference, provider, digest) => ({ reference, provider, providerAccountReferencePrivate:'', providerAccountReferenceSha256:digest, operatorControlConfirmed:true, providerTesterEligible:true, uatUseAuthorized:true, mediaConsentUsed:false, chatgunUatIdentityDeletionAuthorized:reference==='B' });
+const receipt = () => ({scope:'final-uat-single-operator-dual-account-always-on-private',ownerAuthorizationComment:6473803567,policyApproved:true,applicationSha:'c'.repeat(40),policyVersions:RC6_POLICY.versions,policyFiles:RC6_POLICY.files,operations:{moderationCoverage:'19:00-22:00 Asia/Bangkok daily',no24x7OrBackupModeratorClaim:true,participantAccess:'24x7-until-explicit-owner-close-or-safety-kill-switch',accessRestrictedToModerationHours:false,automatic2200Shutdown:false,mediaEnabled:false,publicRegistrationEnabled:false,youthAdmissionEnabled:false,productionChangesAuthorized:false,retentionDecision:'campaign-plus-7-days-logical-cleanup-with-recovery-caveat',recoveryCaveatAcknowledged:true,auditEvidenceRetentionDays:90,auditEvidenceRetentionStartsAt:'actual-campaign-close',auditEvidenceScope:'strictly-necessary-minimized-security-audit-only',auditEvidencePhysicalBackupLimitClaimed:false,actualCampaignClosedAt:null,auditEvidenceExpiresAt:null,humanOperatorCount:1,authorizedIdentityCount:2,functionalE2EClassification:'single-operator-dual-account-not-independent-two-human-uat',externalProviderAccountDeletionAuthorized:false,productionLineIdentityDeletionAuthorized:false},window:{timezone:'Asia/Bangkok',start:'2026-10-29T19:00:00+07:00',end:'2026-10-29T22:00:00+07:00'},operator:{reference:'owner',singleHumanOperatorConfirmed:true,age20PlusConfirmed:true,dualDeviceControlConfirmed:true,controlsAllAuthorizedIdentitiesConfirmed:true,socialScopeConsent:true,locationScopeConsent:true,chatScopeConsent:true,presenceScopeConsent:true,privacyScopeConsent:true,disposableTestDataConsent:true,alwaysOnAccessConsent:true,outOfHoursModerationAcknowledged:true,mutualFriendsConsent:true},identities:[identity('A','line','a'.repeat(64)),identity('B','google','b'.repeat(64))],rc6Approval:{scope:'isolated-private-uat-only',bothOwnerControlledIdentities:true,approvedAt:'2026-10-30T15:00:00.000Z',approvalTextSha256:'d'.repeat(64)}});
+
+test('exact rc6 approval enables only mutual Friends in the existing private scope',()=>{
+  const value=receipt(); assert.equal(validateFinalUatRc6Approval(value),value);
+  const vars=finalUatRc6Vars(value); assert.equal(vars.FRIEND_REQUESTS_ENABLED,'true'); assert.equal(vars.MEDIA_UPLOAD_ENABLED,'false'); assert.equal(vars.NEW_ACCOUNT_REGISTRATION_ENABLED,'false'); assert.equal(vars.ADULT_NOTICE_VERSION,RC6_POLICY.versions.adultNotice);
+});
+test('rc6 consent and exact hashes fail closed',()=>{
+  for(const changed of [{...receipt(),operator:{...receipt().operator,mutualFriendsConsent:false}},{...receipt(),policyFiles:{...RC6_POLICY.files,bad:'x'}},{...receipt(),rc6Approval:{...receipt().rc6Approval,bothOwnerControlledIdentities:false}}]) assert.throws(()=>validateFinalUatRc6Approval(changed));
+});
+test('Pages activation patch contains only explicitly approved plain-text keys',()=>{
+  const current={
+    ADULT_NOTICE_VERSION:{type:'plain_text',value:'rc5'},
+    TERMS_VERSION:{type:'plain_text',value:'rc5'},
+    GOOGLE_CLIENT_SECRET:{type:'secret_text'},
+    RATE_LIMIT_PEPPER:{type:'secret_text'},
+  };
+  const patch=buildPagesPlainEnvPatch(current,{ADULT_NOTICE_VERSION:'rc6a',TERMS_VERSION:'rc6a'});
+  assert.deepEqual(patch,{
+    ADULT_NOTICE_VERSION:{type:'plain_text',value:'rc6a'},
+    TERMS_VERSION:{type:'plain_text',value:'rc6a'},
+  });
+  assert.equal('GOOGLE_CLIENT_SECRET' in patch,false);
+  assert.equal('RATE_LIMIT_PEPPER' in patch,false);
+  assert.throws(()=>buildPagesPlainEnvPatch(current,{GOOGLE_CLIENT_SECRET:'redacted'}));
+});

@@ -158,6 +158,10 @@ export async function confirmAccountDeletion(
         WHERE request_id = ? AND operation_id = ? AND status = 'processing'
       ) AND state IN ('active', 'pending_deletion')
     `).bind(operationId, timestamp, timestamp, requestId, operationId),
+    db.prepare(`UPDATE social_messages SET unsent_at=COALESCE(unsent_at,?)
+      WHERE body='' AND media_id IN(SELECT id FROM social_media WHERE owner_user_id=(
+        SELECT user_id FROM account_deletion_requests WHERE request_id=? AND operation_id=? AND status='processing'))
+    `).bind(timestamp,requestId,operationId),
     db.prepare(`
       INSERT INTO deletion_receipts(
         request_id, completed_at, policy_version, implementation_version, outcome, expires_at
@@ -194,7 +198,7 @@ export async function findOrCreateIdentity(
   profile,
   linkUserId,
   timestamp = unixTime(),
-  { allowRegistration = true, allowInvitationRegistration = false, invitationId = null } = {},
+  { allowRegistration = true, allowInvitationRegistration = false, invitationId = null, authorizedCohort = false } = {},
 ) {
   const existing = await db.prepare(
     `SELECT i.user_id, u.status FROM identities i JOIN users u ON u.id = i.user_id
@@ -237,7 +241,14 @@ export async function findOrCreateIdentity(
               last_claim_nonce = ?
           WHERE id = ? AND status = 'active' AND max_uses = 1
             AND expires_at > ? AND use_count < max_uses
-        `).bind(timestamp, claimNonce, invitationId, timestamp),
+            AND (? = 0 OR EXISTS (
+              SELECT 1 FROM uat_authorized_identities authorized
+              WHERE authorized.identity_ref = beta_invitations.uat_identity_ref
+                AND authorized.provider = ?
+                AND authorized.account_reference_sha256 = beta_invitations.uat_account_reference_sha256
+                AND authorized.user_id IS NULL AND authorized.revoked_at IS NULL
+            ))
+        `).bind(timestamp, claimNonce, invitationId, timestamp, authorizedCohort ? 1 : 0, profile.provider),
         db.prepare(`
           INSERT INTO users(id, email, email_verified_at, display_name, avatar_url, status, account_state, created_at, updated_at)
           SELECT ?, ?, ?, ?, ?, 'active', 'pending_acceptance', ?, ?
@@ -272,6 +283,14 @@ export async function findOrCreateIdentity(
           INSERT INTO beta_enrollments(user_id, invitation_id, status, created_at)
           SELECT ?, ?, 'pending_age', ? WHERE EXISTS (SELECT 1 FROM users WHERE id = ?)
         `).bind(userId, invitationId, timestamp, userId),
+        db.prepare(`
+          UPDATE uat_authorized_identities
+          SET invitation_id = ?, user_id = ?, provider_subject_sha256 = ?, enrolled_at = COALESCE(enrolled_at, ?)
+          WHERE ? = 1 AND identity_ref = (SELECT uat_identity_ref FROM beta_invitations WHERE id = ?)
+            AND provider = ?
+            AND account_reference_sha256 = (SELECT uat_account_reference_sha256 FROM beta_invitations WHERE id = ?)
+            AND user_id IS NULL AND revoked_at IS NULL
+        `).bind(invitationId, userId, await sha256(profile.subject), timestamp, authorizedCohort ? 1 : 0, invitationId, profile.provider, invitationId),
         ]);
       } catch (error) {
         // A concurrent callback for the same provider subject rolls this batch back.
@@ -284,20 +303,29 @@ export async function findOrCreateIdentity(
         return winner.user_id;
       }
       if (Number(results[0]?.meta?.changes || 0) !== 1) throw new Error("invitation_unavailable");
+      if (authorizedCohort && Number(results[4]?.meta?.changes || 0) !== 1) throw new Error("uat_cohort_denied");
       return userId;
     }
-    await db.prepare(`
-      INSERT INTO users(id, email, email_verified_at, display_name, avatar_url, status, account_state, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, 'active', 'pending_acceptance', ?, ?)
-    `).bind(
-      userId,
-      safeEmail,
-      safeEmail ? timestamp : null,
-      profile.name || null,
-      profile.picture || null,
-      timestamp,
-      timestamp,
-    ).run();
+    // Public registration has no invitation claim, but account + identity must
+    // still commit together. A failed/duplicate callback must leave no orphan.
+    try {
+      await db.batch([
+        db.prepare(`
+          INSERT INTO users(id,email,email_verified_at,display_name,avatar_url,status,account_state,created_at,updated_at)
+          VALUES(?,?,?,?,?,'active','pending_acceptance',?,?)
+        `).bind(userId,safeEmail,safeEmail?timestamp:null,profile.name||null,profile.picture||null,timestamp,timestamp),
+        db.prepare(`
+          INSERT INTO identities(provider,subject,user_id,provider_email,email_verified,created_at,last_login_at)
+          VALUES(?,?,?,?,?,?,?)
+        `).bind(profile.provider,profile.subject,userId,profile.email||null,profile.emailVerified?1:0,timestamp,timestamp),
+      ]);
+    } catch (error) {
+      const winner=await db.prepare(`SELECT i.user_id,u.status FROM identities i JOIN users u ON u.id=i.user_id
+        WHERE i.provider=? AND i.subject=?`).bind(profile.provider,profile.subject).first();
+      if(!winner||winner.status!=='active')throw error;
+      return winner.user_id;
+    }
+    return userId;
   }
 
   try {

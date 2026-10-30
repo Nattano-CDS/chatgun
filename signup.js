@@ -7,6 +7,8 @@ let turnstileReady = false;
 let turnstileSiteKey = null;
 let turnstileScript = null;
 let turnstileLoadTimer = null;
+const betaAdmission = window.ChatgunBetaAdmission.capture(window.location,window.history);
+let authConfig = null;
 
 const TURNSTILE_SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 const TURNSTILE_CONNECTION_MESSAGE = "ไม่สามารถเชื่อมต่อระบบยืนยันความปลอดภัยได้ โปรดตรวจสอบอินเทอร์เน็ต อนุญาต challenges.cloudflare.com ในตัวบล็อกเนื้อหา แล้วลองใหม่";
@@ -19,6 +21,8 @@ const ERROR_MESSAGES = {
   identity_linked: "บัญชีนี้เชื่อมกับสมาชิกคนอื่นแล้ว",
   registration_closed: "ขณะนี้เปิดให้เข้าสู่ระบบด้วยบัญชีเดิมเท่านั้น การสมัครใหม่จะเปิดหลังมาตรการคุ้มครองผู้เยาว์ได้รับอนุมัติ",
   oauth_failed: "ไม่สามารถเข้าสู่ระบบกับผู้ให้บริการนี้ได้ กรุณาลองใหม่",
+  invitation_invalid: "ลิงก์เชิญไม่ถูกต้องหรือหมดอายุ กรุณาติดต่อผู้ดูแล",
+  invitation_unavailable: "ลิงก์เชิญนี้ไม่พร้อมใช้งาน กรุณาติดต่อผู้ดูแล",
 };
 
 function message(text, ok = false) {
@@ -140,12 +144,14 @@ async function api(path, data) {
 document.querySelectorAll("[data-provider]").forEach((button) => {
   button.addEventListener("click", async () => {
     if (busy) return;
+    if(betaAdmission.error){message(ERROR_MESSAGES[betaAdmission.error]);return;}
     let token;
     try { token = turnstileToken(); } catch (error) { message(error.message); return; }
     lock(true);
     try {
       const result = await api(`/api/auth/oauth/${button.dataset.provider}/start`, {
         turnstileToken: token,
+        ...window.ChatgunBetaAdmission.requestFields(betaAdmission,authConfig),
       });
       const target = new URL(result.authorizationUrl);
       if (target.protocol !== "https:") throw new Error("ปลายทางเข้าสู่ระบบไม่ถูกต้อง");
@@ -162,13 +168,22 @@ async function initializeTurnstile() {
   try {
     const response = await fetch("/api/auth/config", { credentials: "same-origin" });
     const config = await response.json();
+    authConfig = config;
+    const providers=Array.isArray(config.oauthProviders)?config.oauthProviders:[];
+    document.querySelectorAll('[data-provider]').forEach(button=>{button.hidden=!providers.includes(button.dataset.provider);});
     if (config.oauthLoginEnabled === false) {
       document.querySelectorAll("[data-provider]").forEach(button => { button.disabled = true; });
-      $("auth-description").textContent = "การเข้าสู่บัญชีจริงยังไม่เปิดใช้งาน ขณะนี้เปิดให้ชมโหมดตัวอย่าง";
-      message("กลับหน้าแรกเพื่อทดลอง ChatGun ด้วยข้อมูลสมมติ");
+      $("auth-description").textContent = "ChatGun กำลังเตรียมเปิดให้บริการ ยังไม่เปิดรับสมาชิกหรือเข้าสู่บัญชี";
+      message("ระบบบัญชียังไม่พร้อมใช้งาน โปรดกลับมาตรวจสอบภายหลัง");
       return;
     }
     if (!response.ok || !config.turnstileSiteKey) throw new Error("ยังไม่ได้ตั้งค่าระบบตรวจสอบความปลอดภัย");
+    if(!providers.length){message("ยังไม่มีผู้ให้บริการเข้าสู่ระบบที่พร้อมใช้งาน กรุณาติดต่อผู้ดูแล");return;}
+    if(betaAdmission.error){message(ERROR_MESSAGES[betaAdmission.error]);return;}
+    if(betaAdmission.code&&config.invitationOnlyRegistrationEnabled&&!config.newAccountRegistrationEnabled){
+      $("auth-heading").textContent="เข้าร่วมการทดสอบ ChatGun";
+      $("auth-description").textContent="สำหรับผู้ได้รับเชิญอายุ 18 ปีขึ้นไป ยืนยันอายุและอ่านข้อกำหนดหลังเข้าสู่ระบบ";
+    }
     if (config.newAccountRegistrationEnabled) {
       $("auth-heading").textContent = "เข้าสู่ระบบหรือสร้างบัญชี";
       $("auth-description").textContent = "เลือกบัญชีโซเชียลที่คุณต้องการใช้กับ ChatGun";

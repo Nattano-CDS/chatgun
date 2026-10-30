@@ -1,0 +1,60 @@
+{
+  "repository": "Nattano-CDS/chatgun",
+  "pullRequest": 20,
+  "assessedReleaseContentSha": "25cb31d0c56ff95127180e04eb588d9ce4783175",
+  "productionBaselineSha": "a73ff21c615dabb6a0c19c0a22685c2370958ca1",
+  "productionSchema": 17,
+  "targetSchema": 21,
+  "productionPreservation": {"passed": 25, "total": 25},
+  "exactHeadChecks": {
+    "javascript": "PASS",
+    "local-regression": "PASS",
+    "Cloudflare Pages": "PASS",
+    "CodeQL": "PASS",
+    "webkit-regression": "PASS 102/102",
+    "master-matrix chromium": "PASS 272/272",
+    "master-matrix firefox": "PASS 272/272",
+    "master-matrix webkit": "PASS 272/272"
+  },
+  "focusedPhase9Tests": {"passed": 25, "failed": 0},
+  "fullLocalSuite": {"passed": 286, "failed": 0},
+  "migrationRehearsal": {
+    "result": "PASS",
+    "existingCountsPreserved": true,
+    "foreignKeyViolations": 0,
+    "schema22Excluded": true,
+    "schema17Restore": "PASS"
+  },
+  "productionFingerprint": {
+    "foreignKeyViolations": 0,
+    "users": 1,
+    "identities": 1,
+    "sessions": 7,
+    "messages": 0,
+    "media": 0,
+    "moderationGrants": 2,
+    "r2PublicDomains": 0,
+    "accessApplications": 0,
+    "cleanupWorkers": 0,
+    "writes": 0
+  },
+  "githubGovernance": {
+    "mainProtected": false,
+    "rulesets": 0,
+    "dependabotSecurityUpdates": false,
+    "secretScanning": true,
+    "pushProtection": true,
+    "openCodeScanningAlerts": 0
+  },
+  "blockersClosed": 5,
+  "blockersRemaining": 9,
+  "authorization": {
+    "deployment": false,
+    "migration": false,
+    "productionAccessChange": false,
+    "providerPublication": false,
+    "repositorySettings": false,
+    "cleanupDeployment": false
+  },
+  "decision": "NO-GO"
+}

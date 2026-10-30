@@ -79,6 +79,9 @@ test("retention cleanup removes only expired or aged security records", async ()
 
   const deleted = await runRetentionCleanup(database, now);
   assert.deepEqual(deleted, {
+    closedEligibilityReviews: 0,
+    administrationAccessEvents: 0,
+    accountSafetyNotifications: 0,
     oauthFlows: 1,
     betaInvitations: 1,
     sessions: 1,
@@ -88,6 +91,7 @@ test("retention cleanup removes only expired or aged security records", async ()
     deletionRequests: 0,
     deletionReceipts: 0,
     stalePresence: 1,
+    expiredOnlineLeases:0,
     revokedAgeAssurance: 1,
     completedMediaQueue: 1,
   });
@@ -266,6 +270,7 @@ test("provider reauthentication refreshes only the matching active session", asy
         aud: env.LINE_CLIENT_ID,
         nonce: expectedNonce,
         exp: Math.floor(Date.now() / 1000) + 300,
+        iat: Math.floor(Date.now() / 1000),
         sub: providerSubject,
         name: "Privacy Member",
       });
@@ -341,6 +346,7 @@ test("closed registration rejects an unknown provider identity without creating 
         aud: env.LINE_CLIENT_ID,
         nonce: expectedNonce,
         exp: Math.floor(Date.now() / 1000) + 300,
+        iat: Math.floor(Date.now() / 1000),
         sub: "unknown-line-user",
         name: "Unknown Member",
       });

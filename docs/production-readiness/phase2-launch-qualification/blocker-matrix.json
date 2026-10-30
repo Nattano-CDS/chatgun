@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "decision": "NO-GO",
+  "productionMutations": 0,
+  "blockers": [
+    {"id":1,"name":"Public Social policy approval","status":"BLOCKED — OWNER ACTION REQUIRED","technical":"Draft five-document package and hashes prepared","required":"Owner and qualified legal review of exact bytes"},
+    {"id":2,"name":"Google OAuth","status":"BLOCKED — OWNER ACTION REQUIRED","technical":"Callback, PKCE/nonce, linking and session tests pass","required":"Console publication/scope evidence and genuine login"},
+    {"id":3,"name":"Facebook OAuth and LINE revalidation","status":"BLOCKED — OWNER ACTION REQUIRED","technical":"Token-debug/provider validation and LINE OIDC tests pass","required":"Meta publication/App Review evidence and genuine Facebook/LINE login"},
+    {"id":4,"name":"Exact-RC isolated cloud UAT","status":"BLOCKED — OWNER ACTION REQUIRED","technical":"Code-only isolated deployment mechanism prepared; rc5 scope preserved","required":"Approve exact rc6 Friends policy/consent, then genuine owner-controlled flows"},
+    {"id":5,"name":"Physical devices","status":"BLOCKED — OWNER ACTION REQUIRED","technical":"Responsive/cross-device automation passed","required":"Real iOS Safari and Android Chrome execution"},
+    {"id":6,"name":"Moderation and appeals operations","status":"BLOCKED — OWNER ACTION REQUIRED","technical":"Least-privilege workflow and runbook prepared","required":"Assign named primary/backup/appeal/incident roles and coverage"},
+    {"id":7,"name":"Cleanup, monitoring and alerts","status":"BLOCKED — OWNER ACTION REQUIRED","technical":"Cleanup controls/tests and alert proposal prepared","required":"Approve schedules, destinations, ownership and cost thresholds"},
+    {"id":8,"name":"Media operational readiness","status":"BLOCKED — EXTERNAL DEPENDENCY","technical":"Private/quarantine/deletion controls tested in isolation","required":"Staff moderation/scanning and separate activation approval; keep disabled"},
+    {"id":9,"name":"GitHub main protection/integration","status":"BLOCKED — OWNER ACTION REQUIRED","technical":"Ruleset and ancestry audit prepared","required":"Resolve stacked PR integration and apply reviewed main ruleset"},
+    {"id":10,"name":"Dependabot monitoring","status":"BLOCKED — OWNER ACTION REQUIRED","technical":"Pinned dependency-review workflow and Dependabot config prepared","required":"Enable repository alerts/security updates and required check"}
+  ]
+}
