@@ -33,14 +33,20 @@ export function cloudflareAdminAccessConfiguration(env) {
 }
 
 function parseToken(token) {
-  if (typeof token !== 'string' || token.length > 16384) throw new Error('invalid_access_token');
-  const parts = token.split('.');
-  if (parts.length !== 3 || parts.some(part => !/^[A-Za-z0-9_-]+$/u.test(part))) throw new Error('invalid_access_token');
-  const header = JSON.parse(new TextDecoder().decode(decodeBase64Url(parts[0])));
-  const claims = JSON.parse(new TextDecoder().decode(decodeBase64Url(parts[1])));
-  if (header.alg !== 'RS256' || typeof header.kid !== 'string' || !header.kid || header.kid.length > 256
-    || header.crit !== undefined || header.b64 !== undefined) throw new Error('invalid_access_token');
-  return { header, claims, signature: decodeBase64Url(parts[2]), signed: new TextEncoder().encode(parts.slice(0, 2).join('.')) };
+  try {
+    if (typeof token !== 'string' || token.length > 16384) throw new Error('invalid');
+    const parts = token.split('.');
+    if (parts.length !== 3 || parts.some(part => !/^[A-Za-z0-9_-]+$/u.test(part))) throw new Error('invalid');
+    const header = JSON.parse(new TextDecoder().decode(decodeBase64Url(parts[0])));
+    const claims = JSON.parse(new TextDecoder().decode(decodeBase64Url(parts[1])));
+    if (header.alg !== 'RS256' || typeof header.kid !== 'string' || !header.kid || header.kid.length > 256
+      || header.crit !== undefined || header.b64 !== undefined) throw new Error('invalid');
+    return { header, claims, signature: decodeBase64Url(parts[2]), signed: new TextEncoder().encode(parts.slice(0, 2).join('.')) };
+  } catch {
+    // Parsing details are intentionally collapsed so callers cannot distinguish
+    // malformed token structure, JSON or protected-header contents.
+    throw new Error('invalid_access_claims');
+  }
 }
 
 function validateClaims(claims, config, now) {
@@ -62,9 +68,14 @@ export async function verifyCloudflareAccessJwt(token, config, jwks, now = Math.
   validateClaims(parsed.claims, config, now);
   const jwk = jwks?.keys?.find(key => key.kid === parsed.header.kid && key.kty === 'RSA'
     && (!key.alg || key.alg === 'RS256') && (!key.use || key.use === 'sig'));
-  if (!jwk) throw new Error('invalid_access_key');
-  const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
-  if (!await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, parsed.signature, parsed.signed)) throw new Error('invalid_access_signature');
+  if (!jwk) throw new Error('invalid_access_signature');
+  try {
+    const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+    if (!await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, parsed.signature, parsed.signed)) throw new Error('invalid');
+  } catch {
+    // Key-import and signature failures share one non-sensitive category.
+    throw new Error('invalid_access_signature');
+  }
   return { subject: parsed.claims.sub, expiresAt: parsed.claims.exp,
     // JWT issuance/refresh is NOT a new authentication. High-risk operations
     // remain blocked without signed, IdP-originated authentication-time evidence.
@@ -74,16 +85,20 @@ export async function verifyCloudflareAccessJwt(token, config, jwks, now = Math.
 async function trustedKeys(issuer) {
   if (cachedKeys?.issuer === issuer && cachedKeys.expiresAt > Date.now()) return cachedKeys.keys;
   // Never use jku/x5u/iss supplied by an unverified request as a fetch target.
-  const response = await fetch(`${issuer}/cdn-cgi/access/certs`, {
-    headers: { accept: 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(5000),
-  });
-  if (!response.ok) throw new Error('access_keys_unavailable');
-  const body = await response.text();
-  if (body.length > 65536) throw new Error('invalid_access_keys');
-  const keys = JSON.parse(body);
-  if (!Array.isArray(keys.keys) || keys.keys.length > 20) throw new Error('invalid_access_keys');
-  cachedKeys = { issuer, keys, expiresAt: Date.now() + 300000 };
-  return keys;
+  try {
+    const response = await fetch(`${issuer}/cdn-cgi/access/certs`, {
+      headers: { accept: 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) throw new Error('unavailable');
+    const body = await response.text();
+    if (body.length > 65536) throw new Error('unavailable');
+    const keys = JSON.parse(body);
+    if (!Array.isArray(keys.keys) || keys.keys.length > 20) throw new Error('unavailable');
+    cachedKeys = { issuer, keys, expiresAt: Date.now() + 300000 };
+    return keys;
+  } catch {
+    throw new Error('access_verification_unavailable');
+  }
 }
 
 export async function requireCloudflareAdminAccess(request, env, session) {
@@ -91,7 +106,7 @@ export async function requireCloudflareAdminAccess(request, env, session) {
   if (!config) return;
   // Binding both identities prevents a valid owner Access token being combined
   // with somebody else's ChatGun session. No grant is derived from an email.
-  if (session.user_id !== config.userId) throw new Error('access_owner_mismatch');
+  if (session.user_id !== config.userId) throw new Error('invalid_access_claims');
   const token = request.headers.get('cf-access-jwt-assertion');
   const parsed = parseToken(token);
   validateClaims(parsed.claims, config, Math.floor(Date.now() / 1000));

@@ -7,7 +7,7 @@ import { sanitizeImage } from "../../_lib/image.js";
 import { acceptanceFlowEnabled, currentAcceptance } from "../../_lib/acceptance.js";
 import { selfDeclaredAdult } from "../../_lib/age.js";
 import { requireCloudflareAdminAccess } from "../../_lib/cloudflare-admin-access.js";
-import { standaloneAdminEnabled, adminAccessContext, getAdminAccessSession, startAdminAccessSession, adminCsrfValid } from '../../_lib/cloudflare-admin-session.js';
+import { standaloneAdminEnabled, adminAccessContext, getAdminAccessSession, startAdminAccessSession, adminCsrfValid, logAdminAccessFailure } from '../../_lib/cloudflare-admin-session.js';
 import { canContact, albumGrant, canViewPhoto, publicPortrait, publicPortraitColumn, eligibleSql, unblockedSql } from "../../_lib/social-permissions.js";
 
 const LOCATION_FRESH_SECONDS = 120;
@@ -31,6 +31,12 @@ class SocialError extends Error {
     this.code = code;
     this.status = status;
   }
+}
+
+function adminAccessRequired(error, message) {
+  const denied = new SocialError('admin_access_required', message, 403);
+  denied.requestId = logAdminAccessFailure(error);
+  return denied;
 }
 
 function enabled(value) {
@@ -1063,14 +1069,14 @@ async function reports(request, env) {
 
 async function enforceAdminAccess(request, env, session) {
   try { await requireCloudflareAdminAccess(request, env, session); }
-  catch { throw new SocialError('admin_access_required', 'กรุณาเข้าสู่ระบบผู้ดูแลผ่าน Cloudflare Access ด้วยบัญชีที่ได้รับอนุญาต', 403); }
+  catch (error) { throw adminAccessRequired(error, 'กรุณาเข้าสู่ระบบผู้ดูแลผ่าน Cloudflare Access ด้วยบัญชีที่ได้รับอนุญาต'); }
 }
 
 async function moderationSession(request, env) {
   if (!standaloneAdminEnabled(env)) return authenticated(request, env, { csrf: request.method === 'POST' });
   let context;
   try { context = await adminAccessContext(request, env); }
-  catch { throw new SocialError('admin_access_required', 'กรุณาเข้าสู่ระบบผู้ดูแลผ่าน Cloudflare Access', 403); }
+  catch (error) { throw adminAccessRequired(error, 'กรุณาเข้าสู่ระบบผู้ดูแลผ่าน Cloudflare Access'); }
   const session = await getAdminAccessSession(env, context);
   if (!session) throw new SocialError('admin_session_required', 'เซสชันผู้ดูแลหมดอายุ กรุณาออกจาก Cloudflare Access แล้วเข้าสู่ระบบใหม่', 401);
   if (request.method === 'POST') {
@@ -1085,7 +1091,7 @@ async function adminAccessLogin(request, env) {
   if (!standaloneAdminEnabled(env)) throw new SocialError('feature_disabled', 'ขั้นตอนนี้ยังไม่เปิดใช้งาน', 404);
   let context;
   try { context = await adminAccessContext(request, env); }
-  catch { throw new SocialError('admin_access_required', 'กรุณาเข้าสู่ระบบผู้ดูแลผ่าน Cloudflare Access ด้วยบัญชีที่ได้รับอนุญาต', 403); }
+  catch (error) { throw adminAccessRequired(error, 'กรุณาเข้าสู่ระบบผู้ดูแลผ่าน Cloudflare Access ด้วยบัญชีที่ได้รับอนุญาต'); }
   let session = await getAdminAccessSession(env, context);
   let body;
   if (request.method === 'POST') { requireSameOrigin(request); body = await readJson(request); }
@@ -2385,7 +2391,11 @@ export async function onRequest({ request, env }) {
     if (/age_safety_contact_denied/u.test(String(error?.message))) return failure('การติดต่อยังไม่ได้รับอนุญาตตามมาตรการช่วงอายุ',403,'age_safety_review_required');
     if (/direct_chat_(recipient_limit|duplicate)/u.test(String(error?.message))) return failure('ส่งข้อความซ้ำหรือติดต่อสมาชิกใหม่บ่อยเกินไป กรุณารอ',429,'chat_spam_limited');
     if (error instanceof RequestError) return failure("คำขอไม่ถูกต้อง", error.status, error.code);
-    if (error instanceof SocialError) return failure(error.message, error.status, error.code);
+    if (error instanceof SocialError) {
+      const response = failure(error.message, error.status, error.code);
+      if (error.requestId) response.headers.set('x-chatgun-request-id', error.requestId);
+      return response;
+    }
     console.error(JSON.stringify({ event: "social_request_failed", reason: "internal_error", type: error?.name === 'Error' ? 'Error' : 'Unhandled' }));
     return failure("ไม่สามารถดำเนินการได้ กรุณาลองใหม่", 500, "internal_error");
   }
