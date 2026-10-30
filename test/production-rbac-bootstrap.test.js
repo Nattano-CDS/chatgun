@@ -4,9 +4,38 @@ import test from 'node:test';
 import { TestD1 } from './helpers/d1.js';
 import {
   PRODUCTION_RBAC_SCHEMA, PRODUCTION_RBAC_TTL_SECONDS,
+  assertCloudflareAccountIdentity, assertCloudflareD1DatabaseIdentity,
+  assertCloudflarePagesD1Binding,
   assertProductionGrantInventory, assertProductionOwnerEligibility,
   productionGrantInventorySql, productionOwnerEligibilitySql, productionRbacBootstrapBatch,
 } from '../scripts/lib/production-rbac-bootstrap.mjs';
+
+const accountId = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const databaseUuid = '11111111-2222-4333-8444-555555555555';
+
+test('Cloudflare identity guards accept the actual account, D1, and Pages binding response fields', () => {
+  assert.equal(assertCloudflareAccountIdentity({ id: accountId }, accountId), true);
+  assert.equal(assertCloudflareD1DatabaseIdentity({ uuid: databaseUuid, name: 'chatgun-auth' }, databaseUuid, 'chatgun-auth'), true);
+  assert.equal(assertCloudflarePagesD1Binding({ id: databaseUuid }, databaseUuid), true);
+});
+
+for (const [condition, response] of [
+  ['missing UUID', { name: 'chatgun-auth' }],
+  ['malformed UUID', { uuid: 'not-a-uuid', name: 'chatgun-auth' }],
+  ['unexpected UUID', { uuid: 'db9c1d58-b34d-4a61-a2d1-b43642570f1e', name: 'chatgun-auth' }],
+  ['unexpected name', { uuid: databaseUuid, name: 'different-database' }],
+  ['ambiguous identifiers', { uuid: databaseUuid, id: 'db9c1d58-b34d-4a61-a2d1-b43642570f1e', name: 'chatgun-auth' }],
+]) {
+  test(`Cloudflare D1 identity guard fails closed for ${condition}`, () => {
+    assert.throws(() => assertCloudflareD1DatabaseIdentity(response, databaseUuid, 'chatgun-auth'));
+  });
+}
+
+test('related Cloudflare account and Pages binding guards fail closed for invalid fields', () => {
+  assert.throws(() => assertCloudflareAccountIdentity({ uuid: accountId }, accountId));
+  assert.throws(() => assertCloudflarePagesD1Binding({ uuid: databaseUuid }, databaseUuid));
+  assert.throws(() => assertCloudflarePagesD1Binding({ id: 'invalid' }, databaseUuid));
+});
 
 async function fixture() {
   const db = new TestD1({ throughMigration: '0021_eligibility_review_requests.sql' });

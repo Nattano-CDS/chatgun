@@ -4,6 +4,41 @@ export const PRODUCTION_RBAC_ROLE = 'moderation_admin';
 export const PRODUCTION_RBAC_TTL_SECONDS = 3600;
 export const PRODUCTION_RBAC_REASON = 'Owner-authorized one-hour Production moderation_admin bootstrap';
 
+const CLOUDFLARE_IDENTIFIER_PATTERN = /^[0-9a-f]{32}$/iu;
+const D1_UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+
+export function assertCloudflareAccountIdentity(response, expectedAccountId) {
+  assert.match(expectedAccountId, CLOUDFLARE_IDENTIFIER_PATTERN, 'Expected Cloudflare account ID is malformed');
+  assert.ok(response && typeof response === 'object' && !Array.isArray(response), 'Cloudflare account response is invalid');
+  assert.equal(typeof response.id, 'string', 'Cloudflare account ID is missing');
+  assert.match(response.id, CLOUDFLARE_IDENTIFIER_PATTERN, 'Cloudflare account ID is malformed');
+  assert.equal(response.id, expectedAccountId, 'Cloudflare account ID is unexpected');
+  return true;
+}
+
+export function assertCloudflareD1DatabaseIdentity(response, expectedUuid, expectedName) {
+  assert.match(expectedUuid, D1_UUID_PATTERN, 'Expected D1 UUID is malformed');
+  assert.ok(typeof expectedName === 'string' && expectedName.length > 0, 'Expected D1 name is invalid');
+  assert.ok(response && typeof response === 'object' && !Array.isArray(response), 'Cloudflare D1 response is invalid');
+  assert.equal(typeof response.uuid, 'string', 'Cloudflare D1 UUID is missing');
+  assert.match(response.uuid, D1_UUID_PATTERN, 'Cloudflare D1 UUID is malformed');
+  assert.equal(response.uuid, expectedUuid, 'Cloudflare D1 UUID is unexpected');
+  assert.equal(response.name, expectedName, 'Cloudflare D1 name is unexpected');
+  if (Object.hasOwn(response, 'id') && response.id != null) {
+    assert.equal(response.id, response.uuid, 'Cloudflare D1 identity fields are ambiguous');
+  }
+  return true;
+}
+
+export function assertCloudflarePagesD1Binding(binding, expectedUuid) {
+  assert.match(expectedUuid, D1_UUID_PATTERN, 'Expected Pages D1 UUID is malformed');
+  assert.ok(binding && typeof binding === 'object' && !Array.isArray(binding), 'Pages D1 binding is invalid');
+  assert.equal(typeof binding.id, 'string', 'Pages D1 binding ID is missing');
+  assert.match(binding.id, D1_UUID_PATTERN, 'Pages D1 binding ID is malformed');
+  assert.equal(binding.id, expectedUuid, 'Pages D1 binding ID is unexpected');
+  return true;
+}
+
 export const PRODUCTION_RBAC_SCHEMA = Object.freeze({
   users: ['id', 'status', 'account_state'],
   identities: ['provider', 'user_id'],

@@ -5,6 +5,8 @@ import { DatabaseSync } from 'node:sqlite';
 import { readFileSync, statSync, writeFileSync } from 'node:fs';
 import {
   PRODUCTION_RBAC_SCHEMA, PRODUCTION_RBAC_TTL_SECONDS,
+  assertCloudflareAccountIdentity, assertCloudflareD1DatabaseIdentity,
+  assertCloudflarePagesD1Binding,
   assertProductionGrantInventory, assertProductionOwnerEligibility,
   productionGrantInventorySql, productionOwnerEligibilitySql, productionRbacBootstrapBatch,
 } from './lib/production-rbac-bootstrap.mjs';
@@ -43,11 +45,11 @@ async function select(sql, params = []) {
   return result.results;
 }
 
-assert.equal((await api('')).id, account);
-assert.equal((await api(`/d1/database/${database}`)).name, 'chatgun-auth');
+assertCloudflareAccountIdentity(await api(''), account);
+assertCloudflareD1DatabaseIdentity(await api(`/d1/database/${database}`), database, 'chatgun-auth');
 const project = await api('/pages/projects/chatgun');
 assert.equal(project.canonical_deployment.deployment_trigger.metadata.commit_hash, expectedSha);
-assert.equal(project.deployment_configs.production.d1_databases.DB.id, database);
+assertCloudflarePagesD1Binding(project.deployment_configs.production.d1_databases.DB, database);
 for (const [table, required] of Object.entries(PRODUCTION_RBAC_SCHEMA)) {
   const columns = (await select(`PRAGMA table_info(${table})`)).map(column => column.name);
   for (const column of required) assert.ok(columns.includes(column), `${table}.${column} missing`);
