@@ -10,13 +10,16 @@
     "test:e2e": "playwright test",
     "test:e2e:phase6-cross-device": "playwright test --config=playwright.phase6-cross-device.config.js",
     "test:e2e:phase7-responsive": "playwright test --config=playwright.phase7-responsive.config.js",
+    "test:e2e:production-launch-rc": "playwright test --config=playwright.production-launch-rc.config.js",
     "test:performance:phase6": "node scripts/measure-phase6-performance.mjs",
     "test:performance:phase7": "CHATGUN_PERFORMANCE_OUTPUT=docs/production-readiness/phase7/performance-measurements.json node scripts/measure-phase6-performance.mjs",
     "audit:production-preservation": "node scripts/verify-production-preservation.mjs",
     "verify:production-preservation": "node scripts/verify-production-preservation.mjs --enforce",
     "verify:production-remediation": "node scripts/verify-production-remediation.mjs",
     "verify:production-activation": "node scripts/verify-production-activation-package.mjs",
-    "verify:master-production-release": "node scripts/verify-master-production-release.mjs"
+    "verify:master-production-release": "node scripts/verify-master-production-release.mjs",
+    "verify:full-launch-rc": "node scripts/verify-full-launch-rc.mjs",
+    "verify:phase2-launch": "node scripts/verify-phase2-launch-qualification.mjs"
   },
   "engines": {
     "node": ">=22.5"

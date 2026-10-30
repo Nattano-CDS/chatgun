@@ -177,15 +177,27 @@ try {
     hiddenSurfacePolling,
     mobileHorizontalOverflow: await page.evaluate(() => document.documentElement.scrollWidth > innerWidth),
   };
+  // Keep the latency sample and abuse-control assertion independent. A fresh
+  // synthetic actor makes the expected 30+1 boundary explicit and prevents
+  // an earlier browser navigation from making this release gate ambiguous.
+  const throttleContext = await browser.newContext({ baseURL: origin, ignoreHTTPSErrors: true });
+  for (const [name, value] of [['__Host-cg_session', sessions.other390.token], ['__Host-cg_csrf', sessions.other390.csrf]]) {
+    await throttleContext.addCookies([{ name, value, url: origin, secure: true, sameSite: 'Lax' }]);
+  }
   const preThrottle = [];
-  for (let index = iterations; index < 30; index += 1) preThrottle.push((await discoveryContext.request.get('/api/social/discovery')).status());
-  const throttleProbe = await discoveryContext.request.get('/api/social/discovery');
+  for (let index = 0; index < 30; index += 1) preThrottle.push((await throttleContext.request.get('/api/social/discovery')).status());
+  const throttleProbe = await throttleContext.request.get('/api/social/discovery');
   const discoveryRateLimit = {
     requestsBeforeProbe: 30,
     permittedStatuses: [...new Set(preThrottle)],
     probeStatus: throttleProbe.status(),
     result: preThrottle.every(status => status === 200) && throttleProbe.status() === 429 ? 'PASS' : 'FAIL',
   };
+  await throttleContext.close();
+  const releaseChecksPass = discoveryRateLimit.result === 'PASS'
+    && browserMetrics.hiddenSurfacePolling.messageRequests === 0
+    && browserMetrics.hiddenSurfacePolling.conversationRequests === 0
+    && browserMetrics.mobileHorizontalOverflow === false;
   const result = {
     measuredAt: new Date().toISOString(),
     environment: 'isolated local real-handler harness with synthetic identities, in-memory D1 and R2',
@@ -201,10 +213,11 @@ try {
       'physical-device rendering and radio latency',
     ],
     productionWrites: 0,
-    result: 'PASS',
+    result: releaseChecksPass ? 'PASS' : 'FAIL',
   };
   writeFileSync(output, `${JSON.stringify(result, null, 2)}\n`);
   console.log(JSON.stringify(result, null, 2));
+  if (!releaseChecksPass) process.exitCode = 1;
 } finally {
   await browser?.close();
   server.kill('SIGTERM');

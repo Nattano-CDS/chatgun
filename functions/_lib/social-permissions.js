@@ -14,12 +14,16 @@ export function unblockedSql(a,b) {
     (sb.blocker_user_id=${a} AND sb.blocked_user_id=${b}) OR
     (sb.blocker_user_id=${b} AND sb.blocked_user_id=${a}))`;
 }
-export async function canContact(db, viewer, target, {send=true}={}) {
+export async function canContact(db, viewer, target, {send=true, friendsOnly=false}={}) {
   if (!target || viewer===target) return false;
   return Boolean(await db.prepare(`SELECT 1 ok FROM member_profiles p WHERE p.user_id=?
     AND (?=0 OR p.direct_messages_enabled=1) AND ${eligibleSql('p.user_id')}
-    AND ${eligibleSql('?')} AND ${unblockedSql('?','p.user_id')}`)
-    .bind(target,send?1:0,viewer,viewer,viewer).first());
+    AND ${eligibleSql('?')} AND ${unblockedSql('?','p.user_id')}
+    AND (?=0 OR EXISTS(SELECT 1 FROM social_relationships relationship
+      WHERE relationship.status='accepted' AND (
+        (relationship.user_low=? AND relationship.user_high=p.user_id)
+        OR (relationship.user_low=p.user_id AND relationship.user_high=?))))`)
+    .bind(target,send?1:0,viewer,viewer,viewer,friendsOnly?1:0,viewer,viewer).first());
 }
 export async function albumGrant(db, viewer, owner) {
   if (viewer===owner) return true;

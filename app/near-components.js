@@ -13,24 +13,31 @@ window.ChatgunNearComponents = (() => {
   const action = (name, id, text, c, extra = '') => `<button class="${c || ''}" data-action="${name}" data-user="${id}" ${extra}>${text}</button>`;
   const online = (p,id,h) => `<span class="member-online-slot" data-online-user="${h(id||p.user_id||p.other_user_id||'')}"></span>`;
   function card({person:p,id,relation,incoming,context,html:h,portrait,distance,star,userPlus,canRate,rateDisabled,own=false,messagingEnabled=false}) {
+    const request = !own && (context === 'request' || context === 'sent');
     const body = `<article class="person photo-card person-card" data-person="${h(id)}">
       <a class="card-open" href="/app/people/${encodeURIComponent(id)}" data-person-open="${h(id)}" aria-label="เปิดโปรไฟล์ ${h(p.name)}"></a>
       <div class="card-photo">${portrait(p,false)}</div><div class="photo-shade"></div>
       ${own ? '<span class="self-card-badge">คุณ</span>' : `<span class="card-distance">${icon('pin',14)}${h(distance)}</span>`}
+      ${!own && incoming ? `<button class="incoming-bell" data-show-requests aria-label="${h(p.name)} ส่งคำขอเป็นเพื่อน">${userPlus}<span class="request-dot"></span></button>` : ''}
       <div class="person-details"><div class="person-top"></div>
         <div class="card-name-row"><span class="person-name">${h(p.name)}</span>${online(p,id,h)}${!own&&Number(p.identity_verified)===1?'<span class="verify-badge" role="img" aria-label="ผ่านการตรวจหลักฐานตัวตน · ไม่ใช่การรับรองพฤติกรรม">'+icon('badge',19)+'</span>':''}</div>
         <p class="person-bio">${h(p.bio || 'ยินดีที่ได้รู้จัก')}</p>
         <div class="rating-line">${!own&&canRate?star:''}${own ? 'โปรไฟล์ของคุณ' : p.rating_count ? Number(p.rating).toFixed(1) : 'ยังไม่มีคะแนน'}</div>
       </div></article>`;
-    return body;
+    return request ? `<div class="request-card">${body}<div class="request-decisions">${context==='request' ? action('accept',h(id),'ยอมรับ','primary')+action('reject',h(id),'ปฏิเสธ','secondary') : action('cancel',h(id),'ยกเลิกคำขอ','secondary')}</div></div>` : body;
   }
   function peopleActions(c, block=false){
     if(c.own)return '';
-    const id=c.html(c.id);
-    return '<div class="people-management"><span class="safety-actions">'+action('report',id,icon('flag',15)+'รายงานผู้ใช้','')+(block?action('block',id,'บล็อกผู้ใช้',''):'')+'</span></div>';
+    const id=c.html(c.id),r=c.relation,relationshipActions=c.config.friendRequestsEnabled
+      ? (r?.status==='pending'&&!c.incoming?action('cancel',id,'ยกเลิกคำขอ',''):r?.status==='accepted'?action('unfriend',id,'เลิกเป็นเพื่อน',''):'') : '';
+    return '<div class="people-management">'+relationshipActions+'<span class="safety-actions">'+action('report',id,icon('flag',15)+'รายงานผู้ใช้','')+(block?action('block',id,'บล็อกผู้ใช้',''):'')+'</span></div>';
   }
   function primary(c,size=19){
-    return !c.own&&c.config.messagingEnabled?action('chat',c.html(c.id),icon('chat',size)+'แชท','primary'):'';
+    if(c.own)return '';
+    const id=c.html(c.id);
+    if(!c.config.friendRequestsEnabled)return c.config.messagingEnabled?action('chat',id,icon('chat',size)+'แชท','primary'):'';
+    if(c.relation?.status==='accepted')return c.config.messagingEnabled?action('chat',id,icon('chat',size)+'แชท','primary'):'';
+    return action(c.incoming?'accept':'request',id,c.userPlus+(c.incoming?'ยอมรับคำขอ':c.relation?.status==='pending'?'ส่งคำขอแล้ว':'เพิ่มเพื่อน'),'primary',c.relation?.status==='pending'&&!c.incoming?'disabled':'');
   }
   function privateAlbum(c){
     const h=c.html;
@@ -67,7 +74,7 @@ window.ChatgunNearComponents = (() => {
     return `<main class="full-profile profile-route gallery-page" aria-label="Gallery ${h(p.name)}">
       <header class="gallery-header"><button class="gallery-back" data-profile-return aria-label="กลับไปโปรไฟล์">${icon('back',23)}</button>${brand('Gallery')}<button class="gallery-back" data-close-profile aria-label="ปิด Gallery">${icon('close',22)}</button></header>
       <div class="gallery-summary"><div class="gallery-avatar">${c.portrait(p,false)}</div><div><h2>${h(p.name)}${badge(p)}</h2><span>${c.photos.length} รูป · ${score(c,true)}</span><p>${h(p.bio||'ยังไม่ได้เขียน Bio')}</p>
-      <div class="gallery-facts"><span>${h(p.gender||'ไม่ระบุเพศ')}</span>${p.distance!=null?`<span>${icon('pin',14)}${h(c.distance)}</span>`:''}<span>${c.own?'โปรไฟล์ของคุณ':'แชทโดยตรงได้'}</span></div>
+      <div class="gallery-facts"><span>${h(p.gender||'ไม่ระบุเพศ')}</span>${p.distance!=null?`<span>${icon('pin',14)}${h(c.distance)}</span>`:''}<span>${c.own?'โปรไฟล์ของคุณ':!c.config.friendRequestsEnabled?'แชทโดยตรงได้':c.relation?.status==='accepted'?'เป็นเพื่อนกันแล้ว':c.incoming?'ส่งคำขอเป็นเพื่อนถึงคุณ':c.relation?.status==='pending'?'ส่งคำขอแล้ว':'ยังไม่ได้เป็นเพื่อน'}</span></div>
       <div class="gallery-interests">${chips(c)}</div>${c.own?'':`<div class="gallery-actions">${primary(c,16)}${c.canRate?action('rate',h(c.id),c.star+'ให้คะแนน','',c.rateDisabled?'disabled':''):''}${action('block',h(c.id),'บล็อก','')}</div>`}</div></div>
 
       <div class="album-gallery-nav"><button data-profile-gallery>Gallery</button>${albumIconButton(c)}</div>

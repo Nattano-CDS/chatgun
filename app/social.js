@@ -40,13 +40,14 @@ const state = {
   appealableMedia: [],
   moderationNotifications: [],
   verification: null,
-  activeTab: ["near", "chat", "reviews", "profile"].includes(new URLSearchParams(location.search).get("tab")) ? new URLSearchParams(location.search).get("tab") : "near",
+  activeTab: ["near", "friends", "chat", "reviews", "profile"].includes(new URLSearchParams(location.search).get("tab")) ? new URLSearchParams(location.search).get("tab") : "near",
   selectedPerson: null,
   selectedChat: null,
   locationFresh: !1,
   locationWatch: null,
   lastLocationPost: 0,
   lastUnread: 0,
+  lastRequests: 0,
   threadMessages: [],
   threadHasMore: !1,
   threadNewMessages: 0,
@@ -204,15 +205,32 @@ function renderPeople() {
   $("#people-grid").innerHTML = cards.map((person, i) => `${i === columns * 2 ? ad : ""}${personCard(person)}`).join("") + (visible.length ? ad : empty), $("#people-count").title = "จำนวนสมาชิกอื่นที่ตรงตัวกรอง ไม่รวมทางลัดโปรไฟล์ของคุณ", $("#people-count").setAttribute("aria-label", `สมาชิกอื่น ${people.length} คน ไม่รวมโปรไฟล์ของคุณ`), $("#discovery-pagination").hidden = !people.length, $("#discovery-pagination").innerHTML = `<button class="secondary" data-discovery-page="${state.discoveryPage - 1}" ${state.discoveryPage === 1 ? "disabled" : ""}>ก่อนหน้า</button><span aria-live="polite">หน้า ${state.discoveryPage} / ${pages}</span><button class="secondary" data-discovery-page="${state.discoveryPage + 1}" ${state.discoveryPage === pages ? "disabled" : ""}>ถัดไป</button>`;
 }
 function renderRelationships() {
-  const unread = state.conversations.filter((p) => !p.muted).reduce((n, p) => n + Number(p.unread_count || 0), 0);
-  unread > state.lastUnread && (state.activeTab !== 'chat'||document.visibilityState !== "visible") && "Notification" in window && Notification.permission === "granted" && localStorage.getItem("chatgun-notifications") === "enabled" && new Notification("ChatGun", { body: "มีข้อความหรือคำขอใหม่", icon: "/favicon.svg" }), state.lastUnread = unread, $("#message-badge").hidden = !unread, $("#message-badge").textContent = String(unread), renderConversations();
+  const byId = new Map(state.conversations.map((item) => [item.other_user_id, item]));
+  const relationships = state.relationships.map((item) => ({ ...item, ...(byId.get(item.other_user_id) || {}) }));
+  const incoming = relationships.filter((item) => item.status === "pending" && item.requested_by !== state.account.user.id);
+  const sent = relationships.filter((item) => item.status === "pending" && item.requested_by === state.account.user.id);
+  const friends = relationships.filter((item) => item.status === "accepted");
+  const visibleConversations = state.config.friendRequestsEnabled ? friends : state.conversations;
+  const unread = visibleConversations.filter((p) => !p.muted).reduce((n, p) => n + Number(p.unread_count || 0), 0);
+  const requestIncrease = incoming.length > state.lastRequests;
+  (unread > state.lastUnread || requestIncrease) && (state.activeTab !== "chat" || document.visibilityState !== "visible") && "Notification" in window && Notification.permission === "granted" && localStorage.getItem("chatgun-notifications") === "enabled" && new Notification("ChatGun", { body: "มีข้อความหรือคำขอใหม่", icon: "/favicon.svg" });
+  state.lastUnread = unread, state.lastRequests = incoming.length;
+  $("#message-badge").hidden = !unread, $("#message-badge").textContent = String(unread);
+  if (state.config.friendRequestsEnabled) {
+    $("#request-badge").hidden = !incoming.length, $("#request-badge").textContent = String(incoming.length);
+    $("#requests-grid").innerHTML = [...incoming.map((item) => personCard(item, "request")), ...sent.map((item) => personCard(item, "sent"))].join("") || '<p class="subtitle">ไม่มีคำขอที่รอดำเนินการ</p>';
+    $("#friends-tab>h2:first-of-type").textContent = `คำขอเป็นเพื่อน · ${incoming.length + sent.length}`;
+    $("#friends-tab>h2:last-of-type").textContent = `เพื่อน · ${friends.length}`;
+    $("#friends-grid").innerHTML = friends.map((item) => personCard(item, "friend")).join("") || '<div class="empty"><h2>ยังไม่มีเพื่อน</h2><p>ส่งคำขอและรออีกฝ่ายยอมรับก่อนเริ่มแชท</p></div>';
+  }
+  renderConversations(visibleConversations);
 }
 function renderConversations(friends = state.conversations) {
   const list = $("#conversation-list");
-  list.innerHTML = friends.length ? friends.sort((a, b) => Number(b.last_message_at || b.updated_at) - Number(a.last_message_at || a.updated_at)).map((person) => {
+  list.innerHTML = friends.length ? friends.sort((a, b) => Number(b.last_message_at || b.updated_at) - Number(a.last_message_at || a.updated_at) || String(a.other_user_id).localeCompare(String(b.other_user_id))).map((person) => {
     const preview = person.last_message_at ? person.last_message_unsent_at ? "ยกเลิกส่งข้อความแล้ว" : `${person.last_message_sender_id === state.account.user.id ? "คุณ: " : ""}${person.last_message_media_id ? "ส่งรูปภาพ" : person.last_message_body || "ข้อความ"}` : "เริ่มบทสนทนา", date = person.last_message_at ? new Date(Number(person.last_message_at) * 1e3) : null, time = date ? date.toLocaleDateString("th-TH") === (/* @__PURE__ */ new Date()).toLocaleDateString("th-TH") ? date.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" }) : date.toLocaleDateString("th-TH", { day: "numeric", month: "short" }) : "";
     return `<button class="conversation ${state.selectedChat === person.other_user_id ? "active" : ""}" data-chat="${escapeHtml(person.other_user_id)}"><span class="avatar">${escapeHtml(initials(person.name))}</span><span class="conversation-copy"><span><span class="member-name-status"><strong>${escapeHtml(person.name)}</strong>${onlineSlot(person,person.other_user_id)}</span><time>${escapeHtml(time)}</time></span><small>${escapeHtml(preview)}</small></span>${Number(person.unread_count || 0) ? `<b class="inbox-unread">${Number(person.unread_count)}</b>` : ""}</button>`;
-  }).join("") : '<div class="empty"><p>เลือกสมาชิกจากหน้าค้นหาเพื่อเริ่มแชท</p></div>';
+  }).join("") : `<div class="empty"><p>${state.config.friendRequestsEnabled ? "ต้องเป็นเพื่อนกันก่อนจึงจะแชทได้" : "เลือกสมาชิกจากหน้าค้นหาเพื่อเริ่มแชท"}</p></div>`;
   for (const person of friends) populateAvatar($(`[data-chat="${CSS.escape(person.other_user_id)}"] .avatar`, list), person);
   state.conversationMore && list.insertAdjacentHTML("beforeend", "<button data-more-conversations>โหลดบทสนทนาเพิ่มเติม</button>");
 }
@@ -279,9 +297,12 @@ async function loadVerification() {
   $("#verification-status").textContent = state.verification ? labels[state.verification.status] : "ยังไม่ส่ง", $("#verification-form").hidden = ["pending", "approved"].includes(state.verification?.status);
 }
 async function loadRelationships() {
-  if (!state.config.messagingEnabled) return;
-  const result = await api("/api/social/conversations");
-  state.conversations = result.conversations, state.conversationMore = !!result.hasMore, state.conversationOffset = result.nextOffset || state.conversations.length, renderRelationships();
+  if (!state.config.messagingEnabled && !state.config.friendRequestsEnabled) return;
+  const [conversations, relationships] = await Promise.all([
+    state.config.messagingEnabled ? api("/api/social/conversations") : Promise.resolve({ conversations: [], hasMore: false, nextOffset: 0 }),
+    state.config.friendRequestsEnabled ? api("/api/social/relationships") : Promise.resolve({ relationships: [] }),
+  ]);
+  state.conversations = conversations.conversations, state.relationships = relationships.relationships || [], state.conversationMore = !!conversations.hasMore, state.conversationOffset = conversations.nextOffset || state.conversations.length, renderRelationships();
 }
 async function loadPeople(append=false) {
   if (!state.config.publicDiscoveryEnabled) {
@@ -531,7 +552,7 @@ function mountGalleryUpload() {
 }
 async function showPerson(id, { historyMode = "push", photo = null } = {}) {
   historyMode === "none" && (state.privateAlbumOpen = !!routedProfile()?.private);
-  let person = id === state.account?.user?.id ? state.profile : state.people.find((p) => p.user_id === id) || state.conversations.find((p) => p.other_user_id === id);
+  let person = id === state.account?.user?.id ? state.profile : state.people.find((p) => p.user_id === id) || state.relationships.find((p) => p.other_user_id === id) || state.conversations.find((p) => p.other_user_id === id);
   if ($("#profile-dialog").hidden && !routedProfile() && (state.profileReturnPath = location.pathname + location.search), historyMode !== "none" && updateProfileRoute(id, photo, historyMode), !person && !0) {
     const generation2 = state.profileRequest = (state.profileRequest || 0) + 1;
     try {
@@ -668,7 +689,8 @@ function renderThreadMessages() {
     const key = escapeHtml(timelineMessageKey(message));
     if (message.system) return `<div data-timeline-key="${key}">${albumSystemCard(message)}</div>`;
     const media = message.media_id && !message.unsent_at ? chatMediaUrl(message.media_id) : "", attachment = message.media_id && !message.unsent_at ? media ? `<img class="chat-image" src="${escapeHtml(media)}" alt="รูปในแชท" loading="lazy">` : "<em>รูปนี้ไม่อยู่ในคลังแล้ว</em>" : "";
-    return `<div class="message ${message.sender_user_id === currentActor() ? "mine" : ""} ${message.unsent_at ? "unsent" : ""}" data-timeline-key="${key}">${attachment}${escapeHtml(message.unsent_at ? "ยกเลิกข้อความแล้ว" : message.body)}<time>${new Date(Number(message.created_at) * 1e3).toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" })}</time>${message.sender_user_id === currentActor() && !message.unsent_at ? `<span class="message-tools"><button type="button" data-message-action="unsend" data-message="${escapeHtml(message.id)}">ยกเลิกข้อความ</button></span>` : ""}</div>`;
+    const mine = message.sender_user_id === currentActor(), delivery = mine && !message.unsent_at ? `<span class="message-status" aria-label="สถานะข้อความ">${message.read_at ? "อ่านแล้ว" : "ส่งแล้ว"}</span>` : "";
+    return `<div class="message ${mine ? "mine" : ""} ${message.unsent_at ? "unsent" : ""}" data-timeline-key="${key}">${attachment}${escapeHtml(message.unsent_at ? "ยกเลิกข้อความแล้ว" : message.body)}<time>${new Date(Number(message.created_at) * 1e3).toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" })}</time>${delivery}${mine && !message.unsent_at ? `<span class="message-tools"><button type="button" data-message-action="unsend" data-message="${escapeHtml(message.id)}">ยกเลิกข้อความ</button></span>` : ""}</div>`;
   }).join("")}` : '<div class="empty"><p>เริ่มบทสนทนาด้วยความสุภาพ</p></div>';
 }
 function updateNewMessagesIndicator() {
@@ -729,10 +751,11 @@ async function openChat(id) {
   }
 }
 function switchTab(tab) {
+  if (tab === "friends" && !state.config?.friendRequestsEnabled) tab = "near";
   closeProfileSurface(), delete document.body.dataset.ownGallery, state.activeTab = tab, document.body.dataset.activeTab = tab;
   const controls = $(".discovery-controls"), heading = $("#page-title");
   tab === "near" ? ($(".toolbar-context").append(heading), $(".toolbar").append(controls)) : ($("#discovery-control-storage").append(controls), $(".toolbar").append(heading)), heading.classList.toggle("toolbar-page", tab !== "near"), $(".toolbar")?.classList.remove("filters-open"), $("#filter-toggle")?.setAttribute("aria-expanded", "false");
-  const labels = { near: "หาเพื่อน", chat: "แชท", reviews: "ความคิดเห็น", profile: "โปรไฟล์" };
+  const labels = { near: "หาเพื่อน", friends: "เพื่อน", chat: "แชท", reviews: "ความคิดเห็น", profile: "โปรไฟล์" };
   $$("#primary-nav button").forEach((button) => button.classList.toggle("active", button.dataset.tab === tab)), $$(".tab-view").forEach((view) => {
     view.hidden = view.id !== `${tab}-tab`;
   }), $("#page-title").textContent = labels[tab], tab === "chat" && requestAnimationFrame(sizeConversation);
@@ -774,6 +797,13 @@ async function initialize() {
       document.body.dataset.flow = "onboarding", $("#global-status").textContent = "", $("#onboarding-view").hidden = !1, $("#onboarding-form").elements.name.value = state.account.user.displayName || "";
       return;
     }
+    $("#friends-nav").hidden = !state.config.friendRequestsEnabled;
+    if (state.config.friendRequestsEnabled) {
+      const contactRule = $(".rules strong");
+      contactRule.textContent = "เพื่อนก่อนแชท";
+      contactRule.nextElementSibling.textContent = "ส่งคำขอและรออีกฝ่ายยอมรับก่อนเริ่มบทสนทนา";
+      $("#direct-contact-label").textContent = "รับข้อความจากเพื่อน (ปิดได้ทุกเมื่อ)";
+    }
     try {
       state.profile = (await api("/api/social/profile")).profile;
     } catch (error) {
@@ -804,6 +834,7 @@ $("#primary-nav").addEventListener("click", (event) => {
   if (!state.config?.socialAppEnabled || !state.profile || !navigator.onLine) return;
   // Refresh when entering a surface instead of polling hidden tabs indefinitely.
   if (button.dataset.tab === "near") void loadPeople().catch(() => {});
+  if (button.dataset.tab === "friends") void loadRelationships().catch(() => {});
   if (button.dataset.tab === "chat") void loadRelationships().catch(() => {});
   if(button.dataset.tab==='reviews')void loadRatings().catch(error=>toast(error.message,true));
   if(button.dataset.tab==='profile')void loadMediaSafety().catch(error=>toast(error.message,true));
@@ -1127,7 +1158,8 @@ document.addEventListener("click", async (event) => {
   }
   const reusableAsset = event.target.closest("[data-asset]");
   if (reusableAsset) {
-    $("#asset-grid").innerHTML = `<div class="forward-friends"><h2>เลือกสมาชิกที่จะส่งรูป</h2>${state.people.filter((p) => p.user_id !== currentActor()).map((p) => `<button data-forward-user="${escapeHtml(p.user_id)}" data-forward-asset="${escapeHtml(reusableAsset.dataset.asset)}"><div class="chat-friend-photo">${portrait(p, !1)}</div>${escapeHtml(p.name)} <span aria-hidden="true">➤</span></button>`).join("")}</div>`;
+    const recipients = state.config.friendRequestsEnabled ? state.relationships.filter((p) => p.status === "accepted") : state.people.filter((p) => p.user_id !== currentActor());
+    $("#asset-grid").innerHTML = `<div class="forward-friends"><h2>เลือกสมาชิกที่จะส่งรูป</h2>${recipients.map((p) => `<button data-forward-user="${escapeHtml(p.user_id || p.other_user_id)}" data-forward-asset="${escapeHtml(reusableAsset.dataset.asset)}"><div class="chat-friend-photo">${portrait(p, !1)}</div>${escapeHtml(p.name)} <span aria-hidden="true">➤</span></button>`).join("") || '<p>ยังไม่มีเพื่อนที่ส่งรูปได้</p>'}</div>`;
     return;
   }
   const forward = event.target.closest("[data-forward-user]");
@@ -1142,6 +1174,10 @@ document.addEventListener("click", async (event) => {
   }
   const chat = event.target.closest("[data-chat]");
   if (chat) return openChat(chat.dataset.chat);
+  if (event.target.closest("[data-show-requests]")) {
+    closeProfileSurface(), switchTab("friends");
+    return;
+  }
   const galleryAction = event.target.closest("[data-gallery-action]");
   if (galleryAction) {
     event.preventDefault();
@@ -1186,6 +1222,21 @@ document.addEventListener("click", async (event) => {
       return closeProfileSurface(), openChat(user);
     if (name === "rate")
       return closeProfileSurface(), $("#rating-form").elements.target.value = user, $("#rating-dialog").showModal();
+    if (["request", "accept", "reject", "cancel", "unfriend"].includes(name)) {
+      if (name === "unfriend" && !confirm("เลิกเป็นเพื่อนและปิดการเริ่มแชทใหม่กับสมาชิกนี้หรือไม่?")) return;
+      setBusy(action, !0);
+      try {
+        await api("/api/social/relationships", { method: "POST", body: { action: name, target: user } });
+        await Promise.all([loadRelationships(), loadPeople()]);
+        if (!$("#profile-dialog").hidden && state.selectedPerson) renderPersonRoute(state.personRouteView === "post" ? "profile" : state.personRouteView);
+        toast({ request: "ส่งคำขอเป็นเพื่อนแล้ว", accept: "ยอมรับคำขอแล้ว", reject: "ปฏิเสธคำขอแล้ว", cancel: "ยกเลิกคำขอแล้ว", unfriend: "เลิกเป็นเพื่อนแล้ว" }[name]);
+      } catch (error) {
+        toast(error.message, !0);
+      } finally {
+        setBusy(action, !1);
+      }
+      return;
+    }
     if (name === "block" || name === "unblock") {
       if (name === "block" && !confirm("บล็อกผู้ใช้นี้และเพิกถอนสิทธิ์อัลบั้มหรือไม่?")) return;
       try {

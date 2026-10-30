@@ -43,6 +43,10 @@ function enabled(value) {
   return String(value || "").trim().toLowerCase() === "true";
 }
 
+function contactPolicy(env, options = {}) {
+  return { friendsOnly: enabled(env.FRIEND_REQUESTS_ENABLED), ...options };
+}
+
 function queuePage(request,limit=50){
   const params=new URL(request.url).searchParams,page=Number(params.get('page')||1),q=String(params.get('q')||'').trim();
   if(!Number.isSafeInteger(page)||page<1||page>10000||q.length>80)throw new SocialError('invalid_cursor','ตัวกรองหรือหน้ารายการไม่ถูกต้อง');
@@ -353,7 +357,7 @@ async function config(env) {
     ageAssuranceModel: adultOnboardingEnabled ? "post_oauth_self_declaration_without_date_of_birth" : null,
     adultNoticeVersion: adultOnboardingEnabled ? String(env.ADULT_NOTICE_VERSION || "") || null : null,
     publicDiscoveryEnabled: enabled(env.PUBLIC_DISCOVERY_ENABLED),
-    friendRequestsEnabled: false,
+    friendRequestsEnabled: socialAppEnabled && enabled(env.FRIEND_REQUESTS_ENABLED),
     messagingEnabled: enabled(env.MESSAGING_ENABLED),
     mediaUploadEnabled: enabled(env.MEDIA_UPLOAD_ENABLED),
     mediaQuarantineEnabled: enabled(env.MEDIA_QUARANTINE_ENABLED),
@@ -506,7 +510,7 @@ async function getProfile(request, env) {
       SELECT 1 visible FROM member_profiles
       WHERE user_id = ? AND discovery_visible = 1 AND located_at > ?
     `).bind(target, unixTime() - LOCATION_FRESH_SECONDS).first());
-    if (!visible && !await canContact(env.DB, session.user_id, target) && !await albumGrant(env.DB,session.user_id,target)) {
+    if (!visible && !await canContact(env.DB, session.user_id, target, contactPolicy(env)) && !await albumGrant(env.DB,session.user_id,target)) {
       throw new SocialError("not_found", "ไม่พบโปรไฟล์", 404);
     }
   }
@@ -654,7 +658,81 @@ async function discovery(request, env) {
   return json({ people, locationFresh: true,hasMore:(rows.results||[]).length>limit,nextCursor:candidates.at(-1)?.user_id||null });
 }
 
-async function relationships(request,env) { capability(env,'SOCIAL_APP_ENABLED');throw new SocialError('feature_removed','ไม่ต้องเพิ่มเพื่อนก่อนเริ่มแชท',410); }
+async function relationships(request, env) {
+  capability(env, "SOCIAL_APP_ENABLED");
+  capability(env, "FRIEND_REQUESTS_ENABLED");
+  const session = await authenticated(request, env, { csrf: request.method === "POST" });
+  await requireProfile(env.DB, session.user_id);
+  if (request.method === "GET") {
+    const rows = await env.DB.prepare(`
+      SELECT r.id, r.user_low, r.user_high, r.requested_by, r.status, r.created_at, r.updated_at,
+             p.user_id other_user_id, p.name, p.gender, p.bio, p.interests,
+             ${publicPortraitColumn}, p.direct_messages_enabled,
+             EXISTS(SELECT 1 FROM identity_verification_requests v
+               WHERE v.user_id=p.user_id AND v.status='approved') identity_verified
+      FROM social_relationships r
+      JOIN member_profiles p ON p.user_id=CASE WHEN r.user_low=? THEN r.user_high ELSE r.user_low END
+      WHERE (r.user_low=? OR r.user_high=?)
+        AND ${eligibleSql('p.user_id')} AND ${betaTargetSql(env,'p.user_id')}
+        AND ${unblockedSql('?','p.user_id')}
+      ORDER BY r.updated_at DESC, r.id DESC
+      LIMIT 201
+    `).bind(session.user_id, session.user_id, session.user_id, session.user_id, session.user_id).all();
+    const result = (rows.results || []).slice(0, 200);
+    if (enabled(env.PRESENCE_ENABLED)) {
+      const statuses = await safeOnlineStatuses(env, session.user_id, result.map((item) => item.other_user_id));
+      for (const item of result) item.is_online = statuses[item.other_user_id] === true;
+    }
+    return json({ relationships: result, hasMore: (rows.results || []).length > 200 });
+  }
+
+  await limited(env, "relationship_write_user_hour", session.user_id, 40, 3600);
+  const body = await readJson(request);
+  const target = identifier(body.target);
+  await requireBetaTarget(env, target);
+  if (!await targetExists(env.DB, target)
+      || !await env.DB.prepare(`SELECT 1 ok WHERE ${eligibleSql('?')}`).bind(target).first()) {
+    throw new SocialError("invalid_target", "ไม่พบผู้ใช้", 404);
+  }
+  if (await isBlocked(env.DB, session.user_id, target)) {
+    throw new SocialError("blocked", "ไม่สามารถติดต่อผู้ใช้นี้", 403);
+  }
+  const [low, high] = pair(session.user_id, target);
+  const existing = await env.DB.prepare(
+    "SELECT id,requested_by,status FROM social_relationships WHERE user_low=? AND user_high=?",
+  ).bind(low, high).first();
+  const timestamp = unixTime();
+  if (body.action === "request") {
+    if (existing) throw new SocialError("relationship_exists", "มีคำขอหรือเป็นเพื่อนกันแล้ว", 409);
+    const inserted = await env.DB.prepare(`
+      INSERT OR IGNORE INTO social_relationships(id,user_low,user_high,requested_by,status,created_at,updated_at)
+      VALUES(?,?,?,?,'pending',?,?)
+    `).bind(safeUuid(), low, high, session.user_id, timestamp, timestamp).run();
+    if (!Number(inserted.meta?.changes || 0)) throw new SocialError("relationship_exists", "มีคำขอหรือเป็นเพื่อนกันแล้ว", 409);
+  } else if (body.action === "accept") {
+    if (!existing || existing.status !== "pending" || existing.requested_by === session.user_id) {
+      throw new SocialError("request_not_found", "ไม่พบคำขอ", 404);
+    }
+    const updated = await env.DB.prepare(`UPDATE social_relationships SET status='accepted',updated_at=?
+      WHERE id=? AND status='pending' AND requested_by<>?`).bind(timestamp, existing.id, session.user_id).run();
+    if (!Number(updated.meta?.changes || 0)) throw new SocialError("request_changed", "คำขอเปลี่ยนแปลงแล้ว", 409);
+  } else if (body.action === "reject" || body.action === "cancel") {
+    const ownsRequest = existing?.requested_by === session.user_id;
+    if (!existing || existing.status !== "pending"
+        || (body.action === "reject" ? ownsRequest : !ownsRequest)) {
+      throw new SocialError("request_not_found", "ไม่พบคำขอ", 404);
+    }
+    const removed = await env.DB.prepare("DELETE FROM social_relationships WHERE id=? AND status='pending'").bind(existing.id).run();
+    if (!Number(removed.meta?.changes || 0)) throw new SocialError("request_changed", "คำขอเปลี่ยนแปลงแล้ว", 409);
+  } else if (body.action === "unfriend") {
+    if (!existing || existing.status !== "accepted") throw new SocialError("friend_not_found", "ไม่พบเพื่อน", 404);
+    const removed = await env.DB.prepare("DELETE FROM social_relationships WHERE id=? AND status='accepted'").bind(existing.id).run();
+    if (!Number(removed.meta?.changes || 0)) throw new SocialError("friend_changed", "สถานะเพื่อนเปลี่ยนแปลงแล้ว", 409);
+  } else {
+    throw new SocialError("invalid_action", "คำขอไม่ถูกต้อง");
+  }
+  return json({ ok: true });
+}
 
 async function blocks(request, env) {
   capability(env, "SOCIAL_APP_ENABLED");
@@ -722,8 +800,13 @@ async function conversations(request,env) {
     FROM activity a JOIN member_profiles p ON p.user_id=a.other_user_id
     LEFT JOIN chat_preferences pref ON pref.user_id=? AND pref.other_user_id=p.user_id
     WHERE ${eligibleSql('p.user_id')} AND ${unblockedSql('?','p.user_id')} AND ${betaTargetSql(env,'p.user_id')}
+      AND (?=0 OR EXISTS(SELECT 1 FROM social_relationships relationship
+        WHERE relationship.status='accepted' AND (
+          (relationship.user_low=? AND relationship.user_high=p.user_id)
+          OR (relationship.user_low=p.user_id AND relationship.user_high=?))))
     GROUP BY p.user_id ORDER BY last_message_at DESC,p.user_id LIMIT 51 OFFSET ?`)
-    .bind(...Array(10).fill(session.user_id),session.user_id,session.user_id,offset).all();
+    .bind(...Array(10).fill(session.user_id),session.user_id,session.user_id,
+      enabled(env.FRIEND_REQUESTS_ENABLED)?1:0,session.user_id,session.user_id,offset).all();
   const result=(rows.results||[]).slice(0,50);
   for(const p of result){
     const latest=JSON.parse(p.last_message_payload||'null');delete p.last_message_payload;
@@ -759,7 +842,7 @@ async function albumAccess(request,env){
   if(body.action==='request'){
     const owner=identifier(body.owner);
     await requireBetaTarget(env,owner);
-    if(!await canContact(env.DB,session.user_id,owner)) throw new SocialError('contact_unavailable','ไม่สามารถขอสิทธิ์บัญชีนี้',403);
+    if(!await canContact(env.DB,session.user_id,owner,contactPolicy(env))) throw new SocialError('contact_unavailable','ไม่สามารถขอสิทธิ์บัญชีนี้',403);
     await limited(env,'album_requests_hour',session.user_id,10,3600);
     const result=await env.DB.prepare(`INSERT INTO album_access_requests(id,album_owner_id,requester_id,status,created_at,updated_at)
       SELECT ?,?,?,'pending',?,? WHERE ${eligibleSql('?')} AND ${eligibleSql('?')} AND ${unblockedSql('?','?')}
@@ -794,7 +877,7 @@ async function messages(request, env) {
     const url = new URL(request.url);
     const target = identifier(url.searchParams.get("target"));
     await requireBetaTarget(env,target);
-    if (!await canContact(env.DB, session.user_id, target,{send:false})) throw new SocialError('contact_unavailable','ไม่สามารถติดต่อบัญชีนี้',403);
+    if (!await canContact(env.DB, session.user_id, target,contactPolicy(env,{send:false}))) throw new SocialError('contact_unavailable','ไม่สามารถติดต่อบัญชีนี้',403);
     const before = Number(url.searchParams.get("before") || Number.MAX_SAFE_INTEGER);
     const beforeId = String(url.searchParams.get("beforeId") || "\uffff");
     if (!Number.isFinite(before) || beforeId.length > 128) throw new SocialError("invalid_cursor", "คำขอไม่ถูกต้อง");
@@ -826,7 +909,7 @@ async function messages(request, env) {
     const form = await request.formData();
     const target = String(form.get("target") || "");
     await requireBetaTarget(env,target);
-    if (!await canContact(env.DB, session.user_id, target)) throw new SocialError('contact_unavailable','ไม่สามารถติดต่อบัญชีนี้',403);
+    if (!await canContact(env.DB, session.user_id, target,contactPolicy(env))) throw new SocialError('contact_unavailable','ไม่สามารถติดต่อบัญชีนี้',403);
     const file = form.get("file");
     if (!(file instanceof File) || file.size < 1 || file.size > 8 * 1024 * 1024) {
       throw new SocialError("invalid_file", "รูปภาพต้องมีขนาดไม่เกิน 8 MB");
@@ -892,7 +975,7 @@ async function messages(request, env) {
   }
   const target = String(body.target || "");
   await requireBetaTarget(env,target);
-  if (!await canContact(env.DB, session.user_id, target,{send:body.action!=='read'})) throw new SocialError('contact_unavailable','ไม่สามารถติดต่อบัญชีนี้',403);
+  if (!await canContact(env.DB, session.user_id, target,contactPolicy(env,{send:body.action!=='read'}))) throw new SocialError('contact_unavailable','ไม่สามารถติดต่อบัญชีนี้',403);
   if (body.action === "read") {
     await env.DB.prepare(`UPDATE chat_system_events SET
       owner_read_at=CASE WHEN album_owner_id=? THEN ? ELSE owner_read_at END,
@@ -1019,7 +1102,7 @@ async function chatAssets(request, env) {
     WHERE p.owner_user_id=? AND m.state='active' AND r.status='released' AND r.category='general' ORDER BY m.created_at DESC,m.id LIMIT 12`).bind(session.user_id).all();
   const target=new URL(request.url).searchParams.get('target'),allowed=[];
   if(target)await requireBetaTarget(env,target);
-  if(target&&await canContact(env.DB,session.user_id,target))for(const photo of gallery.results||[])if(await canViewPhoto(env.DB,target,photo))allowed.push(photo);
+  if(target&&await canContact(env.DB,session.user_id,target,contactPolicy(env)))for(const photo of gallery.results||[])if(await canViewPhoto(env.DB,target,photo))allowed.push(photo);
   return json({ assets: rows.results || [],gallery:allowed });
 }
 
@@ -1969,7 +2052,7 @@ async function mayViewProfile(db, env, viewer, owner) {
   if(enabled(env.BETA_ENROLLMENT_REQUIRED)&&!await db.prepare("SELECT 1 ok FROM beta_enrollments WHERE user_id=? AND status='active'").bind(owner).first())return false;
   if (await isBlocked(db, viewer, owner)) return false;
   if (await albumGrant(db,viewer,owner)) return true;
-  if (await canContact(db, viewer, owner)) return true;
+  if (await canContact(db, viewer, owner, contactPolicy(env))) return true;
   if (!enabled(env.PUBLIC_DISCOVERY_ENABLED)) return false;
   return Boolean(await db.prepare(`
     SELECT 1 visible FROM member_profiles p JOIN users u ON u.id = p.user_id
