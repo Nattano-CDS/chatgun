@@ -95,21 +95,6 @@ assert.equal(beforeData.counts.uat_authorized_identities, 2);
 const productionBefore = await cf(`/pages/projects/${PRODUCTION_PROJECT}`);
 assert.equal(productionBefore.canonical_deployment.deployment_trigger.metadata.commit_hash, PRODUCTION_SHA);
 
-const rc6Vars = finalUatRc6Vars(receipt);
-const updatedEnv = structuredClone(beforeProject.deployment_configs.preview.env_vars);
-for (const name of ['ADULT_NOTICE_VERSION', 'TERMS_VERSION', 'PRIVACY_VERSION', 'FRIEND_REQUESTS_ENABLED']) {
-  assert.equal(updatedEnv[name]?.type, 'plain_text');
-  updatedEnv[name].value = rc6Vars[name];
-}
-await cf(`/pages/projects/${PROJECT}`, { deployment_configs: { preview: { env_vars: updatedEnv } } }, 'PATCH');
-const configuredProject = await cf(`/pages/projects/${PROJECT}`);
-const configured = previewConfig(configuredProject);
-for (const [name, value] of Object.entries(beforeConfig.env_vars)) {
-  if (['ADULT_NOTICE_VERSION', 'TERMS_VERSION', 'PRIVACY_VERSION', 'FRIEND_REQUESTS_ENABLED'].includes(name)) continue;
-  assert.deepEqual(configured.env_vars[name], value, `Unexpected UAT configuration drift: ${name}`);
-}
-assert.equal(configured.env_vars.FRIEND_REQUESTS_ENABLED.value, 'true');
-
 const checkout = mkdtempSync(join(tmpdir(), 'chatgun-phase2-uat-build-'));
 execFileSync('git', ['clone', '--shared', '--no-checkout', process.cwd(), checkout], { stdio: 'pipe' });
 execFileSync('git', ['checkout', '--detach', sha], { cwd: checkout, stdio: 'pipe' });
@@ -165,6 +150,20 @@ for (let attempt = 0; attempt < 45; attempt += 1) {
 }
 assert.equal(served?.commit, sha, 'UAT origin did not serve exact RC');
 assert.deepEqual(served.uatPolicyVersions, RC6_POLICY.versions);
+const rc6Vars = finalUatRc6Vars(receipt);
+const updatedEnv = structuredClone(beforeProject.deployment_configs.preview.env_vars);
+for (const name of ['ADULT_NOTICE_VERSION', 'TERMS_VERSION', 'PRIVACY_VERSION', 'FRIEND_REQUESTS_ENABLED']) {
+  assert.equal(updatedEnv[name]?.type, 'plain_text');
+  updatedEnv[name].value = rc6Vars[name];
+}
+await cf(`/pages/projects/${PROJECT}`, { deployment_configs: { preview: { env_vars: updatedEnv } } }, 'PATCH');
+const configuredProject = await cf(`/pages/projects/${PROJECT}`);
+const configured = previewConfig(configuredProject);
+for (const [name, value] of Object.entries(beforeConfig.env_vars)) {
+  if (['ADULT_NOTICE_VERSION', 'TERMS_VERSION', 'PRIVACY_VERSION', 'FRIEND_REQUESTS_ENABLED'].includes(name)) continue;
+  assert.deepEqual(configured.env_vars[name], value, `Unexpected UAT configuration drift: ${name}`);
+}
+assert.equal(configured.env_vars.FRIEND_REQUESTS_ENABLED.value, 'true');
 const afterProject = await cf(`/pages/projects/${PROJECT}`);
 const afterConfig = previewConfig(afterProject);
 assert.ok(isDeepStrictEqual(afterConfig, configured), 'UAT effective configuration drifted after deploy');
