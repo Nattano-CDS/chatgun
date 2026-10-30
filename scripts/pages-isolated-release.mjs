@@ -73,6 +73,7 @@ export function inspectProject(before, current, fingerprint, projectName) {
   assert.equal(source.name,projectName,'Unexpected baseline Pages project');
   assert.equal(latest.name,projectName,'Unexpected current Pages project');
   assert.equal(source.production_branch,latest.production_branch,'Production branch drift');
+  assert.equal(latest.production_branch,'main','Unexpected Pages Production branch');
   const differences=configDiff(before,current);
   const checks=preservationChecks(current,fingerprint);
   if(differences.length || checks.failed.length) throw Object.assign(new Error('Production configuration preservation BLOCKED'),{
