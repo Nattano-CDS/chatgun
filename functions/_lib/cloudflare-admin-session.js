@@ -10,7 +10,9 @@ const ADMIN_ACCESS_FAILURE_CATEGORIES = new Set([
   'invalid_access_signature',
   'invalid_access_configuration',
   'admin_account_inactive',
-  'access_verification_unavailable',
+  'access_jwks_fetch_failed',
+  'access_jwks_invalid_payload',
+  'access_verifier_runtime_failed',
 ]);
 
 export function adminAccessFailureCategory(error) {
@@ -24,11 +26,12 @@ export function adminAccessFailureCategory(error) {
     return 'invalid_access_claims';
   }
   if (['invalid_access_key'].includes(reason)) return 'invalid_access_signature';
-  if (['access_keys_unavailable', 'invalid_access_keys'].includes(reason)) return 'access_verification_unavailable';
+  if (['access_keys_unavailable', 'access_verification_unavailable'].includes(reason)) return 'access_jwks_fetch_failed';
+  if (['invalid_access_keys'].includes(reason)) return 'access_jwks_invalid_payload';
   if (['admin_account_restricted', 'admin_age_safety_hold'].includes(reason)) return 'admin_account_inactive';
   // Unexpected verifier, cryptographic, fetch or D1 failures remain fail-closed
   // and disclose no implementation detail.
-  return 'access_verification_unavailable';
+  return 'access_verifier_runtime_failed';
 }
 
 export function logAdminAccessFailure(error) {

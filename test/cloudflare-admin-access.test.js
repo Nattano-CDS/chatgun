@@ -118,7 +118,40 @@ test('Access key service outages fail closed; a token cannot supply an alternate
   const r = new Request('https://chatgun.pages.dev/api/social/moderation/overview', { headers: { 'cf-access-jwt-assertion': token } });
   try {
     globalThis.fetch = async url => { assert.equal(url, `${issuer}/cdn-cgi/access/certs`); return new Response('unavailable', { status: 503 }); };
-    await assert.rejects(requireCloudflareAdminAccess(r, { ...envConfig, ADMIN_ACCESS_ISSUER: issuer }, { user_id: config.userId }));
+    await assert.rejects(requireCloudflareAdminAccess(r, { ...envConfig, ADMIN_ACCESS_ISSUER: issuer }, { user_id: config.userId }),
+      error => error.message === 'access_jwks_fetch_failed');
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test('Access JWKS diagnostics distinguish fetch, payload, missing-key and verifier runtime failures', async () => {
+  const originalFetch = globalThis.fetch;
+  const principal = async (name, response) => {
+    const issuer = `https://chatgun-jwks-${name}.cloudflareaccess.com`;
+    const token = await signed({ iss: issuer });
+    globalThis.fetch = async url => {
+      assert.equal(url, `${issuer}/cdn-cgi/access/certs`);
+      if (response instanceof Error) throw response;
+      return response;
+    };
+    return cloudflareAdminPrincipal(new Request('https://chatgun.pages.dev/api/admin/session', {
+      headers: { 'cf-access-jwt-assertion': token },
+    }), { ...envConfig, ADMIN_ACCESS_ISSUER: issuer });
+  };
+  try {
+    await assert.rejects(principal('timeout', new DOMException('Timed out', 'TimeoutError')),
+      error => error.message === 'access_jwks_fetch_failed');
+    await assert.rejects(principal('http', new Response('', { status: 503 })),
+      error => error.message === 'access_jwks_fetch_failed');
+    await assert.rejects(principal('json', new Response('{', { headers: { 'content-type': 'application/json' } })),
+      error => error.message === 'access_jwks_invalid_payload');
+    await assert.rejects(principal('shape', Response.json({ keys: 'not-an-array' })),
+      error => error.message === 'access_jwks_invalid_payload');
+    await assert.rejects(principal('key-shape', Response.json({ keys: [{ ...jwk, n: '' }] })),
+      error => error.message === 'access_jwks_invalid_payload');
+    await assert.rejects(principal('missing', Response.json({ keys: [{ ...jwk, kid: 'different-key' }] })),
+      error => error.message === 'invalid_access_signature');
+    await assert.rejects(verifyCloudflareAccessJwt(await signed(), config, { keys: { find() { throw new Error('fixture runtime'); } } }, now),
+      error => error.message === 'access_verifier_runtime_failed');
   } finally { globalThis.fetch = originalFetch; }
 });
 
@@ -218,7 +251,7 @@ test('optional Cloudflare identity lookup binds real login time to verified subj
   } finally {globalThis.fetch=originalFetch;}
 });
 
-test('Admin Access failure taxonomy is allowlisted and defaults unexpected errors to unavailable', () => {
+test('Admin Access failure taxonomy is allowlisted and defaults unexpected errors to verifier runtime failure', () => {
   const cases = new Map([
     ['invalid_access_claims', 'invalid_access_claims'],
     ['invalid_access_signature', 'invalid_access_signature'],
@@ -226,11 +259,14 @@ test('Admin Access failure taxonomy is allowlisted and defaults unexpected error
     ['access_configuration_required', 'invalid_access_configuration'],
     ['admin_account_inactive', 'admin_account_inactive'],
     ['admin_account_restricted', 'admin_account_inactive'],
-    ['access_verification_unavailable', 'access_verification_unavailable'],
-    ['sensitive implementation detail', 'access_verification_unavailable'],
+    ['access_jwks_fetch_failed', 'access_jwks_fetch_failed'],
+    ['access_jwks_invalid_payload', 'access_jwks_invalid_payload'],
+    ['access_verifier_runtime_failed', 'access_verifier_runtime_failed'],
+    ['access_verification_unavailable', 'access_jwks_fetch_failed'],
+    ['sensitive implementation detail', 'access_verifier_runtime_failed'],
   ]);
   for (const [reason, expected] of cases) assert.equal(adminAccessFailureCategory(new Error(reason)), expected);
-  assert.equal(adminAccessFailureCategory(null), 'access_verification_unavailable');
+  assert.equal(adminAccessFailureCategory(null), 'access_verifier_runtime_failed');
 });
 
 test('standalone Admin diagnostics classify failures without leaking credentials and leave RBAC separate', async () => {
@@ -245,7 +281,7 @@ test('standalone Admin diagnostics classify failures without leaking credentials
   const logs = [];
   console.warn = value => logs.push(String(value));
   try {
-    const run = async ({ name, expected, tokenPatch = {}, envPatch = {}, signingKey, user = true, unavailable = false }) => {
+    const run = async ({ name, expected, tokenPatch = {}, envPatch = {}, signingKey, user = true, fetchResult = jwks }) => {
       const db = new TestD1();
       const issuer = `https://chatgun-diagnostic-${name}.cloudflareaccess.com`;
       try {
@@ -256,7 +292,8 @@ test('standalone Admin diagnostics classify failures without leaking credentials
         const token = await tokenFor(issuer, tokenPatch, signingKey);
         globalThis.fetch = async url => {
           assert.equal(url, `${issuer}/cdn-cgi/access/certs`);
-          return unavailable ? new Response('unavailable', { status: 503 }) : Response.json(jwks);
+          if (fetchResult instanceof Error) throw fetchResult;
+          return fetchResult instanceof Response ? fetchResult : Response.json(fetchResult);
         };
         const start = logs.length;
         const response = await adminRequest({ env, request: new Request('https://chatgun.social/api/admin/session', {
@@ -285,8 +322,29 @@ test('standalone Admin diagnostics classify failures without leaking credentials
     await run({ name: 'owner-binding', expected: 'invalid_access_claims', tokenPatch: { email: 'wrong@example.test' } });
     await run({ name: 'signature', expected: 'invalid_access_signature', signingKey: alternatePair.privateKey });
     await run({ name: 'configuration', expected: 'invalid_access_configuration', envPatch: { ADMIN_ACCESS_AUDIENCE: '' } });
-    await run({ name: 'jwks', expected: 'access_verification_unavailable', unavailable: true });
+    await run({ name: 'jwks-timeout', expected: 'access_jwks_fetch_failed', fetchResult: new DOMException('Timed out', 'TimeoutError') });
+    await run({ name: 'jwks-http', expected: 'access_jwks_fetch_failed', fetchResult: new Response('', { status: 503 }) });
+    await run({ name: 'jwks-json', expected: 'access_jwks_invalid_payload', fetchResult: new Response('{') });
+    await run({ name: 'jwks-shape', expected: 'access_jwks_invalid_payload', fetchResult: { keys: 'invalid' } });
     await run({ name: 'inactive', expected: 'admin_account_inactive', user: false });
+
+    const runtimeDb = new TestD1(), runtimeIssuer = 'https://chatgun-diagnostic-runtime.cloudflareaccess.com';
+    try {
+      globalThis.fetch = async url => { assert.equal(url, `${runtimeIssuer}/cdn-cgi/access/certs`); return Response.json(jwks); };
+      const runtimeEnv = { ...environment(runtimeDb), ...envConfig, ADMIN_ACCESS_ISSUER: runtimeIssuer,
+        ADMIN_ACCESS_STANDALONE_ENABLED: 'true', MODERATION_TOOLS_ENABLED: 'true' };
+      runtimeEnv.DB = { prepare() { throw new Error('fixture database runtime'); } };
+      const start = logs.length;
+      const response = await adminRequest({ env: runtimeEnv, request: new Request('https://chatgun.social/api/admin/session', {
+        headers: { 'cf-access-jwt-assertion': await tokenFor(runtimeIssuer) },
+      }) });
+      assert.equal(response.status, 403);
+      assert.equal((await response.json()).code, 'admin_access_required');
+      const diagnostic = JSON.parse(logs.at(-1));
+      assert.equal(logs.length, start + 1);
+      assert.equal(diagnostic.category, 'access_verifier_runtime_failed');
+      assert.deepEqual(Object.keys(diagnostic).sort(), ['category', 'event', 'requestId']);
+    } finally { runtimeDb.close(); }
 
     const db = new TestD1(), issuer = 'https://chatgun-diagnostic-valid.cloudflareaccess.com';
     try {
