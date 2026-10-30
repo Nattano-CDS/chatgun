@@ -10,9 +10,9 @@ export const RC6_POLICY = Object.freeze({
   },
   files: {
     'policies/final-uat/single-operator-rc6a/beta-notice.html': '19168e805f6b6edc2d02b31b2cc6bd430334f00464d58383e36ce7705a5aa414',
-    'policies/final-uat/single-operator-rc6a/terms.html': '3497b3c7fb41bbbeb53cb4c48fff34c5f6b370fa17bdacad8a9029940d5464b1',
-    'policies/final-uat/single-operator-rc6a/privacy.html': '221d03f59511625dddaf4ac044cf20974ee5e726819b9122eda3b90eb9e79e54',
-    'policies/final-uat/single-operator-rc6a/data-deletion.html': '6d32072e58a183c16f7e6594246450f334c1f531331776dd021faa6a53844100',
+    'policies/final-uat/single-operator-rc6a/terms.html': '389ea93cdabce0fd113552b183f7367eddd0bc16e462390b7f6969c8739e36fd',
+    'policies/final-uat/single-operator-rc6a/privacy.html': '25147379e2469c6d36204cd6ef7e3761c0fa4eee3e1748d9d5601acafa6bd194',
+    'policies/final-uat/single-operator-rc6a/data-deletion.html': 'c45a4c5442fea833460442cc452dc0ca310907a8b1f2bb2abc7854ac6dc6322d',
   },
 });
 
