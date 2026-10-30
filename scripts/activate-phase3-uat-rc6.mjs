@@ -1,5 +1,6 @@
-// Deploys code only to the already-isolated ChatGun UAT branch. It never
-// changes Pages variables/bindings, D1/R2 data, Production, or feature flags.
+// Deploys the approved code/policies to the already-isolated ChatGun UAT
+// branch and updates only the four approved plain-text settings. Secret
+// bindings, D1/R2 data and Production are never included in the PATCH.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -7,7 +8,7 @@ import { chmodSync, copyFileSync, cpSync, existsSync, lstatSync, mkdirSync, mkdt
 import { tmpdir } from 'node:os';
 import { basename, join, relative, resolve } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
-import { RC6_POLICY, finalUatRc6Vars, validateFinalUatRc6Approval } from './lib/final-uat-rc6.mjs';
+import { RC6_POLICY, buildPagesPlainEnvPatch, finalUatRc6Vars, validateFinalUatRc6Approval } from './lib/final-uat-rc6.mjs';
 
 assert.equal(process.env.CHATGUN_PHASE3_UAT_ACTIVATE, 'exact-rc6-friends-only');
 const approvalPath = '/Users/nattano/.codex/private-backups/chatgun/final-uat-social-handoff-20261028.json';
@@ -156,12 +157,13 @@ for (let attempt = 0; attempt < 45; attempt += 1) {
 assert.equal(served?.commit, sha, 'UAT origin did not serve exact RC');
 assert.deepEqual(served.uatPolicyVersions, RC6_POLICY.versions);
 const rc6Vars = finalUatRc6Vars(receipt);
-const updatedEnv = structuredClone(beforeProject.deployment_configs.preview.env_vars);
-for (const name of ['ADULT_NOTICE_VERSION', 'TERMS_VERSION', 'PRIVACY_VERSION', 'FRIEND_REQUESTS_ENABLED']) {
-  assert.equal(updatedEnv[name]?.type, 'plain_text');
-  updatedEnv[name].value = rc6Vars[name];
-}
-await cf(`/pages/projects/${PROJECT}`, { deployment_configs: { preview: { env_vars: updatedEnv } } }, 'PATCH');
+const approvedPlainNames = ['ADULT_NOTICE_VERSION', 'TERMS_VERSION', 'PRIVACY_VERSION', 'FRIEND_REQUESTS_ENABLED'];
+const plainPatch = buildPagesPlainEnvPatch(
+  beforeProject.deployment_configs.preview.env_vars,
+  Object.fromEntries(approvedPlainNames.map(name => [name, rc6Vars[name]])),
+);
+assert.deepEqual(Object.keys(plainPatch).sort(), approvedPlainNames.sort());
+await cf(`/pages/projects/${PROJECT}`, { deployment_configs: { preview: { env_vars: plainPatch } } }, 'PATCH');
 const configuredProject = await cf(`/pages/projects/${PROJECT}`);
 const configured = previewConfig(configuredProject);
 for (const [name, value] of Object.entries(beforeConfig.env_vars)) {

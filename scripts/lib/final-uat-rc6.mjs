@@ -47,3 +47,17 @@ export function finalUatRc6Vars(receipt) {
     FRIEND_REQUESTS_ENABLED: 'true',
   };
 }
+
+export function buildPagesPlainEnvPatch(currentEnv, desiredValues) {
+  assert.ok(currentEnv && typeof currentEnv === 'object' && !Array.isArray(currentEnv));
+  assert.ok(desiredValues && typeof desiredValues === 'object' && !Array.isArray(desiredValues));
+  const patch = {};
+  for (const [name, value] of Object.entries(desiredValues)) {
+    assert.equal(currentEnv[name]?.type, 'plain_text', `Refusing to replace non-plain Pages binding: ${name}`);
+    assert.equal(typeof value, 'string', `Invalid Pages value: ${name}`);
+    patch[name] = { type: 'plain_text', value };
+  }
+  assert.ok(Object.keys(patch).length > 0, 'Empty Pages environment patch');
+  assert.ok(Object.values(patch).every(item => item.type === 'plain_text'), 'Secret bindings are forbidden in a metadata-only patch');
+  return patch;
+}
