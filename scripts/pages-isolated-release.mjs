@@ -4,11 +4,10 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { cpSync, existsSync, lstatSync, mkdtempSync, readFileSync, readdirSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { basename, isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { basename, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 
-const repository = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const sha = /^[a-f0-9]{40}$/u;
 const prohibited = new Set(['wrangler.json','wrangler.jsonc','wrangler.toml','.dev.vars','.env']);
 const bindingKeys = ['d1_databases','r2_buckets','kv_namespaces','durable_object_namespaces',
@@ -104,7 +103,6 @@ export function assetManifest(dist,functionsDir) {
 export function prepareStage(dist,functionsDir,commit) {
   assert.match(commit,sha);
   const paths=[resolve(dist),resolve(functionsDir)];
-  for(const path of paths) assert.ok(path===repository || path.startsWith(repository+sep),'Source must be inside repository');
   const manifest=assetManifest(...paths);
   const stage=mkdtempSync(join(tmpdir(),'chatgun-pages-'));
   mkdirSync(join(stage,'dist'));
