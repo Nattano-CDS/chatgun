@@ -21,7 +21,7 @@ test('source card has one semantic full-card link, original hierarchy and no act
  assert.doesNotMatch(out,/data-action="(?:request|chat)"/);
  assert.match(out,/<a class="card-open" href="\/app\/people\/fixture"/);assert.match(out,/<span class="person-name">/);assert.doesNotMatch(out,/<button|card-actions/);
  assert.ok(out.includes('&quot; onerror=&quot;'));
- assert.doesNotMatch(out,/<script>|<img>/);
+ assert.doesNotMatch(out,/<script\b|<img\s*>/iu);
 });
 test('full profile and gallery are source route structures, never duplicated modal/footer compositions',()=>{
  const profile=ui.profile(context),gallery=ui.gallery(context);

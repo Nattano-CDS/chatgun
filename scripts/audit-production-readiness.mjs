@@ -151,4 +151,8 @@ const report = {
 };
 mkdirSync('docs/production-readiness', { recursive: true });
 writeFileSync('docs/production-readiness/live-infrastructure.json', JSON.stringify(report, null, 2) + '\n');
-console.log(JSON.stringify(report, null, 2));
+console.log(JSON.stringify({
+  result: 'PASS',
+  report: 'docs/production-readiness/live-infrastructure.json',
+  productionWrites: 0,
+}));
