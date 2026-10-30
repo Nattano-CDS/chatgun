@@ -1,0 +1,59 @@
+{
+  "manifestVersion": 1,
+  "recordedAt": "2026-10-30T15:14:15Z",
+  "scope": "phase4-public-launch-qualification-read-only-and-local-preparation",
+  "decisions": {
+    "rc6aFriendsMessagingUat": "GO",
+    "phase1PublicLaunchWithoutMedia": "NO-GO",
+    "fullPublicLaunch": "NO-GO"
+  },
+  "testedApplication": {
+    "sha": "38804ae940203108ee08abb98f2a521559501413",
+    "tree": "883582e2826561ccfbc9f9ae631e42a6aa27df69",
+    "pr": 25,
+    "prBase": "codex/jwks-preservation-isolated-deploy",
+    "prHeadVerifiedSeparately": true,
+    "configurationFreePublicBuildFiles": 57,
+    "configurationFreePublicBuildInventorySha256": "1933d99dc954826ff2406085eb3b8767ad37e50de818490b9fd1b003b0ac9df1",
+    "assetsManifestSha256": "bb655d3bc0a2214dff9086b1157d6caac55f0ccf593fbd5f49675bb50fbcf5ad"
+  },
+  "rc6aUat": {
+    "applicationSha": "38804ae940203108ee08abb98f2a521559501413",
+    "artifactInventorySha256": "1b525c231034c9688e1bbfe94a4a52a29a23b8f510875797c12b9a510fe1ba85",
+    "classification": "single-operator-dual-account-functional-e2e-not-independent-two-human-uat",
+    "relationshipScenarios": "11/11 PASS",
+    "schema": 22,
+    "foreignKeyViolations": 0,
+    "messages": 15,
+    "finalRelationshipState": {
+      "accepted": 1,
+      "pending": 0,
+      "blocks": 0
+    }
+  },
+  "tests": {
+    "githubChecks": "8/8 PASS",
+    "focused": "19/19 PASS",
+    "fullUnit": "331/331 PASS",
+    "dependencyVulnerabilities": 0
+  },
+  "productionBaseline": {
+    "sha": "c9327e7913ea09577c06b8a0f70f953f21d0aecb",
+    "schema": 21,
+    "foreignKeyViolations": 0,
+    "mutations": 0,
+    "restrictedPublicFeaturesRemainDisabled": true
+  },
+  "rollback": {
+    "protectedLocalArtifactSha": "c9327e7913ea09577c06b8a0f70f953f21d0aecb",
+    "files": 76,
+    "inventorySha256": "52e309ae6b2427fec08b11479cb58317f13de7463b41821899ea98ba7bde09c2",
+    "directoryMode": "0700",
+    "fileMode": "0600",
+    "configurationIncluded": false,
+    "databaseRestoreAuthorized": false
+  },
+  "productionChanges": 0,
+  "deploymentAuthorized": false,
+  "mergeAuthorized": false
+}
