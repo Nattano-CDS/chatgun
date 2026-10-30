@@ -439,7 +439,7 @@ async function initializeAdmin() {
  state.accountOps=grants.canModerateAccounts;
  document.querySelectorAll('[data-load]').forEach(el=>{const view=el.dataset.load;if(view.startsWith('account-'))el.hidden=!grants.canModerateAccounts;else if(['priority','pending','approved','sensitive','rejected','appeals','audit'].includes(view))el.hidden=!grants.canReviewMedia;else if(['user-reports','media-reports'].includes(view))el.hidden=!grants.canReviewReports;});
  const initialView=canOpenOverview?'overview':grants.canManageRoles?'roles':grants.canInspectMembers?'members':grants.canReviewEligibility?'eligibility':null;
- if(!initialView)throw new Error('บัญชีนี้ไม่มีบทบาทผู้ดูแลที่อนุญาตให้เปิดส่วนงานใด');
+ if(!initialView)throw new Error('ไม่มีสิทธิ์: บัญชีนี้ไม่มีบทบาทผู้ดูแลที่อนุญาตให้เปิดส่วนงานใด');
  await load(initialView);
 }
 initializeAdmin().catch(error=>setStatus(error.message,true));
