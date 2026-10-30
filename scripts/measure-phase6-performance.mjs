@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { chromium, request as playwrightRequest } from '@playwright/test';
 
 const origin = 'https://localhost:8797';
-const output = 'docs/production-readiness/phase6/performance-measurements.json';
+const output = process.env.CHATGUN_PERFORMANCE_OUTPUT || 'docs/production-readiness/phase6/performance-measurements.json';
 const iterations = 20;
 const server = spawn(process.execPath, ['scripts/serve-issue16-local.mjs'], {
   env: { ...process.env, CHATGUN_FULL_SYSTEM_LOCAL: 'true' },
@@ -80,6 +80,103 @@ try {
     const responses = await Promise.all(Array.from({ length: 5 }, () => context.request.get('/api/social/profile')));
     return responses.every(response => response.status() === 200) ? 200 : 500;
   }));
+  const routeDurations = [];
+  const observedRequests = [];
+  const observe = request => {
+    const url = new URL(request.url());
+    if (url.origin === origin) observedRequests.push(url.pathname);
+  };
+  page.on('request', observe);
+  await page.goto('/?tab=profile', { waitUntil: 'networkidle' });
+  const initialPageRequests = observedRequests.length;
+  const initialApiRequests = observedRequests.filter(path => path.startsWith('/api/')).length;
+  const cdp = await context.newCDPSession(page);
+  await cdp.send('Performance.enable');
+  const heap = async () => (await cdp.send('Performance.getMetrics')).metrics.find(metric => metric.name === 'JSHeapUsedSize')?.value || 0;
+  const heapBefore = await heap();
+  for (let index = 0; index < 20; index += 1) {
+    const tab = index % 2 ? 'profile' : 'chat';
+    const started = performance.now();
+    await page.locator(`#primary-nav button[data-tab="${tab}"]`).click();
+    await page.locator(`#${tab}-tab`).waitFor({ state: 'visible' });
+    routeDurations.push(Number((performance.now() - started).toFixed(2)));
+  }
+  const heapAfter = await heap();
+  await page.locator('#primary-nav button[data-tab="chat"]').click();
+  const conversationRenderStarted = performance.now();
+  await page.locator('[data-chat="viewer390"]').waitFor({ state: 'visible' });
+  const conversationListRenderMs = Number((performance.now() - conversationRenderStarted).toFixed(2));
+  const longContext = await browser.newContext({ baseURL: origin, ignoreHTTPSErrors: true, viewport: { width: 390, height: 844 } });
+  const longPage = await longContext.newPage();
+  const longMessages = Array.from({ length: 250 }, (_, index) => ({
+    id: `long-${String(index).padStart(3, '0')}`,
+    sender_user_id: index % 2 ? 'peer' : 'me',
+    receiver_user_id: index % 2 ? 'me' : 'peer',
+    body: `synthetic long conversation ${index}`,
+    created_at: 1_800_000_000 + Math.floor(index / 2),
+  }));
+  await longPage.route('**/api/**', route => {
+    const url = new URL(route.request().url());
+    const responses = {
+      '/api/social/config': { socialAppEnabled: true, publicDiscoveryEnabled: false, messagingEnabled: true, mediaUploadEnabled: false, ratingsEnabled: false, presenceEnabled: false },
+      '/api/auth/me': { user: { id: 'me', displayName: 'Synthetic performance actor' }, providers: ['line'], recentlyAuthenticated: true },
+      '/api/social/profile': { profile: { user_id: 'me', name: 'Synthetic performance actor', direct_messages_enabled: 1, discovery_visible: 0 } },
+      '/api/social/discovery': { people: [], locationFresh: false },
+      '/api/social/conversations': { conversations: [{ other_user_id: 'peer', name: 'Synthetic peer', direct_messages_enabled: 1, unread_count: 0, last_message_at: longMessages.at(-1).created_at, last_message_body: longMessages.at(-1).body }] },
+      '/api/social/messages': { messages: longMessages.slice().reverse(), hasMore: false },
+      '/api/social/ratings': { ratings: [] },
+      '/api/social/blocks': { blocked: [] },
+      '/api/social/gallery': { photos: [], comments: [] },
+      '/api/social/media/appeals': { appeals: [], appealable: [] },
+      '/api/social/moderation/notifications': { notifications: [] },
+    };
+    const body = responses[url.pathname] || { ok: true };
+    return route.fulfill({ status: 200, json: body });
+  });
+  const longConversationStarted = performance.now();
+  await longPage.goto('/?tab=chat');
+  await longPage.locator('[data-chat="peer"]').click();
+  await longPage.locator('#thread .message').first().waitFor({ state: 'visible' });
+  const longConversationMessages = await longPage.locator('#thread .message').count();
+  const longConversationRenderAndPaginationMs = Number((performance.now() - longConversationStarted).toFixed(2));
+  const messageHost = longPage.locator('#thread .messages');
+  await messageHost.evaluate(node => { node.scrollTop = 0; });
+  const scrollStarted = performance.now();
+  await messageHost.evaluate(node => { node.scrollTop = node.scrollHeight; });
+  const longConversationScrollMs = Number((performance.now() - scrollStarted).toFixed(2));
+  await longContext.close();
+  observedRequests.length = 0;
+  await page.locator('#primary-nav button[data-tab="profile"]').click();
+  await page.waitForTimeout(11_000);
+  const hiddenSurfacePolling = {
+    observationMs: 11_000,
+    messageRequests: observedRequests.filter(path => path === '/api/social/messages').length,
+    conversationRequests: observedRequests.filter(path => path === '/api/social/conversations').length,
+  };
+  page.off('request', observe);
+  const browserMetrics = {
+    routeTransitions: {
+      iterations: routeDurations.length,
+      p50Ms: percentile(routeDurations, 0.5),
+      p95Ms: percentile(routeDurations, 0.95),
+      maxMs: Math.max(...routeDurations),
+    },
+    initialPageRequests,
+    initialApiRequests,
+    conversationListRenderMs,
+    longConversation: {
+      renderedMessages: longConversationMessages,
+      renderAndPaginationMs: longConversationRenderAndPaginationMs,
+      scrollTopToBottomMs: longConversationScrollMs,
+    },
+    heap: {
+      beforeBytes: heapBefore,
+      afterTwentyRouteTransitionsBytes: heapAfter,
+      growthBytes: heapAfter - heapBefore,
+    },
+    hiddenSurfacePolling,
+    mobileHorizontalOverflow: await page.evaluate(() => document.documentElement.scrollWidth > innerWidth),
+  };
   const preThrottle = [];
   for (let index = iterations; index < 30; index += 1) preThrottle.push((await discoveryContext.request.get('/api/social/discovery')).status());
   const throttleProbe = await discoveryContext.request.get('/api/social/discovery');
@@ -95,6 +192,7 @@ try {
     iterations,
     browser: 'Playwright Chromium',
     metrics,
+    browserMetrics,
     discoveryRateLimit,
     excluded: [
       'Production load testing',

@@ -3,11 +3,12 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
-test('Phase 3 package is exact-SHA, closed and fail-closed', () => {
+test('Production activation package preserves the owner pilot and remains NO-GO', () => {
   const result = JSON.parse(execFileSync(process.execPath, ['scripts/verify-production-activation-package.mjs'], { encoding: 'utf8' }));
   assert.equal(result.result, 'PASS');
   assert.equal(result.verdict, 'NO-GO');
   assert.equal(result.productionMutations, 0);
+  assert.equal(result.productionPreservationChecksVerified, 25);
 });
 
 test('owner handoff records every privileged blocker without private identifiers', () => {

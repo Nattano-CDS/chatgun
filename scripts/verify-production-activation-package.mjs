@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { verifyProductionPreservation } from './verify-production-preservation.mjs';
 
 const sha256 = path => createHash('sha256').update(readFileSync(path)).digest('hex');
 const manifest = JSON.parse(readFileSync('docs/production-readiness/phase3-release-manifest.json', 'utf8'));
 const consoleEvidence = JSON.parse(readFileSync('docs/production-readiness/phase3-console-verification.json', 'utf8'));
 const config = JSON.parse(readFileSync('wrangler.jsonc', 'utf8')).env.production;
+const fingerprint = JSON.parse(readFileSync('docs/production-readiness/phase6/production-owner-pilot-fingerprint.json', 'utf8'));
 assert.equal(manifest.candidateApplicationSha, 'cfb94c92190a17ebb73983cef4017ca227df5d42');
 assert.equal(manifest.candidateGitTreeSha, '4214e4bce20e52bc1c519927774b38c4f536c19c');
 assert.equal(consoleEvidence.candidateReleaseSha, manifest.candidateApplicationSha);
@@ -31,21 +33,20 @@ for (const [name, expected] of Object.entries(manifest.migrationHashes)) {
   assert.equal(sha256(`migrations/${name}`), expected, name);
   assert.equal(sha256(`migrations/production/${name}`), expected, `production/${name}`);
 }
-for (const flag of [
-  'OAUTH_LOGIN_ENABLED', 'NEW_ACCOUNT_REGISTRATION_ENABLED', 'BETA_INVITATION_REGISTRATION_ENABLED',
-  'ACCEPTANCE_FLOW_ENABLED', 'SOCIAL_APP_ENABLED', 'PUBLIC_DISCOVERY_ENABLED', 'MESSAGING_ENABLED',
-  'PRESENCE_ENABLED', 'MEDIA_UPLOAD_ENABLED', 'SENSITIVE_CONTENT_ENABLED', 'MODERATION_TOOLS_ENABLED',
-  'ACCOUNT_MODERATION_ENABLED', 'IDENTITY_VERIFICATION_ENABLED', 'ELIGIBILITY_REVIEW_ENABLED',
-  'EMAIL_OTP_ENABLED', 'MOBILE_OTP_ENABLED', 'DEMO_MODE_ENABLED', 'DEMO_AUTO_START_ENABLED',
-  'PUBLIC_DEMO_CANARY_ENABLED', 'ADMIN_ACCESS_STANDALONE_ENABLED'
-]) assert.equal(config.vars[flag], 'false', flag);
+const preservation = verifyProductionPreservation(config.vars, fingerprint);
+assert.equal(preservation.result, 'PASS');
+assert.equal(preservation.totalChecks, 25);
+assert.equal(preservation.pilotRegressions.length, 0);
+assert.equal(preservation.restrictedActivations.length, 0);
+for (const flag of ['ELIGIBILITY_REVIEW_ENABLED', 'DEMO_AUTO_START_ENABLED', 'ADMIN_ACCESS_STANDALONE_ENABLED', 'LINE_EMAIL_ENABLED', 'FACEBOOK_EMAIL_ENABLED']) {
+  assert.equal(config.vars[flag], 'false', flag);
+}
 assert.equal(config.vars.ADMIN_CLOUDFLARE_ACCESS_REQUIRED, 'true');
-assert.equal(config.vars.OAUTH_ENABLED_PROVIDERS, '');
 assert.equal(config.d1_databases[0].migrations_dir, 'migrations/production');
 assert.equal(config.r2_buckets[0].bucket_name, 'chatgun-media-production');
 
 console.log(JSON.stringify({
   result: 'PASS', candidateApplicationSha: manifest.candidateApplicationSha,
-  migrationHashesVerified: 4, productionClosedFlagsVerified: 20,
+  migrationHashesVerified: 4, productionPreservationChecksVerified: preservation.totalChecks,
   verdict: manifest.verdict, productionMutations: 0,
 }, null, 2));
