@@ -190,23 +190,29 @@ test('authenticated shortcut is session-owned, deduplicated and independent of d
 test('gallery failed comment keeps its draft and inline reason; likes are disabled while pending',async({page})=>{
  await enableMedia(page);
  let likes=0;
+ const waitForGalleryPost=action=>page.waitForResponse(response=>{
+  if(response.request().method()!=='POST'||new URL(response.url()).pathname!=='/api/social/gallery')return false;
+  try{return response.request().postDataJSON()?.action===action;}catch{return false;}
+ });
  await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',photos:[{id:'fixture-photo',visibility:'public',owner:'near-1',caption:'ภาพสมมติ',like_count:0}],comments:[]}}));
  await page.route('**/api/social/gallery',async r=>{
   const body=r.request().postDataJSON();
   if(body.action==='comment')return r.fulfill({status:403,json:{error:'ไม่มีสิทธิ์ส่งความคิดเห็น'}});
   likes++;await new Promise(resolve=>setTimeout(resolve,300));await r.fulfill(likes===1?{status:503,json:{error:'บันทึก Like ไม่สำเร็จ กรุณาลองอีกครั้ง'}}:{json:{ok:true}});
  });
- await page.goto('/app/people/near-1/gallery/fixture-photo');await expect(page.locator('.lightbox-shell')).toBeVisible();
- await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');await page.locator('#gallery-comment button').click();
+ const galleryLoaded=page.waitForResponse(response=>response.request().method()==='GET'&&new URL(response.url()).pathname==='/api/social/gallery'&&new URL(response.url()).searchParams.get('photo')==='fixture-photo');
+ await page.goto('/app/people/near-1/gallery/fixture-photo');await galleryLoaded;await expect(page.locator('.lightbox-shell')).toBeVisible();
+ await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');await expect(page.locator('#gallery-comment button')).toBeEnabled();
+ const commentResponse=waitForGalleryPost('comment');await page.locator('#gallery-comment button').click();await commentResponse;
  await expect(page.locator('[data-post-feedback]')).toHaveAttribute('role','alert');await expect(page.locator('[data-post-feedback]')).toHaveText('ไม่มีสิทธิ์ส่งความคิดเห็น');
  await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');
-  await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();await expect(page.locator('.post-like')).toBeEnabled();expect(likes).toBe(1);
+  const firstLikeResponse=waitForGalleryPost('like');await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();await firstLikeResponse;await expect(page.locator('.post-like')).toBeEnabled();expect(likes).toBe(1);
   await expect(page.locator('.post-like svg')).toHaveCount(1);await expect(page.locator('[data-post-feedback]')).toHaveText('บันทึก Like ไม่สำเร็จ กรุณาลองอีกครั้ง');
-  await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();
+  const secondLikeResponse=waitForGalleryPost('like');await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();
   await page.locator('#gallery-comment input[name=comment]').fill('ร่างที่แก้ระหว่างกด Like');await expect(page.locator('#gallery-comment button')).toBeDisabled();
-  await expect(page.locator('.post-like')).toBeEnabled();await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ร่างที่แก้ระหว่างกด Like');
+  await secondLikeResponse;await expect(page.locator('.post-like')).toBeEnabled();await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ร่างที่แก้ระหว่างกด Like');
   await expect(page.locator('[data-post-feedback]')).toBeHidden();
-  const response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/social/gallery'&&r.request().method()==='POST');
+  const response=waitForGalleryPost('like');
   await page.locator('.post-like').click();await page.keyboard.press('Escape');await response;
   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   await expect(page.locator('.lightbox-shell')).toHaveCount(0);await expect(page).toHaveURL(/\/people\/near-1\/gallery$/);
