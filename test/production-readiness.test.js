@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
+import { verifyProductionPreservation } from '../scripts/verify-production-preservation.mjs';
 
 const productionMigrations = readdirSync('migrations/production').filter(name => name.endsWith('.sql')).sort();
 const expectedProductionMigrations = readdirSync('migrations')
@@ -16,26 +17,24 @@ test('Production migration lane is byte-exact through schema21 and excludes UAT 
   }
 });
 
-test('Production Wrangler configuration is fail-closed and uses the isolated migration lane', () => {
+test('Production Wrangler configuration preserves the owner pilot and uses the isolated migration lane', () => {
   const config = JSON.parse(readFileSync('wrangler.jsonc', 'utf8'));
   const production = config.env.production;
   assert.equal(production.d1_databases[0].database_id, '9738a051-d914-42d0-8e7b-8098ef2b959d');
   assert.equal(production.d1_databases[0].migrations_dir, 'migrations/production');
   assert.equal(production.r2_buckets[0].bucket_name, 'chatgun-media-production');
-  for (const name of [
-    'OAUTH_LOGIN_ENABLED', 'NEW_ACCOUNT_REGISTRATION_ENABLED', 'BETA_INVITATION_REGISTRATION_ENABLED',
-    'ACCEPTANCE_FLOW_ENABLED', 'SOCIAL_APP_ENABLED', 'ADULT_ONBOARDING_ENABLED',
-    'PUBLIC_DISCOVERY_ENABLED', 'FRIEND_REQUESTS_ENABLED', 'MESSAGING_ENABLED', 'PRESENCE_ENABLED',
-    'MEDIA_UPLOAD_ENABLED', 'SENSITIVE_CONTENT_ENABLED', 'RATINGS_ENABLED', 'IDENTITY_VERIFICATION_ENABLED',
-    'MODERATION_TOOLS_ENABLED', 'ACCOUNT_MODERATION_ENABLED', 'ELIGIBILITY_REVIEW_ENABLED',
-    'ADMIN_ACCESS_STANDALONE_ENABLED', 'DEMO_MODE_ENABLED', 'DEMO_AUTO_START_ENABLED',
-    'PUBLIC_DEMO_CANARY_ENABLED', 'EMAIL_OTP_ENABLED', 'MOBILE_OTP_ENABLED', 'LINE_EMAIL_ENABLED',
-  ]) assert.equal(production.vars[name], 'false', name);
-  assert.equal(production.vars.BETA_ENROLLMENT_REQUIRED, 'true');
+  const fingerprint = JSON.parse(readFileSync('docs/production-readiness/phase6/production-owner-pilot-fingerprint.json', 'utf8'));
+  const preservation = verifyProductionPreservation(production.vars, fingerprint);
+  assert.equal(preservation.result, 'PASS');
+  assert.equal(preservation.totalChecks, 25);
+  for (const name of ['ELIGIBILITY_REVIEW_ENABLED', 'ADMIN_ACCESS_STANDALONE_ENABLED', 'DEMO_AUTO_START_ENABLED', 'LINE_EMAIL_ENABLED', 'FACEBOOK_EMAIL_ENABLED']) {
+    assert.equal(production.vars[name], 'false', name);
+  }
+  assert.equal(production.vars.BETA_ENROLLMENT_REQUIRED, undefined);
   assert.equal(production.vars.MEDIA_QUARANTINE_ENABLED, 'true');
   assert.equal(production.vars.ADMIN_CLOUDFLARE_ACCESS_REQUIRED, 'true');
   assert.equal(production.vars.DEPLOYMENT_ENVIRONMENT, 'production');
-  assert.equal(production.vars.OAUTH_ENABLED_PROVIDERS, '');
+  assert.equal(production.vars.OAUTH_ENABLED_PROVIDERS, 'line');
 });
 
 test('Readiness utilities are verification-only and cannot deploy or apply remote migrations', () => {

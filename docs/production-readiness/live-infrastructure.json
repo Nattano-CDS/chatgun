@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-29T16:36:03.545Z",
+  "checkedAt": "2026-10-30T04:58:11.995Z",
   "account": "23017b53386fb67fc62a52cdd017454c",
   "project": "chatgun",
   "production": {
@@ -148,7 +148,7 @@
     }
   },
   "preview": {
-    "latestDeploymentSha": "fb0210090745cdbfaaf0eb0ca68bfcb24fd6e576",
+    "latestDeploymentSha": "25cb31d0c56ff95127180e04eb588d9ce4783175",
     "database": "5bbfd55d-eb22-4324-8a7d-57bef14110ea",
     "bucket": "chatgun-media-staging",
     "flags": {
@@ -161,16 +161,16 @@
       "ADULT_ONBOARDING_ENABLED": "true",
       "SOCIAL_APP_ENABLED": "true",
       "PUBLIC_DISCOVERY_ENABLED": "true",
-      "FRIEND_REQUESTS_ENABLED": "true",
+      "FRIEND_REQUESTS_ENABLED": "false",
       "MESSAGING_ENABLED": "true",
-      "PRESENCE_ENABLED": null,
+      "PRESENCE_ENABLED": "false",
       "RATINGS_ENABLED": "true",
       "MEDIA_UPLOAD_ENABLED": "true",
       "MEDIA_QUARANTINE_ENABLED": "true",
       "SENSITIVE_CONTENT_ENABLED": "false",
       "EMAIL_OTP_ENABLED": "false",
       "MOBILE_OTP_ENABLED": "false",
-      "DEMO_MODE_ENABLED": "true",
+      "DEMO_MODE_ENABLED": "false",
       "PUBLIC_DEMO_CANARY_ENABLED": null,
       "ADMIN_ACCESS_STANDALONE_ENABLED": null,
       "ADMIN_CLOUDFLARE_ACCESS_REQUIRED": null,

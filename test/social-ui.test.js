@@ -106,11 +106,13 @@ test("moderation UI auto-loads routine overview, justifies restricted evidence, 
 });
 
 test("staging social and private media activation remain isolated from production", () => {
-  const production = JSON.stringify(JSON.parse(wrangler).env.production, null, 2);
-  for (const capability of ["SOCIAL_APP_ENABLED", "PUBLIC_DISCOVERY_ENABLED", "MESSAGING_ENABLED", "RATINGS_ENABLED"]) {
+  const configured=JSON.parse(wrangler).env.production;
+  const production = JSON.stringify(configured, null, 2);
+  for (const capability of ["PUBLIC_DISCOVERY_ENABLED", "MESSAGING_ENABLED", "RATINGS_ENABLED"]) {
     assert.match(wrangler, new RegExp(`"${capability}": "true"`, "u"));
     assert.match(production, new RegExp(`"${capability}": "false"`, "u"));
   }
+  assert.equal(configured.vars.SOCIAL_APP_ENABLED,'true');
   assert.match(wrangler, /"FRIEND_REQUESTS_ENABLED": "false"/u);
   assert.match(wrangler, /"MEDIA_UPLOAD_ENABLED": "true"/u);
   assert.match(wrangler, /"MEDIA_QUARANTINE_ENABLED": "true"/u);
@@ -122,21 +124,20 @@ test("staging social and private media activation remain isolated from productio
   assert.match(wrangler, /"NEW_ACCOUNT_REGISTRATION_ENABLED": "false"/u);
   assert.match(production, /"NEW_ACCOUNT_REGISTRATION_ENABLED": "false"/u);
   assert.match(wrangler, /"BETA_INVITATION_REGISTRATION_ENABLED": "false"/u);
-  assert.match(production, /"BETA_INVITATION_REGISTRATION_ENABLED": "false"/u);
+  assert.match(production, /"BETA_INVITATION_REGISTRATION_ENABLED": "true"/u);
   assert.match(wrangler, /"MODERATION_TOOLS_ENABLED": "true"/u);
-  assert.match(production, /"MODERATION_TOOLS_ENABLED": "false"/u);
+  assert.match(production, /"MODERATION_TOOLS_ENABLED": "true"/u);
   for (const capability of ["IDENTITY_VERIFICATION_ENABLED"]) {
     assert.match(wrangler, new RegExp(`"${capability}": "false"`, "u"));
     assert.match(production, new RegExp(`"${capability}": "false"`, "u"));
   }
   assert.match(production, /"DEMO_MODE_ENABLED": "false"/u);
-  assert.match(production, /"OAUTH_LOGIN_ENABLED": "false"/u);
+  assert.match(production, /"OAUTH_LOGIN_ENABLED": "true"/u);
   assert.match(wrangler, /"ADULT_ONBOARDING_ENABLED": "true"/u);
-  assert.match(production, /"ADULT_ONBOARDING_ENABLED": "false"/u);
+  assert.match(production, /"ADULT_ONBOARDING_ENABLED": "true"/u);
   assert.match(wrangler, /"database_name": "chatgun-auth-staging"/u);
   assert.match(wrangler, /"binding": "MEDIA"[\s\S]*"bucket_name": "chatgun-media-staging"/u);
   assert.match(production, /"database_name": "chatgun-auth"/u);
-  const configured=JSON.parse(wrangler).env.production;
   assert.deepEqual(configured.r2_buckets,[{binding:'MEDIA',bucket_name:'chatgun-media-production'}]);
   assert.equal(configured.vars.MEDIA_UPLOAD_ENABLED,'false');
 });

@@ -1,0 +1,70 @@
+{
+  "checkedAt": "2026-10-29T16:55:34Z",
+  "scope": "read-only; no Production authentication, provider publishing, deployment, migration, flag, account or repository-setting mutation",
+  "candidateReleaseSha": "cfb94c92190a17ebb73983cef4017ca227df5d42",
+  "cloudflare": {
+    "accountId": "23017b53386fb67fc62a52cdd017454c",
+    "productionDeploymentSourcePrefix": "a73ff21",
+    "productionSchema": 17,
+    "foreignKeyViolations": 0,
+    "rowsWrittenByVerification": 0,
+    "productionR2BucketPresent": true,
+    "productionAccessSecretsPresent": false,
+    "productionAccessApplicationVerified": false,
+    "uatAccessControl": {
+      "verifiedInConsole": true,
+      "scope": "isolated UAT admin routes only",
+      "ownerEmailIncludeRule": true,
+      "mfaRequiredOnEveryAccess": true,
+      "sessionDurationMinutes": 10
+    },
+    "productionCleanupWorkersPresent": false
+  },
+  "providers": {
+    "google": {
+      "project": "ChatGun",
+      "productionWebClientPresent": true,
+      "authorizedOrigin": "https://chatgun.social",
+      "callback": "https://chatgun.social/api/auth/oauth/google/callback",
+      "userType": "External",
+      "publishingStatus": "Testing",
+      "authorizedTestUserPresent": true,
+      "extraSensitiveOrRestrictedScopesConfigured": false,
+      "productionLoginTested": false
+    },
+    "meta": {
+      "productionAppPresent": true,
+      "mode": "In development",
+      "publishingStatus": "Unpublished",
+      "appDomain": "chatgun.social",
+      "privacyUrl": "https://chatgun.social/privacy.html",
+      "dataDeletionUrl": "https://chatgun.social/privacy.html#data-deletion",
+      "callback": "https://chatgun.social/api/auth/oauth/facebook/callback",
+      "clientOAuthEnabled": true,
+      "webOAuthEnabled": true,
+      "httpsEnforced": true,
+      "strictRedirectMatching": true,
+      "embeddedBrowserOAuthEnabled": false,
+      "javascriptSdkLoginEnabled": false,
+      "deviceLoginEnabled": false,
+      "requiredAppIconPresent": false,
+      "productionLoginTested": false
+    },
+    "line": {
+      "consoleReadbackCompleted": false,
+      "blocker": "Fresh LINE Business ID login and 2-step verification required from the owner",
+      "productionLoginTested": false
+    }
+  },
+  "github": {
+    "pr19Draft": true,
+    "pr19HeadMatched": true,
+    "pr19Checks": ["javascript", "local-regression", "Cloudflare Pages", "CodeQL"],
+    "pr19ChecksPassed": true,
+    "mainProtected": false,
+    "rulesets": 0,
+    "dependabotAlertsEnabled": false,
+    "openCodeScanningAlerts": 0
+  },
+  "privateIdentifiersOrSecretsRecorded": false
+}

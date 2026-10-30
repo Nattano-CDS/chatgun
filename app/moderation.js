@@ -428,14 +428,18 @@ async function initializeAdmin() {
    if(!session.authenticated)session=await api('/api/admin/session',{method:'POST',routine:true,body:{action:'start'}});
    state.adminCsrf=session.csrfToken;$('#admin-access-logout').hidden=false;
  }
- await load("overview");
  state.accountOps=c.accountModerationEnabled===true;document.querySelectorAll('[data-account-ops]').forEach(el=>el.hidden=!state.accountOps);
- if(!c.moderationToolsEnabled)return;
+ if(!c.moderationToolsEnabled){await load("overview");return;}
  const grants=await api('/api/social/moderation/capabilities',{routine:true});
+ const canOpenOverview=grants.canReviewReports||grants.canReviewMedia;
+ document.querySelector('[data-load="overview"]').hidden=!canOpenOverview;
  document.querySelector('[data-load="eligibility"]').hidden=!grants.canReviewEligibility;
  document.querySelector('[data-load="roles"]').hidden=!grants.canManageRoles;
  for(const view of ['members','deletions'])document.querySelector(`[data-load="${view}"]`).hidden=!grants.canInspectMembers;
  state.accountOps=grants.canModerateAccounts;
  document.querySelectorAll('[data-load]').forEach(el=>{const view=el.dataset.load;if(view.startsWith('account-'))el.hidden=!grants.canModerateAccounts;else if(['priority','pending','approved','sensitive','rejected','appeals','audit'].includes(view))el.hidden=!grants.canReviewMedia;else if(['user-reports','media-reports'].includes(view))el.hidden=!grants.canReviewReports;});
+ const initialView=canOpenOverview?'overview':grants.canManageRoles?'roles':grants.canInspectMembers?'members':grants.canReviewEligibility?'eligibility':null;
+ if(!initialView)throw new Error('ไม่มีสิทธิ์: บัญชีนี้ไม่มีบทบาทผู้ดูแลที่อนุญาตให้เปิดส่วนงานใด');
+ await load(initialView);
 }
 initializeAdmin().catch(error=>setStatus(error.message,true));

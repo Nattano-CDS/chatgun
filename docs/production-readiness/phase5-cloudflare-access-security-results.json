@@ -1,0 +1,45 @@
+{
+  "checkedAt": "2026-10-30T00:10:00+07:00",
+  "baselinePackageSha": "c2451ee114d4afeef8553878c4149e16b9b1dc92",
+  "assessedApplicationSha": "cfb94c92190a17ebb73983cef4017ca227df5d42",
+  "scope": "isolated automated Access, RBAC, CSRF, audit, cleanup, privacy, moderation and responsive admin-browser verification; no genuine Production login",
+  "automated": {
+    "passed": 37,
+    "failed": 0,
+    "skipped": 0,
+    "suites": [
+      {"name": "Access and owner bootstrap", "passed": 14, "failed": 0, "skipped": 0},
+      {"name": "moderation, privacy, cleanup and readiness", "passed": 20, "failed": 0, "skipped": 0},
+      {"name": "responsive isolated Admin browser", "passed": 3, "failed": 0, "skipped": 0, "viewports": [390, 768, 1440]}
+    ],
+    "verifiedControls": [
+      "valid owner application JWT",
+      "invalid signature and algorithm confusion denial",
+      "wrong issuer, audience, identity and owner UUID denial",
+      "expired, missing and malformed time claims denial",
+      "service and organization token denial",
+      "missing and partial configuration fail-closed",
+      "JWKS outage fail-closed with fixed issuer URL",
+      "RBAC, grant expiry and revocation",
+      "recent authentication and identity lookup",
+      "CSRF and purpose-required audit logging",
+      "logout tombstone and assertion replay denial",
+      "ordinary-member Admin denial",
+      "role separation and private evidence boundaries",
+      "inert Production cleanup flags"
+    ]
+  },
+  "blockedLiveScenarios": {
+    "count": 5,
+    "items": [
+      "Production Access application and audience do not exist",
+      "genuine Production owner MFA login not authorized or run",
+      "genuine owner member UUID binding and expiring RBAC grant not authorized or run",
+      "live Production Access session expiry and revocation not run",
+      "live /api/admin namespace verification requires an authorized schema21 candidate release"
+    ]
+  },
+  "genuineMfaPassClaimed": false,
+  "productionMutations": 0,
+  "result": "PASS for isolated automated controls; BLOCKED for five genuine Production scenarios"
+}
