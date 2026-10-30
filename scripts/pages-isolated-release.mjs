@@ -10,6 +10,7 @@ import { isDeepStrictEqual } from 'node:util';
 
 const sha = /^[a-f0-9]{40}$/u;
 const prohibited = new Set(['wrangler.json','wrangler.jsonc','wrangler.toml','.dev.vars','.env']);
+const forbiddenName = name => prohibited.has(name) || name === '.wrangler' || name.startsWith('.env.') || name.startsWith('.dev.vars.');
 const bindingKeys = ['d1_databases','r2_buckets','kv_namespaces','durable_object_namespaces',
   'services','queue_producers','hyperdrive_bindings','analytics_engine_datasets',
   'vectorize_bindings','mtls_certificates','ai_bindings','browsers'];
@@ -61,6 +62,11 @@ export function preservationChecks(project, fingerprint) {
   return {checked:26,passed:26-failed.length,failed,verdict:failed.length?'BLOCKED':'PASS'};
 }
 
+export function deploymentSourceSha(project) {
+  const source = project?.result || project;
+  return source?.canonical_deployment?.deployment_trigger?.metadata?.commit_hash || null;
+}
+
 export function inspectProject(before, current, fingerprint, projectName) {
   const source=before?.result || before;
   const latest=current?.result || current;
@@ -82,7 +88,7 @@ function walkFiles(dir,root=dir) {
   for(const entry of readdirSync(dir,{withFileTypes:true})) {
     const full=join(dir,entry.name);
     if(entry.isSymbolicLink()) throw new Error('Symlink forbidden in staged artifacts');
-    if(entry.name==='.wrangler' || prohibited.has(entry.name)) throw new Error('Wrangler or environment configuration in artifact: '+entry.name);
+    if(forbiddenName(entry.name)) throw new Error('Wrangler or environment configuration in artifact: '+entry.name);
     if(entry.isDirectory()) list.push(...walkFiles(full,root));
     else if(entry.isFile()) list.push({file:full,path:relative(root,full)});
     else throw new Error('Unsupported asset entry');
@@ -131,6 +137,15 @@ if(process.argv[1] === fileURLToPath(import.meta.url)) {
     const fp=JSON.parse(readFileSync(option('--fingerprint'),'utf8'));
     const state=inspectProject(before,current,fp,option('--project'));
     const result={...state,phase,productionDeployment:'NOT RUN',configurationSecretValues:'NOT INSPECTED'};
+    if(phase==='post') {
+      const expectedSha=option('--sha');
+      assert.match(expectedSha,sha);
+      const observedSha=deploymentSourceSha(current);
+      assert.ok(observedSha && sha.test(observedSha),'Missing canonical Production deployment SHA in read-only API snapshot');
+      assert.equal(observedSha,expectedSha,'Deployed SHA mismatch');
+      result.observedProductionSha=observedSha;
+      result.remoteAssetAndSecretRuntimeChecks='NOT RUN — separately required';
+    }
     if(phase==='pre'){
       const commit=option('--sha');
       const staged=prepareStage(option('--dist'),option('--functions'),commit);
