@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { base64Url } from '../functions/_lib/crypto.js';
 import { requireCloudflareAdminAccess, verifyCloudflareAccessJwt, cloudflareAdminPrincipal, cloudflareAdminAccessConfiguration } from '../functions/_lib/cloudflare-admin-access.js';
-import { issueSession, unixTime } from '../functions/_lib/db.js';
+import { hasRecentAuthentication, issueSession, unixTime } from '../functions/_lib/db.js';
 import { onRequest } from '../functions/api/social/[[path]].js';
 import { onRequest as adminRequest } from '../functions/api/admin/[[path]].js';
 import { onRequest as authRequest } from '../functions/api/auth/[[path]].js';
@@ -259,8 +259,17 @@ test('standalone Access login needs no LINE/member cookie, retains RBAC/CSRF, an
 test('optional Cloudflare identity lookup binds real login time to verified subject, email and account, not JWT refresh time', async () => {
   const originalFetch=globalThis.fetch,issuer='https://chatgun-identity-test.cloudflareaccess.com';
   const env={...envConfig,ADMIN_ACCESS_ISSUER:issuer,ADMIN_ACCESS_IDENTITY_LOOKUP_ENABLED:'true'};
-  const cases=[{}, {account_id:'wrong-account'}, {email:'other@example.test'}, {user_uuid:'wrong-subject'},
-    {iat:now+1}, {iat:'today'}, {service_token_status:true}];
+  const cases=[
+    { patch:{}, expected:now-5, recent:true },
+    { patch:{iat:undefined}, expected:null, recent:false },
+    { patch:{iat:now-601}, expected:now-601, recent:false },
+    { patch:{account_id:'wrong-account'}, expected:null, recent:false },
+    { patch:{email:'other@example.test'}, expected:null, recent:false },
+    { patch:{user_uuid:'wrong-subject'}, expected:null, recent:false },
+    { patch:{iat:now+1}, expected:null, recent:false },
+    { patch:{iat:'today'}, expected:null, recent:false },
+    { patch:{service_token_status:true}, expected:null, recent:false },
+  ];
   try {
     for(let index=0;index<cases.length;index++){
       const sub='local-identity-'+index,jwt=await signed({iss:issuer,sub});
@@ -269,12 +278,58 @@ test('optional Cloudflare identity lookup binds real login time to verified subj
         assert.equal(url,`${issuer}/cdn-cgi/access/get-identity`);
         assert.equal(options.headers.cookie,`CF_Authorization=${jwt}`);
         assert.equal(options.redirect,'manual');
-        return Response.json({user_uuid:sub,email:config.email,account_id:'23017b53386fb67fc62a52cdd017454c',iat:now-1000,...cases[index]});
+        return Response.json({user_uuid:sub,email:config.email,account_id:'23017b53386fb67fc62a52cdd017454c',iat:now-5,...cases[index].patch});
       };
       const principal=await cloudflareAdminPrincipal(new Request('https://chatgun.pages.dev/api/admin/session',{headers:{'cf-access-jwt-assertion':jwt}}),env);
-      assert.equal(principal.authenticatedAt,index===0?now-1000:null);
+      assert.equal(principal.authenticatedAt,cases[index].expected);
+      assert.equal(hasRecentAuthentication({authenticated_at:principal.authenticatedAt},now),cases[index].recent);
     }
   } finally {globalThis.fetch=originalFetch;}
+});
+
+test('identity lookup enables a recent-authenticated role journey without granting broader roles', async () => {
+  const db=new TestD1(),originalFetch=globalThis.fetch;
+  const issuer='https://chatgun-identity-journey-test.cloudflareaccess.com';
+  const subject='local-identity-journey-owner';
+  const jwt=await signed({iss:issuer,sub:subject});
+  const env={...environment(db),...envConfig,ADMIN_ACCESS_ISSUER:issuer,ADMIN_ACCESS_IDENTITY_LOOKUP_ENABLED:'true',
+    ADMIN_ACCESS_STANDALONE_ENABLED:'true',SOCIAL_APP_ENABLED:'true',MODERATION_TOOLS_ENABLED:'true'};
+  globalThis.fetch=async(url,options)=>{
+    if(url===`${issuer}/cdn-cgi/access/certs`)return Response.json(jwks);
+    assert.equal(url,`${issuer}/cdn-cgi/access/get-identity`);
+    assert.equal(options.headers.cookie,`CF_Authorization=${jwt}`);
+    assert.equal(options.redirect,'manual');
+    return Response.json({user_uuid:subject,email:config.email,account_id:'23017b53386fb67fc62a52cdd017454c',iat:now-5});
+  };
+  const req=(path,body,csrf,headers={})=>new Request(`https://chatgun.pages.dev/api/admin/${path}`,{
+    method:body?'POST':'GET',headers:{'cf-access-jwt-assertion':jwt,...headers,
+      ...(body?{origin:'https://chatgun.pages.dev','content-type':'application/json','x-cg-admin-csrf':csrf||''}:{})},
+    ...(body?{body:JSON.stringify(body)}:{}),
+  });
+  const call=(path,...args)=>adminRequest({env,request:req(path,...args)});
+  try {
+    await db.prepare("INSERT INTO users(id,display_name,status,created_at,updated_at)VALUES(?,'Local owner','active',?,?)").bind(config.userId,now,now).run();
+    assert.equal((await call('session')).status,403,'Identity lookup never creates an application role');
+    await db.prepare("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES('identity-journey-role',?,'moderation_admin','Local identity lookup journey only',?,?)").bind(config.userId,now,now+3600).run();
+    const challenge=await (await call('session')).json();
+    const login=await (await call('session',{action:'start'},challenge.csrfToken)).json();
+    assert.equal(login.authenticated,true);
+    assert.equal(login.recentlyAuthenticated,true);
+    const capabilities=await (await call('capabilities')).json();
+    assert.deepEqual({manage:capabilities.canManageRoles,reports:capabilities.canReviewReports,media:capabilities.canReviewMedia,
+      members:capabilities.canInspectMembers,identity:capabilities.canReviewIdentity},
+    {manage:true,reports:false,media:false,members:false,identity:false});
+    const purpose={'x-moderation-purpose':'Authorized isolated identity lookup journey'};
+    assert.equal((await call('roles',undefined,undefined,purpose)).status,200);
+    assert.equal((await call('reports',undefined,undefined,purpose)).status,403);
+    assert.equal((await db.prepare("SELECT COUNT(*) n FROM moderation_role_events WHERE action='inspect'").first()).n,1);
+    await db.prepare('UPDATE cloudflare_admin_sessions SET authenticated_at=?').bind(now-601).run();
+    const stale=await call('roles',undefined,undefined,purpose);
+    assert.equal(stale.status,403);
+    assert.equal((await stale.json()).code,'recent_authentication_required');
+    assert.equal((await db.prepare("SELECT COUNT(*) n FROM moderation_role_events WHERE action='inspect'").first()).n,1,
+      'Stale evidence must not generate an authorized-operation audit');
+  } finally {globalThis.fetch=originalFetch;db.close();}
 });
 
 test('Admin Access failure taxonomy is allowlisted and defaults unexpected errors to verifier runtime failure', () => {
