@@ -52,6 +52,9 @@ const state = {
   threadHasMore: !1,
   threadNewMessages: 0,
   galleryView: null,
+  galleryDrafts: new Map(),
+  galleryOperation: null,
+  galleryRequest: 0,
   chosenAsset: null,
   threadPolling: !1,
   locationPermission: null,
@@ -634,9 +637,55 @@ async function refreshAlbumPermission() {
     state.albumRefreshBusy = !1;
   }
 }
-function renderGalleryPost() {
+function galleryPostKey(owner, photo) {
+  return `${String(owner || "")}\u0000${String(photo || "")}`;
+}
+function galleryFormContext(form = $("#gallery-comment")) {
+  if (!form) return null;
+  const owner = form.elements.owner?.value, photo = form.elements.photo?.value, input = form.elements.comment;
+  return owner && photo && input ? { form, owner, photo, input, key: galleryPostKey(owner, photo) } : null;
+}
+function saveGalleryDraft(form = $("#gallery-comment")) {
+  const context = galleryFormContext(form);
+  if (context) state.galleryDrafts.set(context.key, context.input.value);
+  return context;
+}
+function clearGalleryDraft(owner, photo) {
+  state.galleryDrafts.delete(galleryPostKey(owner, photo));
+}
+function syncGalleryControls(form = $("#gallery-comment")) {
+  const context = galleryFormContext(form);
+  if (!context) return;
+  const operation = state.galleryOperation?.key === context.key ? state.galleryOperation : null;
+  const submit = $("button", form), like = $("#gallery-comment") === form ? $(".post-like") : null;
+  context.input.disabled = operation?.kind === "comment";
+  submit.disabled = !!operation || !context.input.value.trim();
+  submit.setAttribute("aria-busy", String(operation?.kind === "comment"));
+  if (like) {
+    like.disabled = !!operation;
+    like.setAttribute("aria-busy", String(operation?.kind === "like"));
+  }
+}
+function beginGalleryOperation(kind, owner, photo) {
+  if (state.galleryOperation) return null;
+  const operation = { kind, key: galleryPostKey(owner, photo), token: crypto.randomUUID() };
+  state.galleryOperation = operation, syncGalleryControls();
+  return operation;
+}
+function endGalleryOperation(operation) {
+  if (state.galleryOperation?.token === operation?.token) state.galleryOperation = null;
+  syncGalleryControls();
+}
+function renderGalleryPost({ focusComment = !1, selection = null } = {}) {
   const c = profileContext(state.selectedPerson, state.galleryView.photos);
-  $("#profile-dialog-content").innerHTML = ChatgunGallery.post({ ...c, view: state.galleryView }), galleryBusy(!!state.galleryBusy), state.personRouteView = "post", document.body.dataset.personRoute = "post", openProfileSurface(), $(".gallery-experience>.topbar").inert = !0, $(".gallery-experience>.page").inert = !0, $(".lightbox-close")?.focus({ preventScroll: !0 });
+  $("#profile-dialog-content").innerHTML = ChatgunGallery.post({ ...c, view: state.galleryView }), state.personRouteView = "post", document.body.dataset.personRoute = "post", openProfileSurface(), $(".gallery-experience>.topbar").inert = !0, $(".gallery-experience>.page").inert = !0;
+  const context = galleryFormContext();
+  if (context) context.input.value = state.galleryDrafts.get(context.key) || "";
+  syncGalleryControls();
+  if (focusComment && context && !context.input.disabled) {
+    context.input.focus({ preventScroll: !0 });
+    if (selection) context.input.setSelectionRange(selection.start, selection.end, selection.direction);
+  } else $(".lightbox-close")?.focus({ preventScroll: !0 });
   const image = $(".lightbox-art img"), art = $(".lightbox-art"), feedback = document.createElement("span");
   feedback.className = "image-load-status", feedback.setAttribute("role", "status"), art.append(feedback);
   const imageStatus = () => {
@@ -648,22 +697,17 @@ function postFeedback(message = "", error = !1) {
   const feedback = $("[data-post-feedback]");
   return feedback ? (feedback.hidden = !message, feedback.setAttribute("role", error ? "alert" : "status"), feedback.textContent = message, !0) : !1;
 }
-function galleryBusy(busy) {
-  state.galleryBusy = busy;
-  const like = $(".post-like"), submit = $("#gallery-comment button"), input = $("#gallery-comment input[name=comment]");
-  like && (like.disabled = busy, like.setAttribute("aria-busy", String(busy))), submit && (submit.disabled = busy || !input?.value.trim(), submit.setAttribute("aria-busy", String(busy)));
-}
 function samePost(owner, photo) {
   return !$("#profile-dialog").hidden && location.pathname === profilePath(owner, photo);
 }
 async function openGalleryPhoto(owner, photo, { historyMode = "push", preserveComment = !1 } = {}) {
-  const generation = state.profileRequest, draft = preserveComment && samePost(owner, photo) ? $("#gallery-comment input[name=comment]")?.value : null, result = await api("/api/social/gallery?user=" + encodeURIComponent(owner) + "&album=" + (state.privateAlbumOpen ? "private" : "public") + "&photo=" + encodeURIComponent(photo));
-  if (generation !== state.profileRequest || $("#profile-dialog").hidden) return;
+  const generation = state.profileRequest, request = ++state.galleryRequest, existing = preserveComment && samePost(owner, photo) ? saveGalleryDraft() : null, focusComment = document.activeElement === existing?.input, selection = focusComment ? { start: existing.input.selectionStart, end: existing.input.selectionEnd, direction: existing.input.selectionDirection } : null, result = await api("/api/social/gallery?user=" + encodeURIComponent(owner) + "&album=" + (state.privateAlbumOpen ? "private" : "public") + "&photo=" + encodeURIComponent(photo));
+  if (generation !== state.profileRequest || request !== state.galleryRequest || $("#profile-dialog").hidden) return;
   const item = result.photos.find((p) => p.id === photo);
   if (!item) throw new Error("ไม่พบรูปหรือคุณไม่มีสิทธิ์ดูรูปนี้");
   state.privateAlbumOpen = item.visibility !== "public";
   const photos = result.photos.filter((p) => p.visibility !== "public" === state.privateAlbumOpen), index = photos.findIndex((p) => p.id === photo);
-  state.galleryView = { ...result, photos, index }, state.personPhotos = result.photos, historyMode !== "none" && updateProfileRoute(owner, photo, historyMode), renderGalleryPost(), draft != null && ($("#gallery-comment input[name=comment]").value = draft, galleryBusy(!!state.galleryBusy));
+  preserveComment || clearGalleryDraft(owner, photo), state.galleryView = { ...result, photos, index }, state.personPhotos = result.photos, historyMode !== "none" && updateProfileRoute(owner, photo, historyMode), renderGalleryPost({ focusComment, selection });
 }
 function albumSystemCard(e) {
   const labels = { pending: "ขอเข้าถึงอัลบั้มส่วนตัว", approved: "อนุมัติสิทธิ์อัลบั้มส่วนตัวแล้ว", rejected: "ปฏิเสธคำขออัลบั้มส่วนตัว", cancelled: "ยกเลิกคำขออัลบั้มส่วนตัว", revoked: "เพิกถอนสิทธิ์อัลบั้มส่วนตัวแล้ว" }, current = e.revision === e.request_revision && e.request_status === e.event_type, owner = currentActor() === e.album_owner_id, button = (action, label) => `<button data-album-action="${action}" data-request="${escapeHtml(e.request_id)}" data-revision="${Number(e.request_revision)}">${label}</button>`;
@@ -1182,6 +1226,7 @@ document.addEventListener("click", async (event) => {
   if (galleryAction) {
     event.preventDefault();
     const { galleryAction: name, photo, user } = galleryAction.dataset;
+    let galleryOperation = null;
     if (name === "view") {
       try {
         await openGalleryPhoto(user, photo);
@@ -1202,15 +1247,17 @@ document.addEventListener("click", async (event) => {
     }
     if (name === "delete" && !confirm("ลบรูปนี้หรือไม่? การลบไฟล์จริงจะดำเนินการผ่านคิวอย่างปลอดภัย")) return;
     if (name === "like") {
-      if (state.galleryBusy) return;
-      galleryBusy(!0), postFeedback();
+      const owner = user || state.galleryView?.owner;
+      galleryOperation = beginGalleryOperation("like", owner, photo);
+      if (!galleryOperation) return;
+      postFeedback();
     }
     try {
       await api("/api/social/gallery", { method: "POST", body: { action: name, id: photo, ...name === "like" ? { album: state.privateAlbumOpen ? "private" : "public" } : {} } }), ["delete", "select"].includes(name) && (await loadOwnGallery(), name === "select" && (state.profile.selected_photo_id = photo), name === "delete" && state.profile.selected_photo_id === photo && (state.profile.selected_photo_id = null), fillProfile(), $("#profile-dialog").hidden || (state.personPhotos = state.myGallery, renderPersonRoute("gallery"))), name === "like" && state.galleryView && samePost(user || state.galleryView.owner, photo) && await openGalleryPhoto(state.galleryView.owner, photo, { historyMode: "replace", preserveComment: !0 }), name !== "like" && toast(name === "delete" ? "ซ่อนรูปและส่งเข้าคิวลบแล้ว" : "ตั้งรูปหลักแล้ว");
     } catch (error) {
       name !== "like" ? toast(error.message, !0) : samePost(state.galleryView?.owner, photo) && postFeedback(error.message, !0);
     } finally {
-      name === "like" && galleryBusy(!1);
+      galleryOperation && endGalleryOperation(galleryOperation);
     }
     return;
   }
@@ -1299,20 +1346,25 @@ document.addEventListener("change", async (event) => {
   event.target.id;
 });
 $("#profile-dialog").addEventListener("submit", async (event) => {
-  if (!event.target.matches("#gallery-comment") || (event.preventDefault(), state.galleryBusy)) return;
-  const data = new FormData(event.target);
-  galleryBusy(!0), postFeedback();
+  if (!event.target.matches("#gallery-comment")) return;
+  event.preventDefault();
+  const form = event.target, data = new FormData(form), owner = data.get("owner"), photo = data.get("photo"), operation = beginGalleryOperation("comment", owner, photo);
+  if (!operation) return;
+  saveGalleryDraft(form), postFeedback();
   try {
-    if (await api("/api/social/gallery", { method: "POST", body: { action: "comment", id: data.get("photo"), album: state.privateAlbumOpen ? "private" : "public", comment: data.get("comment") } }), !samePost(data.get("owner"), data.get("photo"))) return;
-    await openGalleryPhoto(data.get("owner"), data.get("photo"), { historyMode: "replace" }), samePost(data.get("owner"), data.get("photo")) && postFeedback("ส่งคอมเมนต์แล้ว");
+    if (await api("/api/social/gallery", { method: "POST", body: { action: "comment", id: photo, album: state.privateAlbumOpen ? "private" : "public", comment: data.get("comment") } }), clearGalleryDraft(owner, photo), !samePost(owner, photo)) return;
+    await openGalleryPhoto(owner, photo, { historyMode: "replace" }), samePost(owner, photo) && postFeedback("ส่งคอมเมนต์แล้ว");
   } catch (error) {
-    samePost(data.get("owner"), data.get("photo")) && postFeedback(error.message, !0);
+    samePost(owner, photo) && postFeedback(error.message, !0);
   } finally {
-    galleryBusy(!1);
+    endGalleryOperation(operation);
   }
 });
 $("#profile-dialog").addEventListener("input", (event) => {
-  event.target.matches("#gallery-comment input[name=comment]") && ($("#gallery-comment button").disabled = !!state.galleryBusy || !event.target.value.trim());
+  if (!event.target.matches("#gallery-comment input[name=comment]")) return;
+  const context = saveGalleryDraft(event.target.form), current = galleryFormContext();
+  if (context && current && current.form !== context.form && current.key === context.key) current.input.value = context.input.value, syncGalleryControls(current.form);
+  else syncGalleryControls(context?.form);
 });
 $("#thread").addEventListener("change", (event) => {
   event.target.matches("input[name=file]") && event.target.files?.length && event.target.closest("form").requestSubmit();
