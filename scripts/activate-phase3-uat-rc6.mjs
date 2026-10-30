@@ -80,7 +80,12 @@ assert.equal(beforeProject.production_branch, 'reserved-no-production');
 const beforeConfig = previewConfig(beforeProject);
 assert.equal(beforeConfig.d1_databases.DB.id, DB);
 assert.equal(beforeConfig.r2_buckets.MEDIA.name, BUCKET);
-assert.equal(beforeConfig.env_vars.FRIEND_REQUESTS_ENABLED.value, 'false', 'Expected pre-rc6 Friends gate');
+assert.ok(['false', 'true'].includes(beforeConfig.env_vars.FRIEND_REQUESTS_ENABLED.value));
+if (beforeConfig.env_vars.FRIEND_REQUESTS_ENABLED.value === 'true') {
+  assert.equal(beforeConfig.env_vars.ADULT_NOTICE_VERSION.value, RC6_POLICY.versions.adultNotice);
+  assert.equal(beforeConfig.env_vars.TERMS_VERSION.value, RC6_POLICY.versions.terms);
+  assert.equal(beforeConfig.env_vars.PRIVACY_VERSION.value, RC6_POLICY.versions.privacy);
+}
 assert.equal(beforeConfig.env_vars.MEDIA_UPLOAD_ENABLED.value, 'false');
 assert.equal(beforeConfig.env_vars.NEW_ACCOUNT_REGISTRATION_ENABLED.value, 'false');
 for (const name of ['GOOGLE_CLIENT_SECRET', 'FACEBOOK_CLIENT_SECRET', 'LINE_CLIENT_SECRET', 'TURNSTILE_SECRET_KEY']) {
@@ -164,6 +169,19 @@ for (const [name, value] of Object.entries(beforeConfig.env_vars)) {
   assert.deepEqual(configured.env_vars[name], value, `Unexpected UAT configuration drift: ${name}`);
 }
 assert.equal(configured.env_vars.FRIEND_REQUESTS_ENABLED.value, 'true');
+if (beforeConfig.env_vars.FRIEND_REQUESTS_ENABLED.value === 'false') {
+  execFileSync('npx', ['--yes', 'wrangler@4.156.0', 'pages', 'deploy', 'dist', '--project-name', PROJECT, '--branch', 'uat', '--commit-hash', sha, '--commit-dirty=true', '--profile', 'chatgun'], { cwd: stage, env: { ...process.env, CLOUDFLARE_ACCOUNT_ID: ACCOUNT }, stdio: 'inherit' });
+}
+let liveConfig;
+for (let attempt = 0; attempt < 30; attempt += 1) {
+  try {
+    liveConfig = await (await fetch(`${ORIGIN}/api/social/config?rc6a=${Date.now()}`, { cache: 'no-store' })).json();
+    if (liveConfig.friendRequestsEnabled === true && liveConfig.adultNoticeVersion === RC6_POLICY.versions.adultNotice) break;
+  } catch {}
+  await new Promise(resolve => setTimeout(resolve, 2000));
+}
+assert.equal(liveConfig?.friendRequestsEnabled, true, 'Friends project setting was not bound to the live deployment');
+assert.equal(liveConfig?.adultNoticeVersion, RC6_POLICY.versions.adultNotice);
 const afterProject = await cf(`/pages/projects/${PROJECT}`);
 const afterConfig = previewConfig(afterProject);
 assert.ok(isDeepStrictEqual(afterConfig, configured), 'UAT effective configuration drifted after deploy');
