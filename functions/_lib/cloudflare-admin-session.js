@@ -1,8 +1,50 @@
-import { constantTimeEqual, hmac, sha256 } from './crypto.js';
+import { constantTimeEqual, hmac, safeUuid, sha256 } from './crypto.js';
 import { cloudflareAdminPrincipal } from './cloudflare-admin-access.js';
 
 export function standaloneAdminEnabled(env) {
   return env.ADMIN_ACCESS_STANDALONE_ENABLED === 'true';
+}
+
+const ADMIN_ACCESS_FAILURE_CATEGORIES = new Set([
+  'invalid_access_claims',
+  'invalid_access_signature',
+  'invalid_access_configuration',
+  'admin_account_inactive',
+  'access_jwks_fetch_failed',
+  'access_jwks_redirect_failed',
+  'access_jwks_invalid_payload',
+  'access_verifier_runtime_failed',
+]);
+
+export function adminAccessFailureCategory(error) {
+  const reason = String(error?.message || '');
+  if (ADMIN_ACCESS_FAILURE_CATEGORIES.has(reason)) return reason;
+  if (['standalone_admin_disabled', 'missing_admin_csrf_secret', 'access_not_configured',
+    'access_configuration_required', 'invalid_deployment_environment'].includes(reason)) {
+    return 'invalid_access_configuration';
+  }
+  if (['invalid_access_token', 'invalid_access_auth_time', 'access_owner_mismatch'].includes(reason)) {
+    return 'invalid_access_claims';
+  }
+  if (['invalid_access_key'].includes(reason)) return 'invalid_access_signature';
+  if (['access_keys_unavailable', 'access_verification_unavailable'].includes(reason)) return 'access_jwks_fetch_failed';
+  if (['invalid_access_keys'].includes(reason)) return 'access_jwks_invalid_payload';
+  if (['admin_account_restricted', 'admin_age_safety_hold'].includes(reason)) return 'admin_account_inactive';
+  // Unexpected verifier, cryptographic, fetch or D1 failures remain fail-closed
+  // and disclose no implementation detail.
+  return 'access_verifier_runtime_failed';
+}
+
+export function logAdminAccessFailure(error) {
+  const requestId = safeUuid();
+  try {
+    console.warn(JSON.stringify({
+      event: 'admin_access_verification_failed',
+      category: adminAccessFailureCategory(error),
+      requestId,
+    }));
+  } catch { /* Diagnostic logging must never change the denial decision. */ }
+  return requestId;
 }
 
 export async function adminAccessContext(request, env) {
