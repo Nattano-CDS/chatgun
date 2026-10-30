@@ -1,0 +1,49 @@
+{
+  "manifestVersion": 1,
+  "decision": "NO-GO",
+  "scope": "full-production-launch-readiness-candidate",
+  "candidateIdentity": {
+    "source": "git rev-parse HEAD after this package is committed",
+    "mustEqualPrHead": true,
+    "mustEqualTestedHead": true,
+    "mustEqualDeploymentArtifact": true
+  },
+  "verifiedProductionBaseline": {
+    "applicationSha": "c9327e7913ea09577c06b8a0f70f953f21d0aecb",
+    "schema": 21,
+    "foreignKeyViolations": 0,
+    "preservationChecks": "26/26",
+    "productionMutationsDuringThisTask": 0
+  },
+  "database": {
+    "requiredSchema": 21,
+    "newMigrationRequired": false,
+    "excludedFromProduction": "0022_always_on_private_uat_cohort.sql"
+  },
+  "releaseProfile": "docs/production-readiness/full-launch-rc/release-profile.json",
+  "e2eMatrix": "docs/production-readiness/full-launch-rc/e2e-matrix.md",
+  "activationPlan": "docs/production-readiness/full-launch-rc/activation-plan.md",
+  "deploymentChecklist": "docs/production-readiness/full-launch-rc/deployment-checklist.md",
+  "rollbackProcedure": "docs/production-readiness/deployment-rollback-checklist.md",
+  "mandatoryBlockers": [
+    "full-public-social-policy-owner-approval-pending",
+    "google-provider-console-and-genuine-oauth-not-verified",
+    "facebook-provider-console-and-genuine-oauth-not-verified",
+    "release-candidate-isolated-cloud-uat-not-run",
+    "physical-ios-safari-and-android-device-regression-not-run",
+    "public-moderation-escalation-and-independent-appeals-coverage-not-ready",
+    "production-cleanup-schedules-monitoring-and-alert-ownership-not-ready",
+    "production-media-scanning-and-moderation-operations-not-approved",
+    "github-main-branch-protection-not-configured",
+    "github-dependabot-alerts-disabled"
+  ],
+  "forbiddenWithoutSeparateApproval": [
+    "production-deployment",
+    "production-schema-or-data-change",
+    "production-secret-or-oauth-change",
+    "production-role-change",
+    "production-feature-activation",
+    "pull-request-merge",
+    "paid-infrastructure"
+  ]
+}

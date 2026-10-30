@@ -1,0 +1,12 @@
+{
+  "name": "chatgun-media-cleanup-production",
+  "account_id": "23017b53386fb67fc62a52cdd017454c",
+  "main": "workers/media-cleanup.js",
+  "compatibility_date": "2026-10-15",
+  "workers_dev": false,
+  "preview_urls": false,
+  "triggers": {"crons": []},
+  "vars": {"MEDIA_CLEANUP_ENABLED": "false"},
+  "d1_databases": [{"binding":"DB","database_name":"chatgun-auth","database_id":"9738a051-d914-42d0-8e7b-8098ef2b959d"}],
+  "r2_buckets": [{"binding":"MEDIA","bucket_name":"chatgun-media-production"}]
+}

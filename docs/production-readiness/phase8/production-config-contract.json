@@ -1,0 +1,42 @@
+{
+  "format": "chatgun-production-config-contract-v1",
+  "project": "chatgun",
+  "productionBranch": "main",
+  "schema": 21,
+  "foreignKeyViolationsRequired": 0,
+  "plainVariables": {
+    "DEPLOYMENT_ENVIRONMENT": "production",
+    "OAUTH_LOGIN_ENABLED": "true",
+    "OAUTH_ENABLED_PROVIDERS": "line",
+    "ADMIN_ACCESS_STANDALONE_ENABLED": "true",
+    "ADMIN_ACCESS_IDENTITY_LOOKUP_ENABLED": "true",
+    "ADMIN_CLOUDFLARE_ACCESS_REQUIRED": "true",
+    "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
+    "PUBLIC_DISCOVERY_ENABLED": "false",
+    "FRIEND_REQUESTS_ENABLED": "false",
+    "MESSAGING_ENABLED": "false",
+    "MEDIA_UPLOAD_ENABLED": "false",
+    "PRESENCE_ENABLED": "false",
+    "SENSITIVE_CONTENT_ENABLED": "false",
+    "EMAIL_OTP_ENABLED": "false",
+    "MOBILE_OTP_ENABLED": "false",
+    "DEMO_MODE_ENABLED": "false"
+  },
+  "requiredEncryptedBindingNames": [
+    "ADMIN_ACCESS_ISSUER",
+    "ADMIN_ACCESS_AUDIENCE",
+    "ADMIN_ACCESS_EMAIL",
+    "ADMIN_ACCESS_OWNER_USER_ID"
+  ],
+  "requiredBindings": {
+    "D1": ["DB"],
+    "R2": ["MEDIA"]
+  },
+  "deployment": {
+    "configurationFreeArtifactOnly": true,
+    "pinnedWrangler": "4.156.0",
+    "preAndPostSnapshotsRequired": 2,
+    "zeroEffectiveConfigurationDriftRequired": true,
+    "automaticProductionDeploymentsMustBeDisabledBeforeMainIntegration": true
+  }
+}

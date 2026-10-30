@@ -34,7 +34,7 @@ async function member(database, id, name) {
 function env(database, media) {
   return {
     ...environment(database), MEDIA: media,
-    SOCIAL_APP_ENABLED: "true", MEDIA_UPLOAD_ENABLED: "true", PUBLIC_DISCOVERY_ENABLED: "true",
+    SOCIAL_APP_ENABLED: "true", MESSAGING_ENABLED: "true", MEDIA_UPLOAD_ENABLED: "true", PUBLIC_DISCOVERY_ENABLED: "true",
   };
 }
 
@@ -105,6 +105,10 @@ test("gallery validates bytes, stores private media, authorizes reads, and queue
   await database.prepare("UPDATE media_safety_reviews SET status='released',category='general',reviewed_at=? WHERE media_id=?")
     .bind(unixTime(), id).run();
 
+  assert.equal((await onRequest({env:runtime,request:new Request('https://chatgun.pages.dev/api/social/media/'+id,{headers:{cookie:authHeaders(friend).cookie}})})).status,404,"friendship is not album consent");
+  assert.equal((await jsonCall(runtime,"/api/social/albums/access",friend,{action:"request",owner:"media-owner"})).status,200);
+  const approval=await database.prepare("SELECT id,revision FROM album_access_requests").first();
+  assert.equal((await jsonCall(runtime,"/api/social/albums/access",owner,{action:"approve",...approval})).status,200);
   const friendRead = await onRequest({ env: runtime, request: new Request(`https://chatgun.pages.dev/api/social/media/${id}`, { headers: { cookie: authHeaders(friend).cookie } }) });
   assert.equal(friendRead.status, 200);
   assert.equal(friendRead.headers.get("cache-control"), "private, no-store, max-age=0");
@@ -115,8 +119,11 @@ test("gallery validates bytes, stores private media, authorizes reads, and queue
   assert.equal(comment.status, 200);
   await database.prepare("UPDATE member_profiles SET discovery_visible=1,latitude=13.7563,longitude=100.5018,accuracy=10,located_at=? WHERE user_id='media-owner'").bind(unixTime()).run();
   const publicGallery = await onRequest({ env: runtime, request: new Request(`https://chatgun.pages.dev/api/social/gallery?user=media-owner&photo=${id}`, { headers: { cookie: authHeaders(stranger).cookie } }) });
-  assert.equal(publicGallery.status, 200);
-  assert.deepEqual((await publicGallery.json()).comments, [], "public discovery viewers never receive comment bodies");
+  assert.equal(publicGallery.status,404,"private metadata remains hidden from discovery viewers");
+  assert.equal((await jsonCall(runtime,"/api/social/gallery",owner,{action:"visibility",id,visibility:"public"})).status,200);
+  const published=await onRequest({env:runtime,request:new Request('https://chatgun.pages.dev/api/social/gallery?user=media-owner&photo='+id,{headers:{cookie:authHeaders(stranger).cookie}})});
+  assert.equal(published.status,200);
+  assert.equal((await published.json()).comments.length,1,"authorized public viewers can read public-photo comments");
 
   const removed = await jsonCall(runtime, "/api/social/gallery", owner, { action: "delete", id });
   assert.equal(removed.status, 200);
@@ -145,7 +152,7 @@ test("gallery rejects MIME spoofing and leaves no R2 object or D1 row", async ()
   database.close();
 });
 
-test("chat images require friendship, remain private, and retain only five active sender assets", async () => {
+test("chat images require eligible participants, remain private, and retain only five active sender assets", async () => {
   const database = new TestD1();
   const media = new TestR2();
   const runtime = { ...env(database, media), MESSAGING_ENABLED: "true" };
@@ -172,7 +179,7 @@ test("chat images require friendship, remain private, and retain only five activ
   database.close();
 });
 
-test("received chat images can be reused only while an accepted unblocked relationship grants access", async () => {
+test("received chat images require message participation and no block, not friendship", async () => {
   const database = new TestD1();
   const media = new TestR2();
   const runtime = { ...env(database, media), MESSAGING_ENABLED: "true" };
@@ -197,6 +204,9 @@ test("received chat images can be reused only while an accepted unblocked relati
   assert.equal(privateRead.status, 200);
 
   await database.prepare("DELETE FROM social_relationships WHERE id='reuse-original'").run();
+  const withoutFriend=await onRequest({env:runtime,request:new Request("https://chatgun.pages.dev/api/social/chat-assets",{headers:{cookie:authHeaders(recipient).cookie}})});
+  assert.deepEqual((await withoutFriend.json()).assets.map(p=>p.id),[asset.id],"removing historical friendship does not remove conversation participation");
+  await database.prepare("INSERT INTO social_blocks VALUES('reuse-owner','reuse-recipient',1)").run();
   const revokedLibrary = await onRequest({ env: runtime, request: new Request("https://chatgun.pages.dev/api/social/chat-assets", { headers: { cookie: authHeaders(recipient).cookie } }) });
   assert.deepEqual((await revokedLibrary.json()).assets, []);
   const revokedReuse = await jsonCall(runtime, "/api/social/messages", recipient, { action: "send", target: "reuse-friend", mediaId: asset.id, body: "" });
@@ -205,6 +215,7 @@ test("received chat images can be reused only while an accepted unblocked relati
   assert.deepEqual((await ownerLibrary.json()).assets.map((item) => item.id), [asset.id]);
 
   await database.prepare(`INSERT INTO social_relationships(id,user_low,user_high,requested_by,status,created_at,updated_at) VALUES ('reuse-restored','reuse-owner','reuse-recipient','reuse-owner','accepted',2,2)`).run();
+  await database.prepare("DELETE FROM social_blocks").run();
   const forwarded = await jsonCall(runtime, "/api/social/messages", recipient, { action: "send", target: "reuse-friend", mediaId: asset.id, body: "" });
   assert.equal(forwarded.status, 200);
   const forwardedRead = await onRequest({ env: runtime, request: new Request(`https://chatgun.pages.dev/api/social/chat/media/${asset.id}`, { headers: { cookie: authHeaders(nextFriend).cookie } }) });

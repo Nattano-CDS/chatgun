@@ -4,7 +4,7 @@ Status: owner-review draft. This document records the canonical visual language 
 
 ## Scope and provenance
 
-- Canonical source: `/Users/nattano/.codex/worktrees/near-source-audit`
+- Canonical source: local read-only NEAR source checkout (path intentionally omitted)
 - Canonical commit: `98bb83e44bf88eddb9822d7875f18cd4fe833ee2`
 - Primary source files: `app/globals.css`, `app/near.tsx`, `app/chat.tsx`, `app/discovery-grid.tsx`, `app/bottom-nav.tsx`, `app/profile-view.tsx`, `app/login/page.tsx`, and `app/register/register-form.tsx`
 - Reference captures: `docs/visual-audit/screenshots/near/`

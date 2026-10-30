@@ -28,9 +28,9 @@ class PreparedStatement {
 }
 
 export class TestD1 {
-  constructor() {
+  constructor({throughMigration} = {}) {
     this.database = new DatabaseSync(":memory:");
-    for (const migration of readdirSync(resolve("migrations")).filter((name) => name.endsWith(".sql")).sort()) {
+    for (const migration of readdirSync(resolve("migrations")).filter((name) => name.endsWith(".sql") && (!throughMigration || name <= throughMigration)).sort()) {
       this.database.exec(readFileSync(resolve("migrations", migration), "utf8"));
     }
   }

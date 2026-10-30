@@ -4,6 +4,7 @@
   "pages_build_output_dir": "dist",
   "compatibility_date": "2026-10-15",
   "vars": {
+    "PRESENCE_ENABLED": "false",
     "EMAIL_OTP_ENABLED": "false",
     "MOBILE_OTP_ENABLED": "false",
     "LINE_EMAIL_ENABLED": "false",
@@ -16,7 +17,7 @@
     "TERMS_VERSION": "controlled-beta-terms-v1",
     "PRIVACY_VERSION": "controlled-beta-privacy-v1",
     "PUBLIC_DISCOVERY_ENABLED": "true",
-    "FRIEND_REQUESTS_ENABLED": "true",
+    "FRIEND_REQUESTS_ENABLED": "false",
     "MESSAGING_ENABLED": "true",
     "MEDIA_UPLOAD_ENABLED": "true",
     "MEDIA_QUARANTINE_ENABLED": "true",
@@ -24,8 +25,8 @@
     "RATINGS_ENABLED": "true",
     "IDENTITY_VERIFICATION_ENABLED": "false",
     "MODERATION_TOOLS_ENABLED": "true",
-    "DEMO_MODE_ENABLED": "true",
-    "DEMO_AUTO_START_ENABLED": "true"
+    "DEMO_MODE_ENABLED": "false",
+    "DEMO_AUTO_START_ENABLED": "false"
   },
   "d1_databases": [
     {
@@ -44,17 +45,21 @@
   "env": {
     "production": {
       "vars": {
+        "DEPLOYMENT_ENVIRONMENT": "production",
+        "OAUTH_ENABLED_PROVIDERS": "line",
+        "FACEBOOK_EMAIL_ENABLED": "false",
+        "PRESENCE_ENABLED": "false",
         "EMAIL_OTP_ENABLED": "false",
         "MOBILE_OTP_ENABLED": "false",
         "LINE_EMAIL_ENABLED": "false",
         "NEW_ACCOUNT_REGISTRATION_ENABLED": "false",
-        "BETA_INVITATION_REGISTRATION_ENABLED": "false",
-        "ACCEPTANCE_FLOW_ENABLED": "false",
-        "SOCIAL_APP_ENABLED": "false",
-        "ADULT_ONBOARDING_ENABLED": "false",
-        "ADULT_NOTICE_VERSION": "controlled-beta-v1",
-        "TERMS_VERSION": "pending-owner-approval",
-        "PRIVACY_VERSION": "pending-owner-approval",
+        "BETA_INVITATION_REGISTRATION_ENABLED": "true",
+        "ACCEPTANCE_FLOW_ENABLED": "true",
+        "SOCIAL_APP_ENABLED": "true",
+        "ADULT_ONBOARDING_ENABLED": "true",
+        "ADULT_NOTICE_VERSION": "adult-beta-2026-10-20-rc1",
+        "TERMS_VERSION": "terms-beta-2026-10-20-rc1",
+        "PRIVACY_VERSION": "privacy-beta-2026-10-20-rc1",
         "PUBLIC_DISCOVERY_ENABLED": "false",
         "FRIEND_REQUESTS_ENABLED": "false",
         "MESSAGING_ENABLED": "false",
@@ -63,21 +68,31 @@
         "SENSITIVE_CONTENT_ENABLED": "false",
         "RATINGS_ENABLED": "false",
         "IDENTITY_VERIFICATION_ENABLED": "false",
-        "MODERATION_TOOLS_ENABLED": "false",
-        "DEMO_MODE_ENABLED": "true",
-        "DEMO_AUTO_START_ENABLED": "true",
-        "PUBLIC_DEMO_CANARY_ENABLED": "true",
-        "OAUTH_LOGIN_ENABLED": "false"
+        "MODERATION_TOOLS_ENABLED": "true",
+        "ACCOUNT_MODERATION_ENABLED": "false",
+        "ELIGIBILITY_REVIEW_ENABLED": "false",
+        "ADMIN_ACCESS_STANDALONE_ENABLED": "true",
+        "ADMIN_ACCESS_IDENTITY_LOOKUP_ENABLED": "true",
+        "ADMIN_CLOUDFLARE_ACCESS_REQUIRED": "true",
+        "DEMO_MODE_ENABLED": "false",
+        "DEMO_AUTO_START_ENABLED": "false",
+        "PUBLIC_DEMO_CANARY_ENABLED": "false",
+        "OAUTH_LOGIN_ENABLED": "true"
       },
       "d1_databases": [
         {
           "binding": "DB",
           "database_name": "chatgun-auth",
           "database_id": "9738a051-d914-42d0-8e7b-8098ef2b959d",
-          "migrations_dir": "migrations"
+          "migrations_dir": "migrations/production"
         }
       ],
-      "r2_buckets": []
+      "r2_buckets": [
+        {
+          "binding": "MEDIA",
+          "bucket_name": "chatgun-media-production"
+        }
+      ]
     }
   }
 }

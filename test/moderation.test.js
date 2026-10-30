@@ -72,6 +72,30 @@ test("message audit requires safety_admin and records access purpose", async () 
   database.close();
 });
 
+test('safety reviewer can inspect purpose audit history without exposed actor/session identifiers',async()=>{
+ const db=new TestD1(),session=await member(db,'audit-reader'),now=unixTime();try{
+  await db.prepare("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES('audit-role','audit-reader','safety_admin','Approved local audit review fixture',?,?)").bind(now,now+3600).run();
+  const env={...environment(db),SOCIAL_APP_ENABLED:'true',MODERATION_TOOLS_ENABLED:'true'};
+  await onRequest({env,request:request('/api/social/moderation/overview',session)});
+  const response=await onRequest({env,request:request('/api/social/moderation/audit',session)});assert.equal(response.status,200);const data=await response.json();assert.ok(data.accessEvents.some(e=>e.purpose==='routine_admin_dashboard_access'));assert.ok(data.accessEvents.every(e=>!('actor_user_id'in e)&&!('token_hash'in e)));
+ }finally{db.close();}
+});
+
+test('safety_admin cannot view or classify identity evidence even with an accidental safety-review row',async()=>{
+ const db=new TestD1(),admin=await member(db,'boundary-admin');await member(db,'evidence-owner');const now=unixTime();try{
+  await db.prepare("INSERT INTO moderation_roles(user_id,role,created_at)VALUES('boundary-admin','safety_admin',?)").bind(now).run();
+  await db.prepare("INSERT INTO social_media(id,owner_user_id,object_key,purpose,content_type,byte_size,created_at)VALUES('proof-id','evidence-owner','verification/private-local-proof','verification_id','image/png',4,?)").bind(now).run();
+  await db.prepare("INSERT INTO media_safety_reviews(media_id,status,source,created_at)VALUES('proof-id','pending','manual',?)").bind(now).run();
+  const media=new TestR2();media.objects.set('verification/private-local-proof',new Uint8Array([1,2,3,4]));const env={...environment(db),SOCIAL_APP_ENABLED:'true',MODERATION_TOOLS_ENABLED:'true',MEDIA:media};
+  const object=await onRequest({env,request:request('/api/social/moderation/media/proof-id',admin)});assert.equal(object.status,404);
+  const queue=await(await onRequest({env,request:request('/api/social/moderation/media',admin)})).json();assert.equal(queue.media.length,0);
+  const decision=await onRequest({env,request:request('/api/social/moderation/media',admin,{method:'POST',body:{id:'proof-id',status:'released',category:'general',reason:'Must not classify identity evidence',revision:0}})});assert.equal(decision.status,404);
+  await db.prepare("INSERT INTO media_appeals(id,media_id,appellant_user_id,reason,created_at)VALUES('proof-appeal','proof-id','evidence-owner','Accidental identity appeal must stay separate',?)").bind(now).run();
+  const appeals=await(await onRequest({env,request:request('/api/social/moderation/appeals',admin)})).json();assert.equal(appeals.appeals.length,0);
+  const appealDecision=await onRequest({env,request:request('/api/social/moderation/appeals',admin,{method:'POST',body:{id:'proof-appeal',decision:'granted',category:'general',reason:'Must not grant an identity evidence appeal',revision:0}})});assert.equal(appealDecision.status,404);
+ }finally{db.close();}
+});
+
 test("message media audit is role-gated, private, purpose-logged, and hides unsent media", async () => {
   const database = new TestD1();
   const media = new TestR2();

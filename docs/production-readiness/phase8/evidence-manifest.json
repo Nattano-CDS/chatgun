@@ -1,0 +1,36 @@
+{
+  "format": "chatgun-phase8-evidence-manifest-v1",
+  "purpose": "Preserve verifiable references to Phase 7 evidence without copying generated binary evidence into the curated release tree.",
+  "historicalEvidence": {
+    "pullRequest24": {
+      "url": "https://github.com/Nattano-CDS/chatgun/pull/24",
+      "head": "0b547678ba786b7b8129b484ed13af1c2fca9bab"
+    },
+    "pullRequest25": {
+      "url": "https://github.com/Nattano-CDS/chatgun/pull/25",
+      "head": "ff430e67cbaf605faa916f74393f6891b780b77c"
+    },
+    "pullRequest27": {
+      "url": "https://github.com/Nattano-CDS/chatgun/pull/27",
+      "head": "22e7cb5a5a67e860f0edb2ecfc0089d1f3fe6569",
+      "tree": "023d3b643463b35f002d1f6638c17d801a75c6fa",
+      "docsTree": "252d06aff89d01fdf935a95e308ddc00e8f80150",
+      "changedFiles": 3398,
+      "addedBlobBytesReported": 1066000000,
+      "binaryFiles": 2563,
+      "duplicateFiles": 1239
+    }
+  },
+  "retention": {
+    "originalEvidenceLocation": "Existing GitHub pull-request refs and the owner's protected local evidence store",
+    "copiedToCuratedTree": false,
+    "historicalGitObjectsRemoved": false,
+    "onlyCopyDeleted": false,
+    "futureHistoryRemediationRequiresSeparateOwnerApproval": true
+  },
+  "privacy": {
+    "containsPrivateIdentifiers": false,
+    "containsCredentials": false,
+    "containsInvitationTokens": false
+  }
+}

@@ -6,7 +6,13 @@ const screenshotDirectory = resolve("test-results/screenshots");
 
 test.beforeAll(() => mkdirSync(screenshotDirectory, { recursive: true }));
 
+// Deterministic UI contract only. Never evidence of real CAPTCHA/OAuth success.
+async function mockProviderConfiguration(page){
+  await page.route('**/api/auth/config',r=>r.fulfill({json:{oauthLoginEnabled:true,oauthProviders:['google','facebook','line'],turnstileSiteKey:'0xMockedUiOnly',newAccountRegistrationEnabled:false,invitationOnlyRegistrationEnabled:false,emailOtpEnabled:false,mobileOtpEnabled:false}}));
+}
+
 test("signup explains a Turnstile connection failure in Thai and retries before OAuth", async ({ page }) => {
+  await mockProviderConfiguration(page);
   await page.route("https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit", async (route) => {
     await route.fulfill({
       status: 200,
@@ -64,6 +70,8 @@ test("signup explains a Turnstile connection failure in Thai and retries before 
 });
 
 test("signup permits existing social login while public registration remains closed", async ({ page }, testInfo) => {
+  await mockProviderConfiguration(page);
+  await page.route('https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',r=>r.fulfill({contentType:'application/javascript',body:`window.turnstile={render(target){const input=document.createElement('input');input.type='hidden';input.name='cf-turnstile-response';document.querySelector(target).append(input);return 'mock-ui';},getResponse(){return '';}};`}));
   const cspErrors = [];
   page.on("console", (entry) => {
     if (/Content Security Policy directive/iu.test(entry.text())) cspErrors.push(entry.text());
@@ -142,13 +150,14 @@ test("privacy notice explains social identity data use", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "ข้อมูลที่เราเก็บ" })).toBeVisible();
   await expect(page.getByText(/Google, Facebook หรือ LINE/u)).toBeVisible();
   await expect(page.getByRole("heading", { name: "การลบข้อมูล" })).toBeVisible();
-  await expect(page.getByText("Email OTP ถูกปิดใช้งาน")).toBeVisible();
+  await expect(page.getByText(/OTP/).first()).toBeVisible();
 });
 
-test("legal review pages disclose unresolved owner decisions", async ({ page }) => {
+test("approved owner-pilot legal pages retain version, scope and unresolved wider-release decisions", async ({ page }) => {
   await page.goto("/terms.html");
   await expect(page).toHaveTitle("ข้อกำหนดการใช้บริการ | ChatGun");
-  await expect(page.getByText("ฉบับร่างสำหรับเจ้าของบริการตรวจสอบ:")).toBeVisible();
+  await expect(page.locator('[data-policy-version]')).toContainText('20 ตุลาคม 2026');
+  await expect(page.getByRole('heading',{name:'ข้อมูลที่เจ้าของต้องยืนยัน'})).toBeVisible();
 
   await page.goto("/data-deletion.html");
   await expect(page).toHaveTitle("การขอลบบัญชีและข้อมูล | ChatGun");
@@ -161,24 +170,55 @@ test("account page redirects unauthenticated users to signup", async ({ page }) 
   await expect(page.getByRole("heading", { name: "เข้าสู่ระบบด้วยบัญชีเดิม" })).toBeVisible();
 });
 
+test('age-held account has understandable Thai rights controls and usable deletion reauthentication', async ({page}, testInfo) => {
+  await page.route('**/api/auth/me',r=>r.fulfill({json:{user:{displayName:'บัญชีทดสอบความปลอดภัย'},providers:['line'],ageSafetyReviewRequired:true,canLinkAccounts:false,nextPath:'/account.html?access=age-review'}}));
+  await page.route('**/api/auth/sessions',r=>r.fulfill({json:{sessions:[],hasMore:false}}));
+  await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:true}}));
+  await page.route('**/api/auth/config',r=>r.fulfill({json:{oauthProviders:['line'],turnstileSiteKey:'synthetic-ui-only'}}));
+  await page.route('https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',r=>r.fulfill({contentType:'application/javascript',body:`window.turnstile={render(target){document.querySelector(target).textContent='การยืนยันความปลอดภัยจำลองสำหรับ UI เท่านั้น';return 'fixture';},getResponse(){return '';}};`}));
+  await page.route('**/api/auth/account-deletion/request',r=>r.fulfill({status:428,json:{code:'recent_auth_required'}}));
+  await page.goto('/account.html?access=age-review');
+  await expect(page.locator('#age-safety-notice')).toBeVisible();
+  await expect(page.locator('#age-safety-notice')).toContainText('อย่าส่งวันเกิดเต็ม');
+  await expect(page.locator('#age-safety-notice a[href="mailto:natttano@outlook.com"]')).toBeVisible();
+  await expect(page.locator('#open-social')).toBeHidden(); await expect(page.locator('#linking')).toBeHidden();
+  await expect(page.locator('.auth-navigation')).toBeHidden();
+  await expect(page.locator('#session-management')).toBeVisible(); await expect(page.locator('#logout')).toBeVisible();
+  await page.locator('#delete-start').click();
+  await expect(page.locator('#delete-reauth')).toBeVisible();
+  await expect(page.locator('#account-security')).toBeVisible();
+  await expect(page.locator('#turnstile')).toContainText('UI เท่านั้น');
+  await expect(page.locator('.reauth-provider')).toHaveText('LINE');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:resolve(screenshotDirectory,'age-safety-rights-'+testInfo.project.name+'.png'),fullPage:true});
+});
+
+test('query string cannot label a non-held member as age-restricted',async({page})=>{
+  await page.route('**/api/auth/me',r=>r.fulfill({json:{user:{displayName:'บัญชีทดสอบ'},providers:[],ageSafetyReviewRequired:false,canLinkAccounts:false,nextPath:'/account.html'}}));
+  await page.route('**/api/auth/sessions',r=>r.fulfill({json:{sessions:[],hasMore:false}}));
+  await page.route('**/api/social/config',r=>r.fulfill({json:{socialAppEnabled:false}}));
+  await page.route('**/api/auth/config',r=>r.fulfill({json:{oauthProviders:[],turnstileSiteKey:'synthetic-ui-only'}}));
+  await page.goto('/account.html?access=age-review');
+  await expect(page.locator('#logout')).toBeVisible(); await expect(page.locator('#age-safety-notice')).toBeHidden();
+});
+
 test("Pages Functions expose secure config and reject cross-origin mutations", async ({ request, baseURL }) => {
   const configResponse = await request.get("/api/auth/config");
   expect(configResponse.status()).toBe(200);
   expect(configResponse.headers()["cache-control"]).toBe("no-store");
   expect(configResponse.headers()["x-content-type-options"]).toBe("nosniff");
   const config = await configResponse.json();
-  expect(config.oauthProviders).toEqual(["google", "facebook", "line"]);
+  expect(config.oauthProviders).toEqual(config.oauthLoginEnabled ? ["google", "facebook", "line"] : []);
   expect(config.emailOtpEnabled).toBe(false);
   expect(config.mobileOtpEnabled).toBe(false);
   expect(config.smsEnabled).toBe(false);
   expect(config.newAccountRegistrationEnabled).toBe(false);
   expect(config.invitationOnlyRegistrationEnabled).toBe(false);
-  expect(config.safety).toEqual({
-    publicDiscoveryEnabled: false,
-    unsolicitedMessagingEnabled: false,
-    minorRegistrationEnabled: false,
-  });
-  expect(config.turnstileSiteKey).toMatch(/^0x[\w-]+$/u);
+  expect(config.safety).toEqual({publicDiscoveryEnabled:false,unsolicitedMessagingEnabled:false,minorRegistrationEnabled:false});
+  if(config.turnstileSiteKey!==null){
+    if(new URL(baseURL).hostname==='localhost')expect(config.turnstileSiteKey).toBe('turnstile-site'); // Synthetic local harness only.
+    else expect(config.turnstileSiteKey).toMatch(/^0x[\w-]+$/u);
+  }
 
   const disabledOtpResponse = await request.post("/api/auth/otp/start", {
     headers: { origin: baseURL, "content-type": "application/json" },

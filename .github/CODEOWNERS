@@ -1,0 +1,7 @@
+# Review ownership is enforced only after the proposed main ruleset is approved.
+* @Nattano-CDS
+/.github/ @Nattano-CDS
+/functions/ @Nattano-CDS
+/migrations/ @Nattano-CDS
+/workers/ @Nattano-CDS
+/docs/production-readiness/ @Nattano-CDS

@@ -1,0 +1,10 @@
+{
+ "name":"chatgun-final-uat-privacy-cleanup",
+ "account_id":"23017b53386fb67fc62a52cdd017454c",
+ "main":"workers/privacy-cleanup.js",
+ "compatibility_date":"2026-10-15",
+ "workers_dev":false,"preview_urls":false,"send_metrics":false,
+ "triggers":{"crons":["17 3 * * *"]},
+ "vars":{"RETENTION_CLEANUP_ENABLED":"true","UAT_AUDIT_RETENTION_DAYS":"90","UAT_AUDIT_RETENTION_START_MODE":"actual-campaign-close"},
+ "d1_databases":[{"binding":"DB","database_name":"chatgun-final-uat","database_id":"e3cb426c-b88a-4b93-90fd-39df524f68ae","migrations_dir":"migrations"}]
+}

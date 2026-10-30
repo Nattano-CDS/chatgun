@@ -83,6 +83,13 @@ test("social capabilities fail closed and never expose a game capability", async
     sensitiveContentEnabled: false,
     demoModeEnabled: false,
     demoAutoStartEnabled: false,
+    onlineStatusEnabled: false,
+    moderationToolsEnabled: false,
+    alwaysOnPrivateUat: false,
+    participantAccess: null,
+    moderationCoverage: null,
+    adminAccessStandaloneEnabled: false,
+    accountModerationEnabled: false,
     gameEnabled: false,
     emailOtpEnabled: false,
     mobileOtpEnabled: false,
@@ -194,45 +201,30 @@ test("discovery throttles repeated reads used for location inference", async () 
   database.close();
 });
 
-test("friendship, messaging, blocking, and reports enforce server-side relationship rules", async () => {
-  const database = new TestD1();
-  const env = socialEnvironment(database);
-  const alice = await addUser(database, "rel-alice", "Alice");
-  const bob = await addUser(database, "rel-bob", "Bob");
-  await onboard(env, alice, "Alice");
-  await onboard(env, bob, "Bob");
-
-  const premature = await call(env, request("/api/social/messages", alice, {
-    method: "POST", body: { action: "send", target: "rel-bob", body: "hello" },
-  }));
-  assert.equal(premature.status, 403);
-
-  assert.equal((await call(env, request("/api/social/relationships", alice, {
-    method: "POST", body: { action: "request", target: "rel-bob" },
-  }))).status, 200);
-  assert.equal((await call(env, request("/api/social/relationships", bob, {
-    method: "POST", body: { action: "accept", target: "rel-alice" },
-  }))).status, 200);
-
-  const sent = await call(env, request("/api/social/messages", alice, {
-    method: "POST", body: { action: "send", target: "rel-bob", body: "hello" },
-  }));
-  assert.equal(sent.status, 200, await sent.text());
-  const thread = await call(env, request("/api/social/messages?target=rel-alice", bob));
-  const payload = await thread.json();
-  assert.equal(payload.messages[0].body, "hello");
-  const inbox = await call(env, request("/api/social/relationships", alice));
-  const conversation = (await inbox.json()).relationships.find((item) => item.other_user_id === "rel-bob");
-  assert.equal(conversation.last_message_body, "hello");
-  assert.equal(conversation.last_message_sender_id, "rel-alice");
-  assert.ok(Number(conversation.last_message_at) > 0);
-  await database.prepare("UPDATE social_relationships SET status='pending' WHERE id=?").bind(conversation.id).run();
-  const pendingInbox = await call(env, request("/api/social/relationships", alice));
-  const pendingConversation = (await pendingInbox.json()).relationships.find((item) => item.other_user_id === "rel-bob");
-  assert.equal(pendingConversation.last_message_body, null, "pending relationships do not receive message previews");
-  assert.equal(pendingConversation.unread_count, 0);
-  await database.prepare("UPDATE social_relationships SET status='accepted' WHERE id=?").bind(conversation.id).run();
-
+test("friend requests gate messaging and enforce accept, reject, duplicate, removal, and blocking rules", async () => {
+  const database=new TestD1(),env=socialEnvironment(database);
+  const alice=await addUser(database,"rel-alice","Alice"),bob=await addUser(database,"rel-bob","Bob"),carol=await addUser(database,"rel-carol","Carol");
+  await onboard(env,alice,"Alice");await onboard(env,bob,"Bob");await onboard(env,carol,"Carol");
+  assert.equal((await (await call(env,new Request("https://chatgun.pages.dev/api/social/config"))).json()).friendRequestsEnabled,true);
+  const premature=await call(env,request("/api/social/messages",alice,{method:"POST",body:{action:"send",target:"rel-bob",body:"hello"}}));
+  assert.equal(premature.status,403);
+  const duplicateRequests=await Promise.all([1,2].map(()=>call(env,request("/api/social/relationships",alice,{method:"POST",body:{action:"request",target:"rel-bob"}}))));
+  assert.deepEqual(duplicateRequests.map((response)=>response.status).sort(),[200,409]);
+  let pending=await(await call(env,request("/api/social/relationships",bob))).json();
+  assert.equal(pending.relationships[0].requested_by,"rel-alice");
+  assert.equal(pending.relationships[0].status,"pending");
+  assert.equal((await call(env,request("/api/social/relationships",bob,{method:"POST",body:{action:"accept",target:"rel-alice"}}))).status,200);
+  const sent=await call(env,request("/api/social/messages",alice,{method:"POST",body:{action:"send",target:"rel-bob",body:"hello"}}));
+  assert.equal(sent.status,200,await sent.text());
+  const thread=await call(env,request("/api/social/messages?target=rel-alice",bob));
+  assert.equal((await thread.json()).messages[0].body,"hello");
+  const inbox=await call(env,request("/api/social/conversations",bob));
+  const conversation=(await inbox.json()).conversations.find(p=>p.other_user_id==="rel-alice");
+  assert.equal(conversation.unread_count,1);
+  assert.ok(conversation.last_message_at>0);
+  assert.equal((await call(env,request("/api/social/relationships",alice,{method:"POST",body:{action:"request",target:"rel-carol"}}))).status,200);
+  assert.equal((await call(env,request("/api/social/relationships",carol,{method:"POST",body:{action:"reject",target:"rel-alice"}}))).status,200);
+  assert.equal((await call(env,request("/api/social/messages",alice,{method:"POST",body:{action:"send",target:"rel-carol",body:"denied"}}))).status,403);
   const report = await call(env, request("/api/social/reports", bob, {
     method: "POST",
     body: { target: "rel-alice", category: "harassment", details: "ข้อความไม่เหมาะสม" },
@@ -248,6 +240,19 @@ test("friendship, messaging, blocking, and reports enforce server-side relations
   assert.equal(await database.prepare("SELECT COUNT(*) count FROM social_relationships").first().then((r) => r.count), 0);
   const denied = await call(env, request("/api/social/messages?target=rel-bob", alice));
   assert.equal(denied.status, 403);
+  database.close();
+});
+
+test("removing a friend immediately hides the conversation and prevents cached contact capability", async () => {
+  const database=new TestD1(),env=socialEnvironment(database);
+  const alice=await addUser(database,"remove-alice","Alice"),bob=await addUser(database,"remove-bob","Bob");
+  await onboard(env,alice,"Alice");await onboard(env,bob,"Bob");
+  for(const [session,action,target] of [[alice,"request","remove-bob"],[bob,"accept","remove-alice"]])
+    assert.equal((await call(env,request("/api/social/relationships",session,{method:"POST",body:{action,target}}))).status,200);
+  assert.equal((await call(env,request("/api/social/messages",alice,{method:"POST",body:{action:"send",target:"remove-bob",body:"before removal"}}))).status,200);
+  assert.equal((await call(env,request("/api/social/relationships",alice,{method:"POST",body:{action:"unfriend",target:"remove-bob"}}))).status,200);
+  assert.equal((await call(env,request("/api/social/messages?target=remove-bob",alice))).status,403);
+  assert.deepEqual((await(await call(env,request("/api/social/conversations",alice))).json()).conversations,[]);
   database.close();
 });
 

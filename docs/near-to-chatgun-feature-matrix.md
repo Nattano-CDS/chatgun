@@ -25,7 +25,7 @@ The original implementation is confidently identified as the owner-controlled Ch
 | D1 schema verification | Sites read-only overview and the 25 versioned Drizzle migrations agree on 19 tables |
 | Design evidence | Version 91 deployment screenshot exists in Sites; source includes complete responsive CSS, fonts, icons, demo atlases, and game art |
 
-The source was opened into an audit-only checkout at `/Users/nattano/.codex/worktrees/near-source-audit`. No source file or source commit was changed. The destination baseline is PR #5 (`codex/privacy-safety`, commit `9c315cf`), which already contains PR #3 authentication plus the staging privacy/safety controls. PR #4 remains a separate legal draft and was not merged.
+The source was opened in a local, read-only NEAR source checkout. No source file or source commit was changed. The destination baseline is PR #5 (`codex/privacy-safety`, commit `9c315cf`), which already contains PR #3 authentication plus the staging privacy/safety controls. PR #4 remains a separate legal draft and was not merged.
 
 ## Status definitions
 
