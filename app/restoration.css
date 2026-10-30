@@ -32,6 +32,7 @@
 .thread .messages{min-height: 0px; overscroll-behavior: contain; padding: 22px 20px;}
 .message{max-width: 80%; line-height: 1.65; font-size: 14px; overflow-wrap: anywhere;}
 .message.mine{background: rgb(121, 82, 207);}
+.message-status{display:block;margin-top:3px;font-size:10px;opacity:.78;text-align:right;}
 .composer{background: rgb(255, 255, 255); align-items: center; flex-shrink: 0;}
 .composer input{min-width: 0px;}
 .composer .icon-button{flex-shrink: 0;}

@@ -9,7 +9,7 @@ import {issueSession,unixTime} from '../functions/_lib/db.js';
 import {onRequest as social} from '../functions/api/social/[[path]].js';
 import {onRequest as auth} from '../functions/api/auth/[[path]].js';
 import {onRequestGet as health} from '../functions/api/health.js';
-const db=new TestD1(),now=unixTime(),sessions={},fullSystem=process.env.CHATGUN_FULL_SYSTEM_LOCAL==='true',objects=new Map();
+const db=new TestD1(),now=unixTime(),sessions={},fullSystem=process.env.CHATGUN_FULL_SYSTEM_LOCAL==='true',launchRc=process.env.CHATGUN_LAUNCH_RC==='true',objects=new Map();
 const tls=mkdtempSync(resolve(tmpdir(),'chatgun-issue16-local-tls-'));
 execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',tls+'/key.pem','-out',tls+'/cert.pem','-subj','/CN=localhost','-days','1'],{stdio:'pipe'});
 const tlsOptions={key:readFileSync(tls+'/key.pem'),cert:readFileSync(tls+'/cert.pem')};
@@ -27,7 +27,7 @@ for(const width of [390,768,1440])for(const [kind,name] of [['viewer','ผู้
   if(kind==='moderator')await db.prepare("INSERT INTO moderation_access_grants(id,user_id,role,grant_reason,granted_at,expires_at)VALUES(?,?,'moderation_admin','Local-only role management regression fixture',?,?)").bind(id+'-role-admin',id,now,now+1800).run();
 }
 writeFileSync('/tmp/chatgun-issue16-local-sessions.json',JSON.stringify(sessions),{mode:0o600});
-const base={...environment(db),SOCIAL_APP_ENABLED:'true',PRESENCE_ENABLED:'true',PUBLIC_DISCOVERY_ENABLED:'true',MESSAGING_ENABLED:'true',MODERATION_TOOLS_ENABLED:'true',ACCOUNT_MODERATION_ENABLED:'true',MEDIA_UPLOAD_ENABLED:'false',RATINGS_ENABLED:'false',IDENTITY_VERIFICATION_ENABLED:'false',OAUTH_LOGIN_ENABLED:'false',NEW_ACCOUNT_REGISTRATION_ENABLED:'false',DEMO_MODE_ENABLED:'false',DEMO_AUTO_START_ENABLED:'false'};
+const base={...environment(db),SOCIAL_APP_ENABLED:'true',PRESENCE_ENABLED:'true',PUBLIC_DISCOVERY_ENABLED:'true',FRIEND_REQUESTS_ENABLED:launchRc?'true':'false',MESSAGING_ENABLED:'true',MODERATION_TOOLS_ENABLED:'true',ACCOUNT_MODERATION_ENABLED:'true',MEDIA_UPLOAD_ENABLED:'false',RATINGS_ENABLED:'false',IDENTITY_VERIFICATION_ENABLED:'false',OAUTH_LOGIN_ENABLED:'false',NEW_ACCOUNT_REGISTRATION_ENABLED:'false',DEMO_MODE_ENABLED:'false',DEMO_AUTO_START_ENABLED:'false'};
 if(fullSystem)Object.assign(base,{ELIGIBILITY_REVIEW_ENABLED:'true',BETA_ENROLLMENT_REQUIRED:'true',MEDIA_UPLOAD_ENABLED:'true',MEDIA_QUARANTINE_ENABLED:'true',RATINGS_ENABLED:'true',MEDIA:{async put(key,bytes){objects.set(key,new Uint8Array(bytes));},async head(key){return objects.has(key)?{}:null;},async get(key){return objects.has(key)?{body:objects.get(key)}:null;},async delete(key){objects.delete(key);}}});
 const dist=resolve('dist'),mime={'.js':'text/javascript','.css':'text/css','.html':'text/html','.svg':'image/svg+xml','.json':'application/json','.png':'image/png','.woff2':'font/woff2'};
 for(const [port,enabled] of [[8797,true],[8798,false]])createServer(tlsOptions,async(req,res)=>{
