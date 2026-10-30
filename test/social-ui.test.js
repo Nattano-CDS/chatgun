@@ -5,6 +5,7 @@ import test from "node:test";
 const html = readFileSync("app/index.html", "utf8");
 const script = readFileSync("app/social.js", "utf8");
 const styles = readFileSync("app/social.css", "utf8");
+const restorationStyles = readFileSync("app/restoration.css", "utf8");
 const headers = readFileSync("_headers", "utf8");
 const redirects = readFileSync("_redirects", "utf8");
 const moderationHtml = readFileSync("app/moderation.html", "utf8");
@@ -55,6 +56,10 @@ test("social client uses same-origin APIs, CSRF, escaped rendering, and fail-clo
   assert.match(script, /last_message_sender_id/u);
   assert.match(script, /navigator\.permissions\.query\(\{ name: "geolocation" \}\)/u);
   assert.match(script, /revokeLocationPublication/u);
+  assert.match(script, /refreshPublishedLocation/u);
+  assert.match(script, /locationPublicationEnabled = state\.config\.publicDiscoveryEnabled && Number\(state\.profile\.discovery_visible\) === 1/u);
+  assert.match(script, /window\.addEventListener\("pageshow", resumeLocationPublication\)/u);
+  assert.match(script, /shouldRevokeLocationPublication/u);
   assert.match(script, /refreshOpenThread/u);
   assert.match(script, /hadUnread && await loadRelationships\(\)/u);
   assert.match(script, /if \(!state\.config\.mediaUploadEnabled\) return state\.myGallery = \[\], renderOwnGallery\(\)/u);
@@ -82,6 +87,24 @@ test("chat renders chronological DOM without reverse flex and preserves timeline
   assert.match(script, /new-messages-indicator/u);
   assert.match(script, /isNearTimelineBottom/u);
   assert.match(script, /state\.threadMessages\[0\]/u);
+});
+
+test("mobile chat keyboard does not leave the bottom-navigation gap above the composer", () => {
+  assert.match(script, /isLikelyChatKeyboardOpen/u);
+  assert.match(script, /chatViewportHeight/u);
+  assert.match(script, /visualViewport\?\.offsetTop/u);
+  assert.match(script, /visualViewport\?\.addEventListener\("scroll", sizeConversation\)/u);
+  assert.match(script, /activeElement\?\.closest\?\.\("#thread \.composer"\)/u);
+  assert.match(script, /focusin/u);
+  assert.match(restorationStyles, /data-keyboard-open="true"[^}]+\.sidebar\{visibility: hidden/u);
+  assert.match(restorationStyles, /data-keyboard-open="true"[^}]+main\{padding-bottom: 0px/u);
+  assert.match(restorationStyles, /data-keyboard-open="true"[^}]+\.chat-layout\{min-height: 0px !important/u);
+});
+
+test("presence and location controls remain fail-closed during initialization", () => {
+  assert.match(script, /online-status-toggle"\)\.disabled = !0, await onlinePresence\.start\(\), \$\("#online-status-toggle"\)\.disabled = !1/u);
+  assert.match(script, /const wasPublished = state\.locationPublicationEnabled \|\| state\.locationFresh/u);
+  assert.match(script, /state\.config\?\.publicDiscoveryEnabled \? renderPeople\(\) : await loadPeople\(\)/u);
 });
 
 test("responsive social route receives only the required geolocation permission", () => {

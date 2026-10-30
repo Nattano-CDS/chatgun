@@ -2,6 +2,8 @@ import { offerDemoRetirement } from "./retire-demo.js";
 import { createOnlinePresence } from "./online-presence.js";
 import { createMessageDelivery } from "./message-delivery.js";
 import { isNearTimelineBottom, mergeTimelineMessages, timelineMessageKey } from "./chat-timeline.js";
+import { shouldRepublishLocation, shouldRevokeLocationPublication } from "./location-publication.js";
+import { chatViewportHeight, isLikelyChatKeyboardOpen } from "./chat-viewport.js";
 const deliverMessage=createMessageDelivery((path,options)=>api(path,options));
 let onlinePresence;
 const onlineSlot=(person,id)=>window.ChatgunNearComponents.online(person,id,escapeHtml);
@@ -10,7 +12,7 @@ async function startOnlinePresence() {
     for (const slot of document.querySelectorAll("[data-online-user]")) slot.innerHTML = statuses[slot.dataset.onlineUser] === !0 ? '<span class="member-online-dot" aria-hidden="true"></span><span>ออนไลน์</span>' : "";
   }, preference: (enabled) => {
     $("#online-status-toggle").checked = enabled;
-  } }), $("#online-preference").hidden = !1, await onlinePresence.start();
+  } }), $("#online-preference").hidden = !1, $("#online-status-toggle").disabled = !0, await onlinePresence.start(), $("#online-status-toggle").disabled = !1;
   new MutationObserver(records=>{
     if(records.some(record=>[...record.addedNodes].some(node=>node.nodeType===1&&(node.matches('[data-online-user]')||node.querySelector('[data-online-user]')))))void onlinePresence.refresh();
   }).observe(document.body,{childList:true,subtree:true});
@@ -44,7 +46,9 @@ const state = {
   selectedPerson: null,
   selectedChat: null,
   locationFresh: !1,
+  locationPublicationEnabled: !1,
   locationWatch: null,
+  locationRefreshPending: !1,
   lastLocationPost: 0,
   lastUnread: 0,
   lastRequests: 0,
@@ -320,7 +324,7 @@ async function loadPeople(append=false) {
   const generation=state.discoveryGeneration=(state.discoveryGeneration||0)+1,result = await api('/api/social/discovery?'+query);
   if(generation!==state.discoveryGeneration)return;
   state.discoveryCursor=result.nextCursor;$('#discovery-more').hidden=!result.hasMore;
-  state.people = append?[...new Map([...state.people,...result.people].map(p=>[p.user_id,p])).values()]:result.people, state.locationFresh = result.locationFresh, $("#location-banner").classList.toggle("active", state.locationFresh), $("#location-toggle").textContent = state.locationFresh ? "ปิดตำแหน่ง" : "เปิดตำแหน่ง", renderPeople();
+  state.people = append?[...new Map([...state.people,...result.people].map(p=>[p.user_id,p])).values()]:result.people, state.locationFresh = result.locationFresh, $("#location-banner").classList.toggle("active", state.locationPublicationEnabled), $("#location-toggle").textContent = state.locationPublicationEnabled ? "ปิดตำแหน่ง" : "เปิดตำแหน่ง", renderPeople();
 }
 $('#discovery-more').addEventListener('click',async(event)=>{setBusy(event.currentTarget,true);try{await loadPeople(true);}catch(error){toast(error.message,true);}finally{setBusy(event.currentTarget,false);}});
 async function loadRatings(append=false) {
@@ -344,12 +348,12 @@ $('#reviews-more').addEventListener('click',async(event)=>{setBusy(event.current
 async function loadBlocked() {
   state.blocked = (await api("/api/social/blocks")).blocked, renderBlocked();
 }
-async function updateLocation() {
+async function updateLocation({ resume = !1 } = {}) {
   const button = $("#location-toggle");
-  if (state.locationFresh) {
+  if (state.locationPublicationEnabled && !resume) {
     setBusy(button, !0);
     try {
-      await api("/api/social/discovery", { method: "POST", body: { action: "hide" } }), state.locationWatch !== null && navigator.geolocation.clearWatch(state.locationWatch), state.locationWatch = null, state.people = [], state.locationFresh = !1, renderPeople(), button.textContent = "เปิดตำแหน่ง", $("#location-banner").classList.remove("active");
+      await api("/api/social/discovery", { method: "POST", body: { action: "hide" } }), state.locationWatch !== null && navigator.geolocation.clearWatch(state.locationWatch), state.locationWatch = null, state.locationPublicationEnabled = !1, state.people = [], state.locationFresh = !1, renderPeople(), button.textContent = "เปิดตำแหน่ง", $("#location-banner").classList.remove("active");
     } catch (error) {
       toast(error.message, !0);
     } finally {
@@ -358,6 +362,7 @@ async function updateLocation() {
     return;
   }
   if (!navigator.geolocation) return toast("อุปกรณ์นี้ไม่รองรับตำแหน่ง", !0);
+  state.locationPublicationEnabled = !0;
   setBusy(button, !0, "กำลังหาตำแหน่ง…");
   const publish = async ({ coords }) => {
     if (!(document.visibilityState !== "visible" || Date.now() - state.lastLocationPost < 55e3)) {
@@ -365,26 +370,64 @@ async function updateLocation() {
       try {
         await api("/api/social/discovery", { method: "POST", body: { action: "location", latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy } }), state.locationFresh = !0, await loadPeople(), toast("เปิดการค้นหาคนใกล้คุณแล้ว");
       } catch (error) {
-        await revokeLocationPublication({ notifyServer: state.locationFresh }), toast(error.message, !0);
+        state.lastLocationPost = 0, toast(error.message, !0);
       } finally {
         button.disabled = !1, delete button.dataset.label;
       }
     }
   }, failed = async (error) => {
-    await revokeLocationPublication({ notifyServer: state.locationFresh }), button.disabled = !1, button.textContent = "เปิดตำแหน่ง", delete button.dataset.label, toast(error.code === 1 ? "กรุณาอนุญาตตำแหน่งเพื่อค้นหาคนใกล้คุณ" : "ไม่สามารถอ่านตำแหน่งได้", !0);
+    shouldRevokeLocationPublication(error) && await revokeLocationPublication(), state.lastLocationPost = 0, button.disabled = !1, button.textContent = state.locationPublicationEnabled ? "ปิดตำแหน่ง" : "เปิดตำแหน่ง", delete button.dataset.label, toast(error.code === 1 ? "กรุณาอนุญาตตำแหน่งเพื่อค้นหาคนใกล้คุณ" : "ยังอ่านตำแหน่งไม่ได้ ระบบจะลองใหม่โดยไม่ปิดตำแหน่ง", !0);
   };
   state.locationWatch = navigator.geolocation.watchPosition(publish, failed, { enableHighAccuracy: !0, timeout: 12e3, maximumAge: 3e4 });
 }
 async function revokeLocationPublication({ notifyServer = !0 } = {}) {
-  state.locationWatch !== null && navigator.geolocation && navigator.geolocation.clearWatch(state.locationWatch), state.locationWatch = null, state.lastLocationPost = 0, notifyServer && state.config?.socialAppEnabled && state.profile && await api("/api/social/discovery", { method: "POST", body: { action: "hide" } }).catch(() => {
-  }), state.locationFresh = !1, state.people = [], $("#location-banner")?.classList.remove("active"), $("#location-toggle") && ($("#location-toggle").textContent = "เปิดตำแหน่ง"), $("#people-grid") && renderPeople();
+  const wasPublished = state.locationPublicationEnabled || state.locationFresh;
+  state.locationWatch !== null && navigator.geolocation && navigator.geolocation.clearWatch(state.locationWatch);
+  state.locationWatch = null, state.locationPublicationEnabled = !1, state.lastLocationPost = 0;
+  notifyServer && wasPublished && state.config?.socialAppEnabled && state.profile && await api("/api/social/discovery", { method: "POST", body: { action: "hide" } }).catch(() => {});
+  state.locationFresh = !1, state.people = [], $("#location-banner")?.classList.remove("active"), $("#location-toggle") && ($("#location-toggle").textContent = "เปิดตำแหน่ง");
+  if ($("#people-grid")) state.config?.publicDiscoveryEnabled ? renderPeople() : await loadPeople();
+}
+async function refreshPublishedLocation() {
+  if (!shouldRepublishLocation({
+    watching: state.locationWatch !== null,
+    pending: state.locationRefreshPending,
+    visible: document.visibilityState === "visible",
+    online: navigator.onLine,
+    lastPost: state.lastLocationPost,
+    now: Date.now(),
+  })) return !1;
+  state.locationRefreshPending = !0;
+  state.lastLocationPost = Date.now();
+  try {
+    const coords = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(
+      ({ coords: current }) => resolve(current), reject,
+      { enableHighAccuracy: !0, timeout: 12e3, maximumAge: 3e4 },
+    ));
+    await api("/api/social/discovery", { method: "POST", body: {
+      action: "location", latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy,
+    } });
+    state.locationFresh = !0;
+    return !0;
+  } catch (error) {
+    state.lastLocationPost = 0;
+    shouldRevokeLocationPublication(error) && await revokeLocationPublication();
+    return !1;
+  } finally {
+    state.locationRefreshPending = !1;
+  }
+}
+function resumeLocationPublication() {
+  if (!state.locationPublicationEnabled || state.locationWatch !== null || !navigator.geolocation || state.locationPermission?.state === "denied") return !1;
+  void updateLocation({ resume: !0 });
+  return !0;
 }
 async function monitorLocationPermission() {
   if (!(!navigator.permissions?.query || !navigator.geolocation))
     try {
       const permission = await navigator.permissions.query({ name: "geolocation" });
-      state.locationPermission = permission, permission.state === "denied" && await revokeLocationPublication({ notifyServer: state.locationFresh }), permission.onchange = () => {
-        permission.state === "denied" && revokeLocationPublication({ notifyServer: state.locationFresh }).then(() => toast("สิทธิ์ตำแหน่งถูกปิด จึงซ่อนคุณจากการค้นหาแล้ว", !0));
+      state.locationPermission = permission, permission.state === "denied" && await revokeLocationPublication(), permission.onchange = () => {
+        permission.state === "denied" && revokeLocationPublication().then(() => toast("สิทธิ์ตำแหน่งถูกปิด จึงซ่อนคุณจากการค้นหาแล้ว", !0));
       };
     } catch {
     }
@@ -464,9 +507,18 @@ window.addEventListener("beforeunload", (e) => {
   !approvedUnload && (unsavedUpload() || uploadSelection.busy) && (e.preventDefault(), e.returnValue = "");
 });
 function keyboardViewport() {
-  document.body.dataset.keyboardOpen = String(!!(window.visualViewport && innerHeight - window.visualViewport.height > 150));
+  const composerFocused = document.activeElement?.closest?.("#thread .composer") != null;
+  document.body.dataset.keyboardOpen = String(isLikelyChatKeyboardOpen({
+    composerFocused,
+    compactViewport: matchMedia("(max-width: 760px)").matches,
+    hasVisualViewport: window.visualViewport != null,
+    layoutViewportHeight: innerHeight,
+    visualViewportHeight: window.visualViewport?.height || innerHeight,
+  }));
+  requestAnimationFrame(sizeConversation);
 }
 window.visualViewport?.addEventListener("resize", keyboardViewport);
+window.visualViewport || document.addEventListener("focusin", keyboardViewport);
 document.addEventListener("focusout", () => setTimeout(keyboardViewport, 100));
 function mountGalleryUpload() {
   const form = $("#approved-gallery-upload");
@@ -807,11 +859,12 @@ function switchTab(tab) {
 function sizeConversation() {
   const layout = $(".chat-layout");
   if (state.activeTab !== "chat" || !layout) return;
-  const viewport = window.visualViewport?.height || innerHeight, navigation = $(".sidebar").getBoundingClientRect().height;
-  layout.style.setProperty("--chat-height", `${Math.max(260, viewport - layout.getBoundingClientRect().top - navigation - 8)}px`);
+  const viewport = window.visualViewport?.height || innerHeight, viewportOffsetTop = window.visualViewport?.offsetTop || 0, keyboardOpen = document.body.dataset.keyboardOpen === "true", navigation = $(".sidebar").getBoundingClientRect().height;
+  layout.style.setProperty("--chat-height", `${chatViewportHeight({ viewportHeight: viewport, viewportOffsetTop, layoutTop: layout.getBoundingClientRect().top, navigationHeight: navigation, keyboardOpen })}px`);
 }
 window.addEventListener("resize", sizeConversation);
 window.visualViewport?.addEventListener("resize", sizeConversation);
+window.visualViewport?.addEventListener("scroll", sizeConversation);
 async function initialize() {
   offerDemoRetirement($("#retired-demo"));
   // A closed prelaunch is intentionally static: it must remain accessible when
@@ -859,7 +912,8 @@ async function initialize() {
       }
       throw error;
     }
-    $("#global-status").textContent = "", delete document.body.dataset.flow, $("#social-view").hidden = !1, $("#always-on-uat-notice").hidden = !state.config.alwaysOnPrivateUat, localStorage.getItem("chatgun-notifications") === "enabled" && ($("#notification-toggle").textContent = "ปิดการแจ้งเตือนขณะเปิดแอป"), fillProfile(), await refreshSections(), await monitorLocationPermission(), switchTab(state.activeTab), location.pathname === "/app/photos" && openOwnGallery(!1);
+    state.locationPublicationEnabled = state.config.publicDiscoveryEnabled && Number(state.profile.discovery_visible) === 1;
+    $("#global-status").textContent = "", delete document.body.dataset.flow, $("#social-view").hidden = !1, $("#always-on-uat-notice").hidden = !state.config.alwaysOnPrivateUat, localStorage.getItem("chatgun-notifications") === "enabled" && ($("#notification-toggle").textContent = "ปิดการแจ้งเตือนขณะเปิดแอป"), fillProfile(), await refreshSections(), await monitorLocationPermission(), resumeLocationPublication(), switchTab(state.activeTab), location.pathname === "/app/photos" && openOwnGallery(!1);
     const route = routedProfile();
     if(route)await showPerson(route.user,{historyMode:'none',photo:route.photo}).catch(error=>toast(error.message,true));
     if(state.config.onlineStatusEnabled)await startOnlinePresence().catch(()=>toast('สถานะออนไลน์ยังไม่พร้อม ส่วนอื่นยังใช้งานได้',true));
@@ -1458,20 +1512,13 @@ window.addEventListener("offline", () => {
   $("#global-status").textContent = "ออฟไลน์ — การเปลี่ยนแปลงจะยังไม่ถูกส่ง";
 });
 window.addEventListener("online", () => {
-  $("#global-status").textContent = "", toast("กลับมาออนไลน์แล้ว"), refreshOpenThread().catch(() => {
+  $("#global-status").textContent = "", toast("กลับมาออนไลน์แล้ว"), resumeLocationPublication(), refreshOpenThread().catch(() => {
   });
 });
 document.addEventListener("visibilitychange", () => {
   document.visibilityState === "visible" && state.config?.socialAppEnabled && state.profile && (Promise.all(state.activeTab === "near" ? [loadPeople()] :
     state.activeTab === "chat" ? [loadRelationships(), refreshOpenThread()] : []).catch(() => {
-  }), state.locationWatch !== null && Date.now() - state.lastLocationPost > 55e3 && navigator.geolocation.getCurrentPosition(async ({ coords }) => {
-    state.lastLocationPost = Date.now();
-    try {
-      await api("/api/social/discovery", { method: "POST", body: { action: "location", latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy } }), await loadPeople();
-    } catch {
-      await revokeLocationPublication({ notifyServer: state.locationFresh });
-    }
-  }, () => revokeLocationPublication({ notifyServer: state.locationFresh }), { enableHighAccuracy: !0, timeout: 12e3, maximumAge: 0 }));
+  }), void refreshPublishedLocation());
 });
 setInterval(() => {
   if (document.visibilityState !== "visible" || !navigator.onLine ||
@@ -1481,6 +1528,7 @@ setInterval(() => {
   if (state.activeTab === "near") void loadPeople().catch(() => {});
   if(state.config.messagingEnabled)void loadRelationships().catch(()=>{});
   if(state.activeTab==='profile'&&state.myGallery.some(p=>p.review_status==='pending'))void Promise.all([loadOwnGallery(),loadMediaSafety()]).catch(()=>{});
+  void refreshPublishedLocation();
 }, 3e4);
 setInterval(() => {
   document.visibilityState === "visible" && navigator.onLine && (refreshOpenThread().catch(() => {
@@ -1494,8 +1542,9 @@ document.addEventListener("visibilitychange", () => {
   });
 });
 window.addEventListener("pagehide", () => {
-  state.locationWatch !== null && navigator.geolocation && navigator.geolocation.clearWatch(state.locationWatch), state.locationPermission && (state.locationPermission.onchange = null);
+  state.locationWatch !== null && navigator.geolocation && navigator.geolocation.clearWatch(state.locationWatch), state.locationWatch = null, state.locationPermission && (state.locationPermission.onchange = null);
 });
+window.addEventListener("pageshow", resumeLocationPublication);
 window.addEventListener("popstate", (event) => {
   if (document.body.dataset.staticPrelaunch === "true") return;
   if (restoringUpload) {

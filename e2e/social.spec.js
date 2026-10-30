@@ -28,7 +28,7 @@ async function mockSocialApi(page) {
     const responses = {
       "/api/social/config": config,
       "/api/auth/me": { user: { id: "me", displayName: "นัท" }, providers: ["google"], recentlyAuthenticated: true },
-      "/api/social/profile": { profile: { user_id: "me", name: "นัท", gender: "ไม่ระบุ", bio: "ชอบทำความรู้จักเพื่อนใหม่", interests: "กาแฟ, เทคโนโลยี", discovery_visible: 1 } },
+      "/api/social/profile": { profile: { user_id: "me", name: "นัท", gender: "ไม่ระบุ", bio: "ชอบทำความรู้จักเพื่อนใหม่", interests: "กาแฟ, เทคโนโลยี", discovery_visible: 0 } },
       "/api/social/discovery": { locationFresh: true, people: [
         { user_id: "near-1", name: "มิน", gender: "หญิง", bio: "ชอบคาเฟ่และถ่ายรูป", interests: "กาแฟ, ถ่ายรูป", distance: 82, rating: 4.8, rating_count: 12 },
         { user_id: "near-2", name: "ต้น", gender: "ชาย", bio: "วิ่งและท่องเที่ยว", interests: "วิ่ง, ท่องเที่ยว", distance: 640, rating: 4.5, rating_count: 6 },
@@ -67,6 +67,62 @@ test('restricted public account reaches account privacy/deletion and appeal cont
 test('authenticated chat deep link opens the actual inbox immediately',async({page})=>{
   await page.goto('/?tab=chat');await expect(page.locator('#chat-tab')).toBeVisible();
   await expect(page.locator('#near-tab')).not.toBeVisible();await expect(page.locator('[data-chat="friend-1"]')).toBeVisible();
+});
+
+test('approved location publication resumes after refresh and survives transient device errors', async ({ page }) => {
+  const actions = [];
+  await page.route('**/api/social/profile', route => route.fulfill({ json: {
+    profile: { user_id: 'me', name: 'นัท', discovery_visible: 1 },
+  } }));
+  page.on('request', request => {
+    if (request.method() === 'POST' && new URL(request.url()).pathname === '/api/social/discovery')
+      actions.push(request.postDataJSON()?.action);
+  });
+  await page.addInitScript(() => {
+    let nextWatch = 0;
+    Object.defineProperty(navigator, 'permissions', { configurable: true, value: { query: async () => ({ state: 'granted', onchange: null }) } });
+    Object.defineProperty(navigator, 'geolocation', { configurable: true, value: {
+      watchPosition(success, failure) {
+        const id = ++nextWatch;
+        setTimeout(() => success({ coords: { latitude: 13.75, longitude: 100.5, accuracy: 10 } }), 0);
+        setTimeout(() => failure({ code: 2 }), 20);
+        return id;
+      },
+      clearWatch() {},
+      getCurrentPosition(success) { success({ coords: { latitude: 13.75, longitude: 100.5, accuracy: 10 } }); },
+    } });
+  });
+  await page.goto('/app/');
+  await expect.poll(() => actions.filter(action => action === 'location').length).toBe(1);
+  await expect(page.locator('#location-toggle')).toHaveText('ปิดตำแหน่ง');
+  await page.reload();
+  await expect.poll(() => actions.filter(action => action === 'location').length).toBe(2);
+  await expect(page.locator('#location-toggle')).toHaveText('ปิดตำแหน่ง');
+  expect(actions).not.toContain('hide');
+});
+
+test('mobile software keyboard leaves no navigation-sized gap below the chat composer', async ({ page }) => {
+  await page.addInitScript(() => {
+    const viewport = new EventTarget();
+    Object.defineProperty(viewport, 'height', { value: 900, writable: true });
+    Object.defineProperty(viewport, 'offsetTop', { value: 0, writable: true });
+    Object.defineProperty(window, 'visualViewport', { value: viewport, configurable: true });
+    window.__resizeTestViewport = (height, offsetTop = 0) => {
+      viewport.height = height;
+      viewport.offsetTop = offsetTop;
+      viewport.dispatchEvent(new Event('resize'));
+      viewport.dispatchEvent(new Event('scroll'));
+    };
+  });
+  await page.goto('/app/?tab=chat');
+  await page.locator('[data-chat="friend-1"]').click();
+  await page.locator('#thread input[name=body]').focus();
+  await page.evaluate(() => window.__resizeTestViewport(500, 140));
+  await expect(page.locator('body')).toHaveAttribute('data-keyboard-open', 'true');
+  await expect(page.locator('#app .sidebar')).toHaveCSS('visibility', 'hidden');
+  await expect.poll(() => page.locator('#thread .composer').evaluate(node => Math.round(node.getBoundingClientRect().bottom - window.visualViewport.offsetTop))).toBe(500);
+  await page.evaluate(() => window.__resizeTestViewport(220, 140));
+  await expect.poll(() => page.locator('#thread .composer').evaluate(node => Math.round(node.getBoundingClientRect().bottom - window.visualViewport.offsetTop))).toBeLessThanOrEqual(220);
 });
 
 test('chat timeline stays chronological and preserves intentional reading position', async ({ page }) => {

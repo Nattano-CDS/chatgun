@@ -217,6 +217,9 @@ body{line-height: 1.5;}
 #app .discovery-pagination span{font-size: 13px; color: rgb(153, 135, 170);}
 #app .discovery-pagination button{font-size: 13px; min-height: 44px;}
 body[data-active-tab="chat"] #app > main{max-width: none; height: 100dvh; padding: 0px 0px 72px; overflow: hidden;}
+body[data-active-tab="chat"][data-keyboard-open="true"] #app > main{padding-bottom: 0px;}
+body[data-active-tab="chat"][data-keyboard-open="true"] #app .sidebar{visibility: hidden; pointer-events: none;}
+body[data-active-tab="chat"][data-keyboard-open="true"] #app .chat-layout{min-height: 0px !important;}
 body[data-active-tab="chat"] #app .toolbar{height: 74px; margin: 0px; padding: 0px 24px; border: 0px; position: relative;}
 body[data-active-tab="chat"] #demo-banner{display: none;}
 body[data-active-tab="chat"]:has(.chat-layout.open) #app .toolbar{display: none;}
