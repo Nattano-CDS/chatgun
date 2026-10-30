@@ -189,23 +189,26 @@ test('authenticated shortcut is session-owned, deduplicated and independent of d
 
 test('gallery failed comment keeps its draft and inline reason; likes are disabled while pending',async({page})=>{
  await enableMedia(page);
- let likes=0;
+ let likes=0,comments=0;
  const waitForGalleryPost=action=>page.waitForResponse(response=>{
   if(response.request().method()!=='POST'||new URL(response.url()).pathname!=='/api/social/gallery')return false;
   try{return response.request().postDataJSON()?.action===action;}catch{return false;}
  });
- await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',photos:[{id:'fixture-photo',visibility:'public',owner:'near-1',caption:'ภาพสมมติ',like_count:0}],comments:[]}}));
- await page.route('**/api/social/gallery',async r=>{
+ await page.route('**/api/social/gallery**',async r=>{
+  if(r.request().method()==='GET')return r.fulfill({json:{owner:'near-1',photos:[{id:'fixture-photo',visibility:'public',owner:'near-1',caption:'ภาพสมมติ',like_count:0}],comments:[]}});
   const body=r.request().postDataJSON();
-  if(body.action==='comment')return r.fulfill({status:403,json:{error:'ไม่มีสิทธิ์ส่งความคิดเห็น'}});
+  if(body.action==='comment'){comments++;await new Promise(resolve=>setTimeout(resolve,150));return r.fulfill(comments===1?{status:403,json:{error:'ไม่มีสิทธิ์ส่งความคิดเห็น'}}:{json:{ok:true}});}
   likes++;await new Promise(resolve=>setTimeout(resolve,300));await r.fulfill(likes===1?{status:503,json:{error:'บันทึก Like ไม่สำเร็จ กรุณาลองอีกครั้ง'}}:{json:{ok:true}});
  });
  const galleryLoaded=page.waitForResponse(response=>response.request().method()==='GET'&&new URL(response.url()).pathname==='/api/social/gallery'&&new URL(response.url()).searchParams.get('photo')==='fixture-photo');
  await page.goto('/app/people/near-1/gallery/fixture-photo');await galleryLoaded;await expect(page.locator('.lightbox-shell')).toBeVisible();
- await page.locator('#gallery-comment input[name=comment]').fill('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');await expect(page.locator('#gallery-comment button')).toBeEnabled();
- const commentResponse=waitForGalleryPost('comment');await page.locator('#gallery-comment button').click();await commentResponse;
+ const comment=page.locator('#gallery-comment input[name=comment]'),submit=page.locator('#gallery-comment button');
+ await expect(submit).toBeDisabled();await comment.fill('ข้อความชั่วคราว');await expect(submit).toBeEnabled();await comment.fill('');await expect(submit).toBeDisabled();await comment.fill('   ');await expect(submit).toBeDisabled();
+ await comment.fill('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');await expect(submit).toBeEnabled();
+ const commentResponse=waitForGalleryPost('comment');await submit.click();await expect(comment).toBeDisabled();await expect(submit).toBeDisabled();await expect(page.locator('.post-like')).toBeDisabled();await commentResponse;
  await expect(page.locator('[data-post-feedback]')).toHaveAttribute('role','alert');await expect(page.locator('[data-post-feedback]')).toHaveText('ไม่มีสิทธิ์ส่งความคิดเห็น');
- await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');
+ await expect(comment).toBeEnabled();await expect(page.locator('.post-like')).toBeEnabled();await expect(comment).toHaveValue('ความคิดเห็นสมมติที่ยังส่งไม่สำเร็จ');await comment.fill('ร่างหลังแก้ข้อผิดพลาด');await expect(submit).toBeEnabled();
+ const recoveredComment=waitForGalleryPost('comment');await submit.click();await recoveredComment;await expect(comment).toHaveValue('');await expect(submit).toBeDisabled();
   const firstLikeResponse=waitForGalleryPost('like');await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();await firstLikeResponse;await expect(page.locator('.post-like')).toBeEnabled();expect(likes).toBe(1);
   await expect(page.locator('.post-like svg')).toHaveCount(1);await expect(page.locator('[data-post-feedback]')).toHaveText('บันทึก Like ไม่สำเร็จ กรุณาลองอีกครั้ง');
   const secondLikeResponse=waitForGalleryPost('like');await page.locator('.post-like').click();await expect(page.locator('.post-like')).toBeDisabled();
@@ -224,7 +227,7 @@ test('public photo stays open without a private grant and foreground updates pre
  await page.clock.install();let updated=false;
  await page.route('**/api/social/gallery?*',r=>r.fulfill({json:{owner:'near-1',album:{granted:false,request:null},photos:[{id:'public-refresh',visibility:'public',caption:'รูปสาธารณะ',like_count:updated?2:0}],comments:updated?[{id:'new',sender_name:'ผู้แสดงความคิดเห็นทดสอบ',body:'ความคิดเห็นใหม่'}]:[]}}));
  await page.goto('/app/people/near-1/gallery/public-refresh');await expect(page.locator('.lightbox-shell')).toBeVisible();await page.locator('#gallery-comment input[name=comment]').fill('ร่างที่ต้องรักษาไว้');updated=true;await page.clock.fastForward(11000);
- await expect(page.locator('.lightbox-shell')).toBeVisible();await expect(page.locator('.post-comments')).toContainText('ความคิดเห็นใหม่');await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ร่างที่ต้องรักษาไว้');
+ await expect(page.locator('.lightbox-shell')).toBeVisible();await expect(page.locator('.post-comments')).toContainText('ความคิดเห็นใหม่');await expect(page.locator('#gallery-comment input[name=comment]')).toHaveValue('ร่างที่ต้องรักษาไว้');await expect(page.locator('#gallery-comment button')).toBeEnabled();
 });
 test('core configuration outage exposes a working recovery action without fake members',async({page})=>{
  let failed=true;await page.route('**/api/social/config',r=>failed?r.fulfill({status:503,json:{message:'Temporary failure'}}):r.fulfill({json:config}));await page.goto('/');await expect(page.locator('#disabled-view')).toBeVisible();await expect(page.locator('#people-grid .person-card')).toHaveCount(0);failed=false;await page.locator('#service-retry').click();await expect(page.locator('#social-view')).toBeVisible();await expect(page.locator('#disabled-view')).toBeHidden();
