@@ -15,7 +15,8 @@
     "audit:production-preservation": "node scripts/verify-production-preservation.mjs",
     "verify:production-preservation": "node scripts/verify-production-preservation.mjs --enforce",
     "verify:production-remediation": "node scripts/verify-production-remediation.mjs",
-    "verify:production-activation": "node scripts/verify-production-activation-package.mjs"
+    "verify:production-activation": "node scripts/verify-production-activation-package.mjs",
+    "verify:master-production-release": "node scripts/verify-master-production-release.mjs"
   },
   "engines": {
     "node": ">=22.5"
