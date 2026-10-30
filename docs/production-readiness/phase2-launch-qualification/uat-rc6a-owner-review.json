@@ -1,0 +1,20 @@
+{
+  "status": "PROPOSED_NOT_APPROVED_NOT_ACTIVE",
+  "scope": "single-operator-dual-account-private-uat-with-mutual-friends",
+  "supersedes": "rc6 package with Adult Notice version/manifest mismatch; activation stopped before deploy or flag change",
+  "versions": {
+    "adultNotice": "adult-social-friends-single-operator-dual-account-uat-2026-10-30-rc6a",
+    "terms": "terms-social-friends-single-operator-dual-account-uat-2026-10-30-rc6a",
+    "privacy": "privacy-social-friends-single-operator-dual-account-uat-2026-10-30-rc6a",
+    "deletion": "deletion-social-friends-single-operator-dual-account-uat-2026-10-30-rc6a"
+  },
+  "files": {
+    "policies/final-uat/single-operator-rc6a/beta-notice.html": "19168e805f6b6edc2d02b31b2cc6bd430334f00464d58383e36ce7705a5aa414",
+    "policies/final-uat/single-operator-rc6a/terms.html": "3497b3c7fb41bbbeb53cb4c48fff34c5f6b370fa17bdacad8a9029940d5464b1",
+    "policies/final-uat/single-operator-rc6a/privacy.html": "221d03f59511625dddaf4ac044cf20974ee5e726819b9122eda3b90eb9e79e54",
+    "policies/final-uat/single-operator-rc6a/data-deletion.html": "6d32072e58a183c16f7e6594246450f334c1f531331776dd021faa6a53844100"
+  },
+  "materialChangeFromRc5": "Adds mutual friend request state and consent; friend-only messaging; reject/cancel/remove; block removes friendship and unblock does not restore it.",
+  "correctionFromRc6": "Corrects the Adult Notice declared version and replaces draft-state wording with conditional exact-approval wording; all four hashes change.",
+  "activationBlockedUntilExactOwnerApproval": true
+}

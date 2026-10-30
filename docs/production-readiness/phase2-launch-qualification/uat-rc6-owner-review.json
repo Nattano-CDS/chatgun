@@ -1,5 +1,5 @@
 {
-  "status": "PROPOSED_NOT_APPROVED_NOT_ACTIVE",
+  "status": "SUPERSEDED_NOT_ACTIVE_VERSION_MISMATCH",
   "scope": "single-operator-dual-account-private-uat-with-mutual-friends",
   "versions": {
     "adultNotice": "adult-social-friends-single-operator-dual-account-uat-2026-10-30-rc6",

@@ -3,16 +3,16 @@ import { PROPOSED_POLICY as RC5_POLICY, finalUatSocialVars, validateFinalUatSoci
 
 export const RC6_POLICY = Object.freeze({
   versions: {
-    adultNotice: 'adult-social-friends-single-operator-dual-account-uat-2026-10-30-rc6',
-    terms: 'terms-social-friends-single-operator-dual-account-uat-2026-10-30-rc6',
-    privacy: 'privacy-social-friends-single-operator-dual-account-uat-2026-10-30-rc6',
-    deletion: 'deletion-social-friends-single-operator-dual-account-uat-2026-10-30-rc6',
+    adultNotice: 'adult-social-friends-single-operator-dual-account-uat-2026-10-30-rc6a',
+    terms: 'terms-social-friends-single-operator-dual-account-uat-2026-10-30-rc6a',
+    privacy: 'privacy-social-friends-single-operator-dual-account-uat-2026-10-30-rc6a',
+    deletion: 'deletion-social-friends-single-operator-dual-account-uat-2026-10-30-rc6a',
   },
   files: {
-    'policies/final-uat/single-operator-rc6/beta-notice.html': '51a3d29a2ec4f2d2c37dfe1083d5644c50688c2f98c1efb07edc19fde69848c6',
-    'policies/final-uat/single-operator-rc6/terms.html': 'bc22928c1d7b2e94c643d58c50f4fe81d19ce2d5dd7825adbf6839d9e73872ae',
-    'policies/final-uat/single-operator-rc6/privacy.html': '0aff863c3ce838fd568a56f8ab130c2e37b8662575ea0117b211e53756149f86',
-    'policies/final-uat/single-operator-rc6/data-deletion.html': 'fa32d86d0649e3f2ec3cdd7789aab205654e62648c9a51f35c1623a2ed6ac0a5',
+    'policies/final-uat/single-operator-rc6a/beta-notice.html': '19168e805f6b6edc2d02b31b2cc6bd430334f00464d58383e36ce7705a5aa414',
+    'policies/final-uat/single-operator-rc6a/terms.html': '3497b3c7fb41bbbeb53cb4c48fff34c5f6b370fa17bdacad8a9029940d5464b1',
+    'policies/final-uat/single-operator-rc6a/privacy.html': '221d03f59511625dddaf4ac044cf20974ee5e726819b9122eda3b90eb9e79e54',
+    'policies/final-uat/single-operator-rc6a/data-deletion.html': '6d32072e58a183c16f7e6594246450f334c1f531331776dd021faa6a53844100',
   },
 });
 

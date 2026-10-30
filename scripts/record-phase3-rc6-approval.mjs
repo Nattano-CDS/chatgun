@@ -8,7 +8,7 @@ import { RC6_POLICY, validateFinalUatRc6Approval } from './lib/final-uat-rc6.mjs
 assert.equal(process.env.CHATGUN_RC6_APPROVAL, 'record-exact-owner-approval');
 const path = resolve(process.env.CHATGUN_UAT_PRIVATE_APPROVAL_FILE || '');
 assert.equal(path, '/Users/nattano/.codex/private-backups/chatgun/final-uat-social-handoff-20261028.json');
-const approvalText = 'I approve all four exact rc6 versions and SHA-256 hashes listed above for isolated private UAT only, including mutual-friend state processing for my owner-controlled LINE A and Google B identities.';
+const approvalText = 'I approve all four corrected exact rc6a versions and SHA-256 hashes listed above for isolated private UAT only, including mutual-friend state processing for my owner-controlled LINE A and Google B identities.';
 const receipt = JSON.parse(readFileSync(path, 'utf8'));
 assert.equal(receipt.identities?.length, 2);
 assert.ok(receipt.identities.every(identity => !identity.providerAccountReferencePrivate));
