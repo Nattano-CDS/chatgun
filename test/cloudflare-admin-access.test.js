@@ -80,7 +80,7 @@ test('Access validates real handler RBAC, audit, CSRF and revocation without gra
   let fetches = 0;
   globalThis.fetch = async (url, options) => {
     assert.equal(url, `${config.issuer}/cdn-cgi/access/certs`);
-    assert.equal(options.redirect, 'error');
+    assert.equal(options.redirect, 'manual');
     fetches++;
     return Response.json(jwks);
   };
@@ -142,6 +142,8 @@ test('Access JWKS diagnostics distinguish fetch, payload, missing-key and verifi
       error => error.message === 'access_jwks_fetch_failed');
     await assert.rejects(principal('http', new Response('', { status: 503 })),
       error => error.message === 'access_jwks_fetch_failed');
+    await assert.rejects(principal('redirect', new Response('', { status: 302, headers: { location: 'https://other.example.test/' } })),
+      error => error.message === 'access_jwks_redirect_failed');
     await assert.rejects(principal('json', new Response('{', { headers: { 'content-type': 'application/json' } })),
       error => error.message === 'access_jwks_invalid_payload');
     await assert.rejects(principal('shape', Response.json({ keys: 'not-an-array' })),
@@ -152,6 +154,30 @@ test('Access JWKS diagnostics distinguish fetch, payload, missing-key and verifi
       error => error.message === 'invalid_access_signature');
     await assert.rejects(verifyCloudflareAccessJwt(await signed(), config, { keys: { find() { throw new Error('fixture runtime'); } } }, now),
       error => error.message === 'access_verifier_runtime_failed');
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test('Access JWKS retrieval uses Workers-supported manual redirect handling and rejects redirects', async () => {
+  const originalFetch = globalThis.fetch;
+  const issuer = 'https://chatgun-workers-fetch-test.cloudflareaccess.com';
+  const token = await signed({ iss: issuer });
+  const request = new Request('https://chatgun.pages.dev/api/admin/session', {
+    headers: { 'cf-access-jwt-assertion': token },
+  });
+  let calls = 0;
+  try {
+    globalThis.fetch = async (url, options) => {
+      calls++;
+      assert.equal(url, `${issuer}/cdn-cgi/access/certs`);
+      // Cloudflare Workers throws before sending when redirect is "error".
+      if (options?.redirect === 'error') throw new TypeError('unsupported redirect mode');
+      assert.equal(options?.redirect, 'manual');
+      return Response.json(jwks);
+    };
+    assert.equal((await cloudflareAdminPrincipal(request, {
+      ...envConfig, ADMIN_ACCESS_ISSUER: issuer,
+    })).subject, claims.sub);
+    assert.equal(calls, 1);
   } finally { globalThis.fetch = originalFetch; }
 });
 
@@ -242,7 +268,7 @@ test('optional Cloudflare identity lookup binds real login time to verified subj
         if(url===`${issuer}/cdn-cgi/access/certs`)return Response.json(jwks);
         assert.equal(url,`${issuer}/cdn-cgi/access/get-identity`);
         assert.equal(options.headers.cookie,`CF_Authorization=${jwt}`);
-        assert.equal(options.redirect,'error');
+        assert.equal(options.redirect,'manual');
         return Response.json({user_uuid:sub,email:config.email,account_id:'23017b53386fb67fc62a52cdd017454c',iat:now-1000,...cases[index]});
       };
       const principal=await cloudflareAdminPrincipal(new Request('https://chatgun.pages.dev/api/admin/session',{headers:{'cf-access-jwt-assertion':jwt}}),env);
@@ -260,6 +286,7 @@ test('Admin Access failure taxonomy is allowlisted and defaults unexpected error
     ['admin_account_inactive', 'admin_account_inactive'],
     ['admin_account_restricted', 'admin_account_inactive'],
     ['access_jwks_fetch_failed', 'access_jwks_fetch_failed'],
+    ['access_jwks_redirect_failed', 'access_jwks_redirect_failed'],
     ['access_jwks_invalid_payload', 'access_jwks_invalid_payload'],
     ['access_verifier_runtime_failed', 'access_verifier_runtime_failed'],
     ['access_verification_unavailable', 'access_jwks_fetch_failed'],
@@ -324,6 +351,7 @@ test('standalone Admin diagnostics classify failures without leaking credentials
     await run({ name: 'configuration', expected: 'invalid_access_configuration', envPatch: { ADMIN_ACCESS_AUDIENCE: '' } });
     await run({ name: 'jwks-timeout', expected: 'access_jwks_fetch_failed', fetchResult: new DOMException('Timed out', 'TimeoutError') });
     await run({ name: 'jwks-http', expected: 'access_jwks_fetch_failed', fetchResult: new Response('', { status: 503 }) });
+    await run({ name: 'jwks-redirect', expected: 'access_jwks_redirect_failed', fetchResult: new Response('', { status: 302 }) });
     await run({ name: 'jwks-json', expected: 'access_jwks_invalid_payload', fetchResult: new Response('{') });
     await run({ name: 'jwks-shape', expected: 'access_jwks_invalid_payload', fetchResult: { keys: 'invalid' } });
     await run({ name: 'inactive', expected: 'admin_account_inactive', user: false });

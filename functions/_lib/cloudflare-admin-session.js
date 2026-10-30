@@ -11,6 +11,7 @@ const ADMIN_ACCESS_FAILURE_CATEGORIES = new Set([
   'invalid_access_configuration',
   'admin_account_inactive',
   'access_jwks_fetch_failed',
+  'access_jwks_redirect_failed',
   'access_jwks_invalid_payload',
   'access_verifier_runtime_failed',
 ]);

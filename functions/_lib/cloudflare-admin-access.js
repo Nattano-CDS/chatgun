@@ -105,12 +105,16 @@ async function trustedKeys(issuer) {
   let response;
   try {
     response = await fetch(`${issuer}/cdn-cgi/access/certs`, {
-      headers: { accept: 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(5000),
+      // Workers does not implement Fetch's "error" redirect mode and throws
+      // before issuing the subrequest. Manual mode keeps redirects observable
+      // without forwarding request headers to another destination.
+      headers: { accept: 'application/json' }, redirect: 'manual', signal: AbortSignal.timeout(5000),
     });
   } catch {
-    // Timeout, network and redirect failures share one non-sensitive category.
+    // Timeout and network failures share one non-sensitive category.
     throw new Error('access_jwks_fetch_failed');
   }
+  if (response.status >= 300 && response.status < 400) throw new Error('access_jwks_redirect_failed');
   if (!response?.ok) throw new Error('access_jwks_fetch_failed');
   let body;
   try {
@@ -164,7 +168,8 @@ export async function cloudflareAdminPrincipal(request, env) {
       try {
         const response = await fetch(`${config.issuer}/cdn-cgi/access/get-identity`, {
           headers: { accept: 'application/json', cookie: `CF_Authorization=${token}` },
-          redirect: 'error', signal: AbortSignal.timeout(5000),
+          // Never forward the Access token across a redirect.
+          redirect: 'manual', signal: AbortSignal.timeout(5000),
         });
         if (response.ok) {
           const text = await response.text();
