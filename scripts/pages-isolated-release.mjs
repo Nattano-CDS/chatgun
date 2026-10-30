@@ -9,6 +9,9 @@ import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 
 const sha = /^[a-f0-9]{40}$/u;
+const safeName = /^[a-z0-9][a-z0-9-]{0,62}$/u;
+const safeProfile = /^[a-z0-9][a-z0-9_-]{0,62}$/u;
+const semver = /^\d+\.\d+\.\d+$/u;
 const prohibited = new Set(['wrangler.json','wrangler.jsonc','wrangler.toml','.dev.vars','.env']);
 const forbiddenName = name => prohibited.has(name) || name === '.wrangler' || name.startsWith('.env.') || name.startsWith('.dev.vars.');
 const bindingKeys = ['d1_databases','r2_buckets','kv_namespaces','durable_object_namespaces',
@@ -28,8 +31,10 @@ export function productionConfiguration(project) {
   for (const key of bindingKeys) {
     if (config[key] !== undefined) assert.ok(config[key] && typeof config[key] === 'object', 'Invalid ' + key);
   }
-  // Fields like wrangler_config_hash, fail_open, compatibility date and bindings
-  // are deliberately NOT ignored. Only secret values are unreadable.
+  // Cloudflare recalculates this internal metadata hash for a config-free code
+  // upload even when every effective runtime setting is unchanged. Compare all
+  // deployable fields, including fail_open, compatibility settings and bindings.
+  delete config.wrangler_config_hash;
   return config;
 }
 
@@ -62,24 +67,62 @@ export function preservationChecks(project, fingerprint) {
   return {checked:26,passed:26-failed.length,failed,verdict:failed.length?'BLOCKED':'PASS'};
 }
 
+function bindingEntries(bindings) {
+  if (Array.isArray(bindings)) return bindings;
+  if (!bindings || typeof bindings !== 'object') return [];
+  return Object.entries(bindings).map(([binding, value]) => ({ binding, ...(value || {}) }));
+}
+
+export function runtimeContractChecks(project, contract) {
+  const wrapper = project?.result ? project : null;
+  const source = project?.result || project;
+  const config = productionConfiguration(project);
+  const failed = [];
+  if (!contract || typeof contract !== 'object') throw new Error('Missing Production runtime contract');
+  if (contract.accountId && wrapper?.account_id !== contract.accountId) failed.push('account_id');
+  if (source.name !== contract.projectName) failed.push('project_name');
+  if (source.production_branch !== contract.productionBranch) failed.push('production_branch');
+  for (const [name, expected] of Object.entries(contract.requiredPlainVariables || {})) {
+    const actual = config.env_vars[name];
+    if (!actual || actual.type !== 'plain_text' || actual.value !== expected) failed.push(`plain:${name}`);
+  }
+  for (const name of contract.requiredSecretBindings || []) {
+    if (config.env_vars[name]?.type !== 'secret_text') failed.push(`secret:${name}`);
+  }
+  for (const name of contract.requiredD1Bindings || []) {
+    const binding = bindingEntries(config.d1_databases).find(item => item.binding === name);
+    const identifier = binding?.id || binding?.database_id;
+    if (typeof identifier !== 'string' || !identifier) failed.push(`d1:${name}`);
+  }
+  for (const name of contract.requiredR2Bindings || []) {
+    const binding = bindingEntries(config.r2_buckets).find(item => item.binding === name);
+    const identifier = binding?.name || binding?.bucket_name;
+    if (typeof identifier !== 'string' || !identifier) failed.push(`r2:${name}`);
+  }
+  return { verdict: failed.length ? 'BLOCKED' : 'PASS', failed };
+}
+
 export function deploymentSourceSha(project) {
   const source = project?.result || project;
   return source?.canonical_deployment?.deployment_trigger?.metadata?.commit_hash || null;
 }
 
-export function inspectProject(before, current, fingerprint, projectName) {
+export function inspectProject(before, current, fingerprint, contract) {
   const source=before?.result || before;
   const latest=current?.result || current;
-  assert.equal(source.name,projectName,'Unexpected baseline Pages project');
-  assert.equal(latest.name,projectName,'Unexpected current Pages project');
+  assert.equal(source.name,contract.projectName,'Unexpected baseline Pages project');
+  assert.equal(latest.name,contract.projectName,'Unexpected current Pages project');
   assert.equal(source.production_branch,latest.production_branch,'Production branch drift');
-  assert.equal(latest.production_branch,'main','Unexpected Pages Production branch');
+  assert.equal(latest.production_branch,contract.productionBranch,'Unexpected Pages Production branch');
+  const baselineContract=runtimeContractChecks(before,contract);
+  const currentContract=runtimeContractChecks(current,contract);
   const differences=configDiff(before,current);
   const checks=preservationChecks(current,fingerprint);
-  if(differences.length || checks.failed.length) throw Object.assign(new Error('Production configuration preservation BLOCKED'),{
-    differences,failedChecks:checks.failed
+  const failedChecks=[...baselineContract.failed.map(x=>`baseline:${x}`),...currentContract.failed.map(x=>`current:${x}`),...checks.failed];
+  if(differences.length || failedChecks.length) throw Object.assign(new Error('Production configuration preservation BLOCKED'),{
+    differences,failedChecks
   });
-  return {verdict:'PASS',project:projectName,preserved:checks.passed,configurationDifferences:0,
+  return {verdict:'PASS',project:contract.projectName,preserved:checks.passed,configurationDifferences:0,
     secrets:{bindingNamesAndTypesCompared:true,contentsVerifiable:false}};
 }
 
@@ -107,8 +150,12 @@ export function assetManifest(dist,functionsDir) {
   return {files:hashed.length,digest:createHash('sha256').update(JSON.stringify(hashed)).digest('hex')};
 }
 
-export function prepareStage(dist,functionsDir,commit) {
+export function prepareStage(dist,functionsDir,commit,{projectName='chatgun',branch='main',profile='chatgun',wranglerVersion='4.156.0'}={}) {
   assert.match(commit,sha);
+  assert.match(projectName,safeName);
+  assert.match(branch,safeName);
+  assert.match(profile,safeProfile);
+  assert.match(wranglerVersion,semver);
   const paths=[resolve(dist),resolve(functionsDir)];
   const manifest=assetManifest(...paths);
   const stage=mkdtempSync(join(tmpdir(),'chatgun-pages-'));
@@ -119,8 +166,8 @@ export function prepareStage(dist,functionsDir,commit) {
   const staged=assetManifest(join(stage,'dist'),join(stage,'functions'));
   assert.deepEqual(staged,manifest,'Staged artifact differs from source');
   assert.ok(!existsSync(join(stage,'.wrangler')),'Generated Wrangler deployment redirection prohibited');
-  return {stage,manifest,command:['wrangler','pages','deploy','dist','--project-name','chatgun',
-    '--branch','main','--commit-hash',commit]};
+  return {stage,manifest,command:['npx','--yes',`wrangler@${wranglerVersion}`,'pages','deploy','dist',
+    '--project-name',projectName,'--branch',branch,'--commit-hash',commit,'--profile',profile]};
 }
 
 function option(name) {
@@ -136,7 +183,9 @@ if(process.argv[1] === fileURLToPath(import.meta.url)) {
     const before=JSON.parse(readFileSync(option('--before'),'utf8'));
     const current=JSON.parse(readFileSync(option('--current'),'utf8'));
     const fp=JSON.parse(readFileSync(option('--fingerprint'),'utf8'));
-    const state=inspectProject(before,current,fp,option('--project'));
+    const contract=JSON.parse(readFileSync(option('--contract'),'utf8'));
+    assert.equal(option('--project'),contract.projectName,'CLI project does not match runtime contract');
+    const state=inspectProject(before,current,fp,contract);
     const result={...state,phase,productionDeployment:'NOT RUN',configurationSecretValues:'NOT INSPECTED'};
     if(phase==='post') {
       const expectedSha=option('--sha');
@@ -149,7 +198,10 @@ if(process.argv[1] === fileURLToPath(import.meta.url)) {
     }
     if(phase==='pre'){
       const commit=option('--sha');
-      const staged=prepareStage(option('--dist'),option('--functions'),commit);
+      const staged=prepareStage(option('--dist'),option('--functions'),commit,{
+        projectName:contract.projectName,branch:contract.productionBranch,
+        profile:contract.wranglerProfile,wranglerVersion:contract.wranglerVersion
+      });
       Object.assign(result,{testedSourceSha:commit,stage:staged.stage,assetDigest:staged.manifest.digest,
         files:staged.manifest.files,deployCommand:staged.command,
         instruction:'For a separately authorized deployment only: run the pinned Wrangler executable FROM stage, with no --config, --env or repository cwd. This script never deploys.'});
