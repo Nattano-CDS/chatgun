@@ -29,7 +29,7 @@ const deploy = read('scripts/deploy-phase2-uat-rc.mjs').toString();
 assert.match(deploy, /FRIEND_REQUESTS_ENABLED\.value, 'false'/u);
 assert.match(deploy, /productionWrites: 0/u);
 assert.doesNotMatch(deploy, /pages project update|d1 execute|r2 object put/iu);
-const workflow = read('.github/workflows/dependency-review.yml').toString();
+const workflow = read('.github/dependency-review.yml.proposed').toString();
 assert.match(workflow, /actions\/dependency-review-action@[a-f0-9]{40}/u);
 const ruleset = json('docs/production-readiness/phase2-launch-qualification/proposed-main-ruleset.json');
 assert.equal(ruleset.enforcement, 'active');
