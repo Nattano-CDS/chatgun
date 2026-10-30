@@ -3,9 +3,10 @@ import test from 'node:test';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import {
   productionConfiguration, configDiff, preservationChecks, inspectProject,
-  assetManifest, prepareStage
+  assetManifest, prepareStage, deploymentSourceSha
 } from '../scripts/pages-isolated-release.mjs';
 
 const fingerprint=JSON.parse(readFileSync('docs/production-readiness/phase6/production-owner-pilot-fingerprint.json','utf8'));
@@ -96,4 +97,35 @@ test('unsafe source artifacts are rejected before stage or deployment',()=>{
     writeFileSync(join(dist,'.env'),'SECRET=redacted');
     assert.throws(()=>prepareStage(dist,functionsDir,'ed9df39081d2b0a6e2a0ea1ef3815e720a8a5bd4'),/environment/);
   } finally {rmSync(temp,{recursive:true,force:true});}
+});
+
+test('postflight requires canonical Production SHA and does not claim remote assets or secret values',()=>{
+  const temp=mkdtempSync(join(tmpdir(),'chatgun-postfixture-'));
+  try {
+    const before=makeProject(),after=structuredClone(before);
+    const correct='ed9df39081d2b0a6e2a0ea1ef3815e720a8a5bd4';
+    after.canonical_deployment={deployment_trigger:{metadata:{commit_hash:correct}}};
+    assert.equal(deploymentSourceSha(after),correct);
+    const baseline=join(temp,'before.json'),latest=join(temp,'after.json');
+    writeFileSync(baseline,JSON.stringify(before));
+    writeFileSync(latest,JSON.stringify(after));
+    const args=['scripts/pages-isolated-release.mjs','--phase','post','--project','chatgun',
+      '--before',baseline,'--current',latest,'--fingerprint',
+      'docs/production-readiness/phase6/production-owner-pilot-fingerprint.json','--sha',correct];
+    const run=spawnSync(process.execPath,args,{encoding:'utf8'});
+    assert.equal(run.status,0,run.stderr);
+    const result=JSON.parse(run.stdout);
+    assert.equal(result.verdict,'PASS');
+    assert.equal(result.observedProductionSha,correct);
+    assert.equal(result.remoteAssetAndSecretRuntimeChecks,'NOT RUN — separately required');
+    assert.equal(result.productionDeployment,'NOT RUN');
+    const invalid=spawnSync(process.execPath,[...args.slice(0,-1),'f12466ea282355084a2cacb6d165bca20beb3b4c'],{encoding:'utf8'});
+    assert.equal(invalid.status,1);
+    assert.match(invalid.stderr,/Deployed SHA mismatch/);
+  } finally {rmSync(temp,{recursive:true,force:true});}
+});
+test('explicit --deploy is prohibited even for a synthetic invocation',()=>{
+  const run=spawnSync(process.execPath,['scripts/pages-isolated-release.mjs','--deploy'],{encoding:'utf8'});
+  assert.equal(run.status,1);
+  assert.match(run.stderr,/forbidden/);
 });
