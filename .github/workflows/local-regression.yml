@@ -1,0 +1,43 @@
+name: Local security and browser regression (no deployment)
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: chatgun-local-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  local-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # Visual invariants compare against the approved historical SVG source.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm audit --audit-level=high
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+        env:
+          CHATGUN_RELEASE_MODE: default
+          CHATGUN_CANARY_BUILD: 'true'
+      - run: npx playwright test --config=playwright.issue16.config.js
+      - run: npm run build
+        env:
+          CHATGUN_RELEASE_MODE: controlled-beta
+      - run: npx playwright test --config=playwright.platform-local.config.js
+      - run: npx playwright test --config=playwright.full-system-local.config.js
+      - run: npm run build
+        env:
+          CHATGUN_RELEASE_MODE: closed-prelaunch
+          CHATGUN_CANARY_BUILD: 'true'
+      - run: node scripts/test-closed-release.mjs --local
+      # No Cloudflare credentials, remote fixtures, provider calls or deployment steps.
