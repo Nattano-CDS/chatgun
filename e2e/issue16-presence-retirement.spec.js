@@ -3,7 +3,12 @@ import {readFileSync,mkdirSync} from 'node:fs';
 const evidence='docs/issue-16/screens';mkdirSync(evidence,{recursive:true});
 async function login(browser,actor,width){
   const sessions=JSON.parse(readFileSync('/tmp/chatgun-issue16-local-sessions.json','utf8'));
-  const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width,height:900}});
+  const context=await browser.newContext({
+    ignoreHTTPSErrors:true,
+    viewport:{width,height:900},
+    permissions:['geolocation'],
+    geolocation:{latitude:13.75,longitude:100.5,accuracy:10},
+  });
   for(const [name,value] of [['__Host-cg_session',sessions[actor].token],['__Host-cg_csrf',sessions[actor].csrf]])await context.addCookies([{name,value,url:'https://localhost:8797',secure:true,sameSite:'Lax'}]);
   const page=await context.newPage();await page.goto('/');return {context,page};
 }
@@ -14,10 +19,13 @@ for(const width of [390,768,1440]){
     try{
       await expect(owner.page.locator('#social-view')).toBeVisible();
       await owner.page.locator('#primary-nav [data-tab=profile]').click();
-      await owner.page.locator('#online-status-toggle').check();
+      const onlineToggle=owner.page.locator('#online-status-toggle');
+      await expect(onlineToggle).toBeEnabled();await expect(onlineToggle).not.toBeChecked();
+      const preferenceResponse=owner.page.waitForResponse(response=>response.request().method()==='POST'&&new URL(response.url()).pathname==='/api/social/online'&&response.request().postDataJSON()?.action==='preference');
+      await onlineToggle.check();expect((await preferenceResponse).status()).toBe(200);
       await expect.poll(async()=>{const r=await viewer.context.request.get('/api/social/online?users='+ownerId);return (await r.json()).statuses?.[ownerId];}).toBe(true);
       await viewer.page.reload();await expect(viewer.page.locator(`[data-person=${ownerId}] .member-online-slot`)).toHaveText('ออนไลน์');
-      await viewer.page.locator(`[data-person=${ownerId}]`).scrollIntoViewIfNeeded();await viewer.page.screenshot({path:`${evidence}/online-discovery-${width}.png`});
+      await expect.poll(async()=>{try{await viewer.page.locator(`[data-person=${ownerId}]`).scrollIntoViewIfNeeded();return true;}catch{return false;}}).toBe(true);await viewer.page.screenshot({path:`${evidence}/online-discovery-${width}.png`});
       await viewer.page.locator(`[data-person=${ownerId}] .card-open`).click();await expect(viewer.page.locator('.full-name-row .member-online-slot')).toHaveText('ออนไลน์');
       await viewer.page.screenshot({path:`${evidence}/online-profile-${width}.png`});
       await viewer.page.locator('.full-profile-actions [data-action=chat]').click();
