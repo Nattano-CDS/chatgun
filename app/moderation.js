@@ -258,9 +258,14 @@ function renderAccountOperations(items,view){
   for(const item of items){
     const card=node('article',null,'moderation-card');card.dataset.accountItem=item.id;card.dataset.revision=String(item.revision||0);
     card.append(cardHeader(item.subject_name||'สิทธิ์ Beta',new Date(item.created_at*1000).toLocaleString('th-TH'),item.status||item.action),node('p',item.reason));
+    if(view==='account-reconsiderations'){
+      card.append(node('p','การพิจารณานี้ทำโดยผู้ตัดสินเดิม ไม่ใช่การอุทธรณ์อิสระ','moderation-warning'));
+      if(item.evidence_text)card.append(node('p','ข้อมูลเพิ่มเติมจากสมาชิก: '+item.evidence_text));
+    }
     if(item.reviewer_conflict){card.dataset.conflict='true';card.append(node('p','คุณเป็นผู้ตัดสินเดิม จึงไม่สามารถตัดสินคำอุทธรณ์นี้ได้ ต้องให้ผู้ตรวจคนอื่นพิจารณา','error'));}
     const actions=node('div',null,'dialog-actions');
     if(view==='account-restrictions'&&item.status==='active')actions.append(button('คืนสิทธิ์ Beta','account-lift',item.id));
+    if(view==='account-reconsiderations')actions.append(button('ยกเลิกข้อจำกัดหลังพิจารณาใหม่','account-reconsideration','lifted'),button('คงข้อจำกัดหลังพิจารณาใหม่','account-reconsideration','upheld','danger'));
     if(view==='account-appeals')actions.append(button('คืนสิทธิ์ตามอุทธรณ์','account-appeal','lifted'),button('ยืนยันการระงับ','account-appeal','upheld','danger'));
     if(view==='account-appeals'&&item.reviewer_conflict)actions.querySelectorAll('button').forEach(control=>{control.disabled=true;});
     card.append(actions);results.append(card);
@@ -325,7 +330,11 @@ async function load(view = state.view) {
     for(const grant of payload.grants||[]){const card=node('article',undefined,'panel');card.append(node('h3',grant.user_id),node('p',`${grant.role} · หมดอายุ ${new Date(grant.expires_at*1000).toLocaleString('th-TH')}`));if(!grant.revoked_at)card.append(button('ถอนสิทธิ์','role-revoke',grant.id));results.append(card);}
     for(const event of payload.events||[]){const card=node('article',undefined,'panel');card.append(node('h3',event.action+' · '+event.role),node('p',event.reason));results.append(card);}
   }
-  else if(view.startsWith('account-')){const kind={'account-restrictions':'restrictions','account-appeals':'appeals','account-history':'history'}[view];payload=await api('/api/social/moderation/accounts?view='+kind+'&page='+state.page);renderAccountOperations(payload.items||[],view);}
+  else if(view.startsWith('account-')){
+    if(view==='account-reconsiderations')payload=await api('/api/social/moderation/reconsiderations?page='+state.page);
+    else {const kind={'account-restrictions':'restrictions','account-appeals':'appeals','account-history':'history'}[view];payload=await api('/api/social/moderation/accounts?view='+kind+'&page='+state.page);}
+    renderAccountOperations(payload.items||[],view);
+  }
   state.hasMore = Boolean(payload?.hasMore);
   $("#moderation-page").textContent = `หน้า ${state.page.toLocaleString("th-TH")}`;
   $("[data-page='previous']").disabled = state.page <= 1;
@@ -392,6 +401,10 @@ document.addEventListener("click", async (event) => {
       if(action.dataset.action==='account-appeal'){
         body={action:'resolve_appeal',id:card.dataset.accountItem,revision:Number(card.dataset.revision),decision:action.dataset.value,reason};
       }
+      if(action.dataset.action==='account-reconsideration'){
+        body={id:card.dataset.accountItem,revision:Number(card.dataset.revision),decision:action.dataset.value,reason};
+        await api('/api/social/moderation/reconsiderations',{method:'POST',body});await load();return;
+      }
       await api('/api/social/moderation/accounts',{method:'POST',body});await load();return;
     }
     if (action.dataset.action === "media-view") await showMedia(action.dataset.value);
@@ -438,6 +451,7 @@ async function initializeAdmin() {
  for(const view of ['members','deletions'])document.querySelector(`[data-load="${view}"]`).hidden=!grants.canInspectMembers;
  state.accountOps=grants.canModerateAccounts;
  document.querySelectorAll('[data-load]').forEach(el=>{const view=el.dataset.load;if(view.startsWith('account-'))el.hidden=!grants.canModerateAccounts;else if(['priority','pending','approved','sensitive','rejected','appeals','audit'].includes(view))el.hidden=!grants.canReviewMedia;else if(['user-reports','media-reports'].includes(view))el.hidden=!grants.canReviewReports;});
+ document.querySelector('[data-reconsideration]').hidden=!grants.canModerateAccounts||c.accountReconsiderationEnabled!==true;
  const initialView=canOpenOverview?'overview':grants.canManageRoles?'roles':grants.canInspectMembers?'members':grants.canReviewEligibility?'eligibility':null;
  if(!initialView)throw new Error('ไม่มีสิทธิ์: บัญชีนี้ไม่มีบทบาทผู้ดูแลที่อนุญาตให้เปิดส่วนงานใด');
  await load(initialView);

@@ -15,13 +15,15 @@ test('dedicated UAT cannot select Production, original staging or issue13 bindin
 });
 test('UAT deployment explicitly serializes closed flags and real site key into Wrangler config',()=>{
  for(const k of ['OAUTH_LOGIN_ENABLED','NEW_ACCOUNT_REGISTRATION_ENABLED','BETA_INVITATION_REGISTRATION_ENABLED','SENSITIVE_CONTENT_ENABLED','IDENTITY_VERIFICATION_ENABLED','EMAIL_OTP_ENABLED','MOBILE_OTP_ENABLED','DEMO_MODE_ENABLED','MESSAGING_ENABLED','PRESENCE_ENABLED','MEDIA_UPLOAD_ENABLED'])assert.equal(c.vars[k],'false',k);
+ assert.notEqual(c.vars.ACCOUNT_RECONSIDERATION_ENABLED,'true');
  assert.equal(c.vars.BETA_ENROLLMENT_REQUIRED,'true');assert.equal(c.vars.ADMIN_CLOUDFLARE_ACCESS_REQUIRED,'true');assert.equal(c.vars.OAUTH_ENABLED_PROVIDERS,'');assert.match(c.vars.TURNSTILE_SITE_KEY,/^0x4/);
  const deployer=readFileSync('scripts/prepare-final-uat.mjs','utf8');assert.match(deployer,/wrangler\.jsonc',JSON\.stringify\(config\(\)\)/);assert.match(deployer,/assert\.equal\(auth\.oauthLoginEnabled,false\)/);
  assert.ok(!Object.keys(c.vars).some(k=>/SECRET|PEPPER|CLIENT_ID/.test(k)),'Secrets must not be version controlled');
 });
-test('existing schema21 proof stays exact and the always-on cohort migration advances schema locally',()=>{
+test('existing schema21 proof stays exact and later UAT/development migrations remain separately ordered',()=>{
  const proof=JSON.parse(readFileSync('docs/final-uat/schema-verification.json'));
- const files=readdirSync('migrations').filter(n=>/^\d{4}.*\.sql$/.test(n)).sort(),applied=files.slice(0,21);assert.equal(files.length,22);assert.equal(proof.migrationCount,21);assert.equal(proof.foreignKeyViolations,0);
+ const files=readdirSync('migrations').filter(n=>/^\d{4}.*\.sql$/.test(n)).sort(),applied=files.slice(0,21);assert.equal(files.length,23);assert.equal(proof.migrationCount,21);assert.equal(proof.foreignKeyViolations,0);
  assert.deepEqual(proof.checksums,applied.map(name=>({name,sha256:createHash('sha256').update(readFileSync('migrations/'+name)).digest('hex')})));
  assert.equal(files[21],'0022_always_on_private_uat_cohort.sql');
+ assert.equal(files[22],'0023_account_reconsiderations.sql');
 });
