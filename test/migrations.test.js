@@ -16,11 +16,12 @@ test("migration is idempotent and creates required tables and indexes", () => {
   database.exec(readFileSync("migrations/0020_age_hold_write_guards.sql", "utf8"));
   database.exec(readFileSync("migrations/0021_eligibility_review_requests.sql", "utf8"));
   database.exec(readFileSync("migrations/0022_always_on_private_uat_cohort.sql", "utf8"));
+  database.exec(readFileSync("migrations/0023_account_reconsiderations.sql", "utf8"));
   const tables = database.database.prepare(
     "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name",
   ).all().map(({ name }) => name);
   assert.deepEqual(tables, [
-    "eligibility_review_requests", "eligibility_review_events", "administration_access_events", "account_safety_notifications",
+    "eligibility_review_requests", "eligibility_review_events", "administration_access_events", "account_safety_notifications", "account_reconsiderations", "account_reconsideration_events",
     "cloudflare_admin_sessions", "member_age_safety_holds",
     "beta_account_restrictions", "beta_account_appeals", "beta_account_moderation_events", "album_access_grants", "album_access_requests", "chat_initiations", "chat_preferences", "chat_system_events", "account_acceptances", "account_deletion_requests", "age_assurance_events", "beta_enrollments", "beta_invitations", "deletion_receipts", "identities",
     "identity_verification_requests", "independent_age_assurances", "media_appeals", "media_deletion_queue", "media_moderation_decisions", "media_reports",
@@ -34,7 +35,7 @@ test("migration is idempotent and creates required tables and indexes", () => {
     "SELECT name FROM sqlite_master WHERE type = 'index' AND name LIKE 'idx_%' ORDER BY name",
   ).all().map(({ name }) => name);
   assert.deepEqual(indexes, [
-    "idx_cloudflare_admin_sessions_user", "idx_cloudflare_admin_sessions_expiry",
+    "idx_cloudflare_admin_sessions_user", "idx_cloudflare_admin_sessions_expiry", "idx_account_reconsiderations_queue", "idx_account_reconsideration_events_created",
     "idx_beta_restriction_active", "idx_beta_appeals_queue", "idx_messages_client_request", "idx_discovery_candidates",
     "idx_album_owner_status", "idx_album_viewer_status", "idx_chat_events_owner", "idx_chat_events_requester", "idx_chat_initiations_daily", "idx_photo_visibility", "idx_account_acceptances_user_accepted", "idx_age_assurance_user", "idx_beta_enrollments_status", "idx_beta_invitations_available", "idx_blocks_blocked", "idx_deletion_receipts_expiry",
     "idx_deletion_requests_expiry", "idx_identities_user", "idx_independent_age_user_status", "idx_media_appeals_status_created", "idx_media_decisions_actor_created",

@@ -373,6 +373,7 @@ async function config(env) {
     moderationCoverage: socialAppEnabled && env.UAT_ACCESS_MODE === "always-on-until-explicit-close" ? moderationCoverage() : null,
     adminAccessStandaloneEnabled: standaloneAdminEnabled(env),
     accountModerationEnabled: socialAppEnabled && enabled(env.ACCOUNT_MODERATION_ENABLED),
+    accountReconsiderationEnabled: socialAppEnabled && enabled(env.ACCOUNT_MODERATION_ENABLED) && enabled(env.ACCOUNT_RECONSIDERATION_ENABLED),
     gameEnabled: false,
     emailOtpEnabled: false,
     mobileOtpEnabled: false,
@@ -1618,12 +1619,111 @@ async function accountAppeals(request,env){
   if(reason.length<10)throw new SocialError('invalid_reason','กรุณาระบุเหตุผลอย่างน้อย 10 ตัวอักษร');
   const restriction=await env.DB.prepare("SELECT id FROM beta_account_restrictions WHERE id=? AND user_id=? AND status='active'").bind(id,session.user_id).first();
   if(!restriction)throw new SocialError('not_found','ไม่พบสิทธิ์อุทธรณ์นี้',404);
+  const pendingReconsideration=await env.DB.prepare("SELECT 1 ok FROM account_reconsiderations WHERE restriction_id=? AND user_id=? AND status='pending'").bind(id,session.user_id).first();
+  if(pendingReconsideration)throw new SocialError('review_path_conflict','มีคำขอให้ผู้ตัดสินเดิมพิจารณาใหม่อยู่แล้ว กรุณารอผลก่อนยื่นอุทธรณ์อิสระ',409);
   const now=unixTime();
   try{await env.DB.batch([
     env.DB.prepare("INSERT INTO beta_account_appeals(id,restriction_id,user_id,reason,created_at) VALUES(?,?,?,?,?)").bind(safeUuid(),id,session.user_id,reason,now),
     env.DB.prepare("INSERT INTO beta_account_moderation_events(id,restriction_id,actor_user_id,action,reason,created_at) VALUES(?,?,?,'appeal','Member submitted authenticated account appeal',?)").bind(safeUuid(),id,session.user_id,now),
   ]);}catch(e){if(String(e.message).includes('UNIQUE'))throw new SocialError('appeal_exists','ส่งคำอุทธรณ์แล้ว',409);throw e;}
   return json({ok:true},201);
+}
+
+async function accountReconsiderations(request,env){
+  capability(env,'SOCIAL_APP_ENABLED');capability(env,'ACCOUNT_MODERATION_ENABLED');capability(env,'ACCOUNT_RECONSIDERATION_ENABLED');
+  const session=await authenticated(request,env,{csrf:request.method==='POST',allowRevokedEnrollment:true});
+  if(request.method==='GET'){
+    const restrictions=await env.DB.prepare(`SELECT r.id,r.status,r.reason,r.created_at,r.resolution_reason,r.revision,
+      c.id reconsideration_id,c.status reconsideration_status,c.reason reconsideration_reason,
+      c.evidence_text,c.decision_reason,c.created_at reconsideration_created_at
+      FROM beta_account_restrictions r
+      LEFT JOIN account_reconsiderations c ON c.restriction_id=r.id AND c.user_id=?
+      WHERE r.user_id=? ORDER BY r.created_at DESC LIMIT 50`).bind(session.user_id,session.user_id).all();
+    return json({
+      reviewType:'same_operator_reconsideration',
+      independent:false,
+      disclosure:'คำขอพิจารณาใหม่นี้ตรวจโดยผู้ตัดสินเดิม ไม่ใช่การอุทธรณ์โดยผู้ตรวจอิสระ',
+      restrictions:restrictions.results||[],
+    });
+  }
+  if(!hasRecentAuthentication(session))throw new SocialError('recent_auth_required','กรุณาเข้าสู่ระบบอีกครั้งก่อนส่งคำขอพิจารณาใหม่',428);
+  await limited(env,'account_reconsideration_day',session.user_id,3,86400);
+  const body=await readJson(request),id=identifier(body.id),reason=cleanText(body.reason,1000,{required:true});
+  const evidenceText=cleanText(body.evidenceText,2000);
+  if(reason.length<10)throw new SocialError('invalid_reason','กรุณาระบุเหตุผลอย่างน้อย 10 ตัวอักษร');
+  if(evidenceText&&evidenceText.length<10)throw new SocialError('invalid_evidence','ข้อมูลเพิ่มเติมต้องยาวอย่างน้อย 10 ตัวอักษร');
+  const restriction=await env.DB.prepare("SELECT id,revision FROM beta_account_restrictions WHERE id=? AND user_id=? AND status='active'").bind(id,session.user_id).first();
+  if(!restriction)throw new SocialError('not_found','ไม่พบรายการจำกัดสิทธิ์ที่ขอพิจารณาใหม่ได้',404);
+  const pendingAppeal=await env.DB.prepare("SELECT 1 ok FROM beta_account_appeals WHERE restriction_id=? AND user_id=? AND status='pending'").bind(id,session.user_id).first();
+  if(pendingAppeal)throw new SocialError('review_path_conflict','มีคำอุทธรณ์อิสระอยู่แล้ว กรุณารอผลก่อนส่งคำขอพิจารณาใหม่',409);
+  const now=unixTime(),reconsiderationId=safeUuid();
+  try{
+    const results=await env.DB.batch([
+      env.DB.prepare(`INSERT INTO account_reconsiderations(id,restriction_id,user_id,reason,evidence_text,restriction_revision,created_at)
+        SELECT ?,id,?,?,?,?,? FROM beta_account_restrictions
+        WHERE id=? AND user_id=? AND status='active' AND revision=?
+          AND NOT EXISTS(SELECT 1 FROM beta_account_appeals WHERE restriction_id=? AND user_id=? AND status='pending')`)
+        .bind(reconsiderationId,session.user_id,reason,evidenceText||null,restriction.revision,now,id,session.user_id,restriction.revision,id,session.user_id),
+      env.DB.prepare(`INSERT INTO account_reconsideration_events(id,reconsideration_id,restriction_id,actor_user_id,action,reason,created_at)
+        SELECT ?,id,restriction_id,user_id,'requested','Member submitted same-operator reconsideration',? FROM account_reconsiderations WHERE id=?`)
+        .bind(safeUuid(),now,reconsiderationId),
+    ]);
+    if(!Number(results[0]?.meta?.changes||0))throw new SocialError('decision_conflict','สถานะรายการเปลี่ยนแปลงแล้ว กรุณาโหลดใหม่',409);
+  }catch(error){
+    if(error instanceof SocialError)throw error;
+    if(String(error.message).includes('UNIQUE'))throw new SocialError('reconsideration_exists','ส่งคำขอพิจารณาใหม่สำหรับรายการนี้แล้ว',409);
+    throw error;
+  }
+  return json({ok:true,reviewType:'same_operator_reconsideration',independent:false},201);
+}
+
+async function moderationReconsiderations(request,env){
+  capability(env,'ACCOUNT_MODERATION_ENABLED');capability(env,'ACCOUNT_RECONSIDERATION_ENABLED');
+  const{session,purpose}=await moderationAccess(request,env,['safety_admin']);
+  if(request.method==='GET'){
+    const paging=queuePage(request);
+    const rows=await env.DB.prepare(`SELECT c.id,c.restriction_id,c.reason,c.evidence_text,c.status,c.revision,c.created_at,
+      p.name subject_name,r.reason restriction_reason,r.created_by=? original_decision_maker
+      FROM account_reconsiderations c JOIN beta_account_restrictions r ON r.id=c.restriction_id
+      LEFT JOIN member_profiles p ON p.user_id=c.user_id
+      WHERE c.status='pending' AND r.status='active' AND r.created_by=?
+      ORDER BY c.created_at,c.id LIMIT ? OFFSET ?`).bind(session.user_id,session.user_id,paging.limit+1,paging.offset).all();
+    await env.DB.prepare(`INSERT INTO account_reconsideration_events(id,actor_user_id,action,reason,created_at)
+      VALUES(?,?,'queue_view',?,?)`).bind(safeUuid(),session.user_id,purpose,unixTime()).run();
+    return queueResult(rows,'items',paging);
+  }
+  await limited(env,'account_reconsideration_decision_hour',session.user_id,20,3600);
+  const body=await readJson(request),id=identifier(body.id),reason=cleanText(body.reason,300,{required:true}),now=unixTime();
+  if(!['upheld','lifted'].includes(body.decision))throw new SocialError('invalid_action','ผลการพิจารณาใหม่ไม่ถูกต้อง');
+  if(!Number.isSafeInteger(body.revision)||body.revision<0)throw new SocialError('revision_required','กรุณาโหลดสถานะใหม่',409);
+  if(reason.length<10)throw new SocialError('invalid_reason','กรุณาระบุเหตุผลอย่างน้อย 10 ตัวอักษร');
+  const item=await env.DB.prepare(`SELECT c.*,r.user_id restriction_user_id,r.status restriction_status,r.revision current_restriction_revision,r.created_by
+    FROM account_reconsiderations c JOIN beta_account_restrictions r ON r.id=c.restriction_id
+    WHERE c.id=? AND c.status='pending' AND c.revision=?`).bind(id,body.revision).first();
+  if(!item)throw new SocialError('decision_conflict','คำขอนี้ถูกดำเนินการหรือแก้ไขแล้ว',409);
+  if(item.created_by!==session.user_id)throw new SocialError('original_decision_maker_required','คำขอพิจารณาใหม่ต้องดำเนินการโดยผู้ตัดสินเดิม',403);
+  if(item.restriction_status!=='active'||item.current_restriction_revision!==item.restriction_revision)throw new SocialError('decision_conflict','สถานะการจำกัดสิทธิ์เปลี่ยนแปลงแล้ว กรุณาโหลดใหม่',409);
+  const lift=body.decision==='lifted',nonce=safeUuid(),nextReconsiderationRevision=item.revision+1,nextRestrictionRevision=item.restriction_revision+1;
+  const statements=[
+    env.DB.prepare(`UPDATE account_reconsiderations SET status=?,decided_by=?,decided_at=?,decision_reason=?,revision=revision+1,decision_nonce=?
+      WHERE id=? AND status='pending' AND revision=? AND restriction_revision=?
+        AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=account_reconsiderations.restriction_id AND status='active' AND revision=? AND created_by=?)`)
+      .bind(body.decision,session.user_id,now,reason,nonce,id,item.revision,item.restriction_revision,item.restriction_revision,session.user_id),
+    env.DB.prepare(`UPDATE beta_account_restrictions SET status=?,resolved_by=?,resolved_at=?,resolution_reason=?,revision=revision+1,decision_nonce=?
+      WHERE id=? AND status='active' AND revision=? AND created_by=?
+        AND EXISTS(SELECT 1 FROM account_reconsiderations WHERE id=? AND decision_nonce=?)`)
+      .bind(lift?'lifted':'active',session.user_id,now,reason,nonce,item.restriction_id,item.restriction_revision,session.user_id,id,nonce),
+  ];
+  if(lift)statements.push(env.DB.prepare(`UPDATE beta_enrollments SET status='active',revoked_at=NULL
+    WHERE user_id=? AND status='revoked' AND EXISTS(SELECT 1 FROM users WHERE id=? AND status='active' AND account_state='active')
+      AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=? AND status='lifted' AND decision_nonce=?)`)
+    .bind(item.restriction_user_id,item.restriction_user_id,item.restriction_id,nonce));
+  statements.push(env.DB.prepare(`INSERT INTO account_reconsideration_events(id,reconsideration_id,restriction_id,actor_user_id,action,reason,revision,created_at)
+    SELECT ?,id,restriction_id,?,?,?, ?,? FROM account_reconsiderations WHERE id=? AND decision_nonce=?`)
+    .bind(safeUuid(),session.user_id,lift?'lifted':'upheld',`${purpose}; ${reason}`.slice(0,300),nextReconsiderationRevision,now,id,nonce));
+  const results=await env.DB.batch(statements);
+  if(!Number(results[0]?.meta?.changes||0)||!Number(results[1]?.meta?.changes||0))throw new SocialError('decision_conflict','ข้อมูลถูกแก้ไขแล้ว',409);
+  return json({ok:true,reviewType:'same_operator_reconsideration',independent:false,restrictionRevision:nextRestrictionRevision});
 }
 
 async function moderationAccounts(request,env){
@@ -2445,7 +2545,9 @@ export async function onRequest({ request, env }) {
       return await eligibilityModeration(request, env, await moderationAccess(request, env, ['safety_admin']));
     }
     if (path === '/api/social/account-appeals' && ['GET','POST'].includes(request.method)) return await accountAppeals(request,env);
+    if (path === '/api/social/account-reconsiderations' && ['GET','POST'].includes(request.method)) return await accountReconsiderations(request,env);
     if (path === '/api/social/moderation/accounts' && ['GET','POST'].includes(request.method)) return await moderationAccounts(request,env);
+    if (path === '/api/social/moderation/reconsiderations' && ['GET','POST'].includes(request.method)) return await moderationReconsiderations(request,env);
     if (path === "/api/social/moderation/roles" && ["GET", "POST"].includes(request.method)) return await moderationRoleManagement(request, env);
     if (path === "/api/social/moderation/reports" && ["GET", "POST"].includes(request.method)) return await moderationReports(request, env);
     if (path === "/api/social/moderation/media-reports" && ["GET", "POST"].includes(request.method)) return await moderationMediaReports(request, env);
