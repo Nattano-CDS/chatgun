@@ -126,6 +126,8 @@ test("moderation UI auto-loads routine overview, justifies restricted evidence, 
   assert.match(moderationScript, /__Host-cg_csrf/u);
   assert.match(moderationScript, /\/api\/social\/moderation\/media/u);
   assert.match(moderationScript, /media-view/u);
+  assert.match(moderationScript, /item\.reviewer_conflict\)actions\.querySelectorAll\('button'\)\.forEach\(control=>\{control\.disabled=true;\}\)/u);
+  assert.doesNotMatch(moderationScript, /conflictAcknowledged|ไม่มีผู้ทบทวนอิสระ[^\n]+confirm/u);
 });
 
 test("staging social and private media activation remain isolated from production", () => {

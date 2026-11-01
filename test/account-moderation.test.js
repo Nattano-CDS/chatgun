@@ -1,11 +1,11 @@
 import test from'node:test';import assert from'node:assert/strict';import{TestD1,environment}from'./helpers/d1.js';import{issueSession,unixTime}from'../functions/_lib/db.js';import{onRequest}from'../functions/api/social/[[path]].js';import{ownerPilotVars,approvedOwnerPilot}from'../scripts/lib/owner-pilot-release.mjs';
 import {eligibleSql,canContact} from '../functions/_lib/social-permissions.js';
-async function setup(){const db=new TestD1(),now=unixTime(),sessions={};for(const id of['admin','member','other']){
+async function setup(){const db=new TestD1(),now=unixTime(),sessions={};for(const id of['admin','independent','member','other']){
  await db.prepare("INSERT INTO users(id,status,account_state,created_at,updated_at)VALUES(?,'active','active',?,?)").bind(id,now,now).run();
  await db.prepare("INSERT INTO age_assurance_events(id,user_id,age_band,method,notice_version,declared_at)VALUES(?,?,'adult_18_plus','self_declaration','v1',?)").bind(id,id,now).run();
  await db.prepare("INSERT INTO member_profiles(user_id,age_assurance_id,name,created_at,updated_at)VALUES(?,?,?,?,?)").bind(id,id,id,now,now).run();
  await db.prepare("INSERT INTO beta_enrollments(user_id,status,created_at,activated_at)VALUES(?,'active',?,?)").bind(id,now,now).run();sessions[id]=await issueSession(db,id,now);
- }await db.prepare("INSERT INTO moderation_roles(user_id,role,created_at)VALUES('admin','safety_admin',?)").bind(now).run();
+ }for(const id of['admin','independent'])await db.prepare("INSERT INTO moderation_roles(user_id,role,created_at)VALUES(?,'safety_admin',?)").bind(id,now).run();
  await db.prepare("INSERT INTO social_reports(id,reporter_user_id,subject_user_id,category,details,created_at)VALUES('case','other','member','harassment','Local fixture',?)").bind(now).run();
  const env={...environment(db),SOCIAL_APP_ENABLED:'true',MODERATION_TOOLS_ENABLED:'true',ACCOUNT_MODERATION_ENABLED:'true',PUBLIC_DISCOVERY_ENABLED:'true',MESSAGING_ENABLED:'true',PRESENCE_ENABLED:'true'};
  function request(path,actor,body,extra={}){const s=sessions[actor],headers={cookie:s?`__Host-cg_session=${s.token}; __Host-cg_csrf=${s.csrf}`:'','x-moderation-purpose':'Investigate authorized synthetic safety case',...extra};if(body)Object.assign(headers,{origin:'https://chatgun.pages.dev','content-type':'application/json','x-csrf-token':s?.csrf||''});return onRequest({env,request:new Request('https://chatgun.pages.dev'+path,{method:body?'POST':'GET',headers,body:body?JSON.stringify(body):undefined})});}
@@ -32,7 +32,7 @@ test('public members without Beta enrollment can be suspended, appeal and recove
  }finally{db.close();}
 });
 test('approved Admin scope changes only moderation; public signup and every social/media wave stay closed',()=>{const receipt=approvedOwnerPilot(),base=ownerPilotVars(receipt),admin=ownerPilotVars(receipt,{ownerAdmin:true});assert.deepEqual(Object.keys(base).filter(k=>base[k]!==admin[k]),['MODERATION_TOOLS_ENABLED']);assert.equal(admin.MODERATION_TOOLS_ENABLED,'true');});
-test('Beta suspension revokes sessions, denies social access, preserves account and permits authenticated appeal with conflict audit',async()=>{const{db,request,sessions}=await setup();try{
+test('Beta suspension revokes sessions, denies social access and requires a different reviewer for appeal',async()=>{const{db,request,sessions}=await setup();try{
  const suspend=await request('/api/social/moderation/accounts','admin',{action:'suspend',reportId:'case',reason:'Suspend controlled Beta access for safety investigation'});assert.equal(suspend.status,201);
  const restriction=await db.prepare('SELECT id,revision FROM beta_account_restrictions').first();
  assert.equal((await request('/api/social/profile','member')).status,401);
@@ -44,10 +44,13 @@ test('Beta suspension revokes sessions, denies social access, preserves account 
  const list=await(await request('/api/social/moderation/accounts?view=appeals','admin')).json();assert.equal(list.items[0].reviewer_conflict,1);
  const decision={action:'resolve_appeal',id:list.items[0].id,revision:0,decision:'lifted',reason:'Review confirms restriction may be safely lifted'};
  assert.equal((await request('/api/social/moderation/accounts','admin',decision)).status,409);
- assert.equal((await request('/api/social/moderation/accounts','admin',{...decision,conflictAcknowledged:true})).status,200);
- assert.equal((await request('/api/social/profile','member')).status,200);
  assert.equal((await request('/api/social/moderation/accounts','admin',{...decision,conflictAcknowledged:true})).status,409);
- const events=(await db.prepare("SELECT action,reason FROM beta_account_moderation_events WHERE action<>'queue_view' ORDER BY created_at,action").all()).results;assert.equal(events.length,3);assert.ok(events.some(e=>e.reason.includes('conflict acknowledged')));assert.equal((await db.prepare('SELECT COUNT(*) n FROM users').first()).n,3);assert.equal(db.database.prepare('PRAGMA foreign_key_check').all().length,0);
+ assert.equal((await db.prepare("SELECT status,reviewed_by FROM beta_account_appeals").first()).status,'pending');
+ const independentList=await(await request('/api/social/moderation/accounts?view=appeals','independent')).json();assert.equal(independentList.items[0].reviewer_conflict,0);
+ assert.equal((await request('/api/social/moderation/accounts','independent',decision)).status,200);
+ assert.equal((await request('/api/social/profile','member')).status,200);
+ assert.equal((await request('/api/social/moderation/accounts','independent',decision)).status,409);
+ const events=(await db.prepare("SELECT action,actor_user_id,reason FROM beta_account_moderation_events WHERE action<>'queue_view' ORDER BY created_at,action").all()).results;assert.equal(events.length,3);assert.equal(events.find(e=>e.action==='appeal_lifted').actor_user_id,'independent');assert.equal((await db.prepare('SELECT COUNT(*) n FROM users').first()).n,4);assert.equal(db.database.prepare('PRAGMA foreign_key_check').all().length,0);
  }finally{db.close();}});
 test('account moderation is default off, role/CSRF/recent-auth guarded and prevents self or privileged suspension',async()=>{const{db,env,request}=await setup();try{
  env.ACCOUNT_MODERATION_ENABLED='false';assert.equal((await request('/api/social/moderation/accounts','admin')).status,404);env.ACCOUNT_MODERATION_ENABLED='true';

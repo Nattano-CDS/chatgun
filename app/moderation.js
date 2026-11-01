@@ -258,10 +258,11 @@ function renderAccountOperations(items,view){
   for(const item of items){
     const card=node('article',null,'moderation-card');card.dataset.accountItem=item.id;card.dataset.revision=String(item.revision||0);
     card.append(cardHeader(item.subject_name||'สิทธิ์ Beta',new Date(item.created_at*1000).toLocaleString('th-TH'),item.status||item.action),node('p',item.reason));
-    if(item.reviewer_conflict){card.dataset.conflict='true';card.append(node('p','คุณเป็นผู้ตัดสินเดิม การทบทวนนี้ไม่ใช่การตรวจสอบอิสระ ต้องบันทึกข้อขัดแย้ง','error'));}
+    if(item.reviewer_conflict){card.dataset.conflict='true';card.append(node('p','คุณเป็นผู้ตัดสินเดิม จึงไม่สามารถตัดสินคำอุทธรณ์นี้ได้ ต้องให้ผู้ตรวจคนอื่นพิจารณา','error'));}
     const actions=node('div',null,'dialog-actions');
     if(view==='account-restrictions'&&item.status==='active')actions.append(button('คืนสิทธิ์ Beta','account-lift',item.id));
     if(view==='account-appeals')actions.append(button('คืนสิทธิ์ตามอุทธรณ์','account-appeal','lifted'),button('ยืนยันการระงับ','account-appeal','upheld','danger'));
+    if(view==='account-appeals'&&item.reviewer_conflict)actions.querySelectorAll('button').forEach(control=>{control.disabled=true;});
     card.append(actions);results.append(card);
   }
 }
@@ -389,8 +390,7 @@ document.addEventListener("click", async (event) => {
       if(action.dataset.action==='account-suspend')body={action:'suspend',reportId:action.dataset.value,reason};
       if(action.dataset.action==='account-lift')body={action:'lift',id:action.dataset.value,revision:Number(card.dataset.revision),reason};
       if(action.dataset.action==='account-appeal'){
-        const conflict=card.dataset.conflict==='true';if(conflict&&!confirm('คุณเป็นผู้ตัดสินเดิม ไม่มีผู้ทบทวนอิสระ ยืนยันว่าบันทึกข้อขัดแย้งและดำเนินการตามขั้นตอนที่เจ้าของอนุมัติแล้วหรือไม่?'))return;
-        body={action:'resolve_appeal',id:card.dataset.accountItem,revision:Number(card.dataset.revision),decision:action.dataset.value,reason,conflictAcknowledged:conflict};
+        body={action:'resolve_appeal',id:card.dataset.accountItem,revision:Number(card.dataset.revision),decision:action.dataset.value,reason};
       }
       await api('/api/social/moderation/accounts',{method:'POST',body});await load();return;
     }
