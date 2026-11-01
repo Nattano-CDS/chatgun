@@ -1680,7 +1680,7 @@ async function moderationAccounts(request,env){
       restriction=await env.DB.prepare("SELECT * FROM beta_account_restrictions WHERE id=? AND status='active'").bind(appeal.restriction_id).first();
     }else restriction=await env.DB.prepare("SELECT * FROM beta_account_restrictions WHERE id=? AND status='active' AND revision=?").bind(identifier(body.id),body.revision).first();
     if(!restriction||!restriction.user_id||restriction.user_id===session.user_id)throw new SocialError('decision_conflict','ไม่พบรายการที่ดำเนินการได้',409);
-    if(appeal&&restriction.created_by===session.user_id&&body.conflictAcknowledged!==true)throw new SocialError('reviewer_conflict','ผู้ตัดสินเดิมต้องบันทึกข้อขัดแย้งและยืนยันการทบทวนที่ไม่เป็นอิสระ',409);
+    if(appeal&&restriction.created_by===session.user_id)throw new SocialError('independent_reviewer_required','ผู้ตัดสินเดิมไม่สามารถตัดสินคำอุทธรณ์นี้ได้ ต้องให้ผู้ตรวจคนอื่นพิจารณา',409);
     const lift=!appeal||body.decision==='lifted',revision=restriction.revision+1,statements=[],nonce=safeUuid();
     if(appeal)statements.push(env.DB.prepare(`UPDATE beta_account_appeals SET status=?,reviewed_by=?,reviewed_at=?,decision_reason=?,revision=revision+1,decision_nonce=?
       WHERE id=? AND status='pending' AND revision=? AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=? AND status='active' AND revision=?)`).bind(body.decision,session.user_id,now,reason,nonce,appeal.id,body.revision,restriction.id,restriction.revision));
@@ -1690,7 +1690,7 @@ async function moderationAccounts(request,env){
       WHERE user_id=? AND status='revoked' AND EXISTS(SELECT 1 FROM users WHERE id=? AND status='active' AND account_state='active')
         AND EXISTS(SELECT 1 FROM beta_account_restrictions WHERE id=? AND status='lifted' AND decision_nonce=?)`).bind(restriction.user_id,restriction.user_id,restriction.id,nonce));
     statements.push(env.DB.prepare(`INSERT INTO beta_account_moderation_events(id,restriction_id,actor_user_id,action,reason,revision,created_at)
-      SELECT ?,id,?,?,?,?,? FROM beta_account_restrictions WHERE id=? AND decision_nonce=?`).bind(safeUuid(),session.user_id,appeal?(lift?'appeal_lifted':'appeal_upheld'):'lift',`${purpose}; ${reason}${appeal&&restriction.created_by===session.user_id?'; original reviewer conflict acknowledged':''}`.slice(0,300),revision,now,restriction.id,nonce));
+      SELECT ?,id,?,?,?,?,? FROM beta_account_restrictions WHERE id=? AND decision_nonce=?`).bind(safeUuid(),session.user_id,appeal?(lift?'appeal_lifted':'appeal_upheld'):'lift',`${purpose}; ${reason}`.slice(0,300),revision,now,restriction.id,nonce));
     const results=await env.DB.batch(statements);if(!results[0]?.meta.changes)throw new SocialError('decision_conflict','ข้อมูลถูกแก้ไขแล้ว',409);
     return json({ok:true});
   }

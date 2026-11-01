@@ -34,7 +34,7 @@ technical capability must remain disabled until named people are assigned the ro
 | High-risk escalation | Named safety owner with a reachable escalation channel |
 | Media review | Trained `safety_admin`; no reviewer may use a shared account |
 | Privacy/security incident | Named technical owner for location, access, and deletion failures |
-| Appeals | Different reviewer from the original decision where possible |
+| Appeals | A different reviewer from the original decision is mandatory; if none is available, adjudication remains blocked |
 
 Role assignment and revocation follow `admin-access-role-management.md`. An admin role alone does
 not reveal case queues or private evidence, and reviewer roles cannot manage access.
@@ -144,7 +144,9 @@ enabled.
 
 ## Appeals and quality
 
-Appeals must be reviewed by someone other than the original decision-maker when possible.
+Appeals must be reviewed by someone other than the original decision-maker. The server rejects
+self-review even when the reviewer acknowledges the conflict; if no independent reviewer is
+available, the appeal remains pending and no final adjudication may be recorded.
 Track reversals and category-specific error rates. Sample closed cases for consistency and
 misuse. Audit searches, bulk access, unusual reviewer volume, after-hours access, and access
 without a valid purpose. Suspend tools on audit failure. Publish response targets only after
